@@ -18,6 +18,7 @@ import kexie.android.dng.entity.desktop.Function;
 import kexie.android.dng.entity.desktop.User;
 import kexie.android.dng.view.users.UsersActivity;
 import kexie.android.dng.viewmodel.desktop.DesktopViewModel;
+import kexie.android.navi.view.RouteQueryActivity;
 
 public class DesktopActivity extends AppCompatActivity
 {
@@ -91,12 +92,13 @@ public class DesktopActivity extends AppCompatActivity
             break;
             case "导航":
             {
-
+                RouteQueryActivity.startOf(this);
             }
             break;
             case "个人信息":
             {
-                UsersActivity.startOf(DesktopActivity.this);
+
+                UsersActivity.startOf(this);
             }
             break;
             case "多媒体":

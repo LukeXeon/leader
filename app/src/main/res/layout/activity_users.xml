@@ -20,22 +20,25 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:background="@android:color/transparent"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_width="250dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="110dp"
+            android:layout_marginLeft="80dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
             <FrameLayout
+                android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
                 <android.support.v7.widget.CardView
+                    android:layout_marginLeft="10dp"
                     android:layout_width="250dp"
-                    android:layout_height="140dp"
+                    android:layout_height="100dp"
                     android:layout_gravity="center"
                     app:cardBackgroundColor="@color/lightblue300"
                     app:cardCornerRadius="20dp"
@@ -43,33 +46,35 @@
                     app:cardUseCompatPadding="false">
 
                     <TextView
-                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|left"
                         android:layout_marginLeft="30dp"
                         android:hint="刷新"
                         android:textColorHint="@android:color/white"
-                        android:textSize="50sp"/>
+                        android:textSize="40sp"/>
                 </android.support.v7.widget.CardView>
             </FrameLayout>
 
             <FrameLayout
+                android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
                 <android.support.v7.widget.CardView
+                    android:layout_marginLeft="10dp"
                     android:layout_width="250dp"
-                    android:layout_height="140dp"
-                    android:layout_gravity="center"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center|top"
                     app:cardBackgroundColor="@color/red300"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="10dp"
                     app:cardUseCompatPadding="false">
 
                     <TextView
-                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:textStyle="bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center|left"
@@ -77,18 +82,19 @@
                         android:hint="返回"
                         android:onClick="@{()->handler.finish()}"
                         android:textColorHint="@android:color/white"
-                        android:textSize="50sp"/>
+                        android:textSize="40sp"/>
                 </android.support.v7.widget.CardView>
             </FrameLayout>
         </LinearLayout>
 
         <android.support.v7.widget.CardView
+            android:transitionName="card"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="270dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="110dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="220dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="120dp"
+            android:layout_marginBottom="20dp"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="40dp"
             app:cardElevation="10dp"
