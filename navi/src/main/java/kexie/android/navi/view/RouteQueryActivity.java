@@ -1,17 +1,19 @@
 package kexie.android.navi.view;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.SearchView;
+
+import java.util.List;
 
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.ActivityRouteQueryBinding;
+import kexie.android.navi.entity.Route;
 import kexie.android.navi.viewmodel.RouteQueryViewModel;
 
 public class RouteQueryActivity extends AppCompatActivity
@@ -27,11 +29,18 @@ public class RouteQueryActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this,
                 R.layout.activity_route_query);
 
-        setSupportActionBar(binding.tbToolBar);
-        getSupportActionBar().setTitle("");
-
         viewModel = ViewModelProviders.of(this)
                 .get(RouteQueryViewModel.class);
+
+        viewModel.getRoutes().observe(this,
+                new Observer<List<Route>>()
+                {
+                    @Override
+                    public void onChanged(@Nullable List<Route> routes)
+                    {
+
+                    }
+                });
     }
 
 

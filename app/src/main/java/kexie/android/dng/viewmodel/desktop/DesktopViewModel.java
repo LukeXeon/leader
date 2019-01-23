@@ -33,7 +33,7 @@ import io.reactivex.schedulers.Schedulers;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.desktop.Function;
 import kexie.android.dng.entity.desktop.User;
-import kexie.android.common.widget.ZoomTransformation;
+import kexie.android.common.util.ZoomTransformation;
 import okhttp3.OkHttpClient;
 
 public class DesktopViewModel

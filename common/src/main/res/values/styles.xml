@@ -12,4 +12,9 @@
                
         <item name="android:windowContentOverlay">@null</item>
     </style>
+    <style name="menu_labels_style">
+        <item name="android:textSize">25sp</item>
+        <item name="android:background">@drawable/draw_text_background_black</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

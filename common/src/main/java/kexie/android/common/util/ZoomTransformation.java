@@ -1,4 +1,4 @@
-package kexie.android.common.widget;
+package kexie.android.common.util;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

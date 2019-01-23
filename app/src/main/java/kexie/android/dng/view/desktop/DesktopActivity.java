@@ -2,8 +2,10 @@ package kexie.android.dng.view.desktop;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -97,8 +99,11 @@ public class DesktopActivity extends AppCompatActivity
             break;
             case "个人信息":
             {
-
-                UsersActivity.startOf(this);
+                this.startActivity(new Intent(this,
+                                UsersActivity.class),
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                                binding.cvCardView,
+                                "card").toBundle());
             }
             break;
             case "多媒体":

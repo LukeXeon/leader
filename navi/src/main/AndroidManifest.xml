@@ -3,8 +3,11 @@
           package="kexie.android.navi">
 
     <application
+
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        <activity android:name=".view.RouteQueryActivity">
+        <activity
+            android:screenOrientation="landscape"
+            android:name=".view.RouteQueryActivity">
         </activity>
     </application>
 

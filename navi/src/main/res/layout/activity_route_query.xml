@@ -4,63 +4,122 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable
+            name="adapter"
+            type="android.support.v4.view.PagerAdapter"/>
     </data>
 
-    <android.support.design.widget.CoordinatorLayout
+    <LinearLayout
+        mipmapBackground='@{"image_background"}'
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
-            <android.support.design.widget.CollapsingToolbarLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:contentScrim="@color/lightblue300"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                android:layout_height="match_parent">
 
                 <kexie.android.navi.widget.MapView
+                    android:id="@+id/mv_map"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_collapseMode="parallax"/>
+                    android:layout_height="match_parent">
+                </kexie.android.navi.widget.MapView>
 
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:layout_gravity="bottom"
-                    android:layout_marginLeft="150dp"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginRight="150dp"
-                    android:layout_marginBottom="30dp"
+                    android:layout_margin="20dp"
                     app:cardBackgroundColor="@android:color/white"
-                    app:cardCornerRadius="15dp"
+                    app:cardCornerRadius="20dp"
                     app:cardElevation="10dp"
-                    app:layout_collapseMode="pin">
+                    app:cardUseCompatPadding="false">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="20dp"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:hint="查找地点"
+                            android:singleLine="true"
+                            android:textColor="@color/grey1000"
+                            android:textColorHint="@color/grey600"
+                            android:textSize="35sp"
+                            android:textStyle="bold"/>
+
+                        <ImageView
+                            mipmap='@{"image_search"}'
+                            android:layout_width="40dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="20dp"
+                            android:layout_marginBottom="10dp"
+                            android:scaleType="centerCrop"/>
+                    </LinearLayout>
                 </android.support.v7.widget.CardView>
+            </FrameLayout>
 
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/tb_tool_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    app:layout_collapseMode="pin"/>
-            </android.support.design.widget.CollapsingToolbarLayout>
-        </android.support.design.widget.AppBarLayout>
+            <com.getbase.floatingactionbutton.FloatingActionsMenu
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="80dp"
+                android:layout_marginBottom="150dp"
+                android:scaleX="1.6"
+                android:scaleY="1.6"
+                app:fab_addButtonColorNormal="@color/white"
+                app:fab_addButtonColorPressed="@color/colorFolderSelecter"
+                app:fab_addButtonPlusIconColor="@color/colorFolderSelecter"
+                app:fab_addButtonSize="normal"
+                app:fab_labelStyle="@style/menu_labels_style"
+                app:fab_labelsPosition="right">
 
-        <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_colorNormal="@color/white"
+                    app:fab_colorPressed="@color/colorFolderSelecter"
+                    app:fab_size="normal"
+                    app:fab_title="功能1"/>
+
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_colorNormal="@color/white"
+                    app:fab_colorPressed="@color/colorFolderSelecter"
+                    app:fab_size="normal"
+                    app:fab_title="功能2"/>
+
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_colorNormal="@color/white"
+                    app:fab_colorPressed="@color/colorFolderSelecter"
+                    app:fab_size="normal"
+                    app:fab_title="返回"/>
+
+            </com.getbase.floatingactionbutton.FloatingActionsMenu>
+        </RelativeLayout>
+
+        <fr.castorflex.android.verticalviewpager.VerticalViewPager
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:layout_margin="25dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="10dp">
-            </android.support.v7.widget.CardView>
-        </android.support.v4.widget.NestedScrollView>
-    </android.support.design.widget.CoordinatorLayout>
+            android:layout_weight="0.618"
+            android:adapter="@{adapter}"
+            android:visibility="@{adapter==null?View.GONE:View.VISIBLE}">
+        </fr.castorflex.android.verticalviewpager.VerticalViewPager>
+    </LinearLayout>
 </layout>

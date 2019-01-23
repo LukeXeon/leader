@@ -1,4 +1,4 @@
-package kexie.android.common;
+package kexie.android.common.util;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -20,6 +20,10 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,6 +33,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class BindingAdapters
 {
+
     private BindingAdapters()
     {
     }
