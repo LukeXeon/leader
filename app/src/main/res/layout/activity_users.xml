@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="user"
+            type="kexie.android.dng.entity.users.User"/>
+
+        <variable
+            name="handler"
+            type="kexie.android.dng.view.users.UsersActivity"/>
+    </data>
+
+    <RelativeLayout
+        mipmapBackground='@{"image_background"}'
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="110dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="250dp"
+                    android:layout_height="140dp"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/lightblue300"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="10dp"
+                    app:cardUseCompatPadding="false">
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|left"
+                        android:layout_marginLeft="30dp"
+                        android:hint="刷新"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="50sp"/>
+                </android.support.v7.widget.CardView>
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="250dp"
+                    android:layout_height="140dp"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/red300"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="10dp"
+                    app:cardUseCompatPadding="false">
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|left"
+                        android:layout_marginLeft="30dp"
+                        android:hint="返回"
+                        android:onClick="@{()->handler.finish()}"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="50sp"/>
+                </android.support.v7.widget.CardView>
+            </FrameLayout>
+        </LinearLayout>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="270dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="110dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="40dp"
+            app:cardElevation="10dp"
+            app:cardUseCompatPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="20dp"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2.5">
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/riv_head"
+                        mipmap='@{"image_background_right"}'
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        app:riv_corner_radius="20dp"/>
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/civ_head"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="20dp"
+                        android:src="@mipmap/ic_launcher"
+                        app:civ_border_color="@android:color/white"
+                        app:civ_border_width="5dp"
+                        app:civ_circle_background_color="@android:color/white"/>
+
+                    <TextView
+                        android:id="@+id/tv_username"
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="30dp"
+                        android:layout_toRightOf="@+id/civ_head"
+                        android:hint="USERNAME"
+                        android:singleLine="true"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="50sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tv_username"
+                        android:layout_marginLeft="50dp"
+                        android:layout_toRightOf="@+id/civ_head"
+                        android:text="已验证"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="@android:color/black"
+                        android:textSize="25sp"
+                        android:textStyle="bold"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        mipmap='@{"image_icon_phone"}'
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"/>
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/draw_text_background_black"
+                        android:gravity="center_vertical|left"
+                        android:hint=" 手机号码：13333333333"
+                        android:singleLine="true"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="30sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        mipmap='@{"image_icon_user2"}'
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"/>
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/draw_text_background_black"
+                        android:gravity="center_vertical|left"
+                        android:hint=" 真实姓名：123123"
+                        android:singleLine="true"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="30sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        mipmap='@{"image_icon_car2"}'
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"/>
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/draw_text_background_black"
+                        android:gravity="center_vertical|left"
+                        android:hint=" 车牌号：44444"
+                        android:singleLine="true"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="30sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        mipmap='@{"image_icon_idcard"}'
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"/>
+
+                    <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="20dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/draw_text_background_black"
+                        android:gravity="center_vertical|left"
+                        android:hint=" 身份证：455555555555555555"
+                        android:singleLine="true"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="30sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+</layout>

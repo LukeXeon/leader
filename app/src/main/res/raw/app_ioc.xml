@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scope framework="foundation-framework">
+    <var
+        name="gson"
+        class="com.google.gson.Gson"
+        factory="singleton"/>
+    <var
+        name="mainThread"
+        class="android.os.Handler"
+        factory="singleton"/>
+</scope>

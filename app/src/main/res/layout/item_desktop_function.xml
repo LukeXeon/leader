@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="function"
+            type="kexie.android.dng.entity.desktop.Function"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_alignParentBottom="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_margin="10dp"
+                android:src="@{function.icon}"
+                app:civ_border_color="@android:color/white"
+                app:civ_circle_background_color="@android:color/white"/>
+
+            <TextView
+                fontAsset='@{"PingFang Regular.ttf"}'
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/draw_text_background"
+                android:gravity="center"
+                android:hint="TEXT"
+                android:textStyle="bold"
+                android:text="@{function.name}"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textSize="25sp"/>
+        </LinearLayout>
+    </RelativeLayout>
+</layout>
