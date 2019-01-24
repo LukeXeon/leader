@@ -97,7 +97,10 @@ public class BindingPagerAdapter<T>
     public void setNewData(Collection<T> data)
     {
         this.data.clear();
-        this.data.addAll(data);
+        if (data != null)
+        {
+            this.data.addAll(data);
+        }
         notifyDataSetChanged();
     }
 

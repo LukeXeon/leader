@@ -9,7 +9,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 
-final class RoundCornerImageView extends AppCompatImageView
+public final class RoundCornerImageView extends AppCompatImageView
 {
     private float mRadius = 18;
     private Path mClipPath = new Path();

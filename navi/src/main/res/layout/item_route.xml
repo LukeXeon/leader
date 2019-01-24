@@ -49,7 +49,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
-                        android:text="@{route.name}"
+                        android:text="@{route.getName()}"
                         android:hint="方案名"
                         android:textSize="30sp"/>
                 </LinearLayout>
@@ -68,7 +68,7 @@
                     android:paddingRight="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical|right"
-                    android:text='@{route.time+"("+route.length+")"}'
+                    android:text='@{route.getTime()+"("+route.getLength()+")"}'
                     android:hint="40分钟(19公里)"
                     android:textSize="30sp"/>
 

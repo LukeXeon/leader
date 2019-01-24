@@ -96,6 +96,16 @@ public final class BindingAdapters
                 .into(view);
     }
 
+    @BindingAdapter({"mipmap_id"})
+    public static void setMipmapId(ImageView view, int id)
+    {
+        Context context = view.getContext()
+                .getApplicationContext();
+        Glide.with(context).load(id)
+                .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
+                .into(view);
+    }
+
     @BindingAdapter({"mipmapBackground"})
     public static void setMipmapBackground(final View view, String name)
     {

@@ -3,8 +3,8 @@
           package="kexie.android.navi">
 
     <application
-
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+        <service android:name="com.amap.api.location.APSService"/>
         <activity
             android:screenOrientation="landscape"
             android:name=".view.RouteQueryActivity">

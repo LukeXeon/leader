@@ -11,7 +11,6 @@ import kexie.android.common.adapter.BindingRecyclerAdapter;
 import kexie.android.common.util.DataBindingCompat;
 import kexie.android.navi.R;
 import kexie.android.navi.entity.Route;
-import kexie.android.navi.entity.Step;
 
 public class RouteBindingAdapter extends BindingPagerAdapter<Route>
 {
@@ -26,9 +25,9 @@ public class RouteBindingAdapter extends BindingPagerAdapter<Route>
     {
         View view = super.instantiateItem(container, position);
         ViewDataBinding viewDataBinding = DataBindingUtil.bind(view);
-        BindingRecyclerAdapter<Step> adapter
+        BindingRecyclerAdapter<Route.Step> adapter
                 = new BindingRecyclerAdapter<>("step", R.layout.item_step);
-        adapter.setNewData(getData().get(position).steps);
+        adapter.setNewData(getData().get(position).getSteps());
         DataBindingCompat.setVariable(viewDataBinding, "adapter", adapter);
         return view;
     }

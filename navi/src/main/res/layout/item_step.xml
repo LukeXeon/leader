@@ -4,7 +4,7 @@
     <data>
         <variable
             name="step"
-            type="kexie.android.navi.entity.Step"/>
+            type="kexie.android.navi.entity.Route.Step"/>
     </data>
     <LinearLayout
 
@@ -38,7 +38,7 @@
                     android:background="@android:color/transparent"
                     android:padding="5dp"
                     android:scaleType="centerInside"
-                    mipmap='@{step.mipmap}'
+                    mipmap_id="@{step.getActionRes()}"
                     android:src="@mipmap/dir_start"/>
             </RelativeLayout>
 
@@ -61,7 +61,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical|left"
-                    android:text="@{step.text}"
+                    android:text="@{step.getAction()}"
                     android:hint="TEXT"
                     android:textSize="20sp"/>
 
