@@ -113,8 +113,8 @@
 
             </com.getbase.floatingactionbutton.FloatingActionsMenu>
         </RelativeLayout>
-
         <fr.castorflex.android.verticalviewpager.VerticalViewPager
+            android:id="@+id/vp_pager"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.618"

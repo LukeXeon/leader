@@ -21,9 +21,15 @@ public class UsersActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_users);
-        viewModel = ViewModelProviders.of(this).get(UsersViewModel.class);
+        binding = DataBindingUtil.setContentView(this,
+                R.layout.activity_users);
+
+        binding.setLifecycleOwner(this);
         binding.setHandler(this);
+
+        viewModel = ViewModelProviders.of(this).get(UsersViewModel.class);
+
+
     }
 
     public static void startOf(Activity activity)

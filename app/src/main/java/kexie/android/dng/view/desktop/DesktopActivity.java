@@ -35,6 +35,8 @@ public class DesktopActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this,
                 R.layout.activity_desktop);
 
+        binding.setLifecycleOwner(this);
+
         binding.setHandler(this);
 
         functionAdapter = new DesktopFunctionAdapter();
