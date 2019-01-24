@@ -1,7 +1,6 @@
 package kexie.android.navi.view;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -40,7 +39,6 @@ public class RouteQueryActivity extends AppCompatActivity
                 R.layout.activity_route_query);
 
         binding.setLifecycleOwner(this);
-        binding.setHandler(this);
 
         viewModel = ViewModelProviders.of(this)
                 .get(RouteQueryViewModel.class);
@@ -78,7 +76,6 @@ public class RouteQueryActivity extends AppCompatActivity
                             Toasty.success(getApplicationContext(),
                                     "查询成功").show();
                         }
-
                     }
                 });
     }

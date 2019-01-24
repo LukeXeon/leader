@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View.OnClickListener" alias="Action"/>
         <import type="kexie.android.navi.R"/>
         <import type="android.view.View"/>
         <import type="kexie.android.common.util.DataBindingCompat"/>
@@ -17,8 +18,8 @@
             type="java.util.List"/>
 
         <variable
-            name="handler"
-            type="kexie.android.navi.view.RouteQueryActivity"/>
+            name="actions"
+            type="java.util.Map"/>
 
         <variable
             name="queryText"
@@ -49,89 +50,105 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
-
-                    <FrameLayout
+                    <LinearLayout
+                        android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
                         android:layout_weight="1">
-
-                        <android.support.v7.widget.CardView
-                            android:layout_margin="10dp"
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="80dp"
-                            android:onClick="@{()->handler.beginQuery()}"
-                            android:visibility="@{DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                            android:layout_height="wrap_content">
+                            <android.support.v7.widget.CardView
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
+                                android:onClick='@{(Action)actions.get("开始查询")}'
+                                android:visibility="@{DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                                android:layout_margin="10dp"
+                                app:cardBackgroundColor="@android:color/white"
+                                app:cardCornerRadius="20dp"
+                                app:cardElevation="10dp"
+                                app:cardPreventCornerOverlap="false"
+                                app:cardUseCompatPadding="false">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="10dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginLeft="20dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center_vertical"
+                                        android:hint="查找地点"
+                                        android:singleLine="true"
+                                        android:textColor="@color/grey1000"
+                                        android:textColorHint="@color/grey600"
+                                        android:textSize="30sp"
+                                        android:textStyle="bold"/>
+
+                                    <ImageView
+                                        mipmap='@{"image_search"}'
+                                        android:layout_width="50dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_marginBottom="5dp"
+                                        android:scaleType="centerInside"/>
+                                </LinearLayout>
+                            </android.support.v7.widget.CardView>
+                            <android.support.v7.widget.CardView
+                                android:layout_margin="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
+                                android:visibility="@{!DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                                app:cardBackgroundColor="@android:color/white"
+                                app:cardCornerRadius="20dp"
+                                app:cardElevation="10dp"
+                                app:cardPreventCornerOverlap="false"
+                                app:cardUseCompatPadding="false">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_margin="10dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginLeft="20dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center_vertical"
+                                        android:singleLine="true"
+                                        android:hint="TEXT"
+                                        android:text="@{queryText}"
+                                        android:textColor="@color/grey1000"
+                                        android:textColorHint="@color/grey600"
+                                        android:textSize="30sp"
+                                        android:textStyle="bold"/>
+                                </LinearLayout>
+                            </android.support.v7.widget.CardView>
+                        </FrameLayout>
+                        <android.support.v7.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="-10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginLeft="10dp"
                             app:cardBackgroundColor="@android:color/white"
                             app:cardCornerRadius="20dp"
                             app:cardElevation="10dp"
                             app:cardPreventCornerOverlap="false"
                             app:cardUseCompatPadding="false">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="10dp"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginLeft="20dp"
-                                    android:layout_weight="1"
-                                    android:gravity="center_vertical"
-                                    android:hint="查找地点"
-                                    android:singleLine="true"
-                                    android:textColor="@color/grey1000"
-                                    android:textColorHint="@color/grey600"
-                                    android:textSize="30sp"
-                                    android:textStyle="bold"/>
-
-                                <ImageView
-                                    mipmap='@{"image_search"}'
-                                    android:layout_width="50dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_marginBottom="5dp"
-                                    android:scaleType="centerInside"/>
-                            </LinearLayout>
                         </android.support.v7.widget.CardView>
-
-                        <android.support.v7.widget.CardView
-                            android:layout_margin="10dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="80dp"
-                            android:visibility="@{!DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
-                            app:cardBackgroundColor="@android:color/white"
-                            app:cardCornerRadius="20dp"
-                            app:cardElevation="10dp"
-                            app:cardPreventCornerOverlap="false"
-                            app:cardUseCompatPadding="false">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="10dp"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginLeft="20dp"
-                                    android:layout_weight="1"
-                                    android:gravity="center_vertical"
-                                    android:singleLine="true"
-                                    android:hint="TEXT"
-                                    android:text="@{queryText}"
-                                    android:textColor="@color/grey1000"
-                                    android:textColorHint="@color/grey600"
-                                    android:textSize="30sp"
-                                    android:textStyle="bold"/>
-                            </LinearLayout>
-                        </android.support.v7.widget.CardView>
-                    </FrameLayout>
-
+                    </LinearLayout>
 
                     <fr.castorflex.android.verticalviewpager.VerticalViewPager
                         android:id="@+id/vp_pager"
@@ -183,15 +200,14 @@
                     app:fab_title="功能2"/>
 
                 <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:onClick='@{(Action)actions.get("返回")}'
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:fab_colorNormal="@color/white"
                     app:fab_colorPressed="@color/colorFolderSelecter"
                     app:fab_size="normal"
                     app:fab_title="返回"/>
-
             </com.getbase.floatingactionbutton.FloatingActionsMenu>
         </RelativeLayout>
-
     </LinearLayout>
 </layout>

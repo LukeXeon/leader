@@ -1,16 +1,21 @@
 package kexie.android.dng.view.users;
 
-import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+import java.util.Map;
 
 import kexie.android.dng.R;
 import kexie.android.dng.databinding.ActivityUsersBinding;
+import kexie.android.dng.entity.users.SimpleUser;
 import kexie.android.dng.viewmodel.users.UsersViewModel;
 
 public class UsersActivity extends AppCompatActivity
@@ -26,9 +31,37 @@ public class UsersActivity extends AppCompatActivity
                 R.layout.activity_users);
 
         binding.setLifecycleOwner(this);
-        binding.setHandler(this);
 
         viewModel = ViewModelProviders.of(this).get(UsersViewModel.class);
+
+        viewModel.getActions().observe(this, new Observer<Map<String, View.OnClickListener>>()
+        {
+            @Override
+            public void onChanged(@Nullable Map<String, View.OnClickListener> actions)
+            {
+                binding.setActions(actions);
+            }
+        });
+
+        viewModel.getHeadImage().observe(this,
+                new Observer<Drawable>()
+        {
+            @Override
+            public void onChanged(@Nullable Drawable drawable)
+            {
+                binding.setHeadImage(drawable);
+            }
+        });
+
+        viewModel.getSimpleUser().observe(this,
+                new Observer<SimpleUser>()
+                {
+                    @Override
+                    public void onChanged(@Nullable SimpleUser simpleUser)
+                    {
+                        binding.setUser(simpleUser);
+                    }
+                });
 
 
     }
