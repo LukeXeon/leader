@@ -4,13 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="kexie.android.common.util.T"/>
+        <import type="kexie.android.dng.R"/>
         <import type="android.view.View.OnClickListener" alias="Action"/>
         <variable
             name="user"
             type="kexie.android.dng.entity.users.SimpleUser"/>
         <variable
             name="actions"
-            type="java.util.Map"/>
+            type="java.util.Map&lt;String,Action&gt;"/>
         <variable
             name="headImage"
             type="android.graphics.drawable.Drawable"/>
@@ -39,7 +41,7 @@
                 android:layout_weight="1">
 
                 <android.support.v7.widget.CardView
-                    android:onClick='@{(Action)actions.get("刷新")}'
+                    android:onClick='@{actions.get("刷新")}'
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
@@ -69,7 +71,7 @@
                 android:layout_weight="1">
 
                 <android.support.v7.widget.CardView
-                    android:onClick='@{(Action)actions.get("返回")}'
+                    android:onClick='@{actions.get("返回")}'
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="120dp"
@@ -130,7 +132,7 @@
                         android:layout_height="120dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="20dp"
-                        android:src="@{headImage}"
+                        android:src="@{headImage==null?T.mipmap(R.mipmap.image_head_man):headImage}"
                         app:civ_border_color="@android:color/white"
                         app:civ_border_width="5dp"
                         app:civ_circle_background_color="@android:color/white"/>

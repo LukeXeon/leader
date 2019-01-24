@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.help.Inputtips;
@@ -12,9 +13,12 @@ import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.RouteSearch;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -25,16 +29,48 @@ import kexie.android.navi.util.Points;
 
 public class RouteQueryViewModel extends AndroidViewModel
 {
+    private static final String DEBUG_TEXT = "火车站";
     private static final String CITY = "西安";
     private final RouteSearch routeSearch;
     private final Executor singleTask = Executors.newSingleThreadExecutor();
     private final MutableLiveData<List<Route>> routes = new MutableLiveData<>();
     private final MutableLiveData<List<Tip>> tips = new MutableLiveData<>();
+    private final MutableLiveData<Map<String,View.OnClickListener>> actions = new MutableLiveData<>();
+    private final MutableLiveData<String> queryText = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
 
     public RouteQueryViewModel(@NonNull Application application)
     {
         super(application);
         routeSearch = new RouteSearch(application);
+        initActions();
+    }
+
+    private void initActions()
+    {
+        actions.setValue(new HashMap<String, View.OnClickListener>()
+        {
+            {
+                put("开始查询", new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        textQuery(DEBUG_TEXT);
+                    }
+                });
+            }
+        });
+    }
+
+    public MutableLiveData<Boolean> getLoading()
+    {
+        return loading;
+    }
+
+    public MutableLiveData<String> getQueryText()
+    {
+        return queryText;
     }
 
     public MutableLiveData<List<Tip>> getTips()
@@ -47,35 +83,49 @@ public class RouteQueryViewModel extends AndroidViewModel
         return routes;
     }
 
-    public void textQuery(final String text)
+    public MutableLiveData<Map<String, View.OnClickListener>> getActions()
     {
-        singleTask.execute(new Runnable()
+        return actions;
+    }
+
+    private void textQuery(final String text)
+    {
+        if (!TextUtils.isEmpty(text))
         {
-            @Override
-            public void run()
+            loading.setValue(true);
+            singleTask.execute(new Runnable()
             {
-                final InputtipsQuery inputtipsQuery
-                        = new InputtipsQuery(text.toString(), CITY);
-                Inputtips inputtips = new Inputtips(getApplication(), inputtipsQuery);
-                try
+                @Override
+                public void run()
                 {
-                    List<Tip> rawResult = inputtips.requestInputtips();
-                    List<Tip> result = new ArrayList<>();
-                    for (Tip tip : rawResult)
+
+                    final InputtipsQuery inputtipsQuery
+                            = new InputtipsQuery(text, CITY);
+                    Inputtips inputtips = new Inputtips(getApplication(), inputtipsQuery);
+                    try
                     {
-                        if (!TextUtils.isEmpty(tip.getPoiID()))
+                        List<Tip> rawResult = inputtips.requestInputtips();
+                        List<Tip> result = new ArrayList<>();
+                        int i=0;
+                        for (Tip tip : rawResult)
                         {
-                            result.add(tip);
+                            if (!TextUtils.isEmpty(tip.getPoiID()))
+                            {
+                                result.add(tip);
+                                Logger.d(++i + "   " + tip.getName());
+                            }
                         }
+                        tips.postValue(result);
+                        loading.postValue(false);
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        tips.postValue(null);
+                        loading.postValue(false);
                     }
-                    tips.postValue(result);
-                } catch (Exception e)
-                {
-                    e.printStackTrace();
-                    tips.postValue(null);
                 }
-            }
-        });
+            });
+        }
     }
 
     private void routeQuery(final Query query)
@@ -126,6 +176,6 @@ public class RouteQueryViewModel extends AndroidViewModel
     @Override
     protected void onCleared()
     {
-        super.onCleared();
+        System.gc();
     }
 }

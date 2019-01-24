@@ -10,14 +10,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import com.amap.api.services.help.Tip;
 
 import java.util.List;
+import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
-import kexie.android.common.util.DataBindingCompat;
+import kexie.android.common.util.T;
 import kexie.android.common.widget.ProgressDialog;
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.ActivityRouteQueryBinding;
@@ -40,6 +42,8 @@ public class RouteQueryActivity extends AppCompatActivity
 
         binding.setLifecycleOwner(this);
 
+        binding.setTips(null);
+
         viewModel = ViewModelProviders.of(this)
                 .get(RouteQueryViewModel.class);
 
@@ -49,7 +53,7 @@ public class RouteQueryActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Route> routes)
                     {
-                        setListViewAnimation(!DataBindingCompat.isEmpty(routes));
+                        setListViewAnimation(!T.isEmpty(routes));
                         binding.setRoutes(routes);
                     }
                 });
@@ -59,23 +63,65 @@ public class RouteQueryActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Tip> tips)
                     {
-                        ProgressDialog progressDialog
-                                = (ProgressDialog) getSupportFragmentManager()
-                                .findFragmentByTag(WAIT_QUERY);
-                        if (progressDialog != null)
-                        {
-                            progressDialog.dismiss();
-                        }
-                        if (DataBindingCompat.isEmpty(tips))
+                        if (T.isEmpty(tips))
                         {
                             Toasty.error(getApplicationContext(),
-                                    "发生错误，请检查网络连接").show();
+                                    "发生错误，请检查网络连接")
+                                    .show();
                         } else
                         {
-                            binding.setTips(tips);
                             Toasty.success(getApplicationContext(),
                                     "查询成功").show();
                         }
+                        binding.setTips(tips);
+                    }
+                });
+        viewModel.getLoading().observe(this,
+                new Observer<Boolean>()
+                {
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean)
+                    {
+                        if (aBoolean != null && aBoolean)
+                        {
+                            ProgressDialog progressDialog = new ProgressDialog();
+                            progressDialog.show(getSupportFragmentManager(),
+                                    WAIT_QUERY);
+                        } else
+                        {
+                            ProgressDialog progressDialog
+                                    = (ProgressDialog) getSupportFragmentManager()
+                                    .findFragmentByTag(WAIT_QUERY);
+                            if (progressDialog != null)
+                            {
+                                progressDialog.dismiss();
+                            }
+                        }
+                    }
+                });
+        viewModel.getQueryText().observe(this,
+                new Observer<String>()
+                {
+                    @Override
+                    public void onChanged(@Nullable String s)
+                    {
+                        if (TextUtils.isEmpty(s))
+                        {
+                            Toasty.warning(getApplicationContext(),
+                                    "搜索内容为空").show();
+                        } else
+                        {
+                            binding.setQueryText(s);
+                        }
+                    }
+                });
+        viewModel.getActions().observe(this,
+                new Observer<Map<String, View.OnClickListener>>()
+                {
+                    @Override
+                    public void onChanged(@Nullable Map<String, View.OnClickListener> actions)
+                    {
+                        binding.setActions(actions);
                     }
                 });
     }
@@ -124,24 +170,6 @@ public class RouteQueryActivity extends AppCompatActivity
         animator.addUpdateListener(updateListener);
         animator.start();
         binding.vpPager.setTag(animator);
-    }
-
-    public void beginQuery()
-    {
-        String text = "火车站";
-        if (!TextUtils.isEmpty(text))
-        {
-            final ProgressDialog progressDialog = new ProgressDialog();
-            progressDialog.show(getSupportFragmentManager(),
-                    WAIT_QUERY);
-            progressDialog.setMessage("正在拼命加载中，请稍等");
-            viewModel.textQuery(text);
-        } else
-        {
-            Toasty.warning(this, "搜索内容为空").show();
-            binding.setQueryText("");
-            viewModel.getRoutes().setValue(null);
-        }
     }
 
     public static void startOf(Context context)

@@ -1,2 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="kexie.android.common"/>
+          package="kexie.android.common">
+    <application>
+        <provider
+            android:authorities="${applicationId}.tools"
+            android:name=".util.ToolInitializer"
+            android:exported="false"
+            android:multiprocess="true"/>
+    </application>
+</manifest>

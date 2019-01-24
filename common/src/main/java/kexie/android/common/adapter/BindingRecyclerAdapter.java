@@ -5,6 +5,7 @@ import android.support.annotation.LayoutRes;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.orhanobut.logger.Logger;
 
 
 import kexie.android.common.util.DataBindingCompat;

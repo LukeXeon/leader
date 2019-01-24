@@ -4,16 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <import type="kexie.android.dng.R"/>
-        <import type="android.view.View.OnClickListener" alias="Action"/>
+
+        <import
+            alias="Action"
+            type="android.view.View.OnClickListener"/>
+
         <import type="kexie.android.dng.entity.desktop.Function"/>
+
         <variable
             name="user"
             type="kexie.android.dng.entity.desktop.User"/>
 
         <variable
             name="simpleFunctions"
-            type="java.util.Map"/>
+            type="java.util.Map&lt;String,Action&gt;"/>
 
         <variable
             name="time"
@@ -21,7 +27,7 @@
 
         <variable
             name="listFunctions"
-            type="java.util.List"/>
+            type="java.util.List&lt;Function&gt;"/>
     </data>
 
     <LinearLayout
@@ -38,7 +44,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="20dp"
             android:layout_weight="0.618"
-            android:onClick='@{(Action)simpleFunctions.get("导航")}'>
+            android:onClick='@{simpleFunctions.get("导航")}'>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/riv_navi"
@@ -115,7 +121,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:onClick='@{(Action)simpleFunctions.get("个人信息")}'
+                android:onClick='@{simpleFunctions.get("个人信息")}'
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -239,14 +245,17 @@
 
                 <ImageView
                     mipmap='@{"image_icon_apps"}'
-                    android:layout_marginLeft="20dp"
-                    android:scaleType="centerInside"
                     android:layout_width="40dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:scaleType="centerInside"/>
             </FrameLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_function_list"
+                adapter_data="@{listFunctions}"
+                adapter_item='@{"function"}'
+                adapter_layout="@{R.layout.item_desktop_function}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/function_text"
@@ -256,9 +265,6 @@
                 android:orientation="horizontal"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
-                adapter_item='@{"function"}'
-                adapter_layout="@{R.layout.item_desktop_function}"
-                adapter_data="@{listFunctions}"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager">
             </android.support.v7.widget.RecyclerView>
 

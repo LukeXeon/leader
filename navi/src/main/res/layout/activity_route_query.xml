@@ -4,22 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View.OnClickListener" alias="Action"/>
+
+        <import
+            alias="Action"
+            type="android.view.View.OnClickListener"/>
+
         <import type="kexie.android.navi.R"/>
+
         <import type="android.view.View"/>
-        <import type="kexie.android.common.util.DataBindingCompat"/>
+
+        <import type="kexie.android.common.util.T"/>
+
+        <import type="com.amap.api.services.help.Tip"/>
+
+        <import type="kexie.android.navi.entity.Route"/>
 
         <variable
             name="tips"
-            type="java.util.List"/>
+            type="java.util.List&lt;Tip&gt;" />
 
         <variable
             name="routes"
-            type="java.util.List"/>
+            type="java.util.List&lt;Route&gt;"/>
 
         <variable
             name="actions"
-            type="java.util.Map"/>
+            type="java.util.Map&lt;String,Action&gt;"/>
 
         <variable
             name="queryText"
@@ -39,34 +49,43 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-                <kexie.android.navi.widget.MapView
-                    android:id="@+id/mv_map"
+                <fragment
+                    android:name="com.amap.api.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:transitionName="map"/>
+                    android:id="@+id/f_map"/>
 
+                <FrameLayout
+                    android:visibility="@{T.isEmpty(tips)?View.GONE:View.VISIBLE}"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </FrameLayout>
                 <LinearLayout
+                    android:layout_marginLeft="120dp"
+                    android:layout_marginRight="120dp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
+
                     <LinearLayout
-                        android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
                         <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
+
                             <android.support.v7.widget.CardView
                                 android:layout_width="match_parent"
-                                android:layout_height="80dp"
-                                android:onClick='@{(Action)actions.get("开始查询")}'
-                                android:visibility="@{DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                                android:layout_height="wrap_content"
                                 android:layout_margin="10dp"
+                                android:onClick='@{actions.get("开始查询")}'
+                                android:visibility="@{T.isEmpty(tips)?View.VISIBLE:View.GONE}"
                                 app:cardBackgroundColor="@android:color/white"
                                 app:cardCornerRadius="20dp"
                                 app:cardElevation="10dp"
@@ -75,13 +94,13 @@
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
+                                    android:layout_height="wrap_content"
                                     android:layout_margin="10dp"
                                     android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="0dp"
-                                        android:layout_height="match_parent"
+                                        android:layout_height="wrap_content"
                                         android:layout_marginLeft="20dp"
                                         android:layout_weight="1"
                                         android:gravity="center_vertical"
@@ -89,7 +108,7 @@
                                         android:singleLine="true"
                                         android:textColor="@color/grey1000"
                                         android:textColorHint="@color/grey600"
-                                        android:textSize="30sp"
+                                        android:textSize="35sp"
                                         android:textStyle="bold"/>
 
                                     <ImageView
@@ -102,11 +121,12 @@
                                         android:scaleType="centerInside"/>
                                 </LinearLayout>
                             </android.support.v7.widget.CardView>
+
                             <android.support.v7.widget.CardView
-                                android:layout_margin="10dp"
                                 android:layout_width="match_parent"
-                                android:layout_height="80dp"
-                                android:visibility="@{!DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="10dp"
+                                android:visibility="@{!T.isEmpty(tips)?View.VISIBLE:View.GONE}"
                                 app:cardBackgroundColor="@android:color/white"
                                 app:cardCornerRadius="20dp"
                                 app:cardElevation="10dp"
@@ -115,53 +135,64 @@
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
+                                    android:layout_height="wrap_content"
                                     android:layout_margin="10dp"
                                     android:orientation="horizontal">
 
                                     <TextView
                                         android:layout_width="0dp"
-                                        android:layout_height="match_parent"
+                                        android:layout_height="wrap_content"
                                         android:layout_marginLeft="20dp"
                                         android:layout_weight="1"
                                         android:gravity="center_vertical"
-                                        android:singleLine="true"
                                         android:hint="TEXT"
+                                        android:singleLine="true"
                                         android:text="@{queryText}"
                                         android:textColor="@color/grey1000"
                                         android:textColorHint="@color/grey600"
-                                        android:textSize="30sp"
+                                        android:textSize="35sp"
                                         android:textStyle="bold"/>
                                 </LinearLayout>
                             </android.support.v7.widget.CardView>
                         </FrameLayout>
+
                         <android.support.v7.widget.CardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="-10dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginRight="10dp"
                             android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:visibility="@{T.isEmpty(tips)?View.GONE:View.VISIBLE}"
                             app:cardBackgroundColor="@android:color/white"
                             app:cardCornerRadius="20dp"
                             app:cardElevation="10dp"
                             app:cardPreventCornerOverlap="false"
                             app:cardUseCompatPadding="false">
+
+                            <android.support.v7.widget.RecyclerView
+                                adapter_data="@{tips}"
+                                adapter_item='@{"tip"}'
+                                adapter_layout="@{R.layout.item_tip}"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="20dp"
+                                android:orientation="vertical"
+                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
                         </android.support.v7.widget.CardView>
                     </LinearLayout>
 
                     <fr.castorflex.android.verticalviewpager.VerticalViewPager
                         android:id="@+id/vp_pager"
+                        adapter_data="@{routes}"
+                        adapter_item='@{"route"}'
+                        adapter_layout="@{R.layout.item_route}"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
                         android:layout_marginRight="10dp"
                         android:layout_marginBottom="10dp"
                         android:layout_weight="0.618"
-                        adapter_item='@{"route"}'
-                        adapter_layout="@{R.layout.item_route}"
-                        adapter_data="@{routes}"
-                        android:visibility="@{!DataBindingCompat.isEmpty(routes)?View.VISIBLE:View.GONE}">
+                        android:visibility="@{!T.isEmpty(routes)?View.VISIBLE:View.GONE}">
                     </fr.castorflex.android.verticalviewpager.VerticalViewPager>
                 </LinearLayout>
 
@@ -172,7 +203,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginLeft="80dp"
+                android:layout_marginLeft="60dp"
                 android:layout_marginBottom="120dp"
                 android:scaleX="1.5"
                 android:scaleY="1.5"
@@ -200,9 +231,9 @@
                     app:fab_title="功能2"/>
 
                 <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:onClick='@{(Action)actions.get("返回")}'
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick='@{actions.get("返回")}'
                     app:fab_colorNormal="@color/white"
                     app:fab_colorPressed="@color/colorFolderSelecter"
                     app:fab_size="normal"

@@ -110,9 +110,4 @@ public final class DataBindingCompat
             throw new RuntimeException(e);
         }
     }
-
-    public static <T> boolean isEmpty(List<T> list)
-    {
-        return !(list != null && list.size() != 0);
-    }
 }

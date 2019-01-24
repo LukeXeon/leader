@@ -16,9 +16,7 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;;
 
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.desktop.Function;
 import kexie.android.dng.entity.desktop.User;
-import kexie.android.common.util.ZoomTransformation;
+import kexie.android.dng.model.FunctionLoadTaskFactory;
 import kexie.android.dng.view.users.UsersActivity;
 import kexie.android.navi.view.RouteQueryActivity;
 import okhttp3.OkHttpClient;
@@ -44,18 +42,6 @@ import okhttp3.OkHttpClient;
 public class DesktopViewModel
         extends AndroidViewModel implements LifecycleObserver
 {
-
-    private static class FunctionLoadTask
-    {
-        private FutureTarget<Drawable> innerTask;
-        private Function function;
-
-        private Function get() throws Exception
-        {
-            innerTask.get();
-            return function;
-        }
-    }
 
     private final MutableLiveData<Map<String,View.OnClickListener>> simpleFunctions
             = new MutableLiveData<>();
@@ -125,43 +111,6 @@ public class DesktopViewModel
         updateTimer.cancel();
     }
 
-    private FunctionLoadTask loadFunction(final String name,
-                                          int mipmap,
-                                          final View.OnClickListener action)
-    {
-        final FunctionLoadTask loadTask = new FunctionLoadTask();
-        loadTask.innerTask = Glide.with(getApplication())
-                .load(mipmap)
-                .apply(RequestOptions.bitmapTransform(new ZoomTransformation(250)))
-                .listener(new RequestListener<Drawable>()
-                {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e,
-                                                Object model,
-                                                Target<Drawable> target,
-                                                boolean isFirstResource)
-                    {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource,
-                                                   Object model,
-                                                   Target<Drawable> target,
-                                                   DataSource dataSource,
-                                                   boolean isFirstResource)
-                    {
-                        loadTask.function = new Function.Builder()
-                                .action(action)
-                                .icon(resource)
-                                .name(name)
-                                .build();
-                        return true;
-                    }
-                }).submit();
-        return loadTask;
-    }
-
     private void initFunctions()
     {
         Observable.just(getApplication())
@@ -171,10 +120,13 @@ public class DesktopViewModel
                     @Override
                     public void accept(Application application) throws Exception
                     {
-                        List<FunctionLoadTask> targets = new LinkedList<FunctionLoadTask>()
+                        final FunctionLoadTaskFactory factory
+                                = FunctionLoadTaskFactory.form(application, 250);
+                        List<FunctionLoadTaskFactory.FunctionLoadTask> targets
+                                = new LinkedList<FunctionLoadTaskFactory.FunctionLoadTask>()
                         {
                             {
-                                add(loadFunction("天气",
+                                add(factory.create("天气",
                                         R.mipmap.image_weather,
                                         new View.OnClickListener()
                                         {
@@ -184,7 +136,7 @@ public class DesktopViewModel
 
                                             }
                                         }));
-                                add(loadFunction("多媒体",
+                                add(factory.create("多媒体",
                                         R.mipmap.image_media,
                                         new View.OnClickListener()
                                         {
@@ -194,7 +146,7 @@ public class DesktopViewModel
 
                                             }
                                         }));
-                                add(loadFunction("APPS",
+                                add(factory.create("APPS",
                                         R.mipmap.image_apps,
                                         new View.OnClickListener()
                                         {
@@ -207,7 +159,7 @@ public class DesktopViewModel
                             }
                         };
                         List<Function> functions = new ArrayList<>(targets.size());
-                        for (FunctionLoadTask task : targets)
+                        for (FunctionLoadTaskFactory.FunctionLoadTask task : targets)
                         {
                             functions.add(task.get());
                         }

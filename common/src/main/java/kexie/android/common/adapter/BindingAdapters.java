@@ -71,30 +71,30 @@ public final class BindingAdapters
     @BindingAdapter("adapter_data")
     public static void setAdapterData(RecyclerView view, List list)
     {
-        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+        setAdapterData(view,(BindingViewAdapter) view.getAdapter(),list);
     }
 
     @BindingAdapter("adapter_data")
     public static void setAdapterData(VerticalViewPager view, List list)
     {
-        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+        setAdapterData(view,(BindingViewAdapter) view.getAdapter(),list);
     }
 
     @BindingAdapter("adapter_data")
     public static void setAdapterData(ViewPager view, List list)
     {
-        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+        setAdapterData(view,(BindingViewAdapter) view.getAdapter(),list);
     }
 
     @SuppressWarnings("unchecked")
-    private static void setAdapterData(BindingViewAdapter adapter, List list)
+    private static void setAdapterData(View view,BindingViewAdapter adapter, List list)
     {
         if (adapter != null)
         {
             adapter.setNewData(list);
         } else
         {
-            Logger.e("no has adapter");
+            Logger.e(view + "no has adapter to bind " + list);
         }
     }
 
