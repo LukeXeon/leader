@@ -1,4 +1,4 @@
-package kexie.android.common.util;
+package kexie.android.common.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -8,6 +8,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.util.LruCache;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,11 +22,11 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.orhanobut.logger.Logger;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.List;
 
+import fr.castorflex.android.verticalviewpager.VerticalViewPager;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -39,14 +41,62 @@ public final class BindingAdapters
     }
 
     private static final LruCache<String,Typeface> TYPEFACE_LRU_CACHE
-            = new LruCache<String,Typeface>(32)
+            = new LruCache<>(32);
+
+
+    @BindingAdapter(value = {"adapter_item","adapter_layout"})
+    public static void setAdapter(RecyclerView view,
+                                  String name,
+                                  int layoutRes)
     {
-        @Override
-        protected int sizeOf(String key, Typeface value)
+        view.setAdapter(new BindingRecyclerAdapter<>(name, layoutRes));
+    }
+
+    @BindingAdapter(value = {"adapter_item","adapter_layout"})
+    public static void setAdapter(ViewPager view,
+                                  String name,
+                                  int layoutRes)
+    {
+        view.setAdapter(new BindingPagerAdapter<>(name, layoutRes));
+    }
+
+    @BindingAdapter(value = {"adapter_item","adapter_layout"})
+    public static void setAdapter(VerticalViewPager view,
+                                  String name,
+                                  int layoutRes)
+    {
+        view.setAdapter(new BindingPagerAdapter<>(name, layoutRes));
+    }
+
+    @BindingAdapter("adapter_data")
+    public static void setAdapterData(RecyclerView view, List list)
+    {
+        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+    }
+
+    @BindingAdapter("adapter_data")
+    public static void setAdapterData(VerticalViewPager view, List list)
+    {
+        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+    }
+
+    @BindingAdapter("adapter_data")
+    public static void setAdapterData(ViewPager view, List list)
+    {
+        setAdapterData((BindingViewAdapter) view.getAdapter(),list);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void setAdapterData(BindingViewAdapter adapter, List list)
+    {
+        if (adapter != null)
         {
-            return 1;
+            adapter.setNewData(list);
+        } else
+        {
+            Logger.e("no has adapter");
         }
-    };
+    }
 
     @BindingAdapter({"fontAsset"})
     public static void setFont(final TextView view, String name)
@@ -96,7 +146,7 @@ public final class BindingAdapters
                 .into(view);
     }
 
-    @BindingAdapter({"mipmap_id"})
+    @BindingAdapter({"mipmap"})
     public static void setMipmapId(ImageView view, int id)
     {
         Context context = view.getContext()

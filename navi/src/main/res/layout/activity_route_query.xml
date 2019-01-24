@@ -4,14 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="kexie.android.navi.R"/>
         <import type="android.view.View"/>
+        <import type="kexie.android.common.util.DataBindingCompat"/>
+
         <variable
-            name="adapter"
-            type="android.support.v4.view.PagerAdapter"/>
+            name="tips"
+            type="java.util.List"/>
+
+        <variable
+            name="routes"
+            type="java.util.List"/>
+
         <variable
             name="handler"
             type="kexie.android.navi.view.RouteQueryActivity"/>
+
         <variable
             name="queryText"
             type="String"/>
@@ -35,67 +43,108 @@
                     android:id="@+id/mv_map"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:transitionName="map">
-                </kexie.android.navi.widget.MapView>
+                    android:transitionName="map"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <android.support.v7.widget.CardView
-                        android:onClick="@{()->handler.beginQuery()}"
+                    <FrameLayout
                         android:layout_width="0dp"
-                        android:layout_height="80dp"
-                        android:layout_margin="20dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="@android:color/white"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="10dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardUseCompatPadding="false">
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                        <android.support.v7.widget.CardView
                             android:layout_margin="10dp"
-                            android:orientation="horizontal">
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:onClick="@{()->handler.beginQuery()}"
+                            android:visibility="@{DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                            app:cardBackgroundColor="@android:color/white"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="10dp"
+                            app:cardPreventCornerOverlap="false"
+                            app:cardUseCompatPadding="false">
 
-                            <TextView
-                                android:text="@{queryText}"
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_marginLeft="20dp"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:hint="查找地点"
-                                android:singleLine="true"
-                                android:textColor="@color/grey1000"
-                                android:textColorHint="@color/grey600"
-                                android:textSize="30sp"
-                                android:textStyle="bold"/>
+                                android:layout_margin="10dp"
+                                android:orientation="horizontal">
 
-                            <ImageView
-                                mipmap='@{"image_search"}'
-                                android:layout_width="50dp"
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="20dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical"
+                                    android:hint="查找地点"
+                                    android:singleLine="true"
+                                    android:textColor="@color/grey1000"
+                                    android:textColorHint="@color/grey600"
+                                    android:textSize="30sp"
+                                    android:textStyle="bold"/>
+
+                                <ImageView
+                                    mipmap='@{"image_search"}'
+                                    android:layout_width="50dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_marginBottom="5dp"
+                                    android:scaleType="centerInside"/>
+                            </LinearLayout>
+                        </android.support.v7.widget.CardView>
+
+                        <android.support.v7.widget.CardView
+                            android:layout_margin="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:visibility="@{!DataBindingCompat.isEmpty(tips)?View.VISIBLE:View.GONE}"
+                            app:cardBackgroundColor="@android:color/white"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="10dp"
+                            app:cardPreventCornerOverlap="false"
+                            app:cardUseCompatPadding="false">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginBottom="5dp"
-                                android:scaleType="centerInside"/>
-                        </LinearLayout>
-                    </android.support.v7.widget.CardView>
+                                android:layout_margin="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="20dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical"
+                                    android:singleLine="true"
+                                    android:hint="TEXT"
+                                    android:text="@{queryText}"
+                                    android:textColor="@color/grey1000"
+                                    android:textColorHint="@color/grey600"
+                                    android:textSize="30sp"
+                                    android:textStyle="bold"/>
+                            </LinearLayout>
+                        </android.support.v7.widget.CardView>
+                    </FrameLayout>
+
 
                     <fr.castorflex.android.verticalviewpager.VerticalViewPager
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="10dp"
                         android:id="@+id/vp_pager"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
                         android:layout_weight="0.618"
-                        android:adapter="@{adapter}"
-                        android:visibility="@{adapter.getCount()==0?View.GONE:View.VISIBLE}">
+                        adapter_item='@{"route"}'
+                        adapter_layout="@{R.layout.item_route}"
+                        adapter_data="@{routes}"
+                        android:visibility="@{!DataBindingCompat.isEmpty(routes)?View.VISIBLE:View.GONE}">
                     </fr.castorflex.android.verticalviewpager.VerticalViewPager>
                 </LinearLayout>
 
@@ -107,9 +156,9 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="80dp"
-                android:layout_marginBottom="150dp"
-                android:scaleX="1.6"
-                android:scaleY="1.6"
+                android:layout_marginBottom="120dp"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
                 app:fab_addButtonColorNormal="@color/white"
                 app:fab_addButtonColorPressed="@color/colorFolderSelecter"
                 app:fab_addButtonPlusIconColor="@color/colorFolderSelecter"

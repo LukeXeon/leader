@@ -2,6 +2,7 @@ package kexie.android.dng.view.users;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ public class UsersActivity extends AppCompatActivity
 
     }
 
-    public static void startOf(Activity activity)
+    public static void startOf(Context activity)
     {
         activity.startActivity(new Intent(activity, UsersActivity.class));
     }

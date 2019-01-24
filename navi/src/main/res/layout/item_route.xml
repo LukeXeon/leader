@@ -3,12 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="kexie.android.navi.R"/>
         <variable
             name="route"
             type="kexie.android.navi.entity.Route"/>
-        <variable
-            name="adapter"
-            type="android.support.v7.widget.RecyclerView.Adapter"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -75,13 +73,14 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rl_list"
                     android:layout_width="match_parent"
-                    android:adapter="@{adapter}"
+                    adapter_item='@{"step"}'
+                    adapter_layout="@{R.layout.item_step}"
+                    adapter_data="@{route.getSteps()}"
                     android:orientation="vertical"
                     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_height="0dp"
                     android:layout_weight="1">
                 </android.support.v7.widget.RecyclerView>
-
                 <Button
                     android:layout_gravity="bottom"
                     android:id="@+id/btn_summit"

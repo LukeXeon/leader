@@ -12,7 +12,6 @@ import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.RouteSearch;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,11 +68,9 @@ public class RouteQueryViewModel extends AndroidViewModel
                             result.add(tip);
                         }
                     }
-                    Logger.d(result.size());
                     tips.postValue(result);
                 } catch (Exception e)
                 {
-                    Logger.d(e);
                     e.printStackTrace();
                     tips.postValue(null);
                 }

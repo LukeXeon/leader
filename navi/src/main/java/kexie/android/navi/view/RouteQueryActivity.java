@@ -1,14 +1,15 @@
 package kexie.android.navi.view;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.app.Activity;
 import android.text.TextUtils;
 import android.widget.LinearLayout;
 
@@ -16,11 +17,10 @@ import com.amap.api.services.help.Tip;
 
 import java.util.List;
 
-
 import es.dmoral.toasty.Toasty;
+import kexie.android.common.util.DataBindingCompat;
 import kexie.android.common.widget.ProgressDialog;
 import kexie.android.navi.R;
-import kexie.android.navi.adapter.RouteBindingAdapter;
 import kexie.android.navi.databinding.ActivityRouteQueryBinding;
 import kexie.android.navi.entity.Route;
 import kexie.android.navi.viewmodel.RouteQueryViewModel;
@@ -29,8 +29,6 @@ public class RouteQueryActivity extends AppCompatActivity
 {
     private static final String WAIT_QUERY = "wait query";
 
-    private final RouteBindingAdapter routeBindingAdapter
-            = new RouteBindingAdapter();
     private ActivityRouteQueryBinding binding;
     private RouteQueryViewModel viewModel;
 
@@ -43,7 +41,6 @@ public class RouteQueryActivity extends AppCompatActivity
 
         binding.setLifecycleOwner(this);
         binding.setHandler(this);
-        binding.setAdapter(routeBindingAdapter);
 
         viewModel = ViewModelProviders.of(this)
                 .get(RouteQueryViewModel.class);
@@ -54,8 +51,8 @@ public class RouteQueryActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Route> routes)
                     {
-                        setListViewAnimation(isEmptyList(routes));
-                        routeBindingAdapter.setNewData(routes);
+                        setListViewAnimation(!DataBindingCompat.isEmpty(routes));
+                        binding.setRoutes(routes);
                     }
                 });
         viewModel.getTips().observe(this,
@@ -71,21 +68,19 @@ public class RouteQueryActivity extends AppCompatActivity
                         {
                             progressDialog.dismiss();
                         }
-                        if (isEmptyList(tips))
+                        if (DataBindingCompat.isEmpty(tips))
                         {
                             Toasty.error(getApplicationContext(),
                                     "发生错误，请检查网络连接").show();
                         } else
                         {
-
+                            binding.setTips(tips);
+                            Toasty.success(getApplicationContext(),
+                                    "查询成功").show();
                         }
+
                     }
                 });
-    }
-
-    private static <T> boolean isEmptyList(List<T> list)
-    {
-        return !(list != null && list.size() != 0);
     }
 
     private void setListViewAnimation(boolean enable)
@@ -152,7 +147,7 @@ public class RouteQueryActivity extends AppCompatActivity
         }
     }
 
-    public static void startOf(Activity context)
+    public static void startOf(Context context)
     {
         context.startActivity(new Intent(context, RouteQueryActivity.class));
     }

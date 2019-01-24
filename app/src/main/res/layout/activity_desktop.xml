@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="kexie.android.dng.R"/>
+        <import type="android.view.View.OnClickListener" alias="Action"/>
+        <import type="kexie.android.dng.entity.desktop.Function"/>
         <variable
             name="user"
             type="kexie.android.dng.entity.desktop.User"/>
 
         <variable
-            name="handler"
-            type="kexie.android.dng.view.desktop.DesktopActivity"/>
-
-        <variable
-            name="adapter"
-            type="android.support.v7.widget.RecyclerView.Adapter"/>
+            name="simpleFunctions"
+            type="java.util.Map"/>
 
         <variable
             name="time"
             type="String"/>
+
+        <variable
+            name="listFunctions"
+            type="java.util.List"/>
     </data>
 
     <LinearLayout
@@ -37,7 +38,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="20dp"
             android:layout_weight="0.618"
-            android:onClick='@{()->handler.jumpTo("导航")}'>
+            android:onClick='@{(Action)simpleFunctions.get("导航")}'>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/riv_navi"
@@ -114,7 +115,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:onClick='@{()->handler.jumpTo("个人信息")}'
+                android:onClick='@{(Action)simpleFunctions.get("个人信息")}'
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -252,10 +253,12 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="40dp"
-                android:adapter="@{adapter}"
                 android:orientation="horizontal"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
+                adapter_item='@{"function"}'
+                adapter_layout="@{R.layout.item_desktop_function}"
+                adapter_data="@{listFunctions}"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager">
             </android.support.v7.widget.RecyclerView>
 

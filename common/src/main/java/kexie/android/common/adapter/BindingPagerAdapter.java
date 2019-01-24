@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -11,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -19,6 +19,7 @@ import kexie.android.common.util.DataBindingCompat;
 
 public class BindingPagerAdapter<T>
         extends PagerAdapter
+        implements BindingViewAdapter<T>
 {
     private final String setterName;
 
@@ -29,7 +30,6 @@ public class BindingPagerAdapter<T>
     private final List<T> data;
 
     private final Stack<ViewDataBinding> bindingCache;
-
 
     public BindingPagerAdapter(String variableName, @LayoutRes int layoutRes)
     {
@@ -94,7 +94,7 @@ public class BindingPagerAdapter<T>
         return data;
     }
 
-    public void setNewData(Collection<T> data)
+    public void setNewData(@Nullable List<T> data)
     {
         this.data.clear();
         if (data != null)

@@ -2,16 +2,20 @@ package kexie.android.common.util;
 
 import android.databinding.ViewDataBinding;
 import android.text.TextUtils;
-import android.util.LruCache;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class DataBindingCompat
 {
-    private static final LruCache<String, Method> TABLE = new LruCache<>(32);
+    private static final Map<Class<? extends ViewDataBinding>,
+            Map<String, Method>>
+            TABLE = new HashMap<>();
 
-    private static String toFrsitUpCaseName(String variableName)
+    private static String toFirstUpCaseName(String variableName)
     {
         return String.valueOf(
                 Character.toUpperCase(variableName.charAt(0))
@@ -26,10 +30,17 @@ public final class DataBindingCompat
         {
             throw new IllegalArgumentException();
         }
-        variableName = "set" + toFrsitUpCaseName(variableName);
         try
         {
-            Method setter = TABLE.get(variableName);
+            Class<? extends ViewDataBinding> bindingClass = binding.getClass();
+            Map<String, Method> table = TABLE.get(binding.getClass());
+            if (table == null)
+            {
+                table = new HashMap<>();
+                TABLE.put(bindingClass, table);
+            }
+            variableName = "set" + toFirstUpCaseName(variableName);
+            Method setter = table.get(variableName);
             if (setter == null)
             {
                 for (Method method : binding.getClass().getMethods())
@@ -41,7 +52,7 @@ public final class DataBindingCompat
                             && void.class.equals(method.getReturnType()))
                     {
                         setter = method;
-                        TABLE.put(variableName, setter);
+                        table.put(variableName, setter);
                     }
                 }
                 if (setter == null)
@@ -60,15 +71,23 @@ public final class DataBindingCompat
     public static <T> T getVariable(ViewDataBinding binding,
                                     String variableName)
     {
-        variableName = "get" + toFrsitUpCaseName(variableName);
+        variableName = "get" + toFirstUpCaseName(variableName);
         if (TextUtils.isEmpty(variableName))
         {
             throw new IllegalArgumentException();
         }
         try
         {
-            Method setter = TABLE.get(variableName);
-            if (setter == null)
+            Class<? extends ViewDataBinding> bindingClass = binding.getClass();
+            Map<String, Method> table = TABLE.get(bindingClass);
+            if (table == null)
+            {
+                table = new HashMap<>();
+                TABLE.put(bindingClass, table);
+            }
+
+            Method getter = table.get(variableName);
+            if (getter == null)
             {
                 for (Method method : binding.getClass().getMethods())
                 {
@@ -76,19 +95,24 @@ public final class DataBindingCompat
                             && method.getParameterTypes().length == 0
                             && !void.class.equals(method.getReturnType()))
                     {
-                        setter = method;
-                        TABLE.put(variableName, setter);
+                        getter = method;
+                        table.put(variableName, getter);
                     }
                 }
-                if (setter == null)
+                if (getter == null)
                 {
                     throw new RuntimeException(variableName + " Getter not found");
                 }
             }
-            return (T) setter.invoke(binding);
+            return (T) getter.invoke(binding);
         } catch (IllegalAccessException | InvocationTargetException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> boolean isEmpty(List<T> list)
+    {
+        return !(list != null && list.size() != 0);
     }
 }
