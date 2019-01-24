@@ -5,17 +5,17 @@ import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+
+import kexie.android.common.util.DataBindingCompat;
 
 public class BindingPagerAdapter<T>
         extends PagerAdapter
@@ -30,16 +30,10 @@ public class BindingPagerAdapter<T>
 
     private final Stack<ViewDataBinding> bindingCache;
 
-    private Method setter;
 
     public BindingPagerAdapter(String variableName, @LayoutRes int layoutRes)
     {
-        if (TextUtils.isEmpty(variableName))
-        {
-            throw new IllegalArgumentException();
-        }
-        this.setterName = "set" + String.valueOf(variableName.charAt(0)
-                + variableName.substring(1));
+        this.setterName= variableName;
         this.layoutRes = layoutRes;
         this.using = new SparseArray<>();
         this.data = new ArrayList<>();
@@ -48,7 +42,7 @@ public class BindingPagerAdapter<T>
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container,
+    public View instantiateItem(@NonNull ViewGroup container,
                                   int position)
     {
         ViewDataBinding binding = using.get(position);
@@ -57,7 +51,7 @@ public class BindingPagerAdapter<T>
             binding = newBinding(container);
             using.put(position, binding);
         }
-        setDataToBinding(binding, data.get(position));
+        DataBindingCompat.setVariable(binding, setterName, data.get(position));
         View view = binding.getRoot();
         container.addView(view);
         return view;
@@ -78,46 +72,18 @@ public class BindingPagerAdapter<T>
         }
     }
 
-    private void setDataToBinding(ViewDataBinding binding, T data)
-    {
-        try
-        {
-            getSetter(binding, data).invoke(binding, data);
-        } catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Method getSetter(ViewDataBinding binding,T data)
-    {
-        if (setter == null)
-        {
-            for (Method method : binding.getClass().getMethods())
-            {
-                Class<?>[] parameters = method.getParameterTypes();
-                if (method.getName().equals(setterName)
-                        && parameters.length == 1
-                        && parameters[0].isInstance(data))
-                {
-                    setter = method;
-                    return setter;
-                }
-            }
-            throw new RuntimeException();
-        }
-        else
-        {
-            return setter;
-        }
-    }
-
     @Override
-    public void destroyItem(@NonNull ViewGroup container,
+    public final void destroyItem(@NonNull ViewGroup container,
                             int position,
                             @NonNull Object object)
     {
-        View view = (View) object;
+        destroyItem(container, position, (View) object);
+    }
+
+    public void destroyItem(@NonNull ViewGroup container,
+                            int position,
+                            @NonNull View view)
+    {
         container.removeView(view);
         using.remove(position);
         bindingCache.push(DataBindingUtil.bind(view));

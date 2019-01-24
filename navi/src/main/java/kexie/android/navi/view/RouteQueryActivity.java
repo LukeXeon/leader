@@ -9,22 +9,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
+
 
 import kexie.android.navi.R;
 import kexie.android.navi.adapter.RouteBindingAdapter;
 import kexie.android.navi.databinding.ActivityRouteQueryBinding;
-import kexie.android.navi.databinding.ItemRouteBinding;
 import kexie.android.navi.entity.Route;
 import kexie.android.navi.viewmodel.RouteQueryViewModel;
 
 public class RouteQueryActivity extends AppCompatActivity
 {
 
-    private final RouteBindingAdapter routeBindingAdapter = new RouteBindingAdapter();
-    private final Stack<ItemRouteBinding> bindingCache = new Stack<>();
+    private final RouteBindingAdapter routeBindingAdapter
+            = new RouteBindingAdapter();
     private ActivityRouteQueryBinding binding;
     private RouteQueryViewModel viewModel;
 
@@ -36,15 +34,7 @@ public class RouteQueryActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this,
                 R.layout.activity_route_query);
 
-        for (int i = 0; i < 3; i++)
-        {
-            ItemRouteBinding itemBinding
-                    = DataBindingUtil.inflate(getLayoutInflater(),
-                    R.layout.item_route,
-                    binding.vpPager,
-                    false);
-            bindingCache.add(itemBinding);
-        }
+        binding.setAdapter(routeBindingAdapter);
 
         viewModel = ViewModelProviders.of(this)
                 .get(RouteQueryViewModel.class);
@@ -55,30 +45,7 @@ public class RouteQueryActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Route> routes)
                     {
-                        if (routes != null)
-                        {
-                            List<ItemRouteBinding> bindings = new ArrayList<>();
-                            for (Route route : routes)
-                            {
-                                ItemRouteBinding routeBinding = bindingCache.pop();
-                                routeBinding.setRoute(route);
-                                bindings.add(routeBinding);
-                            }
-                            routeBindingAdapter.setBindings(bindings);
-                            binding.setAdapter(routeBindingAdapter);
-                        } else
-                        {
-                            binding.setAdapter(null);
-                            List<ItemRouteBinding> bindings
-                                    = routeBindingAdapter.getBindings();
-                            if (bindings != null)
-                            {
-                                for (ItemRouteBinding binding : bindings)
-                                {
-                                    bindingCache.push(binding);
-                                }
-                            }
-                        }
+                        routeBindingAdapter.setNewData(routes);
                     }
                 });
     }

@@ -6,22 +6,28 @@
         <variable
             name="route"
             type="kexie.android.navi.entity.Route"/>
+        <variable
+            name="adapter"
+            type="android.support.v7.widget.RecyclerView.Adapter"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
         <android.support.v7.widget.CardView
+            app:cardUseCompatPadding="false"
+            app:cardElevation="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:background="@android:color/transparent"
             app:cardCornerRadius="20dp">
 
             <LinearLayout
+                android:layout_margin="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -38,6 +44,7 @@
                         android:src="@mipmap/image_search"/>
 
                     <TextView
+                        fontAsset='@{"PingFang Regular.ttf"}'
                         android:id="@+id/tv_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -53,11 +60,12 @@
                     android:background="@color/lightblue500"/>
 
                 <TextView
+                    fontAsset='@{"PingFang Regular.ttf"}'
                     android:id="@+id/tv_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginRight="20dp"
+                    android:paddingRight="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical|right"
                     android:text='@{route.time+"("+route.length+")"}'
@@ -67,15 +75,19 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rl_list"
                     android:layout_width="match_parent"
+                    android:adapter="@{adapter}"
+                    android:orientation="vertical"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_height="0dp"
                     android:layout_weight="1">
                 </android.support.v7.widget.RecyclerView>
 
                 <Button
+                    android:layout_gravity="bottom"
                     android:id="@+id/btn_summit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/btn_draw"
                     android:text="确认"
                     android:textColor="@color/white"

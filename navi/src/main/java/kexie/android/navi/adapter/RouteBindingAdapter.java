@@ -1,56 +1,45 @@
 package kexie.android.navi.adapter;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
+import kexie.android.common.adapter.BindingPagerAdapter;
+import kexie.android.common.adapter.BindingRecyclerAdapter;
+import kexie.android.common.util.DataBindingCompat;
+import kexie.android.navi.R;
+import kexie.android.navi.entity.Route;
+import kexie.android.navi.entity.Step;
 
-import kexie.android.navi.databinding.ItemRouteBinding;
-
-public class RouteBindingAdapter extends PagerAdapter
+public class RouteBindingAdapter extends BindingPagerAdapter<Route>
 {
-    private List<ItemRouteBinding> bindings;
-
+    public RouteBindingAdapter()
+    {
+        super("route", R.layout.item_route);
+    }
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container,
-                                  int position)
+    public View instantiateItem(@NonNull ViewGroup container, int position)
     {
-        View view = bindings.get(position).getRoot();
-        container.addView(view);
+        View view = super.instantiateItem(container, position);
+        ViewDataBinding viewDataBinding = DataBindingUtil.bind(view);
+        BindingRecyclerAdapter<Step> adapter
+                = new BindingRecyclerAdapter<>("step", R.layout.item_step);
+        adapter.setNewData(getData().get(position).steps);
+        DataBindingCompat.setVariable(viewDataBinding, "adapter", adapter);
         return view;
     }
 
     @Override
     public void destroyItem(@NonNull ViewGroup container,
                             int position,
-                            @NonNull Object object)
+                            @NonNull View view)
     {
-        container.removeView((View) object);
-    }
-
-    public void setBindings(List<ItemRouteBinding> bindings)
-    {
-        this.bindings = bindings;
-    }
-
-    public List<ItemRouteBinding> getBindings()
-    {
-        return bindings;
-    }
-
-    @Override
-    public int getCount()
-    {
-        return bindings.size();
-    }
-
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object)
-    {
-        return view == object;
+        ViewDataBinding viewDataBinding = DataBindingUtil.bind(view);
+        DataBindingCompat.setVariable(viewDataBinding, "adapter", null);
+        super.destroyItem(container, position, view);
     }
 }

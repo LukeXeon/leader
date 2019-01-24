@@ -30,6 +30,7 @@
                     android:background="@color/lightblue500"/>
 
                 <ImageView
+
                     android:id="@+id/iv_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -38,7 +39,7 @@
                     android:padding="5dp"
                     android:scaleType="centerInside"
                     mipmap='@{step.mipmap}'
-                    android:src="@drawable/dir_start"/>
+                    android:src="@mipmap/dir_start"/>
             </RelativeLayout>
 
             <LinearLayout
@@ -48,8 +49,14 @@
                 android:orientation="vertical">
 
                 <TextView
+                    fontAsset='@{"PingFang Regular.ttf"}'
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/draw_text_background_blue"
                     android:id="@+id/tv_text"
-                    android:layout_width="match_parent"
+                    android:textColorHint="@android:color/white"
+                    android:textColor="@android:color/white"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
