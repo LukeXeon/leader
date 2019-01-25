@@ -17,7 +17,7 @@
 
         <import type="com.amap.api.services.help.Tip"/>
 
-        <import type="kexie.android.navi.entity.Route"/>
+        <import type="kexie.android.navi.entity.SdkRoute"/>
 
         <variable
             name="tips"
@@ -25,7 +25,7 @@
 
         <variable
             name="routes"
-            type="java.util.List&lt;Route&gt;"/>
+            type="java.util.List&lt;SdkRoute&gt;"/>
 
         <variable
             name="actions"

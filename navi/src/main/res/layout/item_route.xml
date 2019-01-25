@@ -6,7 +6,7 @@
         <import type="kexie.android.navi.R"/>
         <variable
             name="route"
-            type="kexie.android.navi.entity.Route"/>
+            type="kexie.android.navi.entity.SdkRoute"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"

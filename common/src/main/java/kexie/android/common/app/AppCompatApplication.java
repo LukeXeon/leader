@@ -12,7 +12,7 @@ public class AppCompatApplication extends MultiDexApplication
     private static boolean mainCreate = true;
 
     @Override
-    public synchronized final void onCreate()
+    public synchronized void onCreate()
     {
         super.onCreate();
         AutoSize.initCompatMultiProcess(this);
@@ -36,7 +36,6 @@ public class AppCompatApplication extends MultiDexApplication
     @CallSuper
     protected void onCreateMainProcess()
     {
-        registerActivityLifecycleCallbacks(new EventBusHandler());
     }
 
     @Override

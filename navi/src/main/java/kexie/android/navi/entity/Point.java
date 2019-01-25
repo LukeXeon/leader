@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Luke on 2018/12/27.
@@ -43,12 +44,12 @@ public final class Point
         dest.writeDouble(getLongitude());
     }
 
-    private static class PointImpl implements PointCompat
+    private static class Json implements PointCompat
     {
         public final double latitude;
         public final double longitude;
 
-        private PointImpl(double latitude, double longitude)
+        private Json(double latitude, double longitude)
         {
             this.latitude = latitude;
             this.longitude = longitude;
@@ -210,12 +211,17 @@ public final class Point
 
     protected Point(Parcel in)
     {
-        impl = new PointImpl(in.readDouble(), in.readDouble());
+        impl = new Json(in.readDouble(), in.readDouble());
+    }
+
+    public Point(Json json)
+    {
+        this(json.latitude, json.longitude);
     }
 
     public Point(double latitude, double longitude)
     {
-        impl = new PointImpl(latitude, longitude);
+        impl = new Json(latitude, longitude);
     }
 
     public Point(LatLng latLng)

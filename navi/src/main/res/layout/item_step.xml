@@ -4,7 +4,7 @@
     <data>
         <variable
             name="step"
-            type="kexie.android.navi.entity.Route.Step"/>
+            type="kexie.android.navi.entity.SdkRoute.Step"/>
     </data>
     <LinearLayout
 

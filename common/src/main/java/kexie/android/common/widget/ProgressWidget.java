@@ -1,6 +1,7 @@
 package kexie.android.common.widget;
 
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,7 +32,7 @@ import kexie.android.common.R;
  * Created by zhangyc on 2018/6/7.
  */
 
-public class ProgressDialog
+public class ProgressWidget
         extends DialogFragment
 {
     private ProgressBar mProgress;
@@ -39,6 +41,11 @@ public class ProgressDialog
     private ImageView mBotIv;
     private String msg;
     private Handler mainThread = new Handler(Looper.getMainLooper());
+
+    public ProgressWidget()
+    {
+
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
@@ -136,8 +143,38 @@ public class ProgressDialog
             public void run()
             {
                 mainThread.removeCallbacksAndMessages(null);
-                ProgressDialog.super.dismiss();
+                ProgressWidget.super.dismiss();
             }
         }, 200);
+    }
+
+    public static Observer<Boolean> getObserver(FragmentManager fragmentManager)
+    {
+        return new WidgetObserver(fragmentManager);
+    }
+
+    private static class WidgetObserver
+            implements Observer<Boolean>
+    {
+        private static final String TAG = "wait";
+        private final FragmentManager fragmentManager;
+        private final ProgressWidget widget = new ProgressWidget();
+
+        private WidgetObserver(FragmentManager fragmentManager)
+        {
+            this.fragmentManager = fragmentManager;
+        }
+
+        @Override
+        public void onChanged(@Nullable Boolean aBoolean)
+        {
+            if (aBoolean != null && aBoolean)
+            {
+                widget.show(fragmentManager, TAG);
+            } else
+            {
+                widget.dismiss();
+            }
+        }
     }
 }

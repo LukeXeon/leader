@@ -1,5 +1,6 @@
 package kexie.android.navi.view;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,14 +15,26 @@ public class MapNavigationFragment extends Fragment
 {
     private AMapNaviView innerView;
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-        innerView = new AMapNaviView(getContext());
         return innerView;
+    }
+
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        innerView = new AMapNaviView(getContext());
     }
 
     @Override

@@ -10,20 +10,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import com.amap.api.services.help.Tip;
 
 import java.util.List;
-import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
 import kexie.android.common.util.T;
-import kexie.android.common.widget.ProgressDialog;
+import kexie.android.common.widget.ProgressWidget;
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.ActivityRouteQueryBinding;
-import kexie.android.navi.entity.Route;
+import kexie.android.navi.entity.SdkRoute;
 import kexie.android.navi.viewmodel.RouteQueryViewModel;
 
 public class RouteQueryActivity extends AppCompatActivity
@@ -48,10 +46,10 @@ public class RouteQueryActivity extends AppCompatActivity
                 .get(RouteQueryViewModel.class);
 
         viewModel.getRoutes().observe(this,
-                new Observer<List<Route>>()
+                new Observer<List<SdkRoute>>()
                 {
                     @Override
-                    public void onChanged(@Nullable List<Route> routes)
+                    public void onChanged(@Nullable List<SdkRoute> routes)
                     {
                         drawerAnimating(!T.isEmpty(routes));
                         binding.setRoutes(routes);
@@ -84,17 +82,17 @@ public class RouteQueryActivity extends AppCompatActivity
                     {
                         if (aBoolean != null && aBoolean)
                         {
-                            ProgressDialog progressDialog = new ProgressDialog();
-                            progressDialog.show(getSupportFragmentManager(),
+                            ProgressWidget progressWidget = new ProgressWidget();
+                            progressWidget.show(getSupportFragmentManager(),
                                     WAIT_QUERY);
                         } else
                         {
-                            ProgressDialog progressDialog
-                                    = (ProgressDialog) getSupportFragmentManager()
+                            ProgressWidget progressWidget
+                                    = (ProgressWidget) getSupportFragmentManager()
                                     .findFragmentByTag(WAIT_QUERY);
-                            if (progressDialog != null)
+                            if (progressWidget != null)
                             {
-                                progressDialog.dismiss();
+                                progressWidget.dismiss();
                             }
                         }
                     }

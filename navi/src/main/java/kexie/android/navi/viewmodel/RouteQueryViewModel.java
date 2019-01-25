@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 
 import kexie.android.navi.entity.Point;
 import kexie.android.navi.entity.Query;
-import kexie.android.navi.entity.Route;
+import kexie.android.navi.entity.SdkRoute;
 import kexie.android.navi.util.Points;
 
 public class RouteQueryViewModel extends AndroidViewModel
@@ -32,7 +32,7 @@ public class RouteQueryViewModel extends AndroidViewModel
     private static final String CITY = "西安";
     private final RouteSearch routeSearch;
     private final Executor singleTask = Executors.newSingleThreadExecutor();
-    private final MutableLiveData<List<Route>> routes = new MutableLiveData<>();
+    private final MutableLiveData<List<SdkRoute>> routes = new MutableLiveData<>();
     private final MutableLiveData<List<Tip>> tips = new MutableLiveData<>();
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
@@ -58,7 +58,7 @@ public class RouteQueryViewModel extends AndroidViewModel
         return tips;
     }
 
-    public MutableLiveData<List<Route>> getRoutes()
+    public MutableLiveData<List<SdkRoute>> getRoutes()
     {
         return routes;
     }
@@ -143,12 +143,12 @@ public class RouteQueryViewModel extends AndroidViewModel
             {
                 try
                 {
-                    final List<Route> routes = new ArrayList<>();
+                    final List<SdkRoute> routes = new ArrayList<>();
                     for (DrivePath path : routeSearch
                             .calculateDriveRoute(driveRouteQuery)
                             .getPaths())
                     {
-                        routes.add(new Route.Builder()
+                        routes.add(new SdkRoute.Builder()
                                 .from(query.from)
                                 .to(query.to)
                                 .path(path)

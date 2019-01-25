@@ -9,6 +9,8 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.View;
 
@@ -36,6 +38,7 @@ import kexie.android.dng.entity.desktop.Function;
 import kexie.android.dng.entity.desktop.User;
 import kexie.android.dng.model.FunctionLoadTaskFactory;
 import kexie.android.dng.view.users.UsersActivity;
+import kexie.android.navi.view.MapNavigationActivity;
 import kexie.android.navi.view.RouteQueryActivity;
 import okhttp3.OkHttpClient;
 
@@ -55,6 +58,7 @@ public class DesktopViewModel
         super(application);
         initListFunctions();
         initDefaultUserInfo();
+
     }
 
     private void initDefaultUserInfo()
