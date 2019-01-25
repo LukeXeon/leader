@@ -6,10 +6,8 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 
 import java.util.List;
-import java.util.Map;
 
 import kexie.android.dng.R;
 import kexie.android.dng.databinding.ActivityDesktopBinding;
@@ -60,18 +58,9 @@ public class DesktopActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Function> desktopFunctions)
                     {
-                        binding.setListFunctions(desktopFunctions);
+                        binding.setFunctions(desktopFunctions);
                     }
                 });
-        viewModel.getSimpleFunctions().observe(this,
-                new Observer<Map<String, View.OnClickListener>>()
-        {
-            @Override
-            public void onChanged(@Nullable Map<String, View.OnClickListener> func)
-            {
-                binding.setSimpleFunctions(func);
-            }
-        });
+        binding.setActions(viewModel.getActions());
     }
-
 }

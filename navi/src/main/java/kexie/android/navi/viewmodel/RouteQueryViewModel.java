@@ -13,7 +13,6 @@ import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.RouteSearch;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ public class RouteQueryViewModel extends AndroidViewModel
     private final Executor singleTask = Executors.newSingleThreadExecutor();
     private final MutableLiveData<List<Route>> routes = new MutableLiveData<>();
     private final MutableLiveData<List<Tip>> tips = new MutableLiveData<>();
-    private final MutableLiveData<Map<String,View.OnClickListener>> actions = new MutableLiveData<>();
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
 
@@ -43,24 +41,6 @@ public class RouteQueryViewModel extends AndroidViewModel
     {
         super(application);
         routeSearch = new RouteSearch(application);
-        initActions();
-    }
-
-    private void initActions()
-    {
-        actions.setValue(new HashMap<String, View.OnClickListener>()
-        {
-            {
-                put("开始查询", new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        textQuery(DEBUG_TEXT);
-                    }
-                });
-            }
-        });
     }
 
     public MutableLiveData<Boolean> getLoading()
@@ -83,9 +63,21 @@ public class RouteQueryViewModel extends AndroidViewModel
         return routes;
     }
 
-    public MutableLiveData<Map<String, View.OnClickListener>> getActions()
+    public Map<String, View.OnClickListener> getActions()
     {
-        return actions;
+        return new HashMap<String, View.OnClickListener>()
+        {
+            {
+                put("开始查询", new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        textQuery(DEBUG_TEXT);
+                    }
+                });
+            }
+        };
     }
 
     private void textQuery(final String text)
@@ -112,7 +104,6 @@ public class RouteQueryViewModel extends AndroidViewModel
                             if (!TextUtils.isEmpty(tip.getPoiID()))
                             {
                                 result.add(tip);
-                                Logger.d(++i + "   " + tip.getName());
                             }
                         }
                         tips.postValue(result);

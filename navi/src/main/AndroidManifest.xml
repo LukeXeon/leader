@@ -4,11 +4,23 @@
 
     <application
         android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        <service android:name="com.amap.api.location.APSService"/>
+        <service
+            android:exported="false"
+            android:name="com.amap.api.location.APSService"/>
         <activity
             android:screenOrientation="landscape"
-            android:name=".view.RouteQueryActivity">
-        </activity>
+            android:name=".view.RouteQueryActivity"/>
+        <activity
+            android:screenOrientation="landscape"
+            android:name=".view.MapNavigationActivity"/>
+        <!--<service-->
+            <!--android:process=":navi"-->
+            <!--android:exported="false"-->
+            <!--android:name="com.amap.api.location.APSService"/>-->
+        <!--<activity-->
+            <!--android:screenOrientation="landscape"-->
+            <!--android:name=".view.RouteQueryActivity"-->
+            <!--android:process=":navi"/>-->
     </application>
 
 </manifest>

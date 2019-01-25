@@ -42,9 +42,6 @@ import okhttp3.OkHttpClient;
 public class DesktopViewModel
         extends AndroidViewModel implements LifecycleObserver
 {
-
-    private final MutableLiveData<Map<String,View.OnClickListener>> simpleFunctions
-            = new MutableLiveData<>();
     private final MutableLiveData<User> userInfo = new MutableLiveData<>();
     private final MutableLiveData<String> time = new MutableLiveData<>();
     private final MutableLiveData<List<Function>> listFunctions = new MutableLiveData<>();
@@ -56,7 +53,7 @@ public class DesktopViewModel
     public DesktopViewModel(Application application)
     {
         super(application);
-        initFunctions();
+        initListFunctions();
         initDefaultUserInfo();
     }
 
@@ -111,7 +108,7 @@ public class DesktopViewModel
         updateTimer.cancel();
     }
 
-    private void initFunctions()
+    private void initListFunctions()
     {
         Observable.just(getApplication())
                 .subscribeOn(Schedulers.io())
@@ -166,7 +163,11 @@ public class DesktopViewModel
                         DesktopViewModel.this.listFunctions.postValue(functions);
                     }
                 });
-        simpleFunctions.setValue(new HashMap<String, View.OnClickListener>()
+    }
+
+    public Map<String, View.OnClickListener> getActions()
+    {
+        return new HashMap<String, View.OnClickListener>()
         {
             {
                 put("个人信息", new View.OnClickListener()
@@ -186,12 +187,7 @@ public class DesktopViewModel
                     }
                 });
             }
-        });
-    }
-
-    public MutableLiveData<Map<String, View.OnClickListener>> getSimpleFunctions()
-    {
-        return simpleFunctions;
+        };
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

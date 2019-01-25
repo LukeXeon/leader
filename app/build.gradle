@@ -25,7 +25,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api project(':common')
-    implementation 'com.android.support:multidex:+'
+
     implementation project(':navi')
     //implementation project(':framework-runtime')
     //annotationProcessor project(':framework-compiler')

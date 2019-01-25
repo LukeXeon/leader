@@ -1,7 +1,9 @@
 package kexie.android.common.adapter;
 
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.annotation.LayoutRes;
+import android.view.ViewGroup;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -28,8 +30,9 @@ public class BindingRecyclerAdapter<T>
     {
         try
         {
-            DataBindingCompat.setVariable(DataBindingUtil.bind(helper.itemView),
-                    setterName, data);
+            ViewDataBinding binding = DataBindingUtil.bind(helper.itemView);
+            assert binding != null;
+            DataBindingCompat.setVariable(binding, setterName, data);
         } catch (Exception e)
         {
             throw new RuntimeException(e);

@@ -53,7 +53,7 @@ public class RouteQueryActivity extends AppCompatActivity
                     @Override
                     public void onChanged(@Nullable List<Route> routes)
                     {
-                        setListViewAnimation(!T.isEmpty(routes));
+                        drawerAnimating(!T.isEmpty(routes));
                         binding.setRoutes(routes);
                     }
                 });
@@ -115,18 +115,10 @@ public class RouteQueryActivity extends AppCompatActivity
                         }
                     }
                 });
-        viewModel.getActions().observe(this,
-                new Observer<Map<String, View.OnClickListener>>()
-                {
-                    @Override
-                    public void onChanged(@Nullable Map<String, View.OnClickListener> actions)
-                    {
-                        binding.setActions(actions);
-                    }
-                });
+        binding.setActions(viewModel.getActions());
     }
 
-    private void setListViewAnimation(boolean enable)
+    private void drawerAnimating(boolean enable)
     {
         final LinearLayout.LayoutParams layoutParams
                 = (LinearLayout.LayoutParams) binding.vpPager

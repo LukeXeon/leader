@@ -34,14 +34,7 @@ public class UsersActivity extends AppCompatActivity
 
         viewModel = ViewModelProviders.of(this).get(UsersViewModel.class);
 
-        viewModel.getActions().observe(this, new Observer<Map<String, View.OnClickListener>>()
-        {
-            @Override
-            public void onChanged(@Nullable Map<String, View.OnClickListener> actions)
-            {
-                binding.setActions(actions);
-            }
-        });
+        binding.setActions(binding.getActions());
 
         viewModel.getHeadImage().observe(this,
                 new Observer<Drawable>()

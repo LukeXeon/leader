@@ -18,7 +18,7 @@
             type="kexie.android.dng.entity.desktop.User"/>
 
         <variable
-            name="simpleFunctions"
+            name="actions"
             type="java.util.Map&lt;String,Action&gt;"/>
 
         <variable
@@ -26,7 +26,7 @@
             type="String"/>
 
         <variable
-            name="listFunctions"
+            name="functions"
             type="java.util.List&lt;Function&gt;"/>
     </data>
 
@@ -44,7 +44,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="20dp"
             android:layout_weight="0.618"
-            android:onClick='@{simpleFunctions.get("导航")}'>
+            android:onClick='@{actions.get("导航")}'>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/riv_navi"
@@ -121,7 +121,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:gravity="center_vertical"
-                android:onClick='@{simpleFunctions.get("个人信息")}'
+                android:onClick='@{actions.get("个人信息")}'
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -253,7 +253,7 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_function_list"
-                adapter_data="@{listFunctions}"
+                adapter_data="@{functions}"
                 adapter_item='@{"function"}'
                 adapter_layout="@{R.layout.item_desktop_function}"
                 android:layout_width="match_parent"

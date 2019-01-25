@@ -20,20 +20,18 @@ import okhttp3.Request;
 
 public class UsersViewModel extends AndroidViewModel
 {
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
     private final OkHttpClient httpClient = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
     private final MutableLiveData<Drawable> headImage = new MutableLiveData<>();
     private final MutableLiveData<SimpleUser> simpleUser = new MutableLiveData<>();
-    private final MutableLiveData<Map<String, View.OnClickListener>> actions = new MutableLiveData<>();
 
     public UsersViewModel(@NonNull Application application)
     {
         super(application);
         Request request = new Request.Builder()
                 .url("http://172.20.10.5:8080/navigator/device/user/detail/").get().build();
-        initActions();
       }
 
     @Override
@@ -42,24 +40,9 @@ public class UsersViewModel extends AndroidViewModel
         super.onCleared();
     }
 
-    public MutableLiveData<Map<String, View.OnClickListener>> getActions()
+    public Map<String, View.OnClickListener> getActions()
     {
-        return actions;
-    }
-
-    public MutableLiveData<Drawable> getHeadImage()
-    {
-        return headImage;
-    }
-
-    public MutableLiveData<SimpleUser> getSimpleUser()
-    {
-        return simpleUser;
-    }
-
-    private void initActions()
-    {
-        actions.setValue(new HashMap<String, View.OnClickListener>()
+        return new HashMap<String, View.OnClickListener>()
         {
             {
                 put("返回", new View.OnClickListener()
@@ -80,6 +63,17 @@ public class UsersViewModel extends AndroidViewModel
                     }
                 });
             }
-        });
+        };
     }
+
+    public MutableLiveData<Drawable> getHeadImage()
+    {
+        return headImage;
+    }
+
+    public MutableLiveData<SimpleUser> getSimpleUser()
+    {
+        return simpleUser;
+    }
+
 }

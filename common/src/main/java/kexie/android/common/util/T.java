@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.util.LruCache;
 
 import com.blankj.utilcode.util.Utils;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 import java.util.Map;
