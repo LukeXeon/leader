@@ -1,10 +1,10 @@
 package org.kexie.android.databinding;
 
-import android.databinding.BindingAdapter;
-import android.support.annotation.LayoutRes;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.BindingAdapter;
+import androidx.annotation.LayoutRes;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 

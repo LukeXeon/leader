@@ -1,11 +1,10 @@
 package kexie.android.dng.app;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import kexie.android.dng.R;
-import kexie.android.dng.view.desktop.DesktopFragment;
 
 public final class HostActivity extends AppCompatActivity
 {

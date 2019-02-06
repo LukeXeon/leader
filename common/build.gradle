@@ -3,15 +3,13 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
 
-
-
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
     }
@@ -29,15 +27,15 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api 'com.android.support:multidex:+'
-    api 'com.android.support:appcompat-v7:+'
-    api 'com.android.support:support-v13:+'
-    api 'com.android.support.constraint:constraint-layout:+'
-    api 'android.arch.lifecycle:extensions:+'
-    api 'com.android.support:design:+'
+    api 'androidx.appcompat:appcompat:1.1.0-alpha01'
+    api 'androidx.multidex:multidex:2.0.0'
+    api 'androidx.legacy:legacy-support-v13:1.0.0-alpha1'
+    api 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha02'
+    api 'com.google.android.material:material:1.1.0-alpha03'
 
     api project(':databinding')
-    api 'com.github.LukeXeon:Liteproj:+'
+    api 'com.github.LukeXeon:Liteproj:1.0.4'
     api 'com.neovisionaries:nv-websocket-client:+'
     api 'com.getbase:floatingactionbutton:+'
     api 'com.flipboard:bottomsheet-core:+'
@@ -53,6 +51,6 @@ dependencies {
     api 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
 }

@@ -8,7 +8,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 import android.telephony.TelephonyManager;
 
 import java.io.UnsupportedEncodingException;

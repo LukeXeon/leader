@@ -40,7 +40,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:onClick='@{actions.get("刷新")}'
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                         android:hint="刷新"
                         android:textColorHint="@android:color/white"
                         android:textSize="40sp"/>
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
             </FrameLayout>
 
             <FrameLayout
@@ -70,7 +70,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:onClick='@{actions.get("返回")}'
                     android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
@@ -90,11 +90,11 @@
                         android:hint="返回"
                         android:textColorHint="@android:color/white"
                         android:textSize="40sp"/>
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
             </FrameLayout>
         </LinearLayout>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:transitionName="card"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -283,6 +283,6 @@
                         android:textStyle="bold"/>
                 </LinearLayout>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </RelativeLayout>
 </layout>

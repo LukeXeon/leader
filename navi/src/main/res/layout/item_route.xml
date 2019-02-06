@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             app:cardUseCompatPadding="false"
             app:cardElevation="10dp"
             android:layout_width="match_parent"
@@ -70,17 +70,17 @@
                     android:hint="40分钟(19公里)"
                     android:textSize="30sp"/>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rl_list"
                     android:layout_width="match_parent"
                     item_name='@{"step"}'
                     item_layout="@{R.layout.item_step}"
                     item_source="@{route.getSteps()}"
                     android:orientation="vertical"
-                    app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:layout_height="0dp"
                     android:layout_weight="1">
-                </android.support.v7.widget.RecyclerView>
+                </androidx.recyclerview.widget.RecyclerView>
                 <Button
                     android:layout_gravity="bottom"
                     android:id="@+id/btn_summit"
@@ -92,6 +92,6 @@
                     android:textColor="@color/white"
                     android:textSize="30sp"/>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </FrameLayout>
 </layout>

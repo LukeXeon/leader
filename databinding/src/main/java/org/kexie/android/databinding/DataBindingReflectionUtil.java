@@ -1,6 +1,6 @@
 package org.kexie.android.databinding;
 
-import android.databinding.ViewDataBinding;
+import androidx.databinding.ViewDataBinding;
 import android.text.TextUtils;
 
 import java.lang.reflect.InvocationTargetException;
