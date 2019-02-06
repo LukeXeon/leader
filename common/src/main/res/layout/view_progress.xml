@@ -1,136 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
 
-        <!--@drawable/common_progress_dialog_background"-->
-        <FrameLayout
-            android:layout_width="350dp"
+    <!--@drawable/common_progress_dialog_background"-->
+    <FrameLayout
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp">
-            <android.support.v7.widget.CardView
+            android:layout_margin="10dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="false">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="10dp"
-                app:cardPreventCornerOverlap="false"
-                app:cardUseCompatPadding="false">
+                android:background="@android:color/transparent"
+                android:orientation="vertical">
+                <!--Title-->
+                <TextView
+                    fontAsset='@{"PingFang Regular.ttf"}'
+                    android:id="@+id/progress_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="40dp"
+                    android:text=""
+                    android:textColor="#000"
+                    android:textSize="20sp"/>
+
+                <!--进度-->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="18dp"
+                    android:background="@mipmap/progress">
+
+                    <RelativeLayout
+                        android:id="@+id/progress_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true">
+
+                        <ImageView
+                            android:id="@+id/p_bot_iv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/shape_round_corner_bottom"/>
+
+                        <kexie.android.common.widget.RoundCornerImageView
+                            android:id="@+id/p_cover_iv"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/pic_cover_blue_white"/>
+
+                    </RelativeLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/common_progressbar_bg"
+                        android:visibility="invisible"/>
+
+                </FrameLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:background="@android:color/transparent"
-                    android:orientation="vertical">
-                    <!--Title-->
+                    android:orientation="horizontal">
+                    <!--左边的-->
                     <TextView
-                        fontAsset='@{"PingFang Regular.ttf"}'
-                        android:id="@+id/progress_message"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/progress_percent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="40dp"
-                        android:text=""
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:text="3243"
                         android:textColor="#000"
-                        android:textSize="20sp"/>
+                        android:textSize="18sp"
+                        android:visibility="invisible"
 
-                    <!--进度-->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="11dp"
-                        android:layout_marginLeft="18dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginRight="18dp"
-                        android:background="@mipmap/progress">
-
-                        <RelativeLayout
-                            android:id="@+id/progress_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true">
-
-                            <ImageView
-                                android:id="@+id/p_bot_iv"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:src="@drawable/shape_round_corner_bottom"/>
-
-                            <kexie.android.common.widget.RoundCornerImageView
-                                android:id="@+id/p_cover_iv"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/pic_cover_blue_white"/>
-
-                        </RelativeLayout>
-
-                        <ProgressBar
-                            android:id="@+id/progress"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:progressDrawable="@drawable/common_progressbar_bg"
-                            android:visibility="invisible"/>
-
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                        />
+                    <!--右边的-->
+                    <TextView
+                        android:id="@+id/progress_number"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-                        <!--左边的-->
-                        <TextView
-                            android:id="@+id/progress_percent"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:text="3243"
-                            android:textColor="#000"
-                            android:textSize="18sp"
-                            android:visibility="invisible"
-
-                            />
-                        <!--右边的-->
-                        <TextView
-                            android:id="@+id/progress_number"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center_horizontal"
-                            android:text="23424sdfsf2"
-                            android:textColor="#000"
-                            android:textSize="16sp"
-                            android:visibility="invisible"
-                            />
-                    </LinearLayout>
-
+                        android:layout_marginLeft="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:text="23424sdfsf2"
+                        android:textColor="#000"
+                        android:textSize="16sp"
+                        android:visibility="invisible"
+                        />
                 </LinearLayout>
-            </android.support.v7.widget.CardView>
-        </FrameLayout>
 
-        <ImageView
-            android:layout_width="85dp"
-            android:layout_height="85dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:src="@mipmap/head"/>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/percent_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="3dp"
-            android:text="asasasdasd"
-            android:textSize="13sp"
-            android:visibility="invisible"/>
+    <ImageView
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/head"/>
 
-    </RelativeLayout>
-</layout>
+    <TextView
+        android:id="@+id/percent_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="3dp"
+        android:text="asasasdasd"
+        android:textSize="13sp"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

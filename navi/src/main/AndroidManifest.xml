@@ -2,25 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="kexie.android.navi">
 
-    <application
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+    <application android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         <service
-            android:exported="false"
-            android:name="com.amap.api.location.APSService"/>
-        <activity
-            android:screenOrientation="landscape"
-            android:name=".view.RouteQueryActivity"/>
-        <activity
-            android:screenOrientation="landscape"
-            android:name=".view.MapNavigationActivity"/>
-        <!--<service-->
-            <!--android:process=":navi"-->
-            <!--android:exported="false"-->
-            <!--android:name="com.amap.api.location.APSService"/>-->
-        <!--<activity-->
-            <!--android:screenOrientation="landscape"-->
-            <!--android:name=".view.RouteQueryActivity"-->
-            <!--android:process=":navi"/>-->
+            android:name="com.amap.api.location.APSService"
+            android:exported="false"/>
+        <service
+            android:name=".NetworkMonitoringService"
+            android:enabled="true"
+            android:exported="false"/>
+
+        <!-- <service -->
+        <!-- android:process=":navi" -->
+        <!-- android:exported="false" -->
+        <!-- android:name="com.amap.api.location.APSService"/> -->
+        <!-- <activity -->
+        <!-- android:screenOrientation="landscape" -->
+        <!-- android:name=".view.RouteQueryFragment" -->
+        <!-- android:process=":navi"/> -->
     </application>
 
 </manifest>

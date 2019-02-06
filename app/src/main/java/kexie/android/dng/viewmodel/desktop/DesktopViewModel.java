@@ -4,50 +4,36 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.OnLifecycleEvent;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.view.View;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.desktop.Function;
 import kexie.android.dng.entity.desktop.User;
-import kexie.android.dng.model.FunctionLoadTaskFactory;
-import kexie.android.dng.view.users.UsersActivity;
-import kexie.android.navi.view.MapNavigationActivity;
-import kexie.android.navi.view.RouteQueryActivity;
+import kexie.android.dng.model.FunctionFactory;
 import okhttp3.OkHttpClient;
 
+
 public class DesktopViewModel
-        extends AndroidViewModel implements LifecycleObserver
+        extends AndroidViewModel
+        implements LifecycleObserver
 {
+    private static final int BORDER_SIZE = 250;
+
+    private final Executor singleTask = Executors.newSingleThreadExecutor();
     private final MutableLiveData<User> userInfo = new MutableLiveData<>();
     private final MutableLiveData<String> time = new MutableLiveData<>();
-    private final MutableLiveData<List<Function>> listFunctions = new MutableLiveData<>();
     private Timer updateTimer;
     private final OkHttpClient httpClient = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -56,44 +42,32 @@ public class DesktopViewModel
     public DesktopViewModel(Application application)
     {
         super(application);
-        initListFunctions();
-        initDefaultUserInfo();
-
+        initDefault();
     }
 
-    private void initDefaultUserInfo()
+    private void initDefault()
     {
-        Glide.with(getApplication())
-                .load(R.mipmap.image_head_man)
-                .listener(new RequestListener<Drawable>()
+        singleTask.execute(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
                 {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e,
-                                                Object model,
-                                                Target<Drawable> target,
-                                                boolean isFirstResource)
-                    {
-                        new BitmapDrawable(BitmapFactory
-                                .decodeResource(getApplication().getResources(),
-                                        R.mipmap.image_head_man));
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource,
-                                                   Object model,
-                                                   Target<Drawable> target,
-                                                   DataSource dataSource,
-                                                   boolean isFirstResource)
-                    {
-                        User user = new User(resource,
-                                "未登陆");
-                        userInfo.setValue(user);
-                        return true;
-                    }
-                }).submit();
+                    User user = new User(Glide.with(getApplication())
+                            .load(R.mipmap.image_head_man)
+                            .submit().get(),
+                            "未登陆");
+                    userInfo.postValue(user);
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void startTimer()
     {
         updateTimer = new Timer();
@@ -107,116 +81,41 @@ public class DesktopViewModel
         }, 0, 1000);
     }
 
-    private void endTimer()
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    void endTimer()
     {
         updateTimer.cancel();
     }
 
-    private void initListFunctions()
+    public LiveData<List<Function>> getFunctions()
     {
-        Observable.just(getApplication())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<Application>()
-                {
-                    @Override
-                    public void accept(Application application) throws Exception
-                    {
-                        final FunctionLoadTaskFactory factory
-                                = FunctionLoadTaskFactory.form(application, 250);
-                        List<FunctionLoadTaskFactory.FunctionLoadTask> targets
-                                = new LinkedList<FunctionLoadTaskFactory.FunctionLoadTask>()
-                        {
-                            {
-                                add(factory.create("天气",
-                                        R.mipmap.image_weather,
-                                        new View.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(View v)
-                                            {
-
-                                            }
-                                        }));
-                                add(factory.create("多媒体",
-                                        R.mipmap.image_media,
-                                        new View.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(View v)
-                                            {
-
-                                            }
-                                        }));
-                                add(factory.create("APPS",
-                                        R.mipmap.image_apps,
-                                        new View.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(View v)
-                                            {
-
-                                            }
-                                        }));
-                            }
-                        };
-                        List<Function> functions = new ArrayList<>(targets.size());
-                        for (FunctionLoadTaskFactory.FunctionLoadTask task : targets)
-                        {
-                            functions.add(task.get());
-                        }
-                        DesktopViewModel.this.listFunctions.postValue(functions);
-                    }
-                });
-    }
-
-    public Map<String, View.OnClickListener> getActions()
-    {
-        return new HashMap<String, View.OnClickListener>()
+        final MutableLiveData<List<Function>> liveData = new MutableLiveData<>();
+        new Thread(new Runnable()
         {
+            @Override
+            public void run()
             {
-                put("个人信息", new View.OnClickListener()
+                try
                 {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        UsersActivity.startOf(v.getContext());
-                    }
-                });
-                put("导航", new View.OnClickListener()
+                    FunctionFactory factory
+                            = new FunctionFactory(getApplication(),
+                            BORDER_SIZE);
+                    liveData.postValue(factory.getDefault());
+                } catch (Exception e)
                 {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        RouteQueryActivity.startOf(v.getContext());
-                    }
-                });
+                    e.printStackTrace();
+                }
             }
-        };
+        }).start();
+        return liveData;
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    void onPause()
-    {
-        endTimer();
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void onResume()
-    {
-        startTimer();
-    }
-
-    public MutableLiveData<List<Function>> getListFunctions()
-    {
-        return listFunctions;
-    }
-
-    public MutableLiveData<String> getTime()
+    public LiveData<String> getTime()
     {
         return time;
     }
 
-    public MutableLiveData<User> getUserInfo()
+    public LiveData<User> getUserInfo()
     {
         return userInfo;
     }

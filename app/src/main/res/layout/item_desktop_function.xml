@@ -30,7 +30,7 @@
                 app:civ_circle_background_color="@android:color/white"/>
 
             <TextView
-                fontAsset='@{"PingFang Regular.ttf"}'
+                async_font='@{"PingFang Regular.ttf"}'
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/draw_text_background"

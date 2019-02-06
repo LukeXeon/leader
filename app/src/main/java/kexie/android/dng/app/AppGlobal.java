@@ -1,21 +1,24 @@
 package kexie.android.dng.app;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
 import android.provider.Settings;
+import android.support.multidex.MultiDexApplication;
 import android.telephony.TelephonyManager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.UUID;
 
-import kexie.android.common.app.AppCompatApplication;
-import me.jessyan.autosize.AutoSize;
-import xiaofei.library.hermeseventbus.HermesEventBus;
+import kexie.android.navi.NetworkMonitoringService;
 
 
-public class AppGlobal extends AppCompatApplication
+public class AppGlobal extends MultiDexApplication
 {
     private static final String PREFS_FILE = "device_id.xml";
     private static final String PREFS_DEVICE_ID = "device_id";
@@ -37,7 +40,7 @@ public class AppGlobal extends AppCompatApplication
             {
                 final String androidId = Settings.Secure
                         .getString(this.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
+                                Settings.Secure.ANDROID_ID);
                 try
                 {
                     if (!"9774d56d682e549c".equals(androidId))
@@ -67,5 +70,27 @@ public class AppGlobal extends AppCompatApplication
             }
         }
         return uuid;
+    }
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        bindService(new Intent(this,
+                        NetworkMonitoringService.class),
+                new ServiceConnection()
+                {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service)
+                    {
+
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name)
+                    {
+
+                    }
+                }, BIND_AUTO_CREATE);
     }
 }

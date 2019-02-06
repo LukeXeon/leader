@@ -30,29 +30,31 @@ public final class Points
 
     }
 
-    public static final Gson JSON_CONVERTER = new GsonBuilder()
-            .registerTypeAdapter(Point.class, new JsonDeserializer<Point>()
-            {
-                @Override
-                public Point deserialize(JsonElement json, Type typeOfT
-                        , JsonDeserializationContext context) throws JsonParseException
+    public static Gson getJsonConverter()
+    {
+        return new GsonBuilder()
+                .registerTypeAdapter(Point.class, new JsonDeserializer<Point>()
                 {
-                    JsonObject object = (JsonObject) json;
-                    return new Point(object.get("latitude").getAsDouble(),
-                            object.get("longitude").getAsDouble());
-                }
-            }).registerTypeAdapter(Point.class, new JsonSerializer<Point>()
-            {
-                @Override
-                public JsonElement serialize(Point src, Type typeOfSrc, JsonSerializationContext context)
+                    @Override
+                    public Point deserialize(JsonElement json, Type typeOfT
+                            , JsonDeserializationContext context) throws JsonParseException
+                    {
+                        JsonObject object = (JsonObject) json;
+                        return new Point(object.get("latitude").getAsDouble(),
+                                object.get("longitude").getAsDouble());
+                    }
+                }).registerTypeAdapter(Point.class, new JsonSerializer<Point>()
                 {
-                    JsonObject jsonObject = new JsonObject();
-                    jsonObject.addProperty("latitude", src.getLatitude());
-                    jsonObject.addProperty("longitude", src.getLongitude());
-                    return jsonObject;
-                }
-            }).create();
-
+                    @Override
+                    public JsonElement serialize(Point src, Type typeOfSrc, JsonSerializationContext context)
+                    {
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("latitude", src.getLatitude());
+                        jsonObject.addProperty("longitude", src.getLongitude());
+                        return jsonObject;
+                    }
+                }).create();
+    }
 
     public static List<LatLng> toLatLngs(List<Point> points)
     {

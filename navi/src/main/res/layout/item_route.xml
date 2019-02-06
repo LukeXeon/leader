@@ -42,7 +42,7 @@
                         android:src="@mipmap/image_search"/>
 
                     <TextView
-                        fontAsset='@{"PingFang Regular.ttf"}'
+                        async_font='@{"PingFang Regular.ttf"}'
                         android:id="@+id/tv_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                     android:background="@color/lightblue500"/>
 
                 <TextView
-                    fontAsset='@{"PingFang Regular.ttf"}'
+                    async_font='@{"PingFang Regular.ttf"}'
                     android:id="@+id/tv_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -73,9 +73,9 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rl_list"
                     android:layout_width="match_parent"
-                    adapter_item='@{"step"}'
-                    adapter_layout="@{R.layout.item_step}"
-                    adapter_data="@{route.getSteps()}"
+                    item_name='@{"step"}'
+                    item_layout="@{R.layout.item_step}"
+                    item_source="@{route.getSteps()}"
                     android:orientation="vertical"
                     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                     android:layout_height="0dp"

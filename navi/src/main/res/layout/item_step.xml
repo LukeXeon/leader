@@ -37,7 +37,7 @@
                     android:background="@android:color/transparent"
                     android:padding="5dp"
                     android:scaleType="centerInside"
-                    mipmap="@{step.getActionRes()}"
+                    async_src="@{step.getActionRes()}"
                     android:src="@mipmap/dir_start"/>
             </RelativeLayout>
 
@@ -48,7 +48,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    fontAsset='@{"PingFang Regular.ttf"}'
+                    async_font='@{"PingFang Regular.ttf"}'
                     android:layout_marginBottom="3dp"
                     android:layout_marginTop="3dp"
                     android:background="@drawable/draw_text_background_blue"
