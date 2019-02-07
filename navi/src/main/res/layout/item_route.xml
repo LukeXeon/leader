@@ -14,6 +14,7 @@
         android:background="@android:color/transparent">
 
         <androidx.cardview.widget.CardView
+            app:cardPreventCornerOverlap="true"
             app:cardUseCompatPadding="false"
             app:cardElevation="10dp"
             android:layout_width="match_parent"
