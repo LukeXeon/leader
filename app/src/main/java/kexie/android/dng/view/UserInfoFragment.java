@@ -60,11 +60,7 @@ public class UserInfoFragment extends Fragment
         {
             {
                 put("返回", v -> {
-                    getFragmentManager()
-                            .beginTransaction()
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                            .remove(UserInfoFragment.this)
-                            .commit();
+                    getFragmentManager().popBackStack();
                 });
                 put("刷新", v -> {
 

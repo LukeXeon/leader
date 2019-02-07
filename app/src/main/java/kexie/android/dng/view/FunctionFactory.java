@@ -6,8 +6,6 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.Nullable;
-
 import android.os.AsyncTask;
 import android.view.View;
 
@@ -24,10 +22,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 import kexie.android.common.util.ZoomTransformation;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.Function;
+import kexie.android.media.view.MediaFragment;
 
 public final class FunctionFactory
         extends AsyncTask<Void,Void,List<Function>>
@@ -63,9 +65,16 @@ public final class FunctionFactory
                 add(create("多媒体",
                         R.mipmap.image_media,
                         v -> {
-                            AppCompatActivity appCompatActivity
-                                    = (AppCompatActivity) v.getContext();
-
+                            FragmentActivity fragmentActivity
+                                    = (FragmentActivity) v.getContext();
+                            Fragment fragment= new MediaFragment();
+                            fragmentActivity.getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                    .add(R.id.fragment_container,fragment)
+                                    .show(fragment)
+                                    .addToBackStack(null)
+                                    .commit();
                         }));
                 add(create("APPS",
                         R.mipmap.image_apps,

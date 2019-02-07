@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders;
 import kexie.android.dng.R;
 import kexie.android.dng.databinding.FragmentDesktopBinding;
 import kexie.android.dng.viewmodel.DesktopViewModel;
+import kexie.android.navi.view.RouteQueryFragment;
 
 public class DesktopFragment extends Fragment
 {
@@ -59,16 +60,24 @@ public class DesktopFragment extends Fragment
         return new ArrayMap<String, View.OnClickListener>()
         {
             {
-                UserInfoFragment userInfo = new UserInfoFragment();
+
                 put("个人信息", v -> {
+                    UserInfoFragment userInfo = new UserInfoFragment();
                     getFragmentManager().beginTransaction()
-                            .setTransition(FragmentTransaction
-                                    .TRANSIT_FRAGMENT_OPEN)
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .add(R.id.fragment_container, userInfo)
-                            .show(userInfo).commit();
+                            .show(userInfo)
+                            .addToBackStack(null)
+                            .commit();
                 });
                 put("导航", v -> {
-                    //RouteQueryFragment.startOf(v.getContext());
+                    RouteQueryFragment query = new RouteQueryFragment();
+                    getFragmentManager().beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .add(R.id.fragment_container, query)
+                            .show(query)
+                            .addToBackStack(null)
+                            .commit();
                 });
             }
         };

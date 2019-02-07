@@ -24,6 +24,10 @@
             type="java.util.List&lt;Tip&gt;" />
 
         <variable
+            name="showMap"
+            type="Boolean"/>
+
+        <variable
             name="routes"
             type="java.util.List&lt;SdkRoute&gt;"/>
 
@@ -53,8 +57,7 @@
                     android:name="com.amap.api.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/f_map"/>
-
+                    android:id="@+id/fragment_map"/>
                 <FrameLayout
                     android:visibility="@{BT.isEmpty(tips)?View.GONE:View.VISIBLE}"
                     android:layout_width="match_parent"

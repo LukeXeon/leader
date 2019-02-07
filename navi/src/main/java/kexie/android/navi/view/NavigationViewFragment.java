@@ -15,12 +15,6 @@ public class NavigationViewFragment extends Fragment
 {
     private AMapNaviView innerView;
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -31,10 +25,13 @@ public class NavigationViewFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Context context)
+    public void onAttach(@NonNull Context context)
     {
         super.onAttach(context);
-        innerView = new AMapNaviView(getContext());
+        if (innerView != null)
+        {
+            innerView = new AMapNaviView(getContext());
+        }
     }
 
     @Override
@@ -62,7 +59,11 @@ public class NavigationViewFragment extends Fragment
     public void onDestroy()
     {
         super.onDestroy();
-        innerView.onDestroy();
+        if (innerView != null)
+        {
+            innerView.onDestroy();
+            innerView = null;
+        }
     }
 
     @Override
