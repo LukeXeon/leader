@@ -1,11 +1,14 @@
-package kexie.android.dng.model;
+package kexie.android.dng.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.Nullable;
+
+import android.os.AsyncTask;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
@@ -21,76 +24,98 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import androidx.appcompat.app.AppCompatActivity;
 import kexie.android.common.util.ZoomTransformation;
 import kexie.android.dng.R;
-import kexie.android.dng.entity.desktop.Function;
+import kexie.android.dng.entity.Function;
 
 public final class FunctionFactory
+        extends AsyncTask<Void,Void,List<Function>>
 {
+    private static final int BORDER_SIZE = 250;
+    private final ZoomTransformation zoomTransformation;
+    @SuppressLint("StaticFieldLeak")
     private final Context context;
-    private final ZoomTransformation transformation;
+    private final Callback callback;
 
-    public FunctionFactory(Context context, int borderSize)
+    private FunctionFactory(Context context,
+                            int size,
+                            Callback callback)
     {
-        this.context = context;
-        transformation = new ZoomTransformation(borderSize);
+        super();
+        this.context = context.getApplicationContext();
+        this.zoomTransformation = new ZoomTransformation(size);
+        this.callback = callback;
     }
 
-    public List<Function> getDefault()
-            throws ExecutionException, InterruptedException
+    @Override
+    protected List<Function> doInBackground(Void... voids)
     {
-        List<FunctionFactory.LoadTask> targets
-                = new LinkedList<LoadTask>()
+        List<SubLoadTask> targets
+                = new LinkedList<SubLoadTask>()
         {
             {
                 add(create("天气",
                         R.mipmap.image_weather,
-                        new View.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
+                        v -> {
 
-                            }
                         }));
                 add(create("多媒体",
                         R.mipmap.image_media,
-                        new View.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
+                        v -> {
+                            AppCompatActivity appCompatActivity
+                                    = (AppCompatActivity) v.getContext();
 
-                            }
                         }));
                 add(create("APPS",
                         R.mipmap.image_apps,
-                        new View.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
+                        v -> {
 
-                            }
                         }));
             }
         };
         List<Function> functions = new ArrayList<>(targets.size());
-        for (FunctionFactory.LoadTask task : targets)
+        try
         {
-            functions.add(task.get());
+            for (SubLoadTask task : targets)
+            {
+                functions.add(task.get());
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
         return functions;
     }
 
-    private LoadTask create(String name,
-                           int mipmap,
-                           final View.OnClickListener action)
+    public interface Callback
     {
-        return new LoadTask(name, mipmap, action);
+        void onResult(List<Function> functions);
     }
 
-    private final class LoadTask
+    private SubLoadTask create(String name,
+                               int res,
+                               View.OnClickListener listener)
+    {
+        return new SubLoadTask(context, zoomTransformation, name, res, listener);
+    }
+
+    static void getDefault(Context context,
+                                  Callback callback)
+    {
+        new FunctionFactory(context, BORDER_SIZE, callback).execute();
+    }
+
+    @Override
+    protected void onPostExecute(List<Function> functions)
+    {
+        if (callback != null)
+        {
+            callback.onResult(functions);
+        }
+    }
+
+    private static final class SubLoadTask
             implements RequestListener<Drawable>
     {
         private final FutureTarget<Drawable> innerTask;
@@ -98,15 +123,19 @@ public final class FunctionFactory
         private final String name;
         private final int mipmap;
         private final View.OnClickListener action;
+        private final Context context;
 
-        private LoadTask(String name,
-                         int mipmap,
-                         View.OnClickListener action)
+        private SubLoadTask(Context context,
+                            ZoomTransformation transformation,
+                            String name,
+                            int mipmap,
+                            View.OnClickListener action)
         {
             this.name = name;
             this.mipmap = mipmap;
             this.action = action;
-            this.innerTask = Glide.with(context)
+            this.context = context.getApplicationContext();
+            this.innerTask = Glide.with(this.context)
                     .load(mipmap)
                     .apply(RequestOptions.bitmapTransform(transformation))
                     .listener(this).submit();
@@ -126,7 +155,7 @@ public final class FunctionFactory
                                     boolean isFirstResource)
         {
             Resources resources = context.getResources();
-            LoadTask.this.function = new Function.Builder()
+            function = new Function.Builder()
                     .action(action)
                     .icon(new BitmapDrawable(resources,
                             BitmapFactory.decodeResource(resources, mipmap)))

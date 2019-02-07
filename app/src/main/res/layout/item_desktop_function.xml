@@ -6,10 +6,9 @@
     <data>
         <variable
             name="function"
-            type="kexie.android.dng.entity.desktop.Function"/>
+            type="kexie.android.dng.entity.Function"/>
     </data>
     <RelativeLayout
-        android:onClick="@{()->function.action}"
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
         <LinearLayout
@@ -22,6 +21,7 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:onClick="@{function.action}"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_margin="10dp"

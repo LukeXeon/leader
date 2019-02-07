@@ -1,3 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="kexie.android.common">
+    <application>
+        <provider
+            android:authorities="${applicationId}.permissions-initializer"
+            android:name=".widget.PermissionsInitializer"
+            android:exported="false"
+            android:multiprocess="false"/>
+    </application>
 </manifest>

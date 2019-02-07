@@ -11,6 +11,9 @@ import android.provider.Settings;
 import androidx.multidex.MultiDexApplication;
 import android.telephony.TelephonyManager;
 
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.UUID;
@@ -76,6 +79,7 @@ public class AppGlobal extends MultiDexApplication
     public void onCreate()
     {
         super.onCreate();
+        Logger.addLogAdapter(new AndroidLogAdapter());
         bindService(new Intent(this,
                         NetworkMonitoringService.class),
                 new ServiceConnection()

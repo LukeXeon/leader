@@ -1,6 +1,6 @@
-package kexie.android.dng.entity.users;
+package kexie.android.dng.entity;
 
-public class SimpleUser
+public class UserInfo
 {
     public final String username;
     public final String name;
@@ -9,7 +9,7 @@ public class SimpleUser
     public final String carNumber;
     public final String phone;
 
-    private SimpleUser(Builder builder)
+    private UserInfo(Builder builder)
     {
         username = builder.username;
         name = builder.name;
@@ -29,9 +29,10 @@ public class SimpleUser
         private String carNumber;
         private String phone;
 
-        public void phone(String phone)
+        public Builder phone(String phone)
         {
             this.phone = phone;
+            return this;
         }
 
         public String getHeadURL()
@@ -73,9 +74,9 @@ public class SimpleUser
             return this;
         }
 
-        public SimpleUser build()
+        public UserInfo build()
         {
-            return new SimpleUser(this);
+            return new UserInfo(this);
         }
     }
 }

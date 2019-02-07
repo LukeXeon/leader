@@ -1,4 +1,4 @@
-package kexie.android.dng.entity.desktop;
+package kexie.android.dng.entity;
 
 import android.graphics.drawable.Drawable;
 import android.view.View;

@@ -1,1 +1,1 @@
-include ':app', ':common', ':navi', ':databinding'
+include ':app', ':common', ':navi', ':databinding', ':media'

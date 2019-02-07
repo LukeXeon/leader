@@ -1,6 +1,7 @@
 package kexie.android.navi.view;
 
 import android.animation.ValueAnimator;
+
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.databinding.DataBindingUtil;

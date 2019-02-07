@@ -11,11 +11,11 @@
             alias="Action"
             type="android.view.View.OnClickListener"/>
 
-        <import type="kexie.android.dng.entity.desktop.Function"/>
+        <import type="kexie.android.dng.entity.Function"/>
 
         <variable
             name="user"
-            type="kexie.android.dng.entity.desktop.User"/>
+            type="kexie.android.dng.entity.LiteUserInfo"/>
 
         <variable
             name="actions"
@@ -27,11 +27,11 @@
 
         <variable
             name="functions"
-            type="java.util.List&lt;Function&gt;"/>
+            type="java.util.List&lt;kexie.android.dng.entity.Function&gt;"/>
     </data>
 
     <LinearLayout
-        async_background='@{"image_background"}'
+        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
@@ -42,7 +42,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="0.618"
             android:onClick='@{actions.get("导航")}'>
 
@@ -103,7 +103,10 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_margin="10dp"
             android:layout_weight="1">
 
             <com.makeramen.roundedimageview.RoundedImageView
@@ -125,8 +128,8 @@
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="125dp"
-                    android:layout_height="125dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
                     android:layout_marginLeft="20dp"
                     android:src="@{user.headImage}"
                     app:civ_border_color="@color/white"
@@ -226,8 +229,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ll_right_head"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
                 android:layout_marginBottom="10dp">
 
                 <TextView
