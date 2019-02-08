@@ -25,7 +25,7 @@ public class MapNavigationViewModel extends AndroidViewModel
     private final AMapNavi navigation;
     private final Executor singleTask = Executors.newSingleThreadExecutor();
     private final MutableLiveData<Boolean> calculateResult = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private final MutableLiveData<String> loading = new MutableLiveData<>();
 
     public MapNavigationViewModel(@NonNull Application application)
     {
@@ -35,7 +35,7 @@ public class MapNavigationViewModel extends AndroidViewModel
 
     public void calculate(final Route route)
     {
-        isLoading.setValue(true);
+        loading.setValue("加载中");
         singleTask.execute(new Runnable()
         {
             @Override
@@ -77,7 +77,7 @@ public class MapNavigationViewModel extends AndroidViewModel
                             Points.toNaviLatLngs(route.getPoints()), 9);
                     condition.await();
                     lock.unlock();
-                    isLoading.postValue(false);
+                    loading.postValue(null);
                 } catch (Exception e)
                 {
                     throw new AssertionError(e);
@@ -91,9 +91,9 @@ public class MapNavigationViewModel extends AndroidViewModel
         return calculateResult;
     }
 
-    public MutableLiveData<Boolean> getIsLoading()
+    public MutableLiveData<String> getLoading()
     {
-        return isLoading;
+        return loading;
     }
 
     @Override

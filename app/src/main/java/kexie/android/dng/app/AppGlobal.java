@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.provider.Settings;
-import androidx.multidex.MultiDexApplication;
 import android.telephony.TelephonyManager;
 
 import com.orhanobut.logger.AndroidLogAdapter;
@@ -18,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 import java.util.UUID;
 
+import androidx.multidex.MultiDexApplication;
 import kexie.android.navi.NetworkMonitoringService;
 
 

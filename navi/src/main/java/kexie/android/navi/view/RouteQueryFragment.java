@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.databinding.BT;
+import kexie.android.common.databinding.BT;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,7 +14,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
-import kexie.android.common.widget.ProgressWidget;
+import kexie.android.common.widget.ProgressHelper;
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.FragmentRouteQueryBinding;
 import kexie.android.navi.viewmodel.RouteQueryViewModel;
@@ -26,7 +26,6 @@ public class RouteQueryFragment extends Fragment
     private FragmentRouteQueryBinding binding;
     private RouteQueryViewModel viewModel;
 
-    @SuppressWarnings("All")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -66,24 +65,7 @@ public class RouteQueryFragment extends Fragment
                     }
                     binding.setTips(tips);
                 });
-        viewModel.getLoading().observe(this,
-                aBoolean -> {
-                    if (aBoolean != null && aBoolean)
-                    {
-                        ProgressWidget progressWidget = new ProgressWidget();
-                        progressWidget.show(getFragmentManager(),
-                                WAIT_QUERY);
-                    } else
-                    {
-                        ProgressWidget progressWidget
-                                = (ProgressWidget) getFragmentManager()
-                                .findFragmentByTag(WAIT_QUERY);
-                        if (progressWidget != null)
-                        {
-                            progressWidget.dismiss();
-                        }
-                    }
-                });
+                ProgressHelper.observe(viewModel.getLoading(),getChildFragmentManager(),0);
         viewModel.getQueryText().observe(this,
                 s -> {
                     if (TextUtils.isEmpty(s))

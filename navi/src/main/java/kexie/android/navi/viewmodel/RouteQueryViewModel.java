@@ -35,7 +35,7 @@ public class RouteQueryViewModel extends AndroidViewModel
     private final MutableLiveData<List<SdkRoute>> routes = new MutableLiveData<>();
     private final MutableLiveData<List<Tip>> tips = new MutableLiveData<>();
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
+    private final MutableLiveData<String> loading = new MutableLiveData<>();
 
     public RouteQueryViewModel(@NonNull Application application)
     {
@@ -43,7 +43,7 @@ public class RouteQueryViewModel extends AndroidViewModel
         routeSearch = new RouteSearch(application);
     }
 
-    public MutableLiveData<Boolean> getLoading()
+    public MutableLiveData<String> getLoading()
     {
         return loading;
     }
@@ -84,7 +84,7 @@ public class RouteQueryViewModel extends AndroidViewModel
     {
         if (!TextUtils.isEmpty(text))
         {
-            loading.setValue(true);
+            loading.setValue("加载中");
             singleTask.execute(new Runnable()
             {
                 @Override
@@ -107,12 +107,12 @@ public class RouteQueryViewModel extends AndroidViewModel
                             }
                         }
                         tips.postValue(result);
-                        loading.postValue(false);
+                        loading.postValue(null);
                     } catch (Exception e)
                     {
                         e.printStackTrace();
                         tips.postValue(null);
-                        loading.postValue(false);
+                        loading.postValue(null);
                     }
                 }
             });

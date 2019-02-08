@@ -29,7 +29,8 @@ import androidx.fragment.app.FragmentTransaction;
 import kexie.android.common.util.ZoomTransformation;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.Function;
-import kexie.android.media.view.MediaFragment;
+import kexie.android.media.view.MediaBrowseFragment;
+import kexie.android.media.view.MediaHostFragment;
 
 public final class FunctionFactory
         extends AsyncTask<Void,Void,List<Function>>
@@ -67,11 +68,12 @@ public final class FunctionFactory
                         v -> {
                             FragmentActivity fragmentActivity
                                     = (FragmentActivity) v.getContext();
-                            Fragment fragment= new MediaFragment();
+                            Fragment fragment= new MediaHostFragment();
                             fragmentActivity.getSupportFragmentManager()
                                     .beginTransaction()
                                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                    .add(R.id.fragment_container,fragment)
+                                    .add(R.id.fragment_container,
+                                            fragment)
                                     .show(fragment)
                                     .addToBackStack(null)
                                     .commit();

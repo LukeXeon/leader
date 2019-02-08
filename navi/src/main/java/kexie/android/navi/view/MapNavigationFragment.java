@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
-import kexie.android.common.widget.ProgressWidget;
+import kexie.android.common.widget.ProgressHelper;
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.FragmentNavigationBinding;
 import kexie.android.navi.entity.Route;
@@ -76,8 +76,6 @@ public class MapNavigationFragment extends Fragment
                         }
                     }
                 });
-        viewModel.getIsLoading().observe(this,
-                ProgressWidget.getObserver(
-                        this.getFragmentManager()));
+        ProgressHelper.observe(viewModel.getLoading(), this.getChildFragmentManager(),0);
     }
 }
