@@ -5,7 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import kexie.android.common.util.SystemUI;
+import androidx.fragment.app.FragmentTransaction;
+import kexie.android.common.util.SystemUtil;
 import kexie.android.dng.R;
 
 public final class HostActivity extends AppCompatActivity
@@ -14,14 +15,13 @@ public final class HostActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        SystemUI.hide(getWindow());
+        SystemUtil.hide(getWindow());
         DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container,
-                        new DesktopFragment())
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, new DesktopFragment())
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
-
-
 }

@@ -19,12 +19,12 @@ import kexie.android.dng.databinding.FragmentDesktopBinding;
 import kexie.android.dng.viewmodel.DesktopViewModel;
 import kexie.android.navi.view.RouteQueryFragment;
 
-public class DesktopFragment extends Fragment
+public final class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;
     private DesktopViewModel viewModel;
 
-    @Nullable
+    @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -62,20 +62,16 @@ public class DesktopFragment extends Fragment
             {
 
                 put("个人信息", v -> {
-                    UserInfoFragment userInfo = new UserInfoFragment();
                     getFragmentManager().beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .add(R.id.fragment_container, userInfo)
-                            .show(userInfo)
+                            .add(R.id.fragment_container, new UserInfoFragment())
                             .addToBackStack(null)
                             .commit();
                 });
                 put("导航", v -> {
-                    RouteQueryFragment query = new RouteQueryFragment();
                     getFragmentManager().beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .add(R.id.fragment_container, query)
-                            .show(query)
+                            .add(R.id.fragment_container, new RouteQueryFragment())
                             .addToBackStack(null)
                             .commit();
                 });

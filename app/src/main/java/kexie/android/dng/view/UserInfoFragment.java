@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import kexie.android.dng.R;
 import kexie.android.dng.databinding.FragmentUserInfoBinding;
@@ -54,17 +53,12 @@ public class UserInfoFragment extends Fragment
         binding.setActions(getActions());
     }
 
-    public Map<String, View.OnClickListener> getActions()
+    private Map<String, View.OnClickListener> getActions()
     {
         return new HashMap<String, View.OnClickListener>()
         {
             {
-                put("返回", v -> {
-                    getFragmentManager().popBackStack();
-                });
-                put("刷新", v -> {
-
-                });
+                put("返回", v -> getFragmentManager().popBackStack());
             }
         };
     }

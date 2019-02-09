@@ -6,14 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import kexie.android.common.databinding.BT;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
+import kexie.android.common.databinding.BT;
 import kexie.android.common.widget.ProgressHelper;
 import kexie.android.navi.R;
 import kexie.android.navi.databinding.FragmentRouteQueryBinding;

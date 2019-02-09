@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import kexie.android.media.R;
 
 public class MediaHostFragment extends Fragment
@@ -29,7 +30,11 @@ public class MediaHostFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         getChildFragmentManager()
                 .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .add(R.id.fragment_root, new MediaBrowseFragment())
+                .addToBackStack(null)
                 .commit();
     }
+
+
 }

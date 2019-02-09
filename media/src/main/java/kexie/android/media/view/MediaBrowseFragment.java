@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import kexie.android.common.widget.ProgressHelper;
@@ -26,7 +27,6 @@ import kexie.android.media.viewmodel.MediaViewModel;
 public class MediaBrowseFragment
         extends Fragment
 {
-
     private MediaViewModel viewModel;
 
     private FragmentMediaBrowseBinding binding;
@@ -63,9 +63,26 @@ public class MediaBrowseFragment
                     .getColor(R.color.colorBlackAlpha54));
             textView.setText("空空如也");
             adapter.setEmptyView(textView);
-            adapter.setOnItemChildClickListener((adapter1, view1, position) -> {
+            adapter.setOnItemClickListener((adapter1, view1, position) -> {
                 MediaInfo info = (MediaInfo) adapter.getData().get(position);
+                switch (info.getType())
+                {
+                    case MediaInfo.TYPE_PHOTO:
+                    {
+                        getFragmentManager()
+                                .beginTransaction()
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .add(R.id.fragment_root,PhotoViewFragment.newInstance(info))
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                    break;
+                    case MediaInfo.TYPE_VIDEO:
+                    {
 
+                    }
+                    break;
+                }
             });
         });
         viewModel = ViewModelProviders.of(this)
@@ -73,7 +90,7 @@ public class MediaBrowseFragment
         viewModel.getTitle().observe(this,
                 (value) -> binding.setTitle(value));
         ProgressHelper.observe(viewModel.getLoading(), getFragmentManager()
-                ,R.id.fragment_root);
+                , R.id.fragment_root);
         viewModel.getMediaInfo().observe(this,
                 (value) -> binding.setMediaInfos(value));
         binding.setActions(getActions());

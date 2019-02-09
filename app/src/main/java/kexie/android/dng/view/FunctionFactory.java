@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import kexie.android.common.util.ZoomTransformation;
 import kexie.android.dng.R;
 import kexie.android.dng.entity.Function;
-import kexie.android.media.view.MediaBrowseFragment;
 import kexie.android.media.view.MediaHostFragment;
 
 public final class FunctionFactory
@@ -66,16 +64,12 @@ public final class FunctionFactory
                 add(create("多媒体",
                         R.mipmap.image_media,
                         v -> {
-                            FragmentActivity fragmentActivity
-                                    = (FragmentActivity) v.getContext();
-                            Fragment fragment= new MediaHostFragment();
-                            fragmentActivity.getSupportFragmentManager()
+                            AppCompatActivity activity
+                                    = (AppCompatActivity) v.getContext();
+                            activity.getSupportFragmentManager()
                                     .beginTransaction()
+                                    .add(R.id.fragment_container,new MediaHostFragment())
                                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                    .add(R.id.fragment_container,
-                                            fragment)
-                                    .show(fragment)
-                                    .addToBackStack(null)
                                     .commit();
                         }));
                 add(create("APPS",

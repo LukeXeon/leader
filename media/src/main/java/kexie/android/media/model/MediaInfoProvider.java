@@ -47,7 +47,7 @@ public class MediaInfoProvider
 
             if (size < 5 * 1024 * 1024)
             {//<5M
-                MediaInfo materialBean = new MediaInfo(title, path);
+                MediaInfo materialBean = new MediaInfo(title, path, MediaInfo.TYPE_PHOTO);
                 list.add(materialBean);
             }
         }
@@ -93,7 +93,7 @@ public class MediaInfoProvider
 
                     String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)); // 路径
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME));
-                    MediaInfo mediaModel = new MediaInfo(title, path);
+                    MediaInfo mediaModel = new MediaInfo(title, path, MediaInfo.TYPE_VIDEO);
                     list.add(mediaModel);
                 }
             }
