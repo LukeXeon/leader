@@ -12,7 +12,6 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -35,8 +34,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    api project(':common')
+    implementation project(':common')
+    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {
+        exclude group: 'com.dou361.ijkplayer-armv7a',
+                module: 'jjdxm-ijkplayer-armv7a'
+        transitive=true; //传递性(打开会使用仓库的依赖，关闭则不使用)
+    }
+//    implementation 'com.github.Rukey7:IjkPlayerView:+'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha3'

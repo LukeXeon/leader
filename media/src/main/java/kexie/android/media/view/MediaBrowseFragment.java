@@ -22,12 +22,12 @@ import kexie.android.common.widget.ProgressHelper;
 import kexie.android.media.R;
 import kexie.android.media.databinding.FragmentMediaBrowseBinding;
 import kexie.android.media.entity.MediaInfo;
-import kexie.android.media.viewmodel.MediaViewModel;
+import kexie.android.media.viewmodel.MediaBrowseViewModel;
 
 public class MediaBrowseFragment
         extends Fragment
 {
-    private MediaViewModel viewModel;
+    private MediaBrowseViewModel viewModel;
 
     private FragmentMediaBrowseBinding binding;
 
@@ -52,6 +52,8 @@ public class MediaBrowseFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        Map<String, View.OnClickListener> actions = getActions();
+        binding.setActions(actions);
         binding.dataContent.setLayoutManager(
                 new StaggeredGridLayoutManager(4,
                         StaggeredGridLayoutManager.VERTICAL));
@@ -72,28 +74,32 @@ public class MediaBrowseFragment
                         getFragmentManager()
                                 .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .add(R.id.fragment_root,PhotoViewFragment.newInstance(info))
+                                .add(getId(), PhotoViewFragment.newInstance(info, viewModel::loadPhoto))
                                 .addToBackStack(null)
                                 .commit();
                     }
                     break;
                     case MediaInfo.TYPE_VIDEO:
                     {
-
+                        getFragmentManager()
+                                .beginTransaction()
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .add(getId(), VideoPlayerFragment.newInstance(info))
+                                .addToBackStack(null)
+                                .commit();
                     }
                     break;
                 }
             });
         });
         viewModel = ViewModelProviders.of(this)
-                .get(MediaViewModel.class);
+                .get(MediaBrowseViewModel.class);
         viewModel.getTitle().observe(this,
                 (value) -> binding.setTitle(value));
         ProgressHelper.observe(viewModel.getLoading(), getFragmentManager()
-                , R.id.fragment_root);
+                , getId());
         viewModel.getMediaInfo().observe(this,
                 (value) -> binding.setMediaInfos(value));
-        binding.setActions(getActions());
         viewModel.loadPhoto();
     }
 

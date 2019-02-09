@@ -2,6 +2,8 @@ package kexie.android.dng.view;
 
 import android.os.Bundle;
 
+import com.orhanobut.logger.Logger;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -15,7 +17,8 @@ public final class HostActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        SystemUtil.hide(getWindow());
+        Logger.d("test");
+        SystemUtil.hideSystemUi(getWindow());
         DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
         getSupportFragmentManager()

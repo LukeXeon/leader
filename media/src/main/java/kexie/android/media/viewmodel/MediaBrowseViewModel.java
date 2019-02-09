@@ -13,7 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import kexie.android.media.entity.MediaInfo;
 import kexie.android.media.model.MediaInfoProvider;
 
-public class MediaViewModel extends AndroidViewModel
+public class MediaBrowseViewModel extends AndroidViewModel
 {
 
     private Executor singleTask = Executors.newSingleThreadExecutor();
@@ -24,7 +24,7 @@ public class MediaViewModel extends AndroidViewModel
 
     private MutableLiveData<String> loading = new MutableLiveData<>();
 
-    public MediaViewModel(@NonNull Application application)
+    public MediaBrowseViewModel(@NonNull Application application)
     {
         super(application);
     }
