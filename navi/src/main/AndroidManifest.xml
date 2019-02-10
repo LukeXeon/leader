@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="kexie.android.navi">
+          package="org.kexie.android.dng.navi">
 
     <application android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         <service

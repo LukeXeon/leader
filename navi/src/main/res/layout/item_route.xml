@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="kexie.android.navi.R"/>
+        <import type="org.kexie.android.dng.navi.R"/>
         <variable
             name="route"
-            type="kexie.android.navi.entity.SdkRoute"/>
+            type="org.kexie.android.dng.navi.entity.SdkRoute"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"

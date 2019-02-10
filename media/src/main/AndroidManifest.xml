@@ -1,3 +1,3 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="kexie.android.media">
+          package="org.kexie.android.dng.media">
 </manifest>

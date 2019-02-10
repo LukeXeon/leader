@@ -9,15 +9,15 @@
             alias="Action"
             type="android.view.View.OnClickListener"/>
 
-        <import type="kexie.android.navi.R"/>
+        <import type="org.kexie.android.dng.navi.R"/>
 
         <import type="android.view.View"/>
 
-        <import type="kexie.android.common.databinding.BT"/>
+        <import type="org.kexie.android.common.databinding.BT"/>
 
         <import type="com.amap.api.services.help.Tip"/>
 
-        <import type="kexie.android.navi.entity.SdkRoute"/>
+        <import type="org.kexie.android.dng.navi.entity.SdkRoute"/>
 
         <variable
             name="tips"

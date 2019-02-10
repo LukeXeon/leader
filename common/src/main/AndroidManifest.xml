@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="kexie.android.common">
+          package="org.kexie.android.common">
     <application>
         <provider
             android:authorities="${applicationId}.permissions-initializer"

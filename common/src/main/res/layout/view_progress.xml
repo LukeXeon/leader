@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+    <data>
+    </data>
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/rootView"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -7,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:blurOverlayColor="@color/colorBlackAlpha12">
-
         <RelativeLayout
             android:layout_gravity="center"
             android:layout_width="match_parent"
@@ -69,7 +70,7 @@
                                     android:layout_height="match_parent"
                                     android:src="@drawable/shape_round_corner_bottom"/>
 
-                                <kexie.android.common.widget.RoundCornerImageView
+                                <org.kexie.android.common.widget.RoundCornerImageView
                                     android:id="@+id/p_cover_iv"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"

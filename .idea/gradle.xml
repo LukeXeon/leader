@@ -8,11 +8,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/host" />
             <option value="$PROJECT_DIR$/media" />
             <option value="$PROJECT_DIR$/navi" />
             <option value="$PROJECT_DIR$/playerview" />
+            <option value="$PROJECT_DIR$/ux" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

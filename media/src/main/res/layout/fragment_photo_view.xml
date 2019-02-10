@@ -7,7 +7,7 @@
         <import type="android.view.View.OnClickListener" alias="Action"/>
         <variable
             name="info"
-            type="kexie.android.media.entity.MediaInfo"/>
+            type="org.kexie.android.dng.media.entity.MediaInfo"/>
         <variable
             name="actions"
             type="java.util.Map&lt;String,Action&gt;"/>
