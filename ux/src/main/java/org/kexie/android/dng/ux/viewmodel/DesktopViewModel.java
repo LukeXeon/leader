@@ -5,6 +5,9 @@ import android.app.Application;
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
 
+import org.kexie.android.dng.ux.R;
+import org.kexie.android.dng.ux.viewmodel.entity.LiteUserInfo;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
@@ -17,9 +20,6 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
-
-import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.entity.LiteUserInfo;
 import okhttp3.OkHttpClient;
 
 

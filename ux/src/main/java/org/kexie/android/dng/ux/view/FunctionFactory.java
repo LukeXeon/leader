@@ -20,7 +20,7 @@ import com.bumptech.glide.request.target.Target;
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.media.view.MediaBrowseFragment;
 import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.entity.Function;
+import org.kexie.android.dng.ux.viewmodel.entity.Function;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

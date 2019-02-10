@@ -2,7 +2,7 @@ package org.kexie.android.dng.media.viewmodel;
 
 import android.app.Application;
 
-import org.kexie.android.dng.media.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 import org.kexie.android.dng.media.model.MediaInfoProvider;
 
 import java.util.List;

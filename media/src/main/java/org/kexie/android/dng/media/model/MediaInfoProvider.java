@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.kexie.android.dng.media.entity.MediaInfo;
 
 public class MediaInfoProvider
 {

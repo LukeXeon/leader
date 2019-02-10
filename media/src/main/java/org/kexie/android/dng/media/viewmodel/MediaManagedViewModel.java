@@ -3,7 +3,7 @@ package org.kexie.android.dng.media.viewmodel;
 import android.app.Application;
 import android.provider.MediaStore;
 
-import org.kexie.android.dng.media.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;

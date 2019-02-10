@@ -1,22 +1,22 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+
+import org.kexie.android.dng.ux.R;
+import org.kexie.android.dng.ux.viewmodel.entity.UserInfo;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.entity.UserInfo;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 public class UsersViewModel extends AndroidViewModel
 {

@@ -10,7 +10,7 @@ import android.view.animation.Animation;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
-import org.kexie.android.dng.media.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaManagedViewModel;
 
 import androidx.annotation.NonNull;

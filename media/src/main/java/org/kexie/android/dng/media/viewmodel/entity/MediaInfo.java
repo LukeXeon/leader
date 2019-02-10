@@ -1,5 +1,5 @@
 
-package org.kexie.android.dng.media.entity;
+package org.kexie.android.dng.media.viewmodel.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;

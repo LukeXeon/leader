@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
-import org.kexie.android.dng.media.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 
 import java.util.Map;

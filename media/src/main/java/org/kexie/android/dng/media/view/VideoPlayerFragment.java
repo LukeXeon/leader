@@ -13,7 +13,7 @@ import com.dl7.player.media.IjkPlayerView;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
-import org.kexie.android.dng.media.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

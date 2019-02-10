@@ -9,11 +9,11 @@
 
 
 
-        <import type="org.kexie.android.dng.ux.entity.Function"/>
+        <import type="org.kexie.android.dng.ux.viewmodel.entity.Function"/>
 
         <variable
             name="user"
-            type="org.kexie.android.dng.ux.entity.LiteUserInfo"/>
+            type="org.kexie.android.dng.ux.viewmodel.entity.LiteUserInfo"/>
 
         <variable
             name="actions"
@@ -25,7 +25,7 @@
 
         <variable
             name="functions"
-            type="java.util.List&lt;org.kexie.android.dng.ux.entity.Function&gt;"/>
+            type="java.util.List&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
     </data>
 
     <LinearLayout
