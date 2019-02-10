@@ -74,7 +74,9 @@ public class MediaBrowseFragment
                         getFragmentManager()
                                 .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .add(getId(), PhotoViewFragment.newInstance(info, viewModel::loadPhoto))
+                                .add(getId(), PhotoViewFragment.newInstance(info, () -> {
+                                    adapter1.remove(position);
+                                }))
                                 .addToBackStack(null)
                                 .commit();
                     }

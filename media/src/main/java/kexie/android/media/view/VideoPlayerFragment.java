@@ -2,6 +2,7 @@ package kexie.android.media.view;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,10 @@ public class VideoPlayerFragment extends Fragment
                 .apply(RequestOptions.fitCenterTransform())
                 .into(player.mPlayerThumb);
         binding.playerView.init()
+                .setSaveDir(Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                        .getAbsolutePath()+"/dng")
+                .setOnBackListener(getFragmentManager()::popBackStack)
                 .setTitle(info.getTitle())    // set title
                 .setVideoPath(info.getPath())
                 .alwaysFullScreen()
@@ -60,6 +65,7 @@ public class VideoPlayerFragment extends Fragment
                 .start();   // Start playing
         return binding.getRoot();
     }
+
 
     @Override
     public void onPause()

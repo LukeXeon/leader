@@ -1,1 +1,1 @@
-include ':app', ':common', ':navi', ':media'
+include ':app', ':common', ':navi', ':media', ':playerview'

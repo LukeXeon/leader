@@ -12,6 +12,7 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
 import kexie.android.media.R;
 import kexie.android.media.databinding.FragmentPhotoViewBinding;
@@ -68,6 +69,15 @@ public class PhotoViewFragment extends Fragment
         binding.setInfo(getArguments().getParcelable("info"));
         MediaManagedViewModel viewModel = ViewModelProviders.of(this)
                 .get(MediaManagedViewModel.class);
+        binding.blurView.setupWith(binding.photo)
+                .setFrameClearDrawable(
+                        getActivity()
+                        .getWindow()
+                        .getDecorView()
+                        .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
         binding.setActions(new ArrayMap<String, View.OnClickListener>()
         {
             {

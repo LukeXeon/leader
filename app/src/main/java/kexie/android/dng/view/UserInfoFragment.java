@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import kexie.android.dng.R;
 import kexie.android.dng.databinding.FragmentUserInfoBinding;
 import kexie.android.dng.viewmodel.UsersViewModel;
@@ -39,6 +40,14 @@ public class UserInfoFragment extends Fragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
+        binding.blurView.setupWith((ViewGroup) view.getParent())
+                .setFrameClearDrawable(
+                        getActivity().getWindow()
+                                .getDecorView()
+                                .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
 
         viewModel = ViewModelProviders.of(this)
                 .get(UsersViewModel.class);

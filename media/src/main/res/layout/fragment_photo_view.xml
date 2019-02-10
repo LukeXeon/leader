@@ -21,36 +21,44 @@
             android:layout_height="match_parent">
             <com.github.chrisbanes.photoview.PhotoView
                 async_src="@{info.getPath()}"
-                android:scaleType="centerCrop"
+                android:scaleType="centerInside"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </FrameLayout>
-        <LinearLayout
-            android:layout_alignParentBottom="true"
-            android:background="@color/translucent_whitesmoke"
-            android:orientation="horizontal"
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/blurView"
+            app:blurOverlayColor="@color/translucent_whitesmoke"
             android:layout_width="match_parent"
             android:layout_height="60dp">
-            <ImageView
-                android:onClick='@{actions.get("back")}'
-                android:padding="10dp"
-                async_src='@{"icon_back"}'
-                android:layout_width="60dp"
-                android:layout_height="match_parent"/>
-            <TextView
-                android:layout_weight="1"
-                android:textColor="@color/colorBlackAlpha54"
-                android:textSize="25sp"
-                android:text="@{info.getTitle()}"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"/>
-            <ImageView
-                android:onClick='@{actions.get("delete")}'
-                async_src='@{"icon_delete"}'
-                android:padding="10dp"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
+            <LinearLayout
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_marginLeft="30dp"
+                    android:onClick='@{actions.get("back")}'
+                    android:padding="10dp"
+                    async_src='@{"icon_back"}'
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"/>
+                <TextView
+                    android:layout_weight="1"
+                    android:textColor="@color/colorBlackAlpha54"
+                    android:textSize="25sp"
+                    android:text="@{info.getTitle()}"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"/>
+                <ImageView
+                    android:layout_marginRight="30dp"
+                    android:onClick='@{actions.get("delete")}'
+                    async_src='@{"icon_delete"}'
+                    android:padding="10dp"
+                    android:layout_width="60dp"
+                    android:layout_height="match_parent"/>
+            </LinearLayout>
+        </eightbitlab.com.blurview.BlurView>
     </RelativeLayout>
 </layout>
