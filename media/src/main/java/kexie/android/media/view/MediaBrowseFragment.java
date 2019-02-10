@@ -117,8 +117,12 @@ public class MediaBrowseFragment
         return new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("相册", v -> viewModel.loadPhoto());
-                put("视频", v -> viewModel.loadVideo());
+                put("相册", v -> {
+                    viewModel.loadPhoto();
+                });
+                put("视频", v -> {
+                    viewModel.loadVideo();
+                });
             }
         };
     }

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -72,12 +74,13 @@ public class PhotoViewFragment extends Fragment
         binding.blurView.setupWith(binding.photo)
                 .setFrameClearDrawable(
                         getActivity()
-                        .getWindow()
-                        .getDecorView()
-                        .getBackground())
+                                .getWindow()
+                                .getDecorView()
+                                .getBackground())
                 .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
+        binding.setHide(false);
         binding.setActions(new ArrayMap<String, View.OnClickListener>()
         {
             {
@@ -96,6 +99,52 @@ public class PhotoViewFragment extends Fragment
                     {
                         callback.callback();
                     }
+                });
+                put("hide", v -> {
+                    AlphaAnimation animation
+                            = (AlphaAnimation) binding.blurView.getTag();
+                    if (animation != null)
+                    {
+                        animation.cancel();
+                    }
+                    if (binding.getHide())//show
+                    {
+                        binding.blurView.setVisibility(View.VISIBLE);
+                        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+                        alphaAnimation.setDuration(200);
+                        binding.blurView.startAnimation(alphaAnimation);
+                        binding.blurView.setTag(alphaAnimation);
+                    } else//hide
+                    {
+                        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+                        alphaAnimation.setAnimationListener(new Animation.AnimationListener()
+                        {
+                            @Override
+                            public void onAnimationStart(Animation animation)
+                            {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation)
+                            {
+                                if (binding.getHide())
+                                {
+                                    binding.blurView.setVisibility(View.GONE);
+                                }
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation)
+                            {
+
+                            }
+                        });
+                        alphaAnimation.setDuration(200);
+                        binding.blurView.startAnimation(alphaAnimation);
+                        binding.blurView.setTag(alphaAnimation);
+                    }
+                    binding.setHide(!binding.getHide());
                 });
             }
         });

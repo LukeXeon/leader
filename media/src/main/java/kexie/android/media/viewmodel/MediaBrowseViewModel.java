@@ -58,6 +58,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
     {
         loading.setValue("");
         singleTask.execute(() -> {
+
             mediaInfo.postValue(MediaInfoProvider.getPhotoModels(getApplication()));
             loading.postValue(null);
             title.postValue("相册");

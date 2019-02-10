@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
+        <import type="android.view.View"/>
         <import type="android.view.View.OnClickListener" alias="Action"/>
         <variable
             name="info"
@@ -10,9 +11,12 @@
         <variable
             name="actions"
             type="java.util.Map&lt;String,Action&gt;"/>
+        <variable
+            name="hide"
+            type="Boolean"/>
     </data>
     <RelativeLayout
-        android:background="@android:color/white"
+        android:background="@{hide?@android:color/black:@android:color/white}"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <FrameLayout
@@ -20,8 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <com.github.chrisbanes.photoview.PhotoView
+                android:onClick='@{actions.get("hide")}'
                 async_src="@{info.getPath()}"
-                android:scaleType="centerInside"
+                android:scaleType="fitCenter"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </FrameLayout>
@@ -29,7 +34,7 @@
             android:id="@+id/blurView"
             app:blurOverlayColor="@color/translucent_whitesmoke"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="80dp">
             <LinearLayout
                 android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
@@ -37,26 +42,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <ImageView
-                    android:layout_marginLeft="30dp"
                     android:onClick='@{actions.get("back")}'
-                    android:padding="10dp"
+                    android:padding="20dp"
                     async_src='@{"icon_back"}'
-                    android:layout_width="60dp"
+                    android:layout_width="80dp"
                     android:layout_height="match_parent"/>
                 <TextView
                     android:layout_weight="1"
                     android:textColor="@color/colorBlackAlpha54"
                     android:textSize="25sp"
+                    android:singleLine="true"
                     android:text="@{info.getTitle()}"
                     android:gravity="center"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"/>
                 <ImageView
-                    android:layout_marginRight="30dp"
                     android:onClick='@{actions.get("delete")}'
                     async_src='@{"icon_delete"}'
-                    android:padding="10dp"
-                    android:layout_width="60dp"
+                    android:padding="20dp"
+                    android:layout_width="80dp"
                     android:layout_height="match_parent"/>
             </LinearLayout>
         </eightbitlab.com.blurview.BlurView>
