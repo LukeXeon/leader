@@ -74,9 +74,8 @@ public class MediaBrowseFragment
                         getFragmentManager()
                                 .beginTransaction()
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .add(getId(), PhotoViewFragment.newInstance(info, () -> {
-                                    adapter1.remove(position);
-                                }))
+                                .add(getId(), PhotoViewFragment.newInstance(info,
+                                        () -> adapter1.remove(position)))
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -117,11 +116,15 @@ public class MediaBrowseFragment
         return new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("相册", v -> {
+                put("相册", v ->{
                     viewModel.loadPhoto();
+                    binding.dataContent.stopScroll();
+                    binding.dataContent.stopNestedScroll();
                 });
-                put("视频", v -> {
+                put("视频",v ->{
                     viewModel.loadVideo();
+                    binding.dataContent.stopScroll();
+                    binding.dataContent.stopNestedScroll();
                 });
             }
         };

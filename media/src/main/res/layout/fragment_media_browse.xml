@@ -20,10 +20,13 @@
     </data>
     <FrameLayout
         android:id="@+id/root"
+        android:background="@color/white"
         async_background='@{"image_background"}'
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <androidx.cardview.widget.CardView
+            android:background="@android:color/white"
+            app:cardBackgroundColor="@android:color/white"
             android:layout_margin="5dp"
             app:cardElevation="15dp"
             app:cardPreventCornerOverlap="false"

@@ -3,13 +3,13 @@
 
     <!-- 自定义电量进度条 -->
     <style name="ProgressBarBattery" parent="@android:style/Widget.ProgressBar.Horizontal">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">20dp</item>
         <item name="android:background">@mipmap/ic_battery</item>
         <item name="android:paddingTop">1dp</item>
         <item name="android:paddingBottom">1dp</item>
-        <item name="android:paddingLeft">2dp</item>
-        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingLeft">1dp</item>
+        <item name="android:paddingRight">5dp</item>
         <item name="android:indeterminateOnly">false</item>
         <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
         <item name="android:progressDrawable">@drawable/layer_battery_progress</item>
