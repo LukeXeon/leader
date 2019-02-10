@@ -34,7 +34,7 @@
             android:id="@+id/blurView"
             app:blurOverlayColor="@color/translucent_whitesmoke"
             android:layout_width="match_parent"
-            android:layout_height="80dp">
+            android:layout_height="70dp">
             <LinearLayout
                 android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
@@ -45,12 +45,12 @@
                     android:onClick='@{actions.get("back")}'
                     android:padding="20dp"
                     async_src='@{"icon_back"}'
-                    android:layout_width="80dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"/>
                 <TextView
                     android:layout_weight="1"
                     android:textColor="@color/colorBlackAlpha54"
-                    android:textSize="25sp"
+                    android:textSize="30sp"
                     android:singleLine="true"
                     android:text="@{info.getTitle()}"
                     android:gravity="center"
@@ -60,7 +60,7 @@
                     android:onClick='@{actions.get("delete")}'
                     async_src='@{"icon_delete"}'
                     android:padding="20dp"
-                    android:layout_width="80dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"/>
             </LinearLayout>
         </eightbitlab.com.blurview.BlurView>

@@ -1,4 +1,4 @@
-package kexie.android.common.widget;
+package kexie.android.common.app;
 
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;

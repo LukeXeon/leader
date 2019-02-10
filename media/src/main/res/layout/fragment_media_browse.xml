@@ -24,10 +24,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <androidx.cardview.widget.CardView
-            android:layout_margin="15dp"
+            android:layout_margin="5dp"
             app:cardElevation="15dp"
-            app:cardPreventCornerOverlap="true"
-            app:cardUseCompatPadding="false"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="true"
             app:cardCornerRadius="15dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

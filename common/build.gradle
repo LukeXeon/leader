@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 28
@@ -30,6 +32,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:+"
     api 'androidx.appcompat:appcompat:1.1.0-alpha01'
     api 'androidx.multidex:multidex:2.0.0'
     api 'androidx.legacy:legacy-support-v13:1.0.0-alpha1'
@@ -54,10 +57,14 @@ dependencies {
     api 'de.hdodenhof:circleimageview:+'
     api 'com.blankj:utilcode:+'
     api 'com.orhanobut:logger:+'
+
 //    api 'io.reactivex.rxjava2:rxjava:2.0.1'
 //    api 'io.reactivex.rxjava2:rxandroid:2.0.1'
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
+
+}
+repositories {
+    mavenCentral()
 }

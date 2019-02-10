@@ -15,17 +15,21 @@ import android.widget.TextView;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import kexie.android.common.R;
+import kexie.android.common.databinding.ViewProgressBinding;
 
 
 public final class ProgressHelper
         extends Fragment
 {
+    private ViewProgressBinding binding;
     private RoundCornerImageView mProgressIv;
     private ImageView mBotIv;
     private String msg;
@@ -37,16 +41,30 @@ public final class ProgressHelper
                              @Nullable ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.view_progress, container,
+        binding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.view_progress,
+                container,
                 false);
-        view.setOnTouchListener((x, y) -> true);
-        return view;
+        binding.getRoot().setOnTouchListener((x, y) -> true);
+        return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        binding.rootView.setupWith((ViewGroup) view.getParent())
+                .setFrameClearDrawable(
+                        getActivity().getWindow()
+                                .getDecorView()
+                                .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
+
+
         view.setVisibility(View.VISIBLE);
         TextView mProgressMessage = view.findViewById(R.id.progress_message);
         //新增进度条

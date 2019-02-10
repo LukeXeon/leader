@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -58,7 +59,7 @@ import com.dl7.player.utils.SoftInputUtils;
 import com.dl7.player.utils.StringUtils;
 import com.dl7.player.utils.WindowUtils;
 import com.dl7.player.widgets.MarqueeTextView;
-import com.dl7.player.widgets.ShareDialog;
+import com.dl7.player.widgets.ImageDialogFragment;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -2893,16 +2894,8 @@ public class IjkPlayerView extends FrameLayout
     // 判断是否出现锁屏,有则需要重新设置渲染器，不然视频会没有动画只有声音
     private boolean mIsScreenLocked = false;
     // 截图分享弹框
-    private ShareDialog mShareDialog;
+    private ImageDialogFragment mShareDialog;
     // 对话框点击监听，内部和外部
-    private ShareDialog.OnDialogDismissListener mDialogDismissListener = new ShareDialog.OnDialogDismissListener()
-    {
-        @Override
-        public void onDismiss()
-        {
-            recoverFromEditVideo();
-        }
-    };
     // 截图保存路径
     private File mSaveDir;
 
@@ -2947,17 +2940,24 @@ public class IjkPlayerView extends FrameLayout
     {
         if (mShareDialog == null)
         {
-            mShareDialog = new ShareDialog();
-            mShareDialog.setDismissListener(mDialogDismissListener);
+            mShareDialog = new ImageDialogFragment();
+            mShareDialog.setListener(new DialogInterface.OnDismissListener()
+            {
+                @Override
+                public void onDismiss(DialogInterface dialog)
+                {
+                    recoverFromEditVideo();
+                }
+            });
         }
 
-        new ImageTask(mAttachActivity,mSaveDir,bitmap).execute();
+        new SaveImageTask(mAttachActivity,mSaveDir,bitmap).execute();
 
         mShareDialog.setScreenshotPhoto(bitmap);
         mShareDialog.show(mAttachActivity.getSupportFragmentManager(), "share");
     }
 
-    private static final class ImageTask
+    private static final class SaveImageTask
             extends AsyncTask<Void,Void,Boolean>
     {
         @SuppressLint("StaticFieldLeak")
@@ -2965,7 +2965,7 @@ public class IjkPlayerView extends FrameLayout
         private final File file;
         private final Bitmap bitmap;
 
-        private ImageTask(Context context, File file, Bitmap bitmap)
+        private SaveImageTask(Context context, File file, Bitmap bitmap)
         {
             super();
             this.context = context.getApplicationContext();

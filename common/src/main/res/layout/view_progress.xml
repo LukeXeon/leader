@@ -1,96 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorBlackAlpha26">
-
-    <RelativeLayout
+<layout>
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/rootView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@android:color/transparent">
-        <!--@drawable/common_progress_dialog_background"-->
-        <FrameLayout
-            android:layout_width="350dp"
+        android:layout_height="match_parent"
+        app:blurOverlayColor="@color/colorBlackAlpha12">
+
+        <RelativeLayout
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent">
+            <!--@drawable/common_progress_dialog_background"-->
+            <FrameLayout
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="10dp"
-                app:cardPreventCornerOverlap="true"
-                app:cardUseCompatPadding="false">
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:background="@android:color/transparent"
-                    android:orientation="vertical">
-                    <!--Title-->
-                    <TextView
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="10dp"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardUseCompatPadding="true">
 
-                        android:id="@+id/progress_message"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="40dp"
-                        android:text=""
-                        android:textColor="#000"
-                        android:textSize="20sp"/>
+                        android:layout_margin="10dp"
+                        android:background="@android:color/transparent"
+                        android:orientation="vertical">
+                        <!--Title-->
+                        <TextView
 
-                    <!--进度-->
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="11dp"
-                        android:layout_marginLeft="18dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginRight="18dp"
-                        android:background="@mipmap/progress">
+                            android:id="@+id/progress_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="40dp"
+                            android:text=""
+                            android:textColor="#000"
+                            android:textSize="20sp"/>
 
-                        <RelativeLayout
-                            android:id="@+id/progress_layout"
+                        <!--进度-->
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerInParent="true">
+                            android:layout_height="11dp"
+                            android:layout_marginLeft="18dp"
+                            android:layout_marginTop="20dp"
+                            android:layout_marginRight="18dp"
+                            android:background="@mipmap/progress">
 
-                            <ImageView
-                                android:id="@+id/p_bot_iv"
+                            <RelativeLayout
+                                android:id="@+id/progress_layout"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/shape_round_corner_bottom"/>
+                                android:layout_centerInParent="true">
 
-                            <kexie.android.common.widget.RoundCornerImageView
-                                android:id="@+id/p_cover_iv"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/pic_cover_blue_white"/>
+                                <ImageView
+                                    android:id="@+id/p_bot_iv"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/shape_round_corner_bottom"/>
 
-                        </RelativeLayout>
+                                <kexie.android.common.widget.RoundCornerImageView
+                                    android:id="@+id/p_cover_iv"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/pic_cover_blue_white"/>
 
-                    </FrameLayout>
+                            </RelativeLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="30dp"/>
+                        </FrameLayout>
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </FrameLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"/>
 
-        <ImageView
-            android:layout_width="85dp"
-            android:layout_height="85dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:src="@mipmap/head"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
-    </RelativeLayout>
-</RelativeLayout>
+            <ImageView
+                android:layout_marginTop="15dp"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/head"/>
+
+        </RelativeLayout>
+    </eightbitlab.com.blurview.BlurView>
+</layout>
+

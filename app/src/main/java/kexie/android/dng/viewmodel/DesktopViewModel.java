@@ -1,7 +1,6 @@
 package kexie.android.dng.viewmodel;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
@@ -47,7 +46,7 @@ public class DesktopViewModel
             try
             {
                 LiteUserInfo user = new LiteUserInfo(
-                        Glide.with((Context) getApplication())
+                        Glide.with(getApplication())
                         .load(R.mipmap.image_head_man)
                         .submit().get(),
                         "未登陆");

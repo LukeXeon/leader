@@ -3,7 +3,7 @@
     <application>
         <provider
             android:authorities="${applicationId}.permissions-initializer"
-            android:name=".widget.PermissionsInitializer"
+            android:name=".app.PermissionsInitializer"
             android:exported="false"
             android:multiprocess="false"/>
     </application>

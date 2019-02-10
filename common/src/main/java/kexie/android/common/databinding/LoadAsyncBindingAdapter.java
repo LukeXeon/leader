@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -26,6 +27,7 @@ import java.util.WeakHashMap;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
+import kexie.android.common.R;
 
 public final class LoadAsyncBindingAdapter
 {
@@ -97,25 +99,18 @@ public final class LoadAsyncBindingAdapter
         }
         if (res != 0)
         {
-            Glide.with(context).load(res)
-                    .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
-                    .into(view);
+            loadAsync(Glide.with(view).load(res), view);
         } else
         {
-            Glide.with(context).load(name)
-                    .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
-                    .into(view);
+            loadAsync(Glide.with(view).load(name), view);
         }
     }
+
 
     @BindingAdapter({"async_src"})
     public static void loadAsyncToSrc(ImageView view, int id)
     {
-        Context context = view.getContext()
-                .getApplicationContext();
-        Glide.with(context).load(id)
-                .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
-                .into(view);
+        loadAsync(Glide.with(view).load(id), view);
     }
 
     @BindingAdapter({"async_background"})
@@ -126,7 +121,8 @@ public final class LoadAsyncBindingAdapter
         final Resources resources = context.getResources();
         final int res = resources
                 .getIdentifier(name, "mipmap", context.getPackageName());
-        Glide.with(context).load(res)
+        Glide.with(view).load(res)
+                .error(Glide.with(view).load(R.mipmap.image_loading))
                 .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
                 .listener(new RequestListener<Drawable>()
                 {
@@ -154,6 +150,13 @@ public final class LoadAsyncBindingAdapter
                         return true;
                     }
                 }).submit();
+    }
+
+    private static void loadAsync(RequestBuilder<Drawable> builder, ImageView view)
+    {
+        builder.error(Glide.with(view).load(R.mipmap.image_loading))
+                .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
+                .into(view);
     }
 
     @BindingAdapter({"async_font"})
