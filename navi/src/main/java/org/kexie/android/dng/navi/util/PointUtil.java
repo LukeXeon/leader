@@ -1,8 +1,5 @@
 package org.kexie.android.dng.navi.util;
 
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.navi.model.NaviLatLng;
-import com.amap.api.services.core.LatLonPoint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -13,21 +10,21 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.kexie.android.dng.navi.model.Point;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.kexie.android.dng.navi.entity.Point;
 
 /**
  * Created by Luke on 2018/12/27.
  */
 
-public final class Points
+public final class PointUtil
 {
-    private Points()
+    private PointUtil()
     {
-
+        throw new AssertionError();
     }
 
     public static Gson getJsonConverter()
@@ -54,48 +51,6 @@ public final class Points
                         return jsonObject;
                     }
                 }).create();
-    }
-
-    public static List<LatLng> toLatLngs(List<Point> points)
-    {
-        if (points == null)
-        {
-            return null;
-        }
-        List<LatLng> latLngs = new ArrayList<>(points.size());
-        for (Point point : points)
-        {
-            latLngs.add(point.toLatLng());
-        }
-        return latLngs;
-    }
-
-    public static List<LatLonPoint> toLatLatLonPoints(List<Point> points)
-    {
-        if (points == null)
-        {
-            return null;
-        }
-        List<LatLonPoint> latLngs = new ArrayList<>(points.size());
-        for (Point point : points)
-        {
-            latLngs.add(point.toLatLonPoint());
-        }
-        return latLngs;
-    }
-
-    public static List<NaviLatLng> toNaviLatLngs(List<Point> points)
-    {
-        if (points == null)
-        {
-            return null;
-        }
-        List<NaviLatLng> latLngs = new ArrayList<>(points.size());
-        for (Point point : points)
-        {
-            latLngs.add(point.toNaviLatLng());
-        }
-        return latLngs;
     }
 
     public static List<Point> getCircleBy(Point point, double radius)

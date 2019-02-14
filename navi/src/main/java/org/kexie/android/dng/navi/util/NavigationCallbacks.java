@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.widget;
+package org.kexie.android.dng.navi.util;
 
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.model.AMapCalcRouteResult;
@@ -20,7 +20,7 @@ import com.autonavi.tbt.TrafficFacilityInfo;
  * Created by Luke on 2018/12/27.
  */
 
-public abstract class MapNavigationClient
+public abstract class NavigationCallbacks
         implements AMapNaviListener
 {
     @Override

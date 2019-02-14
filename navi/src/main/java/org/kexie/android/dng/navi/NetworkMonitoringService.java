@@ -12,8 +12,8 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.entity.NetRoute;
-import org.kexie.android.dng.navi.entity.Point;
-import org.kexie.android.dng.navi.util.Points;
+import org.kexie.android.dng.navi.model.Point;
+import org.kexie.android.dng.navi.util.PointUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class NetworkMonitoringService extends Service
         private List<Point> points;
     }
 
-    private Gson gson = Points.getJsonConverter();
+    private Gson gson = PointUtil.getJsonConverter();
     private Executor singleTask = Executors.newSingleThreadExecutor();
     private WebSocketFactory factory
             = new WebSocketFactory()
@@ -48,7 +48,7 @@ public class NetworkMonitoringService extends Service
             netRoute.setTo(entity.points.get(entity.points.size() - 1));
             netRoute.setPoints(
                     new ArrayList<>(entity.points.subList(1, entity.points.size() - 1)));
-            //MapNavigationFragment.startOf(NetworkMonitoringService.this, netRoute);
+            //NavigationFragment.startOf(NetworkMonitoringService.this, netRoute);
         }
 
         @Override

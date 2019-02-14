@@ -5,11 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.common.widget.ProgressHelper;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
 import org.kexie.android.dng.navi.entity.Route;
-import org.kexie.android.dng.navi.viewmodel.MapNavigationViewModel;
+import org.kexie.android.dng.navi.viewmodel.NavigationViewModel;
 
 import java.util.Objects;
 
@@ -20,17 +19,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 
-public class MapNavigationFragment extends Fragment
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
+
+public class NavigationFragment extends Fragment
 {
     private static final String ARG = "route";
-    private MapNavigationViewModel viewModel;
+    private NavigationViewModel viewModel;
     private FragmentNavigationBinding binding;
 
-    public static MapNavigationFragment newInstance(Route route)
+    public static NavigationFragment newInstance(Route route)
     {
         Bundle args = new Bundle();
         args.putParcelable(ARG, route);
-        MapNavigationFragment fragment = new MapNavigationFragment();
+        NavigationFragment fragment = new NavigationFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,24 +55,14 @@ public class MapNavigationFragment extends Fragment
         Bundle bundle = getArguments();
         Route route = Objects.requireNonNull(bundle).getParcelable(ARG);
         viewModel = ViewModelProviders.of(this)
-                .get(MapNavigationViewModel.class);
-        viewModel.calculate(route);
-        viewModel.getCalculateResult().observe(this,
-                aBoolean -> {
-                    if (aBoolean != null && aBoolean)
-                    {
-                        Toasty.success(Objects.requireNonNull(getContext())
-                                        .getApplicationContext(),
-                                "路径规划成功")
-                                .show();
-                    } else
-                    {
-                        Toasty.success(Objects.requireNonNull(getContext())
-                                        .getApplicationContext(),
-                                "路径规划失败，请检查网络连接")
-                                .show();
-                    }
-                });
-        ProgressHelper.observe(viewModel.getLoading(), this);
+                .get(NavigationViewModel.class);
+
+
+        viewModel.getOnErrorMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.error(getContext(), s).show());
+        viewModel.getOnSuccessMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 }

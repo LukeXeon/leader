@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.entity;
+package org.kexie.android.dng.navi.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

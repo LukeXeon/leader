@@ -7,6 +7,7 @@ import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.DriveStep;
 
 import org.kexie.android.dng.navi.R;
+import org.kexie.android.dng.navi.model.Point;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

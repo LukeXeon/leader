@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.kexie.android.dng.navi.model.Point;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

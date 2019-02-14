@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.entity;
+package org.kexie.android.dng.navi.model;
 
 import java.util.List;
 

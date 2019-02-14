@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.entity;
+package org.kexie.android.dng.navi.model;
 
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.model.NaviLatLng;
