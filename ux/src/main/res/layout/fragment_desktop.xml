@@ -7,13 +7,11 @@
 
         <import type="org.kexie.android.dng.ux.R"/>
 
-
-
         <import type="org.kexie.android.dng.ux.viewmodel.entity.Function"/>
 
         <variable
             name="user"
-            type="org.kexie.android.dng.ux.viewmodel.entity.LiteUserInfo"/>
+            type="org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo"/>
 
         <variable
             name="actions"
@@ -216,7 +214,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:text='@{"车牌号："+user.username}'
+                                android:text='@{"车牌号："+user.carNumber}'
                                 android:textColor="@color/colorBlackAlpha87"
                                 android:textSize="25sp"/>
                         </LinearLayout>

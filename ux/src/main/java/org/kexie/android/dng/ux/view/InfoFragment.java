@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.databinding.FragmentUserInfoBinding;
-import org.kexie.android.dng.ux.viewmodel.UsersViewModel;
+import org.kexie.android.dng.ux.databinding.FragmentInfoBinding;
+import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 
 import java.util.Map;
 
@@ -16,13 +16,12 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
-public class UserInfoFragment extends Fragment
+public class InfoFragment extends Fragment
 {
-    private FragmentUserInfoBinding binding;
-    private UsersViewModel viewModel;
+    private FragmentInfoBinding binding;
+    private InfoViewModel viewModel;
 
     @Nullable
     @Override
@@ -31,7 +30,7 @@ public class UserInfoFragment extends Fragment
                              @Nullable Bundle savedInstanceState)
     {
         binding = DataBindingUtil.inflate(inflater,
-                R.layout.fragment_user_info, container,
+                R.layout.fragment_info, container,
                 false);
         binding.setLifecycleOwner(this);
         return binding.getRoot();
@@ -41,8 +40,6 @@ public class UserInfoFragment extends Fragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
-        viewModel = ViewModelProviders.of(this)
-                .get(UsersViewModel.class);
         //dataBinding
         binding.blurView.setupWith((ViewGroup) view.getParent())
                 .setFrameClearDrawable(
@@ -55,8 +52,7 @@ public class UserInfoFragment extends Fragment
         binding.setActions(binding.getActions());
         binding.setActions(getActions());
         //liveData
-        viewModel.getHeadImage().observe(this, binding::setHeadImage);
-        viewModel.getSimpleUser().observe(this, binding::setUser);
+        viewModel.getUser().observe(this, binding::setUser);
     }
 
     private Map<String, View.OnClickListener> getActions()

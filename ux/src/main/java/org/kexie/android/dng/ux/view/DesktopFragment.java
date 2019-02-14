@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
 import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
+import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
+import org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo;
 
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 
@@ -29,6 +32,8 @@ public class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;
     private DesktopViewModel viewModel;
+    private InfoViewModel infoViewModel;
+
 
     @NonNull
     @Override
@@ -50,13 +55,16 @@ public class DesktopFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         viewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
+        infoViewModel = ViewModelProviders.of(this).get(InfoViewModel.class);
         getLifecycle().addObserver(viewModel);
         //dataBinding
         binding.setOnItemClick((adapter, view1, position)
                 -> viewModel.requestJumpBy((Function) adapter.getData().get(position)));
         binding.setActions(getActions());
         //liveData
-        viewModel.getUserInfo().observe(this, binding::setUser);
+        Transformations.map(infoViewModel.getUser(),
+                input -> new SimpleUserInfo(input.headImage, input.username, input.carNumber))
+                .observe(this, binding::setUser);
         viewModel.getTime().observe(this, binding::setTime);
         //rx
         viewModel.getDefaultFunction()

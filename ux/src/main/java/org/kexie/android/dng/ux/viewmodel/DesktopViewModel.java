@@ -18,16 +18,12 @@ import com.bumptech.glide.request.target.Target;
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
-import org.kexie.android.dng.ux.viewmodel.entity.LiteUserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
@@ -43,7 +39,6 @@ import io.reactivex.exceptions.Exceptions;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.StreamSupport;
-import okhttp3.OkHttpClient;
 
 
 public class DesktopViewModel
@@ -66,40 +61,16 @@ public class DesktopViewModel
     }
 
     private static final int BORDER_SIZE = 250;
-    private final Executor singleTask = Executors.newSingleThreadExecutor();
-    private final MutableLiveData<LiteUserInfo> userInfo = new MutableLiveData<>();
     private final MutableLiveData<String> time = new MutableLiveData<>();
     private final Map<Function, Uri> functionJumpTo = new ArrayMap<>();
     private final PublishSubject<Uri> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
     private Timer updateTimer;
-    private final OkHttpClient httpClient = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .build();
 
     public DesktopViewModel(Application application)
     {
         super(application);
-        init();
-    }
-
-    private void init()
-    {
-        singleTask.execute(() -> {
-            try
-            {
-                LiteUserInfo user = new LiteUserInfo(
-                        Glide.with(getApplication())
-                                .load(R.mipmap.image_head_man)
-                                .submit().get(),
-                        "未登陆");
-                userInfo.postValue(user);
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        });
     }
 
     public void requestJumpBy(Function function)
@@ -227,11 +198,6 @@ public class DesktopViewModel
     public LiveData<String> getTime()
     {
         return time;
-    }
-
-    public LiveData<LiteUserInfo> getUserInfo()
-    {
-        return userInfo;
     }
 
     public Observable<String> getOnErrorMessage()

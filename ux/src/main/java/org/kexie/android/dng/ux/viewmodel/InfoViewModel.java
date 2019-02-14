@@ -17,15 +17,14 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-public class UsersViewModel extends AndroidViewModel
+public class InfoViewModel extends AndroidViewModel
 {
     private Gson gson = new Gson();
     private Executor singleTask
             = Executors.newSingleThreadExecutor();
-    private final MutableLiveData<Drawable> headImage = new MutableLiveData<>();
-    private final MutableLiveData<UserInfo> simpleUser = new MutableLiveData<>();
+    private final MutableLiveData<UserInfo> user = new MutableLiveData<>();
 
-    public UsersViewModel(@NonNull Application application)
+    public InfoViewModel(@NonNull Application application)
     {
         super(application);
         init();
@@ -46,10 +45,10 @@ public class UsersViewModel extends AndroidViewModel
                         .name("未登录")
                         .phone("未登录")
                         .username("未登录")
+                        .headImage(drawable)
                         .verified(false)
                         .build();
-                headImage.postValue(drawable);
-                simpleUser.postValue(user);
+                this.user.postValue(user);
             } catch (ExecutionException
                     | InterruptedException e)
             {
@@ -58,14 +57,9 @@ public class UsersViewModel extends AndroidViewModel
         });
     }
 
-    public MutableLiveData<Drawable> getHeadImage()
+    public MutableLiveData<UserInfo> getUser()
     {
-        return headImage;
-    }
-
-    public MutableLiveData<UserInfo> getSimpleUser()
-    {
-        return simpleUser;
+        return user;
     }
 
 }
