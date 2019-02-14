@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.kexie.android.common.databinding.BT;
+import org.kexie.android.common.widget.ProgressHelper;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.RouteQueryViewModel;
@@ -16,8 +18,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
-import org.kexie.android.common.databinding.BT;
-import org.kexie.android.common.widget.ProgressHelper;
 
 public class RouteQueryFragment extends Fragment
 {
@@ -65,7 +65,7 @@ public class RouteQueryFragment extends Fragment
                     }
                     binding.setTips(tips);
                 });
-                ProgressHelper.observe(viewModel.getLoading(),getChildFragmentManager(),0);
+                ProgressHelper.observe(viewModel.getLoading(),this);
         viewModel.getQueryText().observe(this,
                 s -> {
                     if (TextUtils.isEmpty(s))

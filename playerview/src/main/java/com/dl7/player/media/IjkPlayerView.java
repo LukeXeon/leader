@@ -477,6 +477,7 @@ public class IjkPlayerView extends FrameLayout
      */
     public int onDestroy()
     {
+
         // 记录播放进度
         int curPosition = mVideoView.getCurrentPosition();
         mVideoView.destroy();

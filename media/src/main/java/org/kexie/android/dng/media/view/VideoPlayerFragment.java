@@ -10,10 +10,11 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dl7.player.media.IjkPlayerView;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
-import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,7 @@ import androidx.fragment.app.Fragment;
 public class VideoPlayerFragment extends Fragment
 {
 
-    public static VideoPlayerFragment newInstance(MediaInfo info)
+    public static VideoPlayerFragment newInstance(LiteMediaInfo info)
     {
         Bundle args = new Bundle();
         args.putParcelable("info", info);
@@ -43,15 +44,24 @@ public class VideoPlayerFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-        MediaInfo info = getArguments().getParcelable("info");
         binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_video_player,
                 container,
                 false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        LiteMediaInfo info = getArguments().getParcelable("info");
+        //dataBinding
         player = binding.playerView;
         Glide.with(this)
-                .load(info.getPath())
+                .load(info.uri)
                 .apply(RequestOptions.fitCenterTransform())
                 .into(player.mPlayerThumb);
         binding.playerView.init()
@@ -59,14 +69,12 @@ public class VideoPlayerFragment extends Fragment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                         .getAbsolutePath()+"/dng")
                 .setOnBackListener(getFragmentManager()::popBackStack)
-                .setTitle(info.getTitle())    // set title
-                .setVideoPath(info.getPath())
+                .setTitle(info.title)    // set title
+                .setVideoPath(info.uri)
                 .alwaysFullScreen()
                 .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
                 .start();   // Start playing
-        return binding.getRoot();
     }
-
 
     @Override
     public void onPause()
@@ -82,8 +90,12 @@ public class VideoPlayerFragment extends Fragment
     public void onDestroyView()
     {
         super.onDestroyView();
-        player = null;
-        binding = null;
+        if (player != null)
+        {
+            Logger.d(this + " onDestroyView");
+            player.onDestroy();
+            player = null;
+        }
     }
 
     @Override
@@ -96,15 +108,6 @@ public class VideoPlayerFragment extends Fragment
         }
     }
 
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        if (player != null)
-        {
-            player.onDestroy();
-        }
-    }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig)

@@ -1,6 +1,5 @@
 package org.kexie.android.dng.media.view;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,10 +7,12 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import org.kexie.android.common.util.AnimationAdapter;
+import org.kexie.android.common.util.Callback;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
-import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaManagedViewModel;
+import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,32 +23,31 @@ import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
 
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
+
 public class PhotoViewFragment extends Fragment
 {
 
     private FragmentPhotoViewBinding binding;
 
-    public interface Callback
-    {
-        void callback();
-    }
 
-
-    public static PhotoViewFragment newInstance(MediaInfo mediaInfo,
-                                                Callback callback)
+    public static PhotoViewFragment newInstance(LiteMediaInfo mediaInfo)
     {
         Bundle args = new Bundle();
         args.putParcelable("info", mediaInfo);
         PhotoViewFragment fragment = new PhotoViewFragment();
         fragment.setArguments(args);
-        fragment.callback = callback;
         return fragment;
     }
 
-    private Callback callback;
+    private Callback<Void> callback;
 
+    public void setCallback(Callback<Void> callback)
+    {
+        this.callback = callback;
+    }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,8 +59,6 @@ public class PhotoViewFragment extends Fragment
                 R.layout.fragment_photo_view,
                 container,
                 false);
-        binding.setLifecycleOwner(this);
-        binding.getRoot().setOnTouchListener((v, event) -> true);
         return binding.getRoot();
     }
 
@@ -69,9 +67,10 @@ public class PhotoViewFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        //dataBinding
+        binding.setLifecycleOwner(this);
+        binding.getRoot().setOnTouchListener((v, event) -> true);
         binding.setInfo(getArguments().getParcelable("info"));
-        MediaManagedViewModel viewModel = ViewModelProviders.of(this)
-                .get(MediaManagedViewModel.class);
         binding.blurView.setupWith(binding.photo)
                 .setFrameClearDrawable(
                         getActivity()
@@ -82,72 +81,64 @@ public class PhotoViewFragment extends Fragment
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
         binding.setHide(false);
+        MediaManagedViewModel viewModel = ViewModelProviders.of(this)
+                .get(MediaManagedViewModel.class);
         binding.setActions(new ArrayMap<String, View.OnClickListener>()
         {
             {
                 View.OnClickListener a1 = v -> getActivity().onBackPressed();
                 put("back", a1);
                 put("delete", v -> {
-                    if (viewModel.delete(binding.getInfo()))
+                    if (viewModel.delete(binding.getInfo()) && callback != null)
                     {
-                        Toasty.success(getContext(), "删除成功").show();
-                    } else
-                    {
-                        Toasty.error(getContext(), "删除失败").show();
-                    }
-                    a1.onClick(v);
-                    if (callback != null)
-                    {
-                        callback.callback();
+                        callback.onResult(null);
                     }
                 });
-                put("hide", v -> {
-                    AlphaAnimation animation
-                            = (AlphaAnimation) binding.blurView.getTag();
-                    if (animation != null)
-                    {
-                        animation.cancel();
-                    }
-                    if (binding.getHide())//show
-                    {
-                        binding.blurView.setVisibility(View.VISIBLE);
-                        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-                        alphaAnimation.setDuration(200);
-                        binding.blurView.startAnimation(alphaAnimation);
-                        binding.blurView.setTag(alphaAnimation);
-                    } else//hide
-                    {
-                        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-                        alphaAnimation.setAnimationListener(new Animation.AnimationListener()
-                        {
-                            @Override
-                            public void onAnimationStart(Animation animation)
-                            {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation)
-                            {
-                                if (binding.getHide())
-                                {
-                                    binding.blurView.setVisibility(View.GONE);
-                                }
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation)
-                            {
-
-                            }
-                        });
-                        alphaAnimation.setDuration(200);
-                        binding.blurView.startAnimation(alphaAnimation);
-                        binding.blurView.setTag(alphaAnimation);
-                    }
-                    binding.setHide(!binding.getHide());
-                });
+                put("hide", v -> hideAnimation());
             }
         });
+        //rx
+        viewModel.getOnErrorMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.error(getContext(), s).show());
+        viewModel.getOnSuccessMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.success(getContext(), s).show());
+    }
+
+    private void hideAnimation()
+    {
+        AlphaAnimation animation
+                = (AlphaAnimation) binding.blurView.getTag();
+        if (animation != null)
+        {
+            animation.cancel();
+        }
+        if (binding.getHide())//show
+        {
+            binding.blurView.setVisibility(View.VISIBLE);
+            AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+            alphaAnimation.setDuration(200);
+            binding.blurView.startAnimation(alphaAnimation);
+            binding.blurView.setTag(alphaAnimation);
+        } else//hide
+        {
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+            alphaAnimation.setAnimationListener(new AnimationAdapter()
+            {
+                @Override
+                public void onAnimationEnd(Animation animation)
+                {
+                    if (binding.getHide())
+                    {
+                        binding.blurView.setVisibility(View.GONE);
+                    }
+                }
+            });
+            alphaAnimation.setDuration(200);
+            binding.blurView.startAnimation(alphaAnimation);
+            binding.blurView.setTag(alphaAnimation);
+        }
+        binding.setHide(!binding.getHide());
     }
 }

@@ -24,7 +24,7 @@
         android:layout_height="match_parent">
         <RelativeLayout
             android:onClick='@{actions.get("返回")}'
-            android:background="@color/colorBlackAlpha26"
+            android:background="@color/translucent_whitesmoke"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

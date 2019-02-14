@@ -9,25 +9,22 @@
             name="title"
             type="String"/>
         <variable
-            name="mediaInfos"
-            type="java.util.List&lt;org.kexie.android.dng.media.viewmodel.entity.MediaInfo&gt;"/>
+            name="mediaInfo"
+            type="java.util.List&lt;org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo&gt;"/>
         <variable
             name="actions"
             type="java.util.Map&lt;String,Action&gt;"/>
         <variable
-            name="onCreateAdapter"
-            type="org.kexie.android.common.databinding.GenericItemRecyclerAdapter.OnCreatedListener"/>
+            name="onItemClick"
+            type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>
     </data>
     <FrameLayout
-        android:id="@+id/root"
-        android:background="@color/white"
+        android:background="@android:color/white"
         async_background='@{"image_background"}'
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <androidx.cardview.widget.CardView
-            android:background="@android:color/white"
             app:cardBackgroundColor="@android:color/white"
-            android:layout_margin="5dp"
             app:cardElevation="15dp"
             app:cardPreventCornerOverlap="false"
             app:cardUseCompatPadding="true"
@@ -61,10 +58,11 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
-                    onAdapterCreated="@{onCreateAdapter}"
                     item_layout="@{R.layout.item_media_info}"
                     item_name='@{"info"}'
-                    item_source="@{mediaInfos}"
+                    item_source="@{mediaInfo}"
+                    onItemClick="@{onItemClick}"
+                    empty_layout="@{R.layout.view_empty}"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
                 </androidx.recyclerview.widget.RecyclerView>

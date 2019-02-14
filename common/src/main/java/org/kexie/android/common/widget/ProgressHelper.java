@@ -15,17 +15,18 @@ import android.widget.TextView;
 import org.kexie.android.common.R;
 import org.kexie.android.common.databinding.ViewProgressBinding;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import eightbitlab.com.blurview.RenderScriptBlur;
-
 
 public final class ProgressHelper
         extends Fragment
@@ -119,6 +120,7 @@ public final class ProgressHelper
     {
         mainThread.postDelayed(() -> {
             mainThread.removeCallbacksAndMessages(null);
+            FragmentManager manager = getFragmentManager();
             getFragmentManager()
                     .beginTransaction()
                     .remove(this)
@@ -128,17 +130,24 @@ public final class ProgressHelper
     }
 
     public static void observe(LiveData<String> liveData,
-                               FragmentManager fragmentManager,
-                               @IdRes int position)
+                               Fragment fragment)
     {
-        liveData.observeForever(new WidgetObserver(fragmentManager, position));
+        WidgetObserver observer = new WidgetObserver(
+                fragment.getParentFragment() == null
+                        ? fragment.getFragmentManager()
+                        : fragment.getParentFragment()
+                        .getChildFragmentManager(),
+                fragment.getId());
+        liveData.observe(fragment, observer);
+        fragment.getLifecycle().addObserver(observer);
     }
 
     private static class WidgetObserver
-            implements Observer<String>
+            implements Observer<String>,
+            LifecycleEventObserver
     {
-        private static final String TAG = "wait";
         private final FragmentManager fragmentManager;
+        private boolean isAttach = false;
         private final ProgressHelper widget = new ProgressHelper();
         private final int position;
 
@@ -159,9 +168,23 @@ public final class ProgressHelper
                         .add(position, widget)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
+                isAttach = true;
             } else
             {
                 widget.dismiss();
+                isAttach = false;
+            }
+        }
+
+        @Override
+        public void onStateChanged(@NonNull LifecycleOwner source,
+                                   @NonNull Lifecycle.Event event)
+        {
+            if (event.equals(Lifecycle.Event.ON_DESTROY)
+                    && isAttach)
+            {
+
+                onChanged(null);
             }
         }
     }

@@ -26,6 +26,9 @@
         <variable
             name="functions"
             type="java.util.List&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
+        <variable
+            name="onItemClick"
+            type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>
     </data>
 
     <LinearLayout
@@ -253,9 +256,10 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_function_list"
-                item_source="@{functions}"
                 item_name='@{"function"}'
                 item_layout="@{R.layout.item_desktop_function}"
+                item_source="@{functions}"
+                onItemClick="@{onItemClick}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/function_text"

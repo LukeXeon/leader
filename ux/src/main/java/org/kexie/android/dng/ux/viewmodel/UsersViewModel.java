@@ -1,7 +1,6 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import com.bumptech.glide.Glide;
@@ -37,7 +36,7 @@ public class UsersViewModel extends AndroidViewModel
         singleTask.execute(() -> {
             try
             {
-                Drawable drawable = Glide.with((Context) getApplication())
+                Drawable drawable = Glide.with(getApplication())
                         .load(R.mipmap.image_head_man)
                         .submit()
                         .get();
@@ -57,12 +56,6 @@ public class UsersViewModel extends AndroidViewModel
                 e.printStackTrace();
             }
         });
-    }
-
-    @Override
-    protected void onCleared()
-    {
-        super.onCleared();
     }
 
     public MutableLiveData<Drawable> getHeadImage()

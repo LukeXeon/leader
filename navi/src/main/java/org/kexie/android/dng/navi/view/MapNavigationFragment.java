@@ -71,6 +71,6 @@ public class MapNavigationFragment extends Fragment
                                 .show();
                     }
                 });
-        ProgressHelper.observe(viewModel.getLoading(), this.getChildFragmentManager(),0);
+        ProgressHelper.observe(viewModel.getLoading(), this);
     }
 }

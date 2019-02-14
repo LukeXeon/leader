@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
-import org.kexie.android.dng.media.viewmodel.entity.MediaInfo;
+import org.kexie.android.dng.media.model.entity.MediaInfo;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <import type="org.kexie.android.dng.ux.R"/>
+        <variable
+            name="appInfo"
+            type="java.util.List&lt;org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo&gt;"/>
+        <variable
+            name="onItemClick"
+            type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>
+    </data>
+    <eightbitlab.com.blurview.BlurView
+        android:id="@+id/blurView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:textSize="40sp"
+                android:text="全部应用"
+                android:textColor="@color/colorBlackAlpha54"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <FrameLayout
+                android:layout_marginBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_gravity="center"
+                    android:id="@+id/dataContent"
+                    item_name='@{"appInfo"}'
+                    item_layout="@{R.layout.item_app}"
+                    item_source="@{appInfo}"
+                    onItemClick="@{onItemClick}"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </androidx.recyclerview.widget.RecyclerView>
+                <org.kexie.android.common.widget.ProgressBar
+                    android:layout_gravity="center"
+                    android:visibility="@{appInfo==null?View.VISIBLE:View.GONE}"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"/>
+            </FrameLayout>
+        </LinearLayout>
+
+    </eightbitlab.com.blurview.BlurView>
+</layout>

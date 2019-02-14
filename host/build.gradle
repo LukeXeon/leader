@@ -37,6 +37,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':common')
     implementation project(':ux')
+    implementation project(':navi')
+    implementation project(':media')
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'

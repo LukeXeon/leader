@@ -9,11 +9,11 @@ import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentUserInfoBinding;
 import org.kexie.android.dng.ux.viewmodel.UsersViewModel;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -41,6 +41,9 @@ public class UserInfoFragment extends Fragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
+        viewModel = ViewModelProviders.of(this)
+                .get(UsersViewModel.class);
+        //dataBinding
         binding.blurView.setupWith((ViewGroup) view.getParent())
                 .setFrameClearDrawable(
                         getActivity().getWindow()
@@ -49,23 +52,16 @@ public class UserInfoFragment extends Fragment
                 .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
-
-        viewModel = ViewModelProviders.of(this)
-                .get(UsersViewModel.class);
-
         binding.setActions(binding.getActions());
-
-        viewModel.getHeadImage().observe(this,
-                drawable -> binding.setHeadImage(drawable));
-
-        viewModel.getSimpleUser().observe(this,
-                simpleUser -> binding.setUser(simpleUser));
         binding.setActions(getActions());
+        //liveData
+        viewModel.getHeadImage().observe(this, binding::setHeadImage);
+        viewModel.getSimpleUser().observe(this, binding::setUser);
     }
 
     private Map<String, View.OnClickListener> getActions()
     {
-        return new HashMap<String, View.OnClickListener>()
+        return new ArrayMap<String, View.OnClickListener>()
         {
             {
                 put("返回", v -> getFragmentManager().popBackStack());

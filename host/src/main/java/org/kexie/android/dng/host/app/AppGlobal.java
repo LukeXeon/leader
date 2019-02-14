@@ -13,6 +13,5 @@ public class AppGlobal extends MultiDexApplication
     {
         super.onCreate();
         Logger.addLogAdapter(new AndroidLogAdapter());
-
     }
 }

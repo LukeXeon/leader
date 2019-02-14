@@ -1,20 +1,20 @@
 package org.kexie.android.common.databinding;
 
+import org.kexie.android.common.R;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.databinding.BindingAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import fr.castorflex.android.verticalviewpager.VerticalViewPager;
-import org.kexie.android.common.R;
 
-public final class GenericItemViewBindingAdapter
+public final class GenericItemViewAdapter
 {
-    private GenericItemViewBindingAdapter()
+    private GenericItemViewAdapter()
     {
         throw new AssertionError();
     }
@@ -30,41 +30,6 @@ public final class GenericItemViewBindingAdapter
         Object getTag(@IdRes int id);
     }
 
-    private static final class RecyclerViewPostItem
-            implements Runnable
-    {
-        private final WeakReference<RecyclerView> reference;
-        private final List<?> items;
-
-        private RecyclerViewPostItem(RecyclerView reference,
-                                     List<?> items)
-        {
-            this.reference = new WeakReference<>(reference);
-            this.items = items;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void run()
-        {
-            RecyclerView recyclerView = reference.get();
-            if (recyclerView != null)
-            {
-                RecyclerView.Adapter adapter
-                        = recyclerView.getAdapter();
-                if (adapter == null)
-                {
-                    recyclerView.post(this);
-                } else
-                {
-                    if (adapter instanceof GenericItemRecyclerAdapter)
-                    {
-                        ((GenericItemRecyclerAdapter) adapter).setNewData(items);
-                    }
-                }
-            }
-        }
-    }
 
     private static final class PagerViewPostItem
             implements Runnable
@@ -100,13 +65,6 @@ public final class GenericItemViewBindingAdapter
         }
     }
 
-    @BindingAdapter({"onAdapterCreated"})
-    public static void setOnCreatedListener(RecyclerView view,
-                                            GenericItemRecyclerAdapter
-                                                    .OnCreatedListener listener)
-    {
-        view.setTag(R.id.on_adapter_created, listener);
-    }
 
     @BindingAdapter({"onAdapterCreated"})
     public static void setOnCreatedListener(ViewPager view,
@@ -116,25 +74,7 @@ public final class GenericItemViewBindingAdapter
         view.setTag(R.id.on_adapter_created, listener);
     }
 
-    @BindingAdapter({"item_name", "item_layout"})
-    public static void setAdapter(RecyclerView view,
-                                  String itemName,
-                                  @LayoutRes int itemLayout)
-    {
-        RecyclerView.Adapter adapter = view.getAdapter();
-        if (!(adapter instanceof GenericItemRecyclerAdapter))
-        {
-            GenericItemRecyclerAdapter<?> genericItemRecyclerAdapter
-                    = new GenericItemRecyclerAdapter<>(itemName, itemLayout);
-            view.setAdapter(genericItemRecyclerAdapter);
-            Object listener = view.getTag(R.id.on_adapter_created);
-            if (listener instanceof GenericItemRecyclerAdapter.OnCreatedListener)
-            {
-                ((GenericItemRecyclerAdapter.OnCreatedListener) listener)
-                        .onCreated(genericItemRecyclerAdapter);
-            }
-        }
-    }
+
 
     @BindingAdapter({"item_name", "item_layout"})
     public static void setAdapter(ViewPager view,
@@ -157,13 +97,6 @@ public final class GenericItemViewBindingAdapter
                                 List<?> dataSource)
     {
         setItems(getPagerView(view), dataSource);
-    }
-
-    @BindingAdapter({"item_source"})
-    public static void setItems(RecyclerView view,
-                                List<?> dataSource)
-    {
-        new RecyclerViewPostItem(view, dataSource).run();
     }
 
     @BindingAdapter({"item_source"})
