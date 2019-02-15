@@ -4,8 +4,8 @@ import android.app.Application;
 
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
+import com.amap.api.navi.model.NaviLatLng;
 
-import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.entity.Route;
 import org.kexie.android.dng.navi.util.NavigationCallbacks;
 
@@ -73,10 +73,10 @@ public class NavigationViewModel extends AndroidViewModel
                         });
                 lock.lock();
                 navigation.calculateDriveRoute(Collections.singletonList(
-                        route.getFrom().toNaviLatLng()),
-                        Collections.singletonList(route.getTo().toNaviLatLng()),
+                        route.getFrom().unBox(NaviLatLng.class)),
+                        Collections.singletonList(route.getTo().unBox(NaviLatLng.class)),
                         StreamSupport.stream(route.getPoints())
-                                .map(Point::toNaviLatLng)
+                                .map(p -> p.unBox(NaviLatLng.class))
                                 .collect(Collectors.toList()), 9);
                 condition.await();
                 lock.unlock();

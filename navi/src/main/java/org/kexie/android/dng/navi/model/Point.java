@@ -1,273 +1,128 @@
 package org.kexie.android.dng.navi.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Luke on 2018/12/27.
  */
 
-public final class Point
-        implements PointCompat,
-        Parcelable
+public abstract class Point
 {
-    public static final Creator<Point> CREATOR = new Creator<Point>()
+    private interface Factory
     {
-        @Override
-        public Point createFromParcel(Parcel in)
-        {
-            return new Point(in);
-        }
+        Object newInstance(double x, double y);
+    }
 
-        @Override
-        public Point[] newArray(int size)
+    private static final Map<Class<?>, Factory> POINT_FACTORIES
+            = new ConcurrentHashMap<Class<?>, Factory>()
+    {
         {
-            return new Point[size];
+            put(NaviLatLng.class, NaviLatLng::new);
+            put(LatLng.class, LatLng::new);
+            put(LatLonPoint.class, LatLonPoint::new);
+            put(JsonPoint.class, JsonPoint::new);
         }
     };
 
-    @Override
-    public int describeContents()
+    public final static Point NO_LOCATION = new Point()
     {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeDouble(getLatitude());
-        dest.writeDouble(getLongitude());
-    }
-
-    private static class Json implements PointCompat
-    {
-        public final double latitude;
-        public final double longitude;
-
-        private Json(double latitude, double longitude)
-        {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
         @Override
         public double getLatitude()
         {
-            return latitude;
+            return Double.NaN;
         }
 
         @Override
         public double getLongitude()
         {
-            return longitude;
+            return Double.NaN;
         }
+    };
 
-        @Override
-        public LatLng toLatLng()
-        {
-            return new LatLng(latitude, longitude);
-        }
+    public abstract double getLatitude();
 
-        @Override
-        public LatLonPoint toLatLonPoint()
-        {
-            return new LatLonPoint(latitude, longitude);
-        }
+    public abstract double getLongitude();
 
-        @Override
-        public NaviLatLng toNaviLatLng()
-        {
-            return new NaviLatLng(latitude, longitude);
-        }
-    }
-
-    private static class LatLngImpl implements PointCompat
+    @SuppressWarnings("unchecked")
+    public <T> T unBox(Class<T> type)
     {
-        private final LatLng latLng;
-
-        private LatLngImpl(LatLng latLng)
-        {
-            this.latLng = latLng;
-        }
-
-        @Override
-        public double getLatitude()
-        {
-            return latLng.latitude;
-        }
-
-        @Override
-        public double getLongitude()
-        {
-            return latLng.longitude;
-        }
-
-        @Override
-        public LatLng toLatLng()
-        {
-            return latLng;
-        }
-
-        @Override
-        public LatLonPoint toLatLonPoint()
-        {
-            return new LatLonPoint(latLng.latitude, latLng.longitude);
-        }
-
-        @Override
-        public NaviLatLng toNaviLatLng()
-        {
-            return new NaviLatLng(latLng.latitude, latLng.longitude);
-        }
+        return (T) Objects.requireNonNull(POINT_FACTORIES.get(type))
+                .newInstance(getLatitude(), getLongitude());
     }
 
-    private static class LatLonPointImpl implements PointCompat
+    public static Point box(NaviLatLng naviLatLng)
     {
-        private final LatLonPoint latLonPoint;
-
-        private LatLonPointImpl(LatLonPoint latLonPoint)
-        {
-            this.latLonPoint = latLonPoint;
-        }
-
-        @Override
-        public double getLatitude()
-        {
-            return latLonPoint.getLatitude();
-        }
-
-        @Override
-        public double getLongitude()
-        {
-            return latLonPoint.getLongitude();
-        }
-
-        @Override
-        public LatLng toLatLng()
-        {
-            return new LatLng(latLonPoint.getLatitude(), latLonPoint.getLongitude());
-        }
-
-        @Override
-        public LatLonPoint toLatLonPoint()
-        {
-            return latLonPoint;
-        }
-
-        @Override
-        public NaviLatLng toNaviLatLng()
-        {
-            return new NaviLatLng(latLonPoint.getLatitude(), latLonPoint.getLongitude());
-        }
+        return new BoxNavPoint(naviLatLng);
     }
 
-    private static class NaviLatLngImpl implements PointCompat
+    public static Point box(LatLonPoint latLonPoint)
     {
-        private final NaviLatLng naviLatLng;
+        return new BoxServicePoint(latLonPoint);
+    }
 
-        private NaviLatLngImpl(NaviLatLng naviLatLng)
+    public static Point box(LatLng latLng)
+    {
+        return new BoxMapPoint(latLng);
+    }
+
+
+    public static Point form(double x, double y)
+    {
+        return new JsonPoint(x, y);
+    }
+
+    // 功能：判断点是否在多边形内
+    // 方法：求解通过该点的水平线与多边形各边的交点
+    // 结论：单边交点为奇数，成立!
+    //参数：
+    // POINT p   指定的某个点
+    // LPPOINT ptPolygon 多边形的各个顶点坐标（首末点可以不一致）
+    public static boolean isInPolygon(Point point, List<Point> APoints)
+    {
+        int nCross = 0;
+        for (int i = 0; i < APoints.size(); i++)
         {
-            this.naviLatLng = naviLatLng;
+            Point p1 = APoints.get(i);
+            Point p2 = APoints.get((i + 1) % APoints.size());
+            // 求解 y=p.y 与 p1p2 的交点
+            if (p1.getLongitude() == p2.getLongitude())      // p1p2 与 y=p0.y平行
+                continue;
+            if (point.getLongitude() < Math.min(p1.getLongitude(), p2.getLongitude()))   // 交点在p1p2延长线上
+                continue;
+            if (point.getLongitude() >= Math.max(p1.getLongitude(), p2.getLongitude()))   // 交点在p1p2延长线上
+                continue;
+            // 求交点的 X 坐标 --------------------------------------------------------------
+            double x = (point.getLongitude() - p1.getLongitude())
+                    * (p2.getLatitude() - p1.getLatitude())
+                    / (p2.getLongitude() - p1.getLongitude())
+                    + p1.getLatitude();
+            if (x > point.getLatitude())
+                nCross++; // 只统计单边交点
         }
+        // 单边交点为偶数，点在多边形之外 ---
+        return (nCross % 2 == 1);
+    }
 
-
-        @Override
-        public double getLatitude()
+    public static List<Point> getCircleBy(Point point, double radius)
+    {
+        List<Point> latLonPoints = new ArrayList<>();
+        for (int i = 0; i < 12; i++)
         {
-            return naviLatLng.getLatitude();
+            double arc = Math.PI * i * 30.0 / 180.0;
+            double addx = radius * Math.sin(arc);
+            double addy = radius * Math.cos(arc);
+            double x = point.getLatitude() + addy;
+            double y = point.getLongitude() + addx;
+            latLonPoints.add(form(x, y));
         }
-
-        @Override
-        public double getLongitude()
-        {
-            return naviLatLng.getLongitude();
-        }
-
-        @Override
-        public LatLng toLatLng()
-        {
-            return new LatLng(naviLatLng.getLatitude(), naviLatLng.getLongitude());
-        }
-
-        @Override
-        public LatLonPoint toLatLonPoint()
-        {
-            return new LatLonPoint(naviLatLng.getLatitude(), naviLatLng.getLongitude());
-        }
-
-        @Override
-        public NaviLatLng toNaviLatLng()
-        {
-            return naviLatLng;
-        }
+        return latLonPoints;
     }
-
-    private final PointCompat impl;
-
-    protected Point(Parcel in)
-    {
-        impl = new Json(in.readDouble(), in.readDouble());
-    }
-
-    public Point(Json json)
-    {
-        this(json.latitude, json.longitude);
-    }
-
-    public Point(double latitude, double longitude)
-    {
-        impl = new Json(latitude, longitude);
-    }
-
-    public Point(LatLng latLng)
-    {
-        impl = new LatLngImpl(latLng);
-    }
-
-    public Point(LatLonPoint latLonPoint)
-    {
-        impl = new LatLonPointImpl(latLonPoint);
-    }
-
-    public Point(NaviLatLng naviLatLng)
-    {
-        impl = new NaviLatLngImpl(naviLatLng);
-    }
-
-    @Override
-    public double getLatitude()
-    {
-        return impl.getLatitude();
-    }
-
-    @Override
-    public double getLongitude()
-    {
-        return impl.getLongitude();
-    }
-
-    @Override
-    public LatLng toLatLng()
-    {
-        return impl.toLatLng();
-    }
-
-    @Override
-    public LatLonPoint toLatLonPoint()
-    {
-        return impl.toLatLonPoint();
-    }
-
-    @Override
-    public NaviLatLng toNaviLatLng()
-    {
-        return impl.toNaviLatLng();
-    }
-
-    public final static Point NO_LOCATION = new Point(Double.NaN, Double.NaN);
-
 }

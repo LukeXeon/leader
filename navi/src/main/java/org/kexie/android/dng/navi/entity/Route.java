@@ -2,15 +2,15 @@ package org.kexie.android.dng.navi.entity;
 
 import android.os.Parcelable;
 
-import org.kexie.android.dng.navi.model.Point;
+import org.kexie.android.dng.navi.model.JsonPoint;
 
 import java.util.List;
 
 public interface Route extends Parcelable
 {
-    Point getFrom();
+    JsonPoint getFrom();
 
-    Point getTo();
+    JsonPoint getTo();
 
-    List<Point> getPoints();
+    List<JsonPoint> getPoints();
 }

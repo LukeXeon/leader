@@ -86,21 +86,21 @@ public class QueryViewModel extends AndroidViewModel
                     ? Collections.emptyList()
                     : StreamSupport.stream(query.avoids)
                     .map(points -> StreamSupport.stream(points)
-                            .map(Point::toLatLonPoint)
+                            .map(point -> point.unBox(LatLonPoint.class))
                             .collect(Collectors.toList()))
                     .collect(Collectors.toList());
 
             List<LatLonPoint> ways = query.ways == null
                     ? Collections.emptyList()
                     : StreamSupport.stream(query.ways)
-                    .map(Point::toLatLonPoint)
+                    .map(point -> point.unBox(LatLonPoint.class))
                     .collect(Collectors.toList());
 
             RouteSearch.DriveRouteQuery driveRouteQuery
                     = new RouteSearch.DriveRouteQuery(
                     new RouteSearch.FromAndTo(
-                            query.from.toLatLonPoint(),
-                            query.to.toLatLonPoint()),
+                            query.from.unBox(LatLonPoint.class),
+                            query.to.unBox(LatLonPoint.class)),
                     query.mode,
                     ways,
                     avoids, "");
@@ -128,13 +128,13 @@ public class QueryViewModel extends AndroidViewModel
         try
         {
             PoiItem item = poiSearch.searchPOIId(poiId);
-            LatLonPoint latLonPoint;
-            latLonPoint = ((latLonPoint = item.getEnter()) != null)
+            LatLonPoint latLonPoint
+                    = ((latLonPoint = item.getEnter()) != null)
                     ? (latLonPoint)
                     : ((latLonPoint = item.getExit()) != null
                     ? latLonPoint
                     : item.getLatLonPoint());
-            return new Point(latLonPoint);
+            return Point.box(latLonPoint);
         } catch (AMapException e)
         {
             e.printStackTrace();

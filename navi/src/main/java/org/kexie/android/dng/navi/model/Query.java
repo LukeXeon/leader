@@ -6,7 +6,7 @@ import java.util.List;
  * Created by Luke on 2018/12/27.
  */
 
-public final class Query
+public class Query
 {
     public final Point from;
     public final Point to;

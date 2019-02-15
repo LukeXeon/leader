@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.kexie.android.dng.navi.model.Point;
+import org.kexie.android.dng.navi.model.JsonPoint;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,11 +14,11 @@ import java.util.Objects;
 public class NetRoute implements Route,Parcelable
 {
     @SerializedName("from")
-    private Point from;
+    private JsonPoint from;
     @SerializedName("to")
-    private Point to;
+    private JsonPoint to;
     @SerializedName("points")
-    private List<Point> points;
+    private List<JsonPoint> points;
 
     public NetRoute()
     {
@@ -27,9 +27,9 @@ public class NetRoute implements Route,Parcelable
 
     protected NetRoute(Parcel in)
     {
-        from = in.readParcelable(Point.class.getClassLoader());
-        to = in.readParcelable(Point.class.getClassLoader());
-        points = in.createTypedArrayList(Point.CREATOR);
+        from = in.readParcelable(JsonPoint.class.getClassLoader());
+        to = in.readParcelable(JsonPoint.class.getClassLoader());
+        points = in.createTypedArrayList(JsonPoint.CREATOR);
     }
 
     public static final Creator<NetRoute> CREATOR = new Creator<NetRoute>()
@@ -47,35 +47,35 @@ public class NetRoute implements Route,Parcelable
         }
     };
 
-    public void setFrom(Point from)
+    public void setFrom(JsonPoint from)
     {
         this.from = from;
     }
 
-    public void setTo(Point to)
+    public void setTo(JsonPoint to)
     {
         this.to = to;
     }
 
-    public void setPoints(List<Point> points)
+    public void setPoints(List<JsonPoint> points)
     {
         this.points = Objects.requireNonNull(points);
     }
 
     @Override
-    public Point getFrom()
+    public JsonPoint getFrom()
     {
         return from;
     }
 
     @Override
-    public Point getTo()
+    public JsonPoint getTo()
     {
         return to;
     }
 
     @Override
-    public List<Point> getPoints()
+    public List<JsonPoint> getPoints()
     {
         return Collections.unmodifiableList(points);
     }

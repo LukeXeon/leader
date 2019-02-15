@@ -12,8 +12,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.entity.NetRoute;
-import org.kexie.android.dng.navi.model.Point;
-import org.kexie.android.dng.navi.util.PointUtil;
+import org.kexie.android.dng.navi.model.JsonPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +25,10 @@ public class NetworkMonitoringService extends Service
     private static class Entity
     {
         @SerializedName("passPoints")
-        private List<Point> points;
+        private List<JsonPoint> points;
     }
 
-    private Gson gson = PointUtil.getJsonConverter();
+    private Gson gson  = new Gson();
     private Executor singleTask = Executors.newSingleThreadExecutor();
     private WebSocketFactory factory
             = new WebSocketFactory()

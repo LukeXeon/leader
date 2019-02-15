@@ -7,7 +7,7 @@ import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.DriveStep;
 
 import org.kexie.android.dng.navi.R;
-import org.kexie.android.dng.navi.model.Point;
+import org.kexie.android.dng.navi.model.JsonPoint;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ public final class SdkRoute
 {
     protected SdkRoute(Parcel in)
     {
-        from = in.readParcelable(Point.class.getClassLoader());
-        to = in.readParcelable(Point.class.getClassLoader());
+        from = in.readParcelable(JsonPoint.class.getClassLoader());
+        to = in.readParcelable(JsonPoint.class.getClassLoader());
         path = in.readParcelable(DrivePath.class.getClassLoader());
     }
 
@@ -141,30 +141,30 @@ public final class SdkRoute
         }
     }
 
-    public final Point from;
-    public final Point to;
+    public final JsonPoint from;
+    public final JsonPoint to;
     public final DrivePath path;
 
     @Override
-    public Point getFrom()
+    public JsonPoint getFrom()
     {
         return from;
     }
 
     @Override
-    public Point getTo()
+    public JsonPoint getTo()
     {
         return to;
     }
 
     @Override
-    public List<Point> getPoints()
+    public List<JsonPoint> getPoints()
     {
         List<DriveStep> driveSteps = path.getSteps();
-        List<Point> points = new ArrayList<>(driveSteps.size());
+        List<JsonPoint> points = new ArrayList<>(driveSteps.size());
         for (DriveStep step : driveSteps)
         {
-            points.add(new Point(step.getPolyline().get(0)));
+            points.add(new JsonPoint(step.getPolyline().get(0)));
         }
         return points;
     }
@@ -233,21 +233,21 @@ public final class SdkRoute
 
     public static final class Builder
     {
-        private Point from;
-        private Point to;
+        private JsonPoint from;
+        private JsonPoint to;
         private DrivePath path;
 
         public Builder()
         {
         }
 
-        public Builder from(Point val)
+        public Builder from(JsonPoint val)
         {
             from = val;
             return this;
         }
 
-        public Builder to(Point val)
+        public Builder to(JsonPoint val)
         {
             to = val;
             return this;
