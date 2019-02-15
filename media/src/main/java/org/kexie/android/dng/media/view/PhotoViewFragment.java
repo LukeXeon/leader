@@ -94,7 +94,7 @@ public class PhotoViewFragment extends Fragment
                         callback.onResult(null);
                     }
                 });
-                put("hide", v -> hideAnimation());
+                put("hide", v -> doHideAnimation());
             }
         });
         //rx
@@ -106,7 +106,7 @@ public class PhotoViewFragment extends Fragment
                 .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 
-    private void hideAnimation()
+    private void doHideAnimation()
     {
         AlphaAnimation animation
                 = (AlphaAnimation) binding.blurView.getTag();
