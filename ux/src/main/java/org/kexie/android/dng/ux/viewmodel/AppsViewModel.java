@@ -10,12 +10,12 @@ import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -27,7 +27,7 @@ import java8.util.stream.StreamSupport;
 public class AppsViewModel extends AndroidViewModel
 {
     private final ExecutorService singletTask = Executors.newSingleThreadExecutor();
-    private final Map<LiteAppInfo, String> packageNames = new ConcurrentHashMap<>();
+    private final Map<LiteAppInfo, String> packageNames = new ArrayMap<>();
     private final MutableLiveData<List<LiteAppInfo>> appInfo = new MutableLiveData<>();
     private final PublishSubject<Intent> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
