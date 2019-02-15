@@ -55,8 +55,7 @@ public class QueryViewModel extends AndroidViewModel
     public void tipQuery(String text)
     {
         singleTask.execute(() -> {
-            final InputtipsQuery inputtipsQuery
-                    = new InputtipsQuery(text, CITY);
+            InputtipsQuery inputtipsQuery = new InputtipsQuery(text, CITY);
             Inputtips inputtips = new Inputtips(getApplication(), inputtipsQuery);
             try
             {

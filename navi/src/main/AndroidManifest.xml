@@ -17,7 +17,7 @@
         <!-- android:name="com.amap.api.location.APSService"/> -->
         <!-- <activity -->
         <!-- android:screenOrientation="landscape" -->
-        <!-- android:name=".view.RouteQueryFragment" -->
+        <!-- android:name=".view.QueryFragment" -->
         <!-- android:process=":navi"/> -->
     </application>
 

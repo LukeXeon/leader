@@ -6,7 +6,7 @@ import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 
-import org.kexie.android.dng.navi.entity.Route;
+import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.util.NavigationCallbacks;
 
 import java.util.Collections;
@@ -39,7 +39,7 @@ public class NavigationViewModel extends AndroidViewModel
         navigation = AMapNavi.getInstance(application);
     }
 
-    public void calculate(final Route route)
+    public void calculate(Route route)
     {
         loading.setValue("加载中");
         singleTask.execute(() -> {
@@ -75,7 +75,7 @@ public class NavigationViewModel extends AndroidViewModel
                 navigation.calculateDriveRoute(Collections.singletonList(
                         route.getFrom().unBox(NaviLatLng.class)),
                         Collections.singletonList(route.getTo().unBox(NaviLatLng.class)),
-                        StreamSupport.stream(route.getPoints())
+                        StreamSupport.stream(route.getWays())
                                 .map(p -> p.unBox(NaviLatLng.class))
                                 .collect(Collectors.toList()), 9);
                 condition.await();

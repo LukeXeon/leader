@@ -5,16 +5,13 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.navi.entity.NetRoute;
-import org.kexie.android.dng.navi.model.JsonPoint;
+import org.kexie.android.dng.navi.model.JsonRoute;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -22,13 +19,7 @@ import java.util.concurrent.Executors;
 
 public class NetworkMonitoringService extends Service
 {
-    private static class Entity
-    {
-        @SerializedName("passPoints")
-        private List<JsonPoint> points;
-    }
 
-    private Gson gson  = new Gson();
     private Executor singleTask = Executors.newSingleThreadExecutor();
     private WebSocketFactory factory
             = new WebSocketFactory()
@@ -41,12 +32,7 @@ public class NetworkMonitoringService extends Service
                 throws Exception
         {
             Logger.d(text);
-            Entity entity = gson.fromJson(text, Entity.class);
-            NetRoute netRoute = new NetRoute();
-            netRoute.setFrom(entity.points.get(0));
-            netRoute.setTo(entity.points.get(entity.points.size() - 1));
-            netRoute.setPoints(
-                    new ArrayList<>(entity.points.subList(1, entity.points.size() - 1)));
+            JsonRoute entity = getGson().fromJson(text, JsonRoute.class);
             //NavigationFragment.startOf(NetworkMonitoringService.this, netRoute);
         }
 
@@ -62,25 +48,25 @@ public class NetworkMonitoringService extends Service
     {
     }
 
+    private static Gson getGson()
+    {
+        return new Gson();
+    }
+
     @Override
     public void onCreate()
     {
         super.onCreate();
-        singleTask.execute(new Runnable()
-        {
-            @Override
-            public void run()
+        singleTask.execute(() -> {
+            try
             {
-                try
-                {
-                    WebSocket  webSocket = factory
-                            .createSocket("ws://172.20.10.5:8080/navigator/websocket/device/navigation");
-                    webSocket.addListener(adapter);
-                    webSocket.connect();
-                } catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                WebSocket  webSocket = factory
+                        .createSocket("ws://172.20.10.5:8080/navigator/websocket/device/navigation");
+                webSocket.addListener(adapter);
+                webSocket.connect();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
             }
         });
 

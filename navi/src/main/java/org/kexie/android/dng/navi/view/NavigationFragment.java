@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
-import org.kexie.android.dng.navi.entity.Route;
+import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.NavigationViewModel;
 
 import java.util.Objects;

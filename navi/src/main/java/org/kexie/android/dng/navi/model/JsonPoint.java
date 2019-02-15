@@ -7,10 +7,17 @@ import android.os.Parcelable;
  * Created by Luke on 2018/12/27.
  */
 
-public class JsonPoint extends Point implements Parcelable
+public class JsonPoint
+        extends Point
+        implements Parcelable
 {
-    private final double latitude;
-    private final double longitude;
+    private double latitude;
+    private double longitude;
+
+    private JsonPoint()
+    {
+
+    }
 
     JsonPoint(double latitude, double longitude)
     {
@@ -52,6 +59,7 @@ public class JsonPoint extends Point implements Parcelable
         }
     };
 
+
     @Override
     public double getLatitude()
     {
@@ -63,5 +71,4 @@ public class JsonPoint extends Point implements Parcelable
     {
         return longitude;
     }
-
 }

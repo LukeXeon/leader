@@ -1,5 +1,7 @@
 package org.kexie.android.dng.navi.model;
 
+import android.os.Parcelable;
+
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
@@ -8,21 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+
+import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
+import java8.util.function.BiFunction;
 
 /**
  * Created by Luke on 2018/12/27.
  */
 
 public abstract class Point
+        implements Parcelable
 {
-    private interface Factory
-    {
-        Object newInstance(double x, double y);
-    }
 
-    private static final Map<Class<?>, Factory> POINT_FACTORIES
-            = new ConcurrentHashMap<Class<?>, Factory>()
+    private static final Map<Class<?>, BiFunction<Double, Double, Object>>
+            POINT_FACTORIES
+            = new ArrayMap<Class<?>, BiFunction<Double, Double, Object>>()
     {
         {
             put(NaviLatLng.class, NaviLatLng::new);
@@ -32,20 +35,16 @@ public abstract class Point
         }
     };
 
-    public final static Point NO_LOCATION = new Point()
-    {
-        @Override
-        public double getLatitude()
-        {
-            return Double.NaN;
-        }
+    public final static Point NO_LOCATION = form(Double.NaN, Double.NaN);
 
-        @Override
-        public double getLongitude()
-        {
-            return Double.NaN;
-        }
-    };
+    @Override
+    public boolean equals(@Nullable Object obj)
+    {
+        return this == obj
+                || (obj instanceof Point
+                && ((Point) obj).getLatitude() == getLatitude()
+                && ((Point) obj).getLongitude() == getLongitude());
+    }
 
     public abstract double getLatitude();
 
@@ -55,7 +54,7 @@ public abstract class Point
     public <T> T unBox(Class<T> type)
     {
         return (T) Objects.requireNonNull(POINT_FACTORIES.get(type))
-                .newInstance(getLatitude(), getLongitude());
+                .apply(getLatitude(), getLongitude());
     }
 
     public static Point box(NaviLatLng naviLatLng)
@@ -72,7 +71,6 @@ public abstract class Point
     {
         return new BoxMapPoint(latLng);
     }
-
 
     public static Point form(double x, double y)
     {
@@ -126,3 +124,4 @@ public abstract class Point
         return latLonPoints;
     }
 }
+

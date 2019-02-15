@@ -6,7 +6,7 @@
         <import type="org.kexie.android.dng.navi.R"/>
         <variable
             name="route"
-            type="org.kexie.android.dng.navi.entity.SdkRoute"/>
+            type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
-                        android:text="@{route.getName()}"
+                        android:text="@{route.name}"
                         android:hint="方案名"
                         android:textSize="30sp"/>
                 </LinearLayout>
@@ -67,7 +67,7 @@
                     android:paddingRight="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical|right"
-                    android:text='@{route.getTime()+"("+route.getLength()+")"}'
+                    android:text='@{route.time+"("+route.length+")"}'
                     android:hint="40分钟(19公里)"
                     android:textSize="30sp"/>
 
@@ -76,7 +76,7 @@
                     android:layout_width="match_parent"
                     item_name='@{"step"}'
                     item_layout="@{R.layout.item_step}"
-                    item_source="@{route.getSteps()}"
+                    item_source="@{route.steps}"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:layout_height="0dp"
