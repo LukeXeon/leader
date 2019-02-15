@@ -58,6 +58,7 @@ public class QueryViewModel extends AndroidViewModel
     private final IdentityHashMap<String, String> tipPoiIds = new IdentityHashMap<>();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
+    private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
     private AMap mapController;
 
     public QueryViewModel(@NonNull Application application)
@@ -103,11 +104,35 @@ public class QueryViewModel extends AndroidViewModel
         if (poiId != null)
         {
             singleTask.execute(() -> {
-                Point point = tipToPoint(tip, poiId);
+                Point point = getTipPoint(tip, poiId);
                 Query query = new Query.Builder().to(point).build();
                 routeQuery(query);
             });
         }
+    }
+
+    public void requestJumpToNavigation(LiteRoute liteRoute)
+    {
+        Route route = routeMapping.get(liteRoute);
+        if (route != null)
+        {
+            onJumpToNavigation.onNext(route);
+        }
+    }
+
+    public Observable<String> getOnSuccessMessage()
+    {
+        return onSuccessMessage;
+    }
+
+    public Observable<String> getOnErrorMessage()
+    {
+        return onErrorMessage;
+    }
+
+    public Observable<Route> getOnJumpToNavigation()
+    {
+        return onJumpToNavigation;
     }
 
     @WorkerThread
@@ -162,7 +187,7 @@ public class QueryViewModel extends AndroidViewModel
     }
 
     @MainThread
-    private Point tipToPoint(String tip, String poiId)
+    private Point getTipPoint(String tip, String poiId)
     {
         PoiSearch.Query query = new PoiSearch.Query(tip, "");
         query.setDistanceSort(false);
@@ -296,15 +321,5 @@ public class QueryViewModel extends AndroidViewModel
     private static String getPathName(DrivePath path)
     {
         return path.getStrategy();
-    }
-
-    public Observable<String> getOnSuccessMessage()
-    {
-        return onSuccessMessage;
-    }
-
-    public Observable<String> getOnErrorMessage()
-    {
-        return onErrorMessage;
     }
 }

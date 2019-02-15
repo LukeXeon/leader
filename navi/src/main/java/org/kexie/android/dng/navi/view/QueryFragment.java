@@ -14,6 +14,10 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import es.dmoral.toasty.Toasty;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 public class QueryFragment extends Fragment
 {
@@ -42,6 +46,14 @@ public class QueryFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
         viewModel = ViewModelProviders.of(this).get(QueryViewModel.class);
+
+
+        viewModel.getOnErrorMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.error(getContext(), s).show());
+        viewModel.getOnSuccessMessage()
+                .as(autoDisposable(from(this)))
+                .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 
     @Override
