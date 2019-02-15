@@ -13,6 +13,11 @@ public class JsonRoute
     private JsonPoint to;
     private List<JsonPoint> ways;
 
+    public JsonRoute()
+    {
+
+    }
+
     protected JsonRoute(Parcel in)
     {
         from = in.readParcelable(JsonPoint.class.getClassLoader());

@@ -156,55 +156,7 @@ package org.kexie.android.dng.navi.entity;
 //        return points;
 //    }
 //
-//    public String getTime()
-//    {
-//        long second = path.getDuration();
-//        if (second > 3600)
-//        {
-//            long hour = second / 3600;
-//            long miniate = (second % 3600) / 60;
-//            return hour + "小时" + miniate + "分钟";
-//        }
-//        if (second >= 60)
-//        {
-//            long miniate = second / 60;
-//            return miniate + "分钟";
-//        }
-//        return second + "秒";
-//    }
-//
-//    public String getLength()
-//    {
-//        int lenMeter = (int) path.getDistance();
-//        if (lenMeter > 10000) // 10 km
-//        {
-//            float dis = lenMeter / 1000;
-//            return dis + "千米";
-//        }
-//        if (lenMeter > 1000)
-//        {
-//            float dis = (float) lenMeter / 1000;
-//            DecimalFormat fnum = new DecimalFormat("##0.0");
-//            String dstr = fnum.format(dis);
-//            return dstr + "千米";
-//        }
-//        if (lenMeter > 100)
-//        {
-//            float dis = lenMeter / 50 * 50;
-//            return dis + "米";
-//        }
-//        float dis = lenMeter / 10 * 10;
-//        if (dis == 0)
-//        {
-//            dis = 10;
-//        }
-//        return dis + "米";
-//    }
-//
-//    public String getName()
-//    {
-//        return path.getStrategy();
-//    }
+
 //
 //
 //    public List<LiteStep> getSteps()

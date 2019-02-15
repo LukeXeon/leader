@@ -57,7 +57,6 @@ public class NavigationFragment extends Fragment
         viewModel = ViewModelProviders.of(this)
                 .get(NavigationViewModel.class);
 
-
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
