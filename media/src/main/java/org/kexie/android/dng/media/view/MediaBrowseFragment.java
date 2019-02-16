@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.common.widget.ProgressHelper;
+import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
@@ -72,7 +72,7 @@ public class MediaBrowseFragment
         viewModel = ViewModelProviders.of(this)
                 .get(MediaBrowseViewModel.class);
         viewModel.getTitle().observe(this, binding::setTitle);
-        ProgressHelper.observe(viewModel.getLoading(), this);
+        ProgressFragment.observe(viewModel.getLoading(), this);
         viewModel.getMediaInfo().observe(this, binding::setMediaInfo);
         viewModel.loadPhoto();
     }

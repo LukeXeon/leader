@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amap.api.maps.SupportMapFragment;
+
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -45,8 +47,12 @@ public class QueryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
+
         viewModel = ViewModelProviders.of(this).get(QueryViewModel.class);
 
+        //noinspection ConstantConditions
+        viewModel.initMapController(((SupportMapFragment) (Object)
+                getChildFragmentManager().findFragmentById(R.id.map_view)).getMap());
 
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this)))

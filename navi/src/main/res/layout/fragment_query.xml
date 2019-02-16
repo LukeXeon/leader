@@ -57,7 +57,7 @@
                     android:name="com.amap.api.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/fragment_map"/>
+                    android:id="@+id/map_view"/>
                 <FrameLayout
                     android:visibility="@{BT.isEmpty(tips)?View.GONE:View.VISIBLE}"
                     android:layout_width="match_parent"

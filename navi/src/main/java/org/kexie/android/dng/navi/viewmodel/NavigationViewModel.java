@@ -7,9 +7,10 @@ import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 
 import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.util.NavigationCallbacks;
+import org.kexie.android.dng.navi.util.NavControllerCallbacks;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
@@ -39,16 +40,16 @@ public class NavigationViewModel extends AndroidViewModel
         navigation = AMapNavi.getInstance(application);
     }
 
-    public void calculate(Route route)
+    public void beginBy(Route route)
     {
         loading.setValue("加载中");
         singleTask.execute(() -> {
             try
             {
-                final Lock lock = new ReentrantLock();
-                final Condition condition = lock.newCondition();
+                Lock lock = new ReentrantLock();
+                Condition condition = lock.newCondition();
                 navigation.addAMapNaviListener(
-                        new NavigationCallbacks()
+                        new NavControllerCallbacks()
                         {
                             public void onCalculateRouteFailure(int code)
                             {
@@ -71,13 +72,25 @@ public class NavigationViewModel extends AndroidViewModel
                                 lock.unlock();
                             }
                         });
+
                 lock.lock();
-                navigation.calculateDriveRoute(Collections.singletonList(
-                        route.getFrom().unBox(NaviLatLng.class)),
-                        Collections.singletonList(route.getTo().unBox(NaviLatLng.class)),
-                        StreamSupport.stream(route.getWays())
-                                .map(p -> p.unBox(NaviLatLng.class))
-                                .collect(Collectors.toList()), 9);
+
+                List<NaviLatLng> form = route.getFrom() == null
+                        ? Collections.emptyList()
+                        : Collections.singletonList(route.getFrom().unBox(NaviLatLng.class));
+
+                List<NaviLatLng> to = route.getTo() == null
+                        ? Collections.emptyList()
+                        : Collections.singletonList(route.getTo().unBox(NaviLatLng.class));
+
+                List<NaviLatLng> ways = route.getWays() == null
+                        || route.getWays().size() == 0
+                        ? Collections.emptyList()
+                        : StreamSupport.stream(route.getWays())
+                        .map(p -> p.unBox(NaviLatLng.class))
+                        .collect(Collectors.toList());
+
+                navigation.calculateDriveRoute(form, to, ways, 9);
                 condition.await();
                 lock.unlock();
                 loading.postValue(null);

@@ -12,7 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class NavigationViewFragment extends Fragment
+public class NavigationViewFragment
+        extends Fragment
 {
     private AMapNaviView innerView;
 

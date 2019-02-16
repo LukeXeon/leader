@@ -43,8 +43,10 @@ public class NavigationFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-        binding = DataBindingUtil.inflate(inflater,
-                R.layout.fragment_navigation, container, false);
+        binding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.fragment_navigation, container,
+                false);
         return binding.getRoot();
     }
 

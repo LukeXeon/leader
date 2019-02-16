@@ -1,0 +1,11 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':mapper-annotations')
+    compileOnly 'com.google.auto.service:auto-service:+'
+    implementation 'com.squareup:javapoet:+'
+}
+
+sourceCompatibility = "8"
+targetCompatibility = "8"

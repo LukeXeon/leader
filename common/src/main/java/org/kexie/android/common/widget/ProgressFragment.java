@@ -19,16 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import eightbitlab.com.blurview.RenderScriptBlur;
+import io.reactivex.functions.Consumer;
 
-public final class ProgressHelper
+public final class ProgressFragment
         extends Fragment
 {
     private ViewProgressBinding binding;
@@ -120,7 +115,6 @@ public final class ProgressHelper
     {
         mainThread.postDelayed(() -> {
             mainThread.removeCallbacksAndMessages(null);
-            FragmentManager manager = getFragmentManager();
             getFragmentManager()
                     .beginTransaction()
                     .remove(this)
@@ -129,63 +123,36 @@ public final class ProgressHelper
         }, 200);
     }
 
-    public static void observe(LiveData<String> liveData,
-                               Fragment fragment)
+    public static Consumer<String> makeObserver(Fragment root)
     {
-        WidgetObserver observer = new WidgetObserver(
-                fragment.getParentFragment() == null
-                        ? fragment.getFragmentManager()
-                        : fragment.getParentFragment()
-                        .getChildFragmentManager(),
-                fragment.getId());
-        liveData.observe(fragment, observer);
-        fragment.getLifecycle().addObserver(observer);
-    }
-
-    private static class WidgetObserver
-            implements Observer<String>,
-            LifecycleEventObserver
-    {
-        private final FragmentManager fragmentManager;
-        private boolean isAttach = false;
-        private final ProgressHelper widget = new ProgressHelper();
-        private final int position;
-
-        private WidgetObserver(FragmentManager fragmentManager,
-                               int position)
+        return new Consumer<String>()
         {
-            this.fragmentManager = fragmentManager;
-            this.position = position;
-        }
+            private final ProgressFragment fragment = new ProgressFragment();
 
-        @Override
-        public void onChanged(@Nullable String message)
-        {
-            if (message != null)
+            @Override
+            public void accept(String s)
             {
-                widget.setMessage(TextUtils.isEmpty(message) ? "加载中" : message);
-                fragmentManager.beginTransaction()
-                        .add(position, widget)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit();
-                isAttach = true;
-            } else
-            {
-                widget.dismiss();
-                isAttach = false;
+                s = "".equals(s) ? "加载中..." : s;
+                if (TextUtils.isEmpty(s))
+                {
+                    fragment.setMessage(s);
+                    if (!fragment.isAdded())
+                    {
+                        root.getFragmentManager()
+                                .beginTransaction()
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .add(root.getId(), fragment)
+                                .show(fragment)
+                                .commit();
+                    }
+                } else
+                {
+                    if (fragment.isAdded())
+                    {
+                        fragment.dismiss();
+                    }
+                }
             }
-        }
-
-        @Override
-        public void onStateChanged(@NonNull LifecycleOwner source,
-                                   @NonNull Lifecycle.Event event)
-        {
-            if (event.equals(Lifecycle.Event.ON_DESTROY)
-                    && isAttach)
-            {
-
-                onChanged(null);
-            }
-        }
+        };
     }
 }
