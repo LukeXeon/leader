@@ -1,11 +1,13 @@
 package org.kexie.android.dng.host.app;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.os.Bundle;
 
 import org.kexie.android.common.util.SystemUtil;
 import org.kexie.android.dng.host.R;
-import org.kexie.android.dng.ux.view.DesktopFragment;
+import org.kexie.android.mapper.FragmentIntent;
+import org.kexie.android.mapper.Mapper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +26,10 @@ public final class HostActivity extends AppCompatActivity
                 R.layout.activity_host);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, new DesktopFragment())
+                .add(R.id.fragment_container,
+                        Mapper.mapping(new FragmentIntent.Builder()
+                                .uri(Uri.parse("dng/ux/main"))
+                                .build()))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

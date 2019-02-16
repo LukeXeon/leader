@@ -12,6 +12,7 @@ import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
 import org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo;
+import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import es.dmoral.toasty.Toasty;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-
+@Mapping("dng/ux/main")
 public class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;

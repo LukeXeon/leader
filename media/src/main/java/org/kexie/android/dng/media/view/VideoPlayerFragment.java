@@ -15,12 +15,14 @@ import com.orhanobut.logger.Logger;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
+import org.kexie.android.mapper.Mapping;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+@Mapping("dng/media/video")
 public class VideoPlayerFragment extends Fragment
 {
 

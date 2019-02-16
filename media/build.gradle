@@ -36,6 +36,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':playerview')
+    annotationProcessor project(':mapper-compiler')
 //    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {
 //        exclude group: 'com.dou361.ijkplayer-armv7a',
 //                module: 'jjdxm-ijkplayer-armv7a'

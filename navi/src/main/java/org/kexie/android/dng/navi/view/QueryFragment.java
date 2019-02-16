@@ -10,6 +10,7 @@ import com.amap.api.maps.SupportMapFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
+import org.kexie.android.mapper.Mapping;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import es.dmoral.toasty.Toasty;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
+@Mapping("dng/navi/query")
 public class QueryFragment extends Fragment
 {
     private static final String WAIT_QUERY = "wait query";

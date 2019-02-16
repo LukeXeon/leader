@@ -64,6 +64,8 @@ dependencies {
     api 'com.orhanobut:logger:2.2.0'
     api 'io.reactivex.rxjava2:rxjava:2.2.6'
     api 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    api project(':mapper-core')
+    annotationProcessor project(':mapper-compiler')
 
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 

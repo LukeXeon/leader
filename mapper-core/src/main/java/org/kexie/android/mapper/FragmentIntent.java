@@ -71,11 +71,6 @@ public final class FragmentIntent implements Parcelable
             return this;
         }
 
-        public Builder requestCode(int val)
-        {
-            return this;
-        }
-
         public FragmentIntent build()
         {
             return new FragmentIntent(this);

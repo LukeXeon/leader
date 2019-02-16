@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentInfoBinding;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
+import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
+@Mapping("dng/ux/info")
 public class InfoFragment extends Fragment
 {
     private FragmentInfoBinding binding;

@@ -9,6 +9,7 @@ import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
+import org.kexie.android.mapper.Mapping;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import es.dmoral.toasty.Toasty;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
+@Mapping("dng/ux/apps")
 public class AppsFragment extends Fragment
 {
     private FragmentAppsBinding binding;
@@ -33,6 +35,7 @@ public class AppsFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
+
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_apps,
                 container,

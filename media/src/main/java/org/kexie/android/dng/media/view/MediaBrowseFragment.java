@@ -5,12 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
-import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
+import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
+import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+@Mapping("dng/media/browse")
 public class MediaBrowseFragment
         extends Fragment
 {
@@ -72,7 +73,7 @@ public class MediaBrowseFragment
         viewModel = ViewModelProviders.of(this)
                 .get(MediaBrowseViewModel.class);
         viewModel.getTitle().observe(this, binding::setTitle);
-        ProgressFragment.observe(viewModel.getLoading(), this);
+        //ProgressFragment.observe(viewModel.getLoading(), this);
         viewModel.getMediaInfo().observe(this, binding::setMediaInfo);
         viewModel.loadPhoto();
     }

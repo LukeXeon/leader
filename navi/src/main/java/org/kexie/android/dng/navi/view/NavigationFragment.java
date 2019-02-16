@@ -9,6 +9,7 @@ import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.NavigationViewModel;
+import org.kexie.android.mapper.Mapping;
 
 import java.util.Objects;
 
@@ -22,6 +23,7 @@ import es.dmoral.toasty.Toasty;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
+@Mapping("dng/navi/navi")
 public class NavigationFragment extends Fragment
 {
     private static final String ARG = "route";
