@@ -15,14 +15,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class GenericItemRecyclerAdapter<T>
+public class GenericRecyclerAdapter<T>
         extends BaseQuickAdapter<T,BaseViewHolder>
 {
     private final String setterName;
 
     @SuppressWarnings("WeakerAccess")
-    public GenericItemRecyclerAdapter(String variableName,
-                                      @LayoutRes int layoutResId)
+    public GenericRecyclerAdapter(String variableName,
+                                  @LayoutRes int layoutResId)
     {
         super(layoutResId);
         this.setterName = variableName;
@@ -48,8 +48,8 @@ public class GenericItemRecyclerAdapter<T>
                                       String itemName,
                                       @LayoutRes int itemLayout)
     {
-        GenericItemRecyclerAdapter adapter
-                = new GenericItemRecyclerAdapter(itemName, itemLayout);
+        GenericRecyclerAdapter adapter
+                = new GenericRecyclerAdapter(itemName, itemLayout);
         view.setAdapter(adapter);
         getLiveAdapter(view).setValue(adapter);
     }
@@ -100,13 +100,13 @@ public class GenericItemRecyclerAdapter<T>
     }
 
     private static void observe(RecyclerView view,
-                                Observer<GenericItemRecyclerAdapter> consumer)
+                                Observer<GenericRecyclerAdapter> consumer)
     {
-        MutableLiveData<GenericItemRecyclerAdapter> liveData = getLiveAdapter(view);
-        liveData.observeForever(new Observer<GenericItemRecyclerAdapter>()
+        MutableLiveData<GenericRecyclerAdapter> liveData = getLiveAdapter(view);
+        liveData.observeForever(new Observer<GenericRecyclerAdapter>()
         {
             @Override
-            public void onChanged(GenericItemRecyclerAdapter adapter)
+            public void onChanged(GenericRecyclerAdapter adapter)
             {
                 if (consumer != null)
                 {
@@ -118,11 +118,11 @@ public class GenericItemRecyclerAdapter<T>
     }
 
     @SuppressWarnings("unchecked")
-    private static MutableLiveData<GenericItemRecyclerAdapter>
+    private static MutableLiveData<GenericRecyclerAdapter>
     getLiveAdapter(RecyclerView view)
     {
-        MutableLiveData<GenericItemRecyclerAdapter> liveData
-                = (MutableLiveData<GenericItemRecyclerAdapter>)
+        MutableLiveData<GenericRecyclerAdapter> liveData
+                = (MutableLiveData<GenericRecyclerAdapter>)
                 view.getTag(R.id.live_adapter);
         if (liveData == null)
         {

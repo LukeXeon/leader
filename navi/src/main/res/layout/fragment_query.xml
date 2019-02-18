@@ -15,13 +15,13 @@
 
         <import type="org.kexie.android.common.databinding.BT"/>
 
-        <import type="com.amap.api.services.help.Tip"/>
-
-        <import type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute" alias="LiteRoute"/>
+        <import
+            type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"
+            alias="LiteRoute"/>
 
         <variable
             name="tips"
-            type="java.util.List&lt;Tip&gt;" />
+            type="java.util.List&lt;String&gt;" />
 
         <variable
             name="showMap"
@@ -38,6 +38,7 @@
         <variable
             name="queryText"
             type="String"/>
+
     </data>
 
     <LinearLayout

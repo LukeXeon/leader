@@ -2,7 +2,7 @@ package org.kexie.android.dng.ux.model.entity;
 
 import android.graphics.drawable.Drawable;
 
-public final class AppInfo
+public class AppInfo
 {
   private String dataDir;
   private Drawable icon;

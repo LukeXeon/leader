@@ -26,7 +26,6 @@ public abstract class NavControllerCallbacks
     @Override
     public void onInitNaviFailure()
     {
-
     }
 
     @Override

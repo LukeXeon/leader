@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="org.kexie.android.common.databinding.BT"/>
+        <import type="org.kexie.android.dng.ux.R"/>
+        <import type="android.view.View.OnClickListener" alias="Action"/>
+        <variable
+            name="user"
+            type="org.kexie.android.dng.ux.viewmodel.entity.UserInfo"/>
+        <variable
+            name="actions"
+            type="java.util.Map&lt;String,Action&gt;"/>
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2.5">
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/riv_head"
+                async_src='@{"image_background_right"}'
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:riv_corner_radius="20dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civ_head"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:src="@{user.headImage}"
+                app:civ_border_color="@android:color/white"
+                app:civ_border_width="5dp"
+                app:civ_circle_background_color="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_username"
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="30dp"
+                android:layout_toRightOf="@+id/civ_head"
+                android:hint="USERNAME"
+                android:text="@{user.username}"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textSize="30sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_username"
+                android:layout_marginLeft="50dp"
+                android:layout_toRightOf="@+id/civ_head"
+                android:hint="已验证"
+                android:text='@{user.verified?("已验证"):("未验证")}'
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_marginLeft="5dp"
+                async_src='@{"image_icon_phone"}'
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"/>
+
+            <TextView
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw_text_background_black"
+                android:gravity="center_vertical|left"
+                android:hint=" 手机号码：13333333333"
+                android:text='@{" 手机号码："+user.phone}'
+                android:singleLine="true"
+                android:textColorHint="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_marginLeft="5dp"
+                async_src='@{"image_icon_user2"}'
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"/>
+
+            <TextView
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw_text_background_black"
+                android:gravity="center_vertical|left"
+                android:hint=" 真实姓名：123123"
+                android:text='@{" 真实姓名："+user.name}'
+                android:singleLine="true"
+                android:textColorHint="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_marginLeft="5dp"
+                async_src='@{"image_icon_car2"}'
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"/>
+
+            <TextView
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw_text_background_black"
+                android:gravity="center_vertical|left"
+                android:hint=" 车牌号：44444"
+                android:text='@{" 车牌号："+user.carNumber}'
+                android:singleLine="true"
+                android:textColorHint="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_marginLeft="5dp"
+                async_src='@{"image_icon_idcard"}'
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"/>
+
+            <TextView
+                async_font='@{"PingFang Regular.ttf"}'
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw_text_background_black"
+                android:gravity="center_vertical|left"
+                android:hint=" 身份证：455555555555555555"
+                android:text='@{" 身份证："+user.idCard}'
+                android:singleLine="true"
+                android:textColorHint="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

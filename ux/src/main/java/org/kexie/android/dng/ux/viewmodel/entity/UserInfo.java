@@ -25,7 +25,6 @@ public class UserInfo
 
     public static final class Builder
     {
-        private String headURL;
         private String username;
         private String name;
         private boolean verified;
@@ -38,11 +37,6 @@ public class UserInfo
         {
             this.phone = phone;
             return this;
-        }
-
-        public String getHeadURL()
-        {
-            return headURL;
         }
 
         public Builder()

@@ -82,7 +82,7 @@ public class DesktopViewModel
     loadFunction(List<FunctionInfo> functionRes)
     {
         return Observable.just(functionRes)
-                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
                 .map(raw -> {
                     functionJumpTo.clear();
                     ZoomTransformation zoomTransformation
@@ -119,7 +119,7 @@ public class DesktopViewModel
                 add(functionBy("多媒体", R.mipmap.image_media, "dng/media/browse"));
                 add(functionBy("APPS", R.mipmap.image_apps, "dng/ux/apps"));
             }
-        }).observeOn(AndroidSchedulers.mainThread());
+        }).subscribeOn(AndroidSchedulers.mainThread());
     }
 
     private static FunctionInfo functionBy(String name, int icon, String path)

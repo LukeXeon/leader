@@ -1,6 +1,5 @@
 package org.kexie.android.common.databinding;
 
-import androidx.databinding.ViewDataBinding;
 import android.text.TextUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -8,10 +7,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.databinding.ViewDataBinding;
+
 public final class DataBindingReflectionUtil
 {
-    private static final Map<Class<?>,
-            Map<String, Method>>
+    private static final Map<Class<?>, Map<String, Method>>
             sTable = new HashMap<>();
 
     private static String toFirstUpCaseName(String variableName)
