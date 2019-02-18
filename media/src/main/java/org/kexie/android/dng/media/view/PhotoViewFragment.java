@@ -13,7 +13,6 @@ import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
 import org.kexie.android.dng.media.viewmodel.MediaManagedViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
-import org.kexie.android.mapper.Mapping;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
+import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;

@@ -3,12 +3,16 @@ package org.kexie.android.common.databinding;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
+import org.kexie.android.common.R;
+
 import java.util.List;
 
 import androidx.annotation.LayoutRes;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GenericItemRecyclerAdapter<T>
@@ -44,10 +48,10 @@ public class GenericItemRecyclerAdapter<T>
                                       String itemName,
                                       @LayoutRes int itemLayout)
     {
-        if (getAdapter(view) == null)
-        {
-            view.setAdapter(new GenericItemRecyclerAdapter(itemName, itemLayout));
-        }
+        GenericItemRecyclerAdapter adapter
+                = new GenericItemRecyclerAdapter(itemName, itemLayout);
+        view.setAdapter(adapter);
+        getLiveAdapter(view).setValue(adapter);
     }
 
     @SuppressWarnings("unchecked")
@@ -55,20 +59,20 @@ public class GenericItemRecyclerAdapter<T>
     public static void setItemSource(RecyclerView view,
                                      List dataSource)
     {
-        getAdapter(view).setNewData(dataSource);
+        observe(view, adapter -> adapter.setNewData(dataSource));
     }
 
     @BindingAdapter(value = {"empty_layout"})
     public static void setEmptyView(RecyclerView view, int layout)
     {
-        getAdapter(view).setEmptyView(layout, view);
+        observe(view, adapter -> adapter.setEmptyView(layout, view));
     }
 
     @BindingAdapter(value = {"onItemClick"})
     public static void setOnItemClickListener(RecyclerView view,
                                               OnItemClickListener listener)
     {
-        getAdapter(view).setOnItemClickListener(listener);
+        observe(view, adapter -> adapter.setOnItemClickListener(listener));
     }
 
     @BindingAdapter(value = {"onItemLongClick"})
@@ -76,7 +80,7 @@ public class GenericItemRecyclerAdapter<T>
     setOnItemLongClickListener(RecyclerView view,
                                OnItemLongClickListener listener)
     {
-        getAdapter(view).setOnItemLongClickListener(listener);
+        observe(view, adapter -> adapter.setOnItemLongClickListener(listener));
     }
 
     @BindingAdapter(value = {"onItemChildClick"})
@@ -84,7 +88,7 @@ public class GenericItemRecyclerAdapter<T>
     setOnItemChildClickListener(RecyclerView view,
                                 OnItemChildClickListener listener)
     {
-        getAdapter(view).setOnItemChildClickListener(listener);
+        observe(view, adapter -> adapter.setOnItemChildClickListener(listener));
     }
 
     @BindingAdapter(value = {"onItemChildLongClick"})
@@ -92,12 +96,39 @@ public class GenericItemRecyclerAdapter<T>
     setOnItemChildLongClickListener(RecyclerView view,
                                     OnItemChildLongClickListener listener)
     {
-        getAdapter(view).setOnItemChildLongClickListener(listener);
+        observe(view, adapter -> adapter.setOnItemChildLongClickListener(listener));
     }
 
-    private static GenericItemRecyclerAdapter getAdapter(RecyclerView view)
+    private static void observe(RecyclerView view,
+                                Observer<GenericItemRecyclerAdapter> consumer)
     {
-        return (GenericItemRecyclerAdapter) view.getAdapter();
+        MutableLiveData<GenericItemRecyclerAdapter> liveData = getLiveAdapter(view);
+        liveData.observeForever(new Observer<GenericItemRecyclerAdapter>()
+        {
+            @Override
+            public void onChanged(GenericItemRecyclerAdapter adapter)
+            {
+                if (consumer != null)
+                {
+                    consumer.onChanged(adapter);
+                }
+                liveData.removeObserver(this);
+            }
+        });
     }
 
+    @SuppressWarnings("unchecked")
+    private static MutableLiveData<GenericItemRecyclerAdapter>
+    getLiveAdapter(RecyclerView view)
+    {
+        MutableLiveData<GenericItemRecyclerAdapter> liveData
+                = (MutableLiveData<GenericItemRecyclerAdapter>)
+                view.getTag(R.id.live_adapter);
+        if (liveData == null)
+        {
+            liveData = new MutableLiveData<>();
+            view.setTag(R.id.live_adapter, liveData);
+        }
+        return liveData;
+    }
 }

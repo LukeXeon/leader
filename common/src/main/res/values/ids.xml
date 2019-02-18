@@ -2,4 +2,5 @@
 <resources>
     <item name="pager_view" type="id"/>
     <item name="on_adapter_created" type="id"/>
+    <item name="live_adapter" type="id"/>
 </resources>

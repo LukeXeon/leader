@@ -1,19 +1,11 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
@@ -25,8 +17,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
+import androidx.core.util.Pair;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -39,6 +31,7 @@ import io.reactivex.exceptions.Exceptions;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.StreamSupport;
+import mapper.Request;
 
 
 public class DesktopViewModel
@@ -50,9 +43,9 @@ public class DesktopViewModel
     {
         private final String name;
         private final int iconRes;
-        private final Uri uri;
+        private final String uri;
 
-        private FunctionInfo(String name, int iconRes, Uri uri)
+        private FunctionInfo(String name, int iconRes, String uri)
         {
             this.iconRes = iconRes;
             this.name = name;
@@ -62,8 +55,8 @@ public class DesktopViewModel
 
     private static final int BORDER_SIZE = 250;
     private final MutableLiveData<String> time = new MutableLiveData<>();
-    private final Map<Function, Uri> functionJumpTo = new ArrayMap<>();
-    private final PublishSubject<Uri> onJumpTo = PublishSubject.create();
+    private final Map<Function, String> functionJumpTo = new ArrayMap<>();
+    private final PublishSubject<Request> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
     private Timer updateTimer;
@@ -75,10 +68,10 @@ public class DesktopViewModel
 
     public void requestJumpBy(Function function)
     {
-        Uri uri = functionJumpTo.get(function);
+        String uri = functionJumpTo.get(function);
         if (uri != null)
         {
-            onJumpTo.onNext(uri);
+            onJumpTo.onNext(new Request.Builder().uri(uri).build());
         } else
         {
             onErrorMessage.onNext("跳转到" + function.name + "失败");
@@ -95,16 +88,19 @@ public class DesktopViewModel
                     ZoomTransformation zoomTransformation
                             = new ZoomTransformation(BORDER_SIZE);
                     StreamSupport.stream(raw)
-                            .map(info -> Glide.with(this.getApplication())
+                            .map(info -> Pair.create(info, Glide.with(this.getApplication())
                                     .load(info.iconRes)
                                     .apply(RequestOptions
                                             .bitmapTransform(zoomTransformation))
-                                    .listener(listenerBy(info))
-                                    .submit())
-                            .forEach(futureTarget -> {
+                                    .submit()))
+                            .forEach(pair -> {
                                 try
                                 {
-                                    futureTarget.get();
+                                    Drawable resource = pair.second.get();
+                                    Function function = new Function(
+                                            pair.first.name,
+                                            resource);
+                                    functionJumpTo.put(function, pair.first.uri);
                                 } catch (Exception e)
                                 {
                                     throw Exceptions.propagate(e);
@@ -112,45 +108,6 @@ public class DesktopViewModel
                             });
                     return new ArrayList<>(functionJumpTo.keySet());
                 });
-    }
-
-    private RequestListener<Drawable> listenerBy(FunctionInfo info)
-    {
-        return new RequestListener<Drawable>()
-        {
-            @Override
-            public boolean onLoadFailed(
-                    @Nullable GlideException e,
-                    Object model,
-                    Target<Drawable> target,
-                    boolean isFirstResource)
-            {
-                Resources resources = getApplication()
-                        .getResources();
-                Function function = new Function(info.name,
-                        new BitmapDrawable(resources,
-                                BitmapFactory.decodeResource(
-                                        resources,
-                                        info.iconRes)));
-                functionJumpTo.put(function, info.uri);
-                return true;
-            }
-
-            @Override
-            public boolean onResourceReady(
-                    Drawable resource,
-                    Object model,
-                    Target<Drawable> target,
-                    DataSource dataSource,
-                    boolean isFirstResource)
-            {
-                Function function = new Function(
-                        info.name,
-                        resource);
-                functionJumpTo.put(function, info.uri);
-                return true;
-            }
-        };
     }
 
     public Observable<List<Function>> getDefaultFunction()
@@ -167,7 +124,7 @@ public class DesktopViewModel
 
     private static FunctionInfo functionBy(String name, int icon, String path)
     {
-        return new FunctionInfo(name, icon, Uri.parse(path));
+        return new FunctionInfo(name, icon, path);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -190,7 +147,7 @@ public class DesktopViewModel
         updateTimer.cancel();
     }
 
-    public Observable<Uri> getOnJumpTo()
+    public Observable<Request> getOnJumpTo()
     {
         return onJumpTo;
     }

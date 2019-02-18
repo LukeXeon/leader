@@ -1,1 +1,1 @@
-include ':host', ':common', ':navi', ':media', ':playerview', ':ux', ':mapper-annotations', ':mapper-compiler', ':mapper-core'
+include ':host', ':common', ':navi', ':media', ':playerview', ':ux'

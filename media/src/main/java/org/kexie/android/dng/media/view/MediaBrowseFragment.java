@@ -10,7 +10,6 @@ import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
-import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -21,6 +20,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import mapper.Mapping;
 
 @Mapping("dng/media/browse")
 public class MediaBrowseFragment

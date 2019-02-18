@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentInfoBinding;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
-import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -17,7 +16,9 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
+import mapper.Mapping;
 
 @Mapping("dng/ux/info")
 public class InfoFragment extends Fragment
@@ -42,6 +43,9 @@ public class InfoFragment extends Fragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
+        viewModel = ViewModelProviders.of(getFragmentManager()
+                .findFragmentByTag("dng/ux/main"))
+                .get(InfoViewModel.class);
         //dataBinding
         binding.blurView.setupWith((ViewGroup) view.getParent())
                 .setFrameClearDrawable(

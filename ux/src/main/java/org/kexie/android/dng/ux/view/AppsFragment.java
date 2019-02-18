@@ -9,7 +9,6 @@ import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
-import org.kexie.android.mapper.Mapping;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
+import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;

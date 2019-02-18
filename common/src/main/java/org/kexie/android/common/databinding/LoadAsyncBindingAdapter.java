@@ -21,13 +21,14 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
+import org.kexie.android.common.R;
+
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
-import org.kexie.android.common.R;
 
 public final class LoadAsyncBindingAdapter
 {
@@ -132,10 +133,9 @@ public final class LoadAsyncBindingAdapter
                                                 Target<Drawable> target,
                                                 boolean isFirstResource)
                     {
-                        view.setBackground(new BitmapDrawable(
+                        view.post(() -> view.setBackground(new BitmapDrawable(
                                 resources,
-                                BitmapFactory
-                                        .decodeResource(resources, res)));
+                                BitmapFactory.decodeResource(resources, res))));
                         return true;
                     }
 
@@ -146,7 +146,7 @@ public final class LoadAsyncBindingAdapter
                                                    DataSource dataSource,
                                                    boolean isFirstResource)
                     {
-                        view.setBackground(resource);
+                        view.post(() -> view.setBackground(resource));
                         return true;
                     }
                 }).submit();

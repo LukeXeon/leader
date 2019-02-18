@@ -1,6 +1,5 @@
 package org.kexie.android.dng.ux.view;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
 import org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo;
-import org.kexie.android.mapper.Mapping;
 
 import java.util.Map;
 
@@ -21,9 +19,13 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
+import mapper.Mapper;
+import mapper.Mapping;
+import mapper.Request;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
@@ -82,10 +84,14 @@ public class DesktopFragment extends Fragment
                 .subscribe(this::jumpTo);
     }
 
-
-    private void jumpTo(Uri uri)
+    private void jumpTo(Request request)
     {
-
+        getFragmentManager()
+                .beginTransaction()
+                .add(getId(), Mapper.getOn(this, request))
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     public Map<String, View.OnClickListener> getActions()
@@ -93,8 +99,8 @@ public class DesktopFragment extends Fragment
         return new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("个人信息", v -> jumpTo(Uri.parse("dng/ux/info")));
-                put("导航", v -> jumpTo(Uri.parse("dng/navi/route")));
+                put("个人信息", v -> jumpTo(new Request.Builder().uri("dng/ux/info").build()));
+                put("导航", v -> jumpTo(new Request.Builder().uri("dng/navi/query").build()));
             }
         };
     }

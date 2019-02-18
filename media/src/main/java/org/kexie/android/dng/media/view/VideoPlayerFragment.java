@@ -15,15 +15,18 @@ import com.orhanobut.logger.Logger;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
-import org.kexie.android.mapper.Mapping;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import mapper.Mapping;
 
 @Mapping("dng/media/video")
-public class VideoPlayerFragment extends Fragment
+public class VideoPlayerFragment
+        extends Fragment
+        implements OnBackPressedCallback
 {
 
     public static VideoPlayerFragment newInstance(LiteMediaInfo info)
@@ -60,6 +63,8 @@ public class VideoPlayerFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         LiteMediaInfo info = getArguments().getParcelable("info");
+        getActivity().addOnBackPressedCallback(this,
+                this);
         //dataBinding
         player = binding.playerView;
         Glide.with(this)
@@ -119,5 +124,15 @@ public class VideoPlayerFragment extends Fragment
         {
             player.configurationChanged(newConfig);
         }
+    }
+
+    @Override
+    public boolean handleOnBackPressed()
+    {
+        if (player != null)
+        {
+            return player.onBackPressed();
+        }
+        return false;
     }
 }
