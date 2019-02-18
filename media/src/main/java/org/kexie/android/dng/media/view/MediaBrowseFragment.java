@@ -1,5 +1,8 @@
 package org.kexie.android.dng.media.view;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +10,6 @@ import android.view.ViewGroup;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
-import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
@@ -18,9 +20,15 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import mapper.Mapper;
 import mapper.Mapping;
+import mapper.Request;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/media/browse")
 public class MediaBrowseFragment
@@ -29,6 +37,8 @@ public class MediaBrowseFragment
     private MediaBrowseViewModel viewModel;
 
     private FragmentMediaBrowseBinding binding;
+
+    private Runnable updateViewCallback;
 
     @Nullable
     @Override
@@ -44,6 +54,7 @@ public class MediaBrowseFragment
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
@@ -57,25 +68,40 @@ public class MediaBrowseFragment
                         StaggeredGridLayoutManager.VERTICAL));
         binding.setOnItemClick((adapter, view1, position) -> {
             LiteMediaInfo info = (LiteMediaInfo) adapter.getData().get(position);
-            switch (info.type)
-            {
-                case MediaInfo.TYPE_PHOTO:
-                {
-                }
-                break;
-                case MediaInfo.TYPE_VIDEO:
-                {
-
-                }
-                break;
-            }
+            viewModel.requestJump(info);
+            updateViewCallback = () -> adapter.remove(position);
         });
         viewModel = ViewModelProviders.of(this)
                 .get(MediaBrowseViewModel.class);
+        //dataBinding
         viewModel.getTitle().observe(this, binding::setTitle);
-        //ProgressFragment.observe(viewModel.getLoading(), this);
         viewModel.getMediaInfo().observe(this, binding::setMediaInfo);
         viewModel.loadPhoto();
+        //rx
+        viewModel.getOnJump()
+                .as(autoDisposable(from(this)))
+                .subscribe(this::jumpTo);
+    }
+
+    private void jumpTo(Request request)
+    {
+        getFragmentManager()
+                .beginTransaction()
+                .add(getId(), Mapper.getOn(this, request))
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        if (requestCode == MediaBrowseViewModel.REQUEST_TO_PHOTO
+                && Activity.RESULT_FIRST_USER == resultCode
+                && updateViewCallback != null)
+        {
+            updateViewCallback.run();
+        }
     }
 
     private Map<String, View.OnClickListener> getActions()

@@ -1,5 +1,6 @@
 package org.kexie.android.dng.media.view;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +9,9 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
 import org.kexie.android.common.util.AnimationAdapter;
-import org.kexie.android.common.util.Callback;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
 import org.kexie.android.dng.media.viewmodel.MediaManagedViewModel;
-import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,22 +32,6 @@ public class PhotoViewFragment extends Fragment
 
     private FragmentPhotoViewBinding binding;
 
-
-    public static PhotoViewFragment newInstance(LiteMediaInfo mediaInfo)
-    {
-        Bundle args = new Bundle();
-        args.putParcelable("info", mediaInfo);
-        PhotoViewFragment fragment = new PhotoViewFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    private Callback<Void> callback;
-
-    public void setCallback(Callback<Void> callback)
-    {
-        this.callback = callback;
-    }
 
     @Nullable
     @Override
@@ -91,9 +74,16 @@ public class PhotoViewFragment extends Fragment
                 View.OnClickListener a1 = v -> getActivity().onBackPressed();
                 put("back", a1);
                 put("delete", v -> {
-                    if (viewModel.delete(binding.getInfo()) && callback != null)
+                    if (viewModel.delete(binding.getInfo()))
                     {
-                        callback.onResult(null);
+                        Fragment fragment = getTargetFragment();
+                        if (fragment != null)
+                        {
+                            fragment.onActivityResult(getTargetRequestCode(),
+                                    Activity.RESULT_FIRST_USER,
+                                    null);
+                        }
+                        getFragmentManager().popBackStack();
                     }
                 });
                 put("hide", v -> doHideAnimation());

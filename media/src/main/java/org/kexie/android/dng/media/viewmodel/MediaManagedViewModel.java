@@ -4,7 +4,6 @@ import android.app.Application;
 import android.provider.MediaStore;
 
 import org.kexie.android.dng.media.model.entity.MediaInfo;
-import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -22,7 +21,7 @@ public class MediaManagedViewModel extends AndroidViewModel
         super(application);
     }
 
-    public boolean delete(LiteMediaInfo info)
+    public boolean delete(MediaInfo info)
     {
         boolean success;
         if (info.type == MediaInfo.TYPE_PHOTO)
@@ -40,7 +39,7 @@ public class MediaManagedViewModel extends AndroidViewModel
         }
         if (success)
         {
-            onErrorMessage.onNext("删除成功");
+            onSuccessMessage.onNext("删除成功");
         } else
         {
             onErrorMessage.onNext("删除失败");

@@ -47,7 +47,8 @@ public class MediaInfoProvider
 
             if (size < 5 * 1024 * 1024)
             {//<5M
-                MediaInfo materialBean = new MediaInfo(title, path, MediaInfo.TYPE_PHOTO);
+                MediaInfo materialBean
+                        = new MediaInfo(title, path, MediaInfo.TYPE_PHOTO);
                 list.add(materialBean);
             }
         }

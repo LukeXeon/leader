@@ -14,7 +14,7 @@ import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
-import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
+import org.kexie.android.dng.media.model.entity.MediaInfo;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -28,15 +28,6 @@ public class VideoPlayerFragment
         extends Fragment
         implements OnBackPressedCallback
 {
-
-    public static VideoPlayerFragment newInstance(LiteMediaInfo info)
-    {
-        Bundle args = new Bundle();
-        args.putParcelable("info", info);
-        VideoPlayerFragment fragment = new VideoPlayerFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     private IjkPlayerView player;
 
@@ -62,7 +53,7 @@ public class VideoPlayerFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        LiteMediaInfo info = getArguments().getParcelable("info");
+        MediaInfo info = getArguments().getParcelable("info");
         getActivity().addOnBackPressedCallback(this,
                 this);
         //dataBinding
