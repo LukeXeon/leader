@@ -43,7 +43,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private Map<LiteMediaInfo, MediaInfo> mediaInfoMapping = new ArrayMap<>();
 
-    private MutableLiveData<String> loading = new MutableLiveData<>();
+    private PublishSubject<String> loading = PublishSubject.create();
 
     private PublishSubject<Request> onJump = PublishSubject.create();
 
@@ -62,7 +62,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
         return title;
     }
 
-    public LiveData<String> getLoading()
+    public Observable<String> getLoading()
     {
         return loading;
     }
@@ -100,7 +100,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private void internalLoad(String type)
     {
-        loading.setValue("");
+        loading.onNext("加载中...");
         singleTask.execute(() -> {
             Map<LiteMediaInfo, MediaInfo> map
                     = StreamSupport.stream(TYPE_VIDEO.equals(type)
@@ -110,7 +110,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
             mediaInfoMapping.clear();
             mediaInfoMapping.putAll(map);
             mediaInfo.postValue(new ArrayList<>(map.keySet()));
-            loading.postValue(null);
+            loading.onNext("");
             title.postValue(type);
         });
     }

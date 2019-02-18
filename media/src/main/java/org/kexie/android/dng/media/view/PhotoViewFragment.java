@@ -83,7 +83,7 @@ public class PhotoViewFragment extends Fragment
                                     Activity.RESULT_FIRST_USER,
                                     null);
                         }
-                        getFragmentManager().popBackStack();
+                        getActivity().onBackPressed();
                     }
                 });
                 put("hide", v -> doHideAnimation());

@@ -7,7 +7,7 @@ import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 
 import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.util.NavControllerCallbacks;
+import org.kexie.android.dng.navi.widget.NavControllerCallbacks;
 
 import java.util.Collections;
 import java.util.List;

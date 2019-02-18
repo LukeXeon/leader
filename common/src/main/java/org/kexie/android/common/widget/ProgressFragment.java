@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.kexie.android.common.R;
 import org.kexie.android.common.databinding.ViewProgressBinding;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -30,9 +31,8 @@ public final class ProgressFragment
     private RoundCornerImageView mProgressIv;
     private ImageView mBotIv;
     private String msg;
-    private Handler mainThread = new Handler(Looper.getMainLooper());
+    private Handler mHandler;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -43,15 +43,17 @@ public final class ProgressFragment
                 R.layout.view_progress,
                 container,
                 false);
-        binding.getRoot().setOnTouchListener((x, y) -> true);
+
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        binding.getRoot().setOnTouchListener((x, y) -> true);
         binding.rootView.setupWith((ViewGroup) view.getParent())
                 .setFrameClearDrawable(
                         getActivity().getWindow()
@@ -60,15 +62,12 @@ public final class ProgressFragment
                 .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
-
-
-        view.setVisibility(View.VISIBLE);
         TextView mProgressMessage = view.findViewById(R.id.progress_message);
         //新增进度条
         mProgressIv = view.findViewById(R.id.p_cover_iv);
         mBotIv = view.findViewById(R.id.p_bot_iv);
         mProgressMessage.setText(msg);
-        mainThread.post(new Runnable()
+        mHandler.post(new Runnable()
         {
             private int value = 0;
 
@@ -78,7 +77,7 @@ public final class ProgressFragment
                 if (value < 100)
                 {
                     updatePercent(++value);
-                    mainThread.postDelayed(this, 10);
+                    mHandler.postDelayed(this, 10);
                 }
             }
         });
@@ -101,6 +100,7 @@ public final class ProgressFragment
     public void onDestroyView()
     {
         super.onDestroyView();
+        binding = null;
         mBotIv = null;
         msg = null;
         mProgressIv = null;
@@ -111,48 +111,65 @@ public final class ProgressFragment
         this.msg = message;
     }
 
-    private void dismiss()
-    {
-        mainThread.postDelayed(() -> {
-            mainThread.removeCallbacksAndMessages(null);
-            getFragmentManager()
-                    .beginTransaction()
-                    .remove(this)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                    .commit();
-        }, 200);
-    }
-
     public static Consumer<String> makeObserver(Fragment root)
     {
-        return new Consumer<String>()
-        {
-            private final ProgressFragment fragment = new ProgressFragment();
+        return new Observer(root);
+    }
 
-            @Override
-            public void accept(String s)
+    private static final class Observer
+            extends Handler
+            implements Consumer<String>,
+            OnBackPressedCallback,
+            Runnable
+    {
+        private final ProgressFragment progressFragment = new ProgressFragment();
+
+        private Observer(Fragment fragment)
+        {
+            super(Looper.getMainLooper());
+            progressFragment.setTargetFragment(fragment, 0);
+            progressFragment.mHandler = this;
+        }
+
+        @Override
+        public void accept(String s)
+        {
+            Fragment target = progressFragment.getTargetFragment();
+            if (!TextUtils.isEmpty(s))
             {
-                s = "".equals(s) ? "加载中..." : s;
-                if (TextUtils.isEmpty(s))
+                progressFragment.setMessage(s);
+                if (!progressFragment.isAdded())
                 {
-                    fragment.setMessage(s);
-                    if (!fragment.isAdded())
-                    {
-                        root.getFragmentManager()
-                                .beginTransaction()
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .add(root.getId(), fragment)
-                                .show(fragment)
-                                .commit();
-                    }
-                } else
-                {
-                    if (fragment.isAdded())
-                    {
-                        fragment.dismiss();
-                    }
+                    target.getFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .add(target.getId(), progressFragment)
+                            .show(progressFragment)
+                            .commit();
+                    target.getActivity().addOnBackPressedCallback(this);
                 }
+            } else
+            {
+                postDelayed(this, 200);
             }
-        };
+        }
+
+        @Override
+        public boolean handleOnBackPressed()
+        {
+            return true;
+        }
+
+        @Override
+        public void run()
+        {
+            this.removeCallbacksAndMessages(null);
+            progressFragment.getFragmentManager()
+                    .beginTransaction()
+                    .remove(progressFragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .commit();
+            progressFragment.getActivity().removeOnBackPressedCallback(this);
+        }
     }
 }

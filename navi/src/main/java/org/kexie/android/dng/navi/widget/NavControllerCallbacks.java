@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.util;
+package org.kexie.android.dng.navi.widget;
 
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.model.AMapCalcRouteResult;
