@@ -62,6 +62,9 @@ public class MediaBrowseFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = ViewModelProviders.of(this)
+                .get(MediaBrowseViewModel.class);
+        //dataBinding
         binding.getRoot().setOnTouchListener((v, event) -> true);
         Map<String, View.OnClickListener> actions = getActions();
         binding.setActions(actions);
@@ -73,11 +76,9 @@ public class MediaBrowseFragment
             viewModel.requestJump(info);
             updateViewCallback = () -> adapter.remove(position);
         });
-        viewModel = ViewModelProviders.of(this)
-                .get(MediaBrowseViewModel.class);
-        //dataBinding
+        binding.setMediaInfos(viewModel.getMediaInfos());
+        //liveData
         viewModel.getTitle().observe(this, binding::setTitle);
-        viewModel.getMediaInfo().observe(this, binding::setMediaInfo);
         //rx
         viewModel.getOnJump()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
@@ -85,7 +86,6 @@ public class MediaBrowseFragment
         viewModel.getLoading()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(ProgressFragment.makeObserver(this));
-
         viewModel.loadPhoto();
     }
 

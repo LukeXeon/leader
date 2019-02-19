@@ -9,8 +9,8 @@
             name="title"
             type="String"/>
         <variable
-            name="mediaInfo"
-            type="java.util.List&lt;org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo&gt;"/>
+            name="mediaInfos"
+            type="androidx.databinding.ObservableList&lt;org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo&gt;"/>
         <variable
             name="actions"
             type="java.util.Map&lt;String,Action&gt;"/>
@@ -60,7 +60,7 @@
                     android:layout_weight="1"
                     item_layout="@{R.layout.item_media_info}"
                     item_name='@{"info"}'
-                    item_source="@{mediaInfo}"
+                    item_source="@{mediaInfos}"
                     onItemClick="@{onItemClick}"
                     empty_layout="@{R.layout.view_empty}"
                     android:layout_width="match_parent"

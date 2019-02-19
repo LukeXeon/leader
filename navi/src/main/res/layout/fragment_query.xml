@@ -21,7 +21,7 @@
 
         <variable
             name="tips"
-            type="java.util.List&lt;String&gt;" />
+            type="java.util.List&lt;org.kexie.android.dng.navi.viewmodel.entity.LiteTip&gt;" />
 
         <variable
             name="showMap"
@@ -176,9 +176,6 @@
                             <androidx.recyclerview.widget.RecyclerView
                                 android:orientation="vertical"
                                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                                item_name='@{"tip"}'
-                                item_layout="@{R.layout.item_tip}"
-                                item_source="@{tips}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_margin="20dp"/>

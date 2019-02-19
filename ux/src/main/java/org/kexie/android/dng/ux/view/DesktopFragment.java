@@ -65,14 +65,13 @@ public class DesktopFragment extends Fragment
         binding.setOnItemClick((adapter, view1, position)
                 -> viewModel.requestJumpBy((Function) adapter.getData().get(position)));
         binding.setActions(getActions());
+        binding.setFunctions(viewModel.getFunctions());
+        viewModel.loadDefaultFunctions();
         //liveData
         Transformations.map(infoViewModel.getUser(),
                 input -> new SimpleUserInfo(input.headImage, input.username, input.carNumber))
                 .observe(this, binding::setUser);
         viewModel.getTime().observe(this, binding::setTime);
-        viewModel.getFunction()
-                .observe(this,binding::setFunctions);
-        viewModel.loadDefaultFunction();
         //rx
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))

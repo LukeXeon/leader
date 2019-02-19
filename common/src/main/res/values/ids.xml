@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="pager_view" type="id"/>
-    <item name="on_adapter_created" type="id"/>
     <item name="live_adapter" type="id"/>
+    <item name="generic_binding_adapter" type="id"/>
 </resources>

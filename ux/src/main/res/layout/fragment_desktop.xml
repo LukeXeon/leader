@@ -23,7 +23,7 @@
 
         <variable
             name="functions"
-            type="java.util.List&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
+            type="androidx.databinding.ObservableList&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
         <variable
             name="onItemClick"
             type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>

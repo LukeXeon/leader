@@ -29,7 +29,6 @@ public class NavigationViewModel extends AndroidViewModel
 {
     private final AMapNavi navigation;
     private final Executor singleTask = Executors.newSingleThreadExecutor();
-    private final MutableLiveData<Boolean> calculateResult = new MutableLiveData<>();
     private final MutableLiveData<String> loading = new MutableLiveData<>();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
@@ -55,7 +54,7 @@ public class NavigationViewModel extends AndroidViewModel
                             {
                                 lock.lock();
                                 navigation.removeAMapNaviListener(this);
-                                calculateResult.postValue(false);
+                                //calculateResult.postValue(false);
                                 condition.signalAll();
                                 lock.unlock();
                             }
@@ -67,7 +66,7 @@ public class NavigationViewModel extends AndroidViewModel
                                 navigation.removeAMapNaviListener(this);
                                 navigation.selectRouteId(ints[0]);
                                 navigation.startNavi(NaviType.EMULATOR);
-                                calculateResult.postValue(true);
+                                //calculateResult.postValue(true);
                                 condition.signalAll();
                                 lock.unlock();
                             }
@@ -77,11 +76,13 @@ public class NavigationViewModel extends AndroidViewModel
 
                 List<NaviLatLng> form = route.getFrom() == null
                         ? Collections.emptyList()
-                        : Collections.singletonList(route.getFrom().unBox(NaviLatLng.class));
+                        : Collections.singletonList(route.getFrom()
+                        .unBox(NaviLatLng.class));
 
                 List<NaviLatLng> to = route.getTo() == null
                         ? Collections.emptyList()
-                        : Collections.singletonList(route.getTo().unBox(NaviLatLng.class));
+                        : Collections.singletonList(route.getTo()
+                        .unBox(NaviLatLng.class));
 
                 List<NaviLatLng> ways = route.getWays() == null
                         || route.getWays().size() == 0

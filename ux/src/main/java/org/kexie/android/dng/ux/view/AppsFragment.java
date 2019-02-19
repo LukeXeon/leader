@@ -36,7 +36,6 @@ public class AppsFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_apps,
                 container,
@@ -62,8 +61,7 @@ public class AppsFragment extends Fragment
                 5));
         binding.setOnItemClick((adapter, view1, position) ->
                 viewModel.requestJumpBy((LiteAppInfo) adapter.getData().get(position)));
-        //liveData
-        viewModel.getAppInfo().observe(this, binding::setAppInfo);
+        binding.setAppInfos(viewModel.getAppInfos());
         viewModel.loadAppInfo();
         //rx
         viewModel.getOnJumpTo()

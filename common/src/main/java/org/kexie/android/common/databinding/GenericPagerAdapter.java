@@ -88,6 +88,7 @@ public class GenericPagerAdapter<T>
                                   int position,
                                   @NonNull Object object)
     {
+
         destroyItem(container, position, (View) object);
     }
 
@@ -169,8 +170,8 @@ public class GenericPagerAdapter<T>
     }
 
     private static void setItemAdapter(View view,
-                                      String itemName,
-                                      @LayoutRes int itemLayout)
+                                       String itemName,
+                                       @LayoutRes int itemLayout)
     {
         GenericPagerAdapter adapter
                 = new GenericPagerAdapter<>(itemName, itemLayout);
@@ -225,4 +226,5 @@ public class GenericPagerAdapter<T>
         }
         return liveData;
     }
+
 }

@@ -3,22 +3,23 @@ package org.kexie.android.dng.media.viewmodel;
 import android.app.Application;
 import android.os.Bundle;
 
-import org.kexie.android.common.util.Collectors;
+import org.kexie.android.common.databinding.OnListChangedCallback;
+import org.kexie.android.common.util.Collectors2;
 import org.kexie.android.dng.media.model.MediaInfoProvider;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableArrayList;
+import androidx.databinding.ObservableList;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.StreamSupport;
@@ -37,7 +38,9 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private MutableLiveData<String> title = new MutableLiveData<>();
 
-    private MutableLiveData<Map<LiteMediaInfo, MediaInfo>> mediaInfo = new MutableLiveData<>();
+    private Map<LiteMediaInfo, MediaInfo> mediaInfos = new HashMap<>();
+
+    private ObservableArrayList<LiteMediaInfo> liteMediaInfos = new ObservableArrayList<>();
 
     private PublishSubject<String> loading = PublishSubject.create();
 
@@ -46,11 +49,23 @@ public class MediaBrowseViewModel extends AndroidViewModel
     public MediaBrowseViewModel(@NonNull Application application)
     {
         super(application);
+        liteMediaInfos.addOnListChangedCallback(
+                new OnListChangedCallback<ObservableList<LiteMediaInfo>>()
+                {
+                    @Override
+                    public void onItemRangeRemoved(
+                            ObservableList<LiteMediaInfo> sender,
+                            int positionStart,
+                            int itemCount)
+                    {
+
+                    }
+                });
     }
 
-    public LiveData<List<LiteMediaInfo>> getMediaInfo()
+    public ObservableList<LiteMediaInfo> getMediaInfos()
     {
-        return Transformations.map(mediaInfo, x -> new ArrayList<>(x.keySet()));
+        return liteMediaInfos;
     }
 
     public LiveData<String> getTitle()
@@ -65,25 +80,21 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     public void requestJump(LiteMediaInfo mediaInfo)
     {
-        Map<LiteMediaInfo, MediaInfo> map = this.mediaInfo.getValue();
-        if (map != null)
+        MediaInfo info = this.mediaInfos.get(mediaInfo);
+        if (info != null)
         {
-            MediaInfo info = map.get(mediaInfo);
-            if (info != null)
-            {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("info", info);
-                Request request = new Request.Builder()
-                        .uri(info.type == MediaInfo.TYPE_PHOTO
-                                ? "dng/media/photo"
-                                : "dng/media/video")
-                        .bundle(bundle)
-                        .code(info.type == MediaInfo.TYPE_PHOTO
-                                ? REQUEST_TO_PHOTO
-                                : REQUEST_TO_VIDEO)
-                        .build();
-                onJump.onNext(request);
-            }
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("info", info);
+            Request request = new Request.Builder()
+                    .uri(info.type == MediaInfo.TYPE_PHOTO
+                            ? "dng/media/photo"
+                            : "dng/media/video")
+                    .bundle(bundle)
+                    .code(info.type == MediaInfo.TYPE_PHOTO
+                            ? REQUEST_TO_PHOTO
+                            : REQUEST_TO_VIDEO)
+                    .build();
+            onJump.onNext(request);
         }
     }
 
@@ -105,8 +116,13 @@ public class MediaBrowseViewModel extends AndroidViewModel
                     = StreamSupport.stream(TYPE_VIDEO.equals(type)
                     ? MediaInfoProvider.getVideoModels(getApplication())
                     : MediaInfoProvider.getPhotoModels(getApplication()))
-                    .collect(Collectors.toLinkedHashMap(i -> new LiteMediaInfo(i.title, i.uri), i -> i));
-            mediaInfo.postValue(map);
+                    .collect(Collectors2.toLinkedHashMap(i -> new LiteMediaInfo(i.title, i.uri), i -> i));
+            mediaInfos.clear();
+            mediaInfos.putAll(map);
+            liteMediaInfos.clear();
+            StreamSupport.stream(map.entrySet())
+                    .map(Map.Entry::getKey)
+                    .forEach(liteMediaInfos::add);
             loading.onNext("");
             title.postValue(type);
         });

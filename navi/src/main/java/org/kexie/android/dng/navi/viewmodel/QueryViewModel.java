@@ -17,6 +17,7 @@ import com.amap.api.services.route.DriveStep;
 import com.amap.api.services.route.RouteSearch;
 import com.bumptech.glide.Glide;
 
+import org.kexie.android.common.util.Collectors2;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.model.BoxRoute;
 import org.kexie.android.dng.navi.model.Point;
@@ -24,11 +25,10 @@ import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteRoute;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteStep;
+import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -37,7 +37,6 @@ import java.util.concurrent.Executors;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
-import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
@@ -52,10 +51,8 @@ public class QueryViewModel extends AndroidViewModel
     private final RouteSearch routeSearch;
     private final Executor singleTask = Executors.newSingleThreadExecutor();
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
-    private final MutableLiveData<List<String>> tipTexts = new MutableLiveData<>();
-    private final MutableLiveData<List<LiteRoute>> liteRoutes = new MutableLiveData<>();
-    private final Map<LiteRoute, Route> routeMapping = new ArrayMap<>();
-    private final IdentityHashMap<String, String> tipPoiIds = new IdentityHashMap<>();
+    private final MutableLiveData<Map<LiteTip,String>> tips = new MutableLiveData<>();
+    private final MutableLiveData<Map<LiteRoute,Route>> routes = new MutableLiveData<>();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
     private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
@@ -80,13 +77,13 @@ public class QueryViewModel extends AndroidViewModel
             Inputtips inputtips = new Inputtips(getApplication(), inputtipsQuery);
             try
             {
-                Map<String, String> rawResult = StreamSupport
+                Map<LiteTip, String> rawResult = StreamSupport
                         .stream(inputtips.requestInputtips())
                         .filter(tip -> !TextUtils.isEmpty(tip.getPoiID()))
-                        .collect(Collectors.toMap(Tip::getName, Tip::getPoiID));
-                tipPoiIds.clear();
-                tipPoiIds.putAll(rawResult);
-                tipTexts.postValue(new ArrayList<>(rawResult.keySet()));
+                        .collect(Collectors2.toLinkedHashMap(x -> new LiteTip(x.getName()),
+                                Tip::getPoiID));
+
+                tips.postValue(rawResult);
                 //loading.postValue(null);
             } catch (Exception e)
             {
@@ -98,25 +95,33 @@ public class QueryViewModel extends AndroidViewModel
     }
 
     @MainThread
-    public void routeQueryBy(String tip)
+    public void routeQueryBy(LiteTip tip)
     {
-        String poiId = tipPoiIds.get(tip);
-        if (poiId != null)
+        Map<LiteTip, String> poi = tips.getValue();
+        if (poi != null)
         {
-            singleTask.execute(() -> {
-                Point point = getTipPoint(tip, poiId);
-                Query query = new Query.Builder().to(point).build();
-                routeQuery(query);
-            });
+            String poiId = poi.get(tip);
+            if (poiId != null)
+            {
+                singleTask.execute(() -> {
+                    Point point = getTipPoint(tip.text, poiId);
+                    Query query = new Query.Builder().to(point).build();
+                    routeQuery(query);
+                });
+            }
         }
     }
 
     public void requestJumpToNavigation(LiteRoute liteRoute)
     {
-        Route route = routeMapping.get(liteRoute);
-        if (route != null)
+        Map<LiteRoute, Route> map = routes.getValue();
+        if (map != null)
         {
-            onJumpToNavigation.onNext(route);
+            Route route = map.get(liteRoute);
+            if (route != null)
+            {
+                onJumpToNavigation.onNext(route);
+            }
         }
     }
 
@@ -163,26 +168,23 @@ public class QueryViewModel extends AndroidViewModel
 
         try
         {
-            Map<LiteRoute, Route> newMapping = StreamSupport.stream(routeSearch
+            Map<LiteRoute, Route> newRoutes = StreamSupport.stream(routeSearch
                     .calculateDriveRoute(driveRouteQuery)
                     .getPaths())
-                    .collect(Collectors.toMap(
-                            path -> new LiteRoute.Builder()
-                                    .name(getPathName(path))
-                                    .length(getPathLength(path))
-                                    .time(getPathTime(path))
-                                    .steps(getPathStep(path))
-                                    .build(),
-                            path -> new BoxRoute(query.from, query.to, path)));
-
-            routeMapping.clear();
-            routeMapping.putAll(newMapping);
-            liteRoutes.postValue(new ArrayList<>(routeMapping.keySet()));
+                    .collect(Collectors2
+                            .toLinkedHashMap(path -> new LiteRoute.Builder()
+                                            .name(getPathName(path))
+                                            .length(getPathLength(path))
+                                            .time(getPathTime(path))
+                                            .steps(getPathStep(path))
+                                            .build(),
+                                    path -> new BoxRoute(query.from, query.to, path)));
+            routes.postValue(newRoutes);
         } catch (Exception e)
         {
             e.printStackTrace();
             onErrorMessage.onNext("路径规划失败,请检查网络连接");
-            liteRoutes.postValue(null);
+            routes.postValue(null);
         }
     }
 
