@@ -22,6 +22,7 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import mapper.Mapper;
@@ -79,10 +80,10 @@ public class MediaBrowseFragment
         viewModel.getMediaInfo().observe(this, binding::setMediaInfo);
         //rx
         viewModel.getOnJump()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(this::jumpTo);
         viewModel.getLoading()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(ProgressFragment.makeObserver(this));
 
         viewModel.loadPhoto();

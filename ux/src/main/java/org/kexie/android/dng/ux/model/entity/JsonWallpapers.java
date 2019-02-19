@@ -13,7 +13,7 @@ public class JsonWallpapers
     @SerializedName("images")
     public List<JsonWallpaper> wallpapers;
 
-    public class JsonWallpaper
+    public static class JsonWallpaper
     {
         @SerializedName("url")
         public String part;//这里的链接还需要加上微软的http://cn.bing.com在前面

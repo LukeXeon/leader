@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
@@ -91,10 +92,10 @@ public class PhotoViewFragment extends Fragment
         });
         //rx
         viewModel.getOnErrorMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 

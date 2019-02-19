@@ -20,6 +20,7 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
@@ -69,18 +70,18 @@ public class DesktopFragment extends Fragment
                 input -> new SimpleUserInfo(input.headImage, input.username, input.carNumber))
                 .observe(this, binding::setUser);
         viewModel.getTime().observe(this, binding::setTime);
+        viewModel.getFunction()
+                .observe(this,binding::setFunctions);
+        viewModel.loadDefaultFunction();
         //rx
-        viewModel.getDefaultFunction()
-                .as(autoDisposable(from(this)))
-                .subscribe(binding::setFunctions);
         viewModel.getOnErrorMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
         viewModel.getOnJumpTo()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(this::jumpTo);
     }
 

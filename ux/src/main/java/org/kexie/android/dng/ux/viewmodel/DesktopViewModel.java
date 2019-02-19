@@ -1,23 +1,24 @@
 package org.kexie.android.dng.ux.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
-import android.graphics.drawable.Drawable;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.kexie.android.common.util.Collectors;
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.collection.ArrayMap;
 import androidx.core.util.Pair;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
@@ -25,8 +26,8 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Transformations;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -55,7 +56,7 @@ public class DesktopViewModel
 
     private static final int BORDER_SIZE = 250;
     private final MutableLiveData<String> time = new MutableLiveData<>();
-    private final Map<Function, String> functionJumpTo = new ArrayMap<>();
+    private final MutableLiveData<Map<Function, String>> functionJumpTo = new MutableLiveData<>();
     private final PublishSubject<Request> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
@@ -68,58 +69,65 @@ public class DesktopViewModel
 
     public void requestJumpBy(Function function)
     {
-        String uri = functionJumpTo.get(function);
-        if (uri != null)
+        Map<Function, String> map = functionJumpTo.getValue();
+        if (map != null)
         {
-            onJumpTo.onNext(new Request.Builder().uri(uri).build());
-        } else
-        {
-            onErrorMessage.onNext("跳转到" + function.name + "失败");
+            String uri = map.get(function);
+            if (uri != null)
+            {
+                onJumpTo.onNext(new Request.Builder().uri(uri).build());
+            } else
+            {
+                onErrorMessage.onNext("跳转到" + function.name + "失败");
+            }
         }
     }
 
-    private Observable<List<Function>>
+    private Observable<Map<Function, String>>
     loadFunction(List<FunctionInfo> functionRes)
     {
         return Observable.just(functionRes)
                 .subscribeOn(Schedulers.io())
                 .map(raw -> {
-                    functionJumpTo.clear();
                     ZoomTransformation zoomTransformation
                             = new ZoomTransformation(BORDER_SIZE);
-                    StreamSupport.stream(raw)
-                            .map(info -> Pair.create(info, Glide.with(this.getApplication())
-                                    .load(info.iconRes)
-                                    .apply(RequestOptions
-                                            .bitmapTransform(zoomTransformation))
-                                    .submit()))
-                            .forEach(pair -> {
+                    return StreamSupport.stream(raw)
+                            .map(info -> Pair.create(info,
+                                    Glide.with(this.getApplication())
+                                            .load(info.iconRes)
+                                            .apply(RequestOptions
+                                                    .bitmapTransform(zoomTransformation))
+                                            .submit()))
+                            .collect(Collectors.toLinkedHashMap(pair -> {
                                 try
                                 {
-                                    Drawable resource = pair.second.get();
-                                    Function function = new Function(
+                                    return new Function(
                                             pair.first.name,
-                                            resource);
-                                    functionJumpTo.put(function, pair.first.uri);
+                                            pair.second.get());
                                 } catch (Exception e)
                                 {
                                     throw Exceptions.propagate(e);
                                 }
-                            });
-                    return new ArrayList<>(functionJumpTo.keySet());
+                            }, pair -> pair.first.uri));
                 });
     }
 
-    public Observable<List<Function>> getDefaultFunction()
+    @SuppressLint("CheckResult")
+    public void loadDefaultFunction()
     {
-        return loadFunction(new ArrayList<FunctionInfo>()
+        loadFunction(new LinkedList<FunctionInfo>()
         {
             {
                 add(functionBy("天气", R.mipmap.image_weather, "dng/ux/weather"));
                 add(functionBy("多媒体", R.mipmap.image_media, "dng/media/browse"));
                 add(functionBy("APPS", R.mipmap.image_apps, "dng/ux/apps"));
             }
-        }).subscribeOn(AndroidSchedulers.mainThread());
+        }).subscribe(functionJumpTo::postValue);
+    }
+
+    public LiveData<List<Function>> getFunction()
+    {
+        return Transformations.map(functionJumpTo, x -> new ArrayList<>(x.keySet()));
     }
 
     private static FunctionInfo functionBy(String name, int icon, String path)

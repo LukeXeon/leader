@@ -1,6 +1,6 @@
 package org.kexie.android.dng.ux.model.entity;
 
-public class JsonQrCode
+public class JsonQrcode
 {
     public String value;
 }

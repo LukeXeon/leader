@@ -49,7 +49,7 @@ public class InfoFragment extends Fragment
 
         getChildFragmentManager()
                 .beginTransaction()
-                .add(R.id.info_host, new QrCodeFragment())
+                .add(R.id.info_host, new QrcodeFragment())
                 .commit();
     }
 }

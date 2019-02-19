@@ -14,8 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import mapper.Mapping;
 
-
+@Mapping("dng/ux/info/content")
 public class InfoContentFragment extends Fragment
 {
     private FragmentInfoContentBinding binding;

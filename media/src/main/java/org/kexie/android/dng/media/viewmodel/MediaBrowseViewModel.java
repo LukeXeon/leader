@@ -3,8 +3,7 @@ package org.kexie.android.dng.media.viewmodel;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.orhanobut.logger.Logger;
-
+import org.kexie.android.common.util.Collectors;
 import org.kexie.android.dng.media.model.MediaInfoProvider;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
@@ -16,13 +15,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 import mapper.Request;
 
@@ -39,9 +37,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private MutableLiveData<String> title = new MutableLiveData<>();
 
-    private MutableLiveData<List<LiteMediaInfo>> mediaInfo = new MutableLiveData<>();
-
-    private Map<LiteMediaInfo, MediaInfo> mediaInfoMapping = new ArrayMap<>();
+    private MutableLiveData<Map<LiteMediaInfo, MediaInfo>> mediaInfo = new MutableLiveData<>();
 
     private PublishSubject<String> loading = PublishSubject.create();
 
@@ -54,7 +50,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     public LiveData<List<LiteMediaInfo>> getMediaInfo()
     {
-        return mediaInfo;
+        return Transformations.map(mediaInfo, x -> new ArrayList<>(x.keySet()));
     }
 
     public LiveData<String> getTitle()
@@ -69,22 +65,25 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     public void requestJump(LiteMediaInfo mediaInfo)
     {
-        MediaInfo info = mediaInfoMapping.get(mediaInfo);
-        Logger.d(mediaInfoMapping.size());
-        if (info != null)
+        Map<LiteMediaInfo, MediaInfo> map = this.mediaInfo.getValue();
+        if (map != null)
         {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("info", info);
-            Request request = new Request.Builder()
-                    .uri(info.type == MediaInfo.TYPE_PHOTO
-                            ? "dng/media/photo"
-                            : "dng/media/video")
-                    .bundle(bundle)
-                    .code(info.type == MediaInfo.TYPE_PHOTO
-                            ? REQUEST_TO_PHOTO
-                            : REQUEST_TO_VIDEO)
-                    .build();
-            onJump.onNext(request);
+            MediaInfo info = map.get(mediaInfo);
+            if (info != null)
+            {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("info", info);
+                Request request = new Request.Builder()
+                        .uri(info.type == MediaInfo.TYPE_PHOTO
+                                ? "dng/media/photo"
+                                : "dng/media/video")
+                        .bundle(bundle)
+                        .code(info.type == MediaInfo.TYPE_PHOTO
+                                ? REQUEST_TO_PHOTO
+                                : REQUEST_TO_VIDEO)
+                        .build();
+                onJump.onNext(request);
+            }
         }
     }
 
@@ -106,10 +105,8 @@ public class MediaBrowseViewModel extends AndroidViewModel
                     = StreamSupport.stream(TYPE_VIDEO.equals(type)
                     ? MediaInfoProvider.getVideoModels(getApplication())
                     : MediaInfoProvider.getPhotoModels(getApplication()))
-                    .collect(Collectors.toMap(i -> new LiteMediaInfo(i.title, i.uri), i -> i));
-            mediaInfoMapping.clear();
-            mediaInfoMapping.putAll(map);
-            mediaInfo.postValue(new ArrayList<>(map.keySet()));
+                    .collect(Collectors.toLinkedHashMap(i -> new LiteMediaInfo(i.title, i.uri), i -> i));
+            mediaInfo.postValue(map);
             loading.onNext("");
             title.postValue(type);
         });

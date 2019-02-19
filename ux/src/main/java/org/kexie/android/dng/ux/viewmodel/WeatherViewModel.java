@@ -29,7 +29,7 @@ public class WeatherViewModel extends AndroidViewModel
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("")
+                .baseUrl("http://cn.bing.com")
                 .client(new OkHttpClient())
                 .build();
         return retrofit.create(WallpaperProvider.class)

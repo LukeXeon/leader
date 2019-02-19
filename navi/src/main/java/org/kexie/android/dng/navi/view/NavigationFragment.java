@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 import mapper.Mapping;
@@ -62,10 +63,10 @@ public class NavigationFragment extends Fragment
                 .get(NavigationViewModel.class);
 
         viewModel.getOnErrorMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 }

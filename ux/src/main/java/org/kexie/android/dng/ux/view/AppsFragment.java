@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import eightbitlab.com.blurview.RenderScriptBlur;
@@ -66,13 +67,13 @@ public class AppsFragment extends Fragment
         viewModel.loadAppInfo();
         //rx
         viewModel.getOnJumpTo()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe();
         viewModel.getOnErrorMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
-                .as(autoDisposable(from(this)))
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 }

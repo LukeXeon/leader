@@ -2,6 +2,7 @@ package org.kexie.android.common.databinding;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.R;
 
@@ -50,6 +51,7 @@ public class GenericRecyclerAdapter<T>
     {
         GenericRecyclerAdapter adapter
                 = new GenericRecyclerAdapter(itemName, itemLayout);
+        Logger.d("setItemAdapter");
         view.setAdapter(adapter);
         getLiveAdapter(view).setValue(adapter);
     }

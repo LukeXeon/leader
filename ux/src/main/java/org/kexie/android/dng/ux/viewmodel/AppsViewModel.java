@@ -3,6 +3,7 @@ package org.kexie.android.dng.ux.viewmodel;
 import android.app.Application;
 import android.content.Intent;
 
+import org.kexie.android.common.util.Collectors;
 import org.kexie.android.dng.ux.model.AppInfoProvider;
 import org.kexie.android.dng.ux.model.entity.AppInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
@@ -15,20 +16,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class AppsViewModel extends AndroidViewModel
 {
     private final ExecutorService singletTask = Executors.newSingleThreadExecutor();
-    private final Map<LiteAppInfo, String> packageNames = new ArrayMap<>();
-    private final MutableLiveData<List<LiteAppInfo>> appInfo = new MutableLiveData<>();
+    private final MutableLiveData<Map<LiteAppInfo, String>> appInfo = new MutableLiveData<>();
     private final PublishSubject<Intent> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
@@ -46,29 +45,31 @@ public class AppsViewModel extends AndroidViewModel
             task.cancel(true);
         }
         task = singletTask.submit(() -> {
-            packageNames.clear();
-            packageNames.putAll(StreamSupport
-                    .stream(AppInfoProvider.getLaunchApps(getApplication()))
-                    .collect(Collectors.toMap(
-                            appInfo -> new LiteAppInfo(appInfo.getName(), appInfo.getIcon()),
-                            AppInfo::getPackageName)));
-            appInfo.postValue(new ArrayList<>(packageNames.keySet()));
+            Map<LiteAppInfo, String> map = StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
+                    .collect(Collectors.toLinkedHashMap(appInfo -> new LiteAppInfo(appInfo.getName(),
+                                    appInfo.getIcon()),
+                            AppInfo::getPackageName));
+            appInfo.postValue(map);
         });
     }
 
     public void requestJumpBy(LiteAppInfo liteAppInfo)
     {
-        String packageName = packageNames.get(liteAppInfo);
-        if (packageName != null)
+        Map<LiteAppInfo, String> map = appInfo.getValue();
+        if (map != null)
         {
-            Intent intent = getApplication()
-                    .getPackageManager()
-                    .getLaunchIntentForPackage(packageName);
-            if (intent != null)
+            String packageName = map.get(liteAppInfo);
+            if (packageName != null)
             {
-                onJumpTo.onNext(intent);
-                onSuccessMessage.onNext("正在打开");
-                return;
+                Intent intent = getApplication()
+                        .getPackageManager()
+                        .getLaunchIntentForPackage(packageName);
+                if (intent != null)
+                {
+                    onJumpTo.onNext(intent);
+                    onSuccessMessage.onNext("正在打开");
+                    return;
+                }
             }
         }
         onErrorMessage.onNext(String.format("%s跳转失败", liteAppInfo.name));
@@ -91,7 +92,7 @@ public class AppsViewModel extends AndroidViewModel
 
     public LiveData<List<LiteAppInfo>> getAppInfo()
     {
-        return appInfo;
+        return Transformations.map(appInfo, x -> new ArrayList<>(x.keySet()));
     }
 
     @Override
