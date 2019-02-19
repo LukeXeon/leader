@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.R;
 
@@ -212,12 +213,13 @@ public class GenericBindingAdapter<X>
         {
             super.addData(positionStart,
                     sender.get(positionStart));
+            Logger.d(sender.get(positionStart) + " " + positionStart + " " + itemCount);
         } else
         {
-            super.addData(positionStart,
-                    sender.subList(positionStart,
-                            positionStart + itemCount - 1));
-
+            List<X> newData = sender.subList(positionStart,
+                    positionStart + itemCount - 1);
+            Logger.d(newData + " " + positionStart + " " + itemCount);
+            super.addData(positionStart, newData);
         }
     }
 
@@ -232,6 +234,7 @@ public class GenericBindingAdapter<X>
         } else
         {
             List<X> data = super.getData();
+            Logger.d(positionStart + " " + itemCount + " " + data);
             int internalPositionStart = positionStart
                     + super.getHeaderLayoutCount();
             data.removeAll(data.subList(positionStart,
