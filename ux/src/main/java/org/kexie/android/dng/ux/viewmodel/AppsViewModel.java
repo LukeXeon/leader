@@ -2,11 +2,11 @@ package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
 import android.content.Intent;
-import android.util.ArrayMap;
+import android.os.Handler;
+import android.os.Looper;
 
-import org.kexie.android.common.util.Collectors2;
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.model.AppInfoProvider;
-import org.kexie.android.dng.ux.model.entity.AppInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
 
 import java.util.Map;
@@ -15,8 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableList;
+import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -26,7 +25,7 @@ public class AppsViewModel extends AndroidViewModel
 {
     private final ExecutorService singletTask = Executors.newSingleThreadExecutor();
     private final Map<LiteAppInfo, String> appInfos = new ArrayMap<>();
-    private final ObservableArrayList<LiteAppInfo> liteAppInfos = new ObservableArrayList<>();
+    private GenericQuickAdapter<LiteAppInfo> adapter;
     private final PublishSubject<Intent> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
@@ -37,6 +36,11 @@ public class AppsViewModel extends AndroidViewModel
         super(application);
     }
 
+    public void setAdapter(GenericQuickAdapter<LiteAppInfo> adapter)
+    {
+        this.adapter = adapter;
+    }
+
     public void loadAppInfo()
     {
         if (task != null && !task.isCancelled())
@@ -44,14 +48,18 @@ public class AppsViewModel extends AndroidViewModel
             task.cancel(true);
         }
         task = singletTask.submit(() -> {
-            Map<LiteAppInfo, String> map = StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
-                    .collect(Collectors2.toLinkedHashMap(appInfo -> new LiteAppInfo(appInfo.getName(),
-                                    appInfo.getIcon()),
-                            AppInfo::getPackageName));
+            Handler handler = new Handler(Looper.getMainLooper());
             appInfos.clear();
-            appInfos.putAll(map);
-            StreamSupport.stream(map.keySet())
-                    .forEach(liteAppInfos::add);
+            handler.post(() -> {
+                adapter.getData().clear();
+                adapter.notifyDataSetChanged();
+            });
+            StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
+                    .forEach(x -> {
+                        LiteAppInfo appInfo = new LiteAppInfo(x.getName(), x.getIcon());
+                        appInfos.put(appInfo, x.getPackageName());
+                        handler.post(() -> adapter.addData(appInfo));
+                    });
         });
     }
 
@@ -86,11 +94,6 @@ public class AppsViewModel extends AndroidViewModel
     public Observable<String> getOnSuccessMessage()
     {
         return onSuccessMessage;
-    }
-
-    public ObservableList<LiteAppInfo> getAppInfos()
-    {
-        return liteAppInfos;
     }
 
     @Override

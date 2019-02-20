@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
 import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
@@ -59,13 +60,20 @@ public class DesktopFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         viewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
-        infoViewModel = ViewModelProviders.of(this).get(InfoViewModel.class);
+        infoViewModel = ViewModelProviders.of(this)
+                .get(InfoViewModel.class);
         getLifecycle().addObserver(viewModel);
         //dataBinding
-        binding.setOnItemClick((adapter, view1, position)
-                -> viewModel.requestJumpBy((Function) adapter.getData().get(position)));
+        GenericQuickAdapter<Function> genericQuickAdapter
+                = new GenericQuickAdapter<>(
+                R.layout.item_desktop_function,
+                "function");
+        genericQuickAdapter.setOnItemClickListener((adapter, view1, position)
+                -> viewModel.requestJumpBy(genericQuickAdapter.getData()
+                .get(position)));
         binding.setActions(getActions());
-        binding.setFunctions(viewModel.getFunctions());
+        binding.setFunctions(genericQuickAdapter);
+        viewModel.setAdapter(genericQuickAdapter);
         viewModel.loadDefaultFunctions();
         //liveData
         Transformations.map(infoViewModel.getUser(),

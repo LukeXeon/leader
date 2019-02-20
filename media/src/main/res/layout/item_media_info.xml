@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
-            name="info"
+            name="mediaInfo"
             type="org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo"/>
     </data>
     <FrameLayout
@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.makeramen.roundedimageview.RoundedImageView
-                    async_src="@{info.uri}"
+                    async_src="@{mediaInfo.uri}"
                     android:scaleType="centerCrop"
                     app:riv_corner_radius_top_left="10dp"
                     app:riv_corner_radius_top_right="10dp"
@@ -30,7 +30,7 @@
                     android:layout_height="150dp"/>
                 <TextView
                     android:textSize="25sp"
-                    android:text="@{info.title}"
+                    android:text="@{mediaInfo.title}"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="10dp"

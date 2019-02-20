@@ -2,13 +2,16 @@ package org.kexie.android.dng.ux.viewmodel;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.util.ArrayMap;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestOptions;
 
-import org.kexie.android.common.util.Collectors2;
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
@@ -19,9 +22,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.collection.ArrayMap;
 import androidx.core.util.Pair;
-import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableList;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -32,6 +34,7 @@ import io.reactivex.Observable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import java8.util.stream.Stream;
 import java8.util.stream.StreamSupport;
 import mapper.Request;
 
@@ -58,7 +61,7 @@ public class DesktopViewModel
     private static final int BORDER_SIZE = 250;
     private final MutableLiveData<String> time = new MutableLiveData<>();
     private final Map<Function, String> functionJumpTo = new ArrayMap<>();
-    private final ObservableArrayList<Function> functions = new ObservableArrayList<>();
+    private GenericQuickAdapter<Function> adapter;
     private final PublishSubject<Request> onJumpTo = PublishSubject.create();
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
@@ -81,7 +84,7 @@ public class DesktopViewModel
         }
     }
 
-    private Observable<Map<Function, String>>
+    private Observable<Stream<Pair<FunctionInfo, FutureTarget<Drawable>>>>
     loadFunction(List<FunctionInfo> functionRes)
     {
         return Observable.just(functionRes)
@@ -93,20 +96,8 @@ public class DesktopViewModel
                             .map(info -> Pair.create(info,
                                     Glide.with(this.getApplication())
                                             .load(info.iconRes)
-                                            .apply(RequestOptions
-                                                    .bitmapTransform(zoomTransformation))
-                                            .submit()))
-                            .collect(Collectors2.toLinkedHashMap(pair -> {
-                                try
-                                {
-                                    return new Function(
-                                            pair.first.name,
-                                            pair.second.get());
-                                } catch (Exception e)
-                                {
-                                    throw Exceptions.propagate(e);
-                                }
-                            }, pair -> pair.first.uri));
+                                            .apply(RequestOptions.bitmapTransform(zoomTransformation))
+                                            .submit()));
                 });
     }
 
@@ -120,18 +111,30 @@ public class DesktopViewModel
                 add(functionBy("多媒体", R.mipmap.image_media, "dng/media/browse"));
                 add(functionBy("APPS", R.mipmap.image_apps, "dng/ux/apps"));
             }
-        }).subscribe(x -> {
+        }).subscribe(stream -> {
+            Handler handler = new Handler(Looper.getMainLooper());
             functionJumpTo.clear();
-            functionJumpTo.putAll(x);
-            functions.clear();
-            StreamSupport.stream(x.keySet())
-                    .forEach(functions::add);
+            handler.post(() -> {
+                adapter.getData().clear();
+                adapter.notifyDataSetChanged();
+            });
+            stream.forEach(x -> {
+                try
+                {
+                    Function function = new Function(x.first.name, x.second.get());
+                    functionJumpTo.put(function, x.first.uri);
+                    handler.post(() -> adapter.addData(function));
+                } catch (Exception e)
+                {
+                    Exceptions.propagate(e);
+                }
+            });
         });
     }
 
-    public ObservableList<Function> getFunctions()
+    public void setAdapter(GenericQuickAdapter<Function> adapter)
     {
-        return functions;
+        this.adapter = adapter;
     }
 
     private static FunctionInfo functionBy(String name, int icon, String path)

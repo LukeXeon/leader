@@ -5,10 +5,7 @@
         <import type="org.kexie.android.dng.ux.R"/>
         <variable
             name="appInfos"
-            type="androidx.databinding.ObservableList&lt;org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo&gt;"/>
-        <variable
-            name="onItemClick"
-            type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo&gt;"/>
     </data>
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/blurView"
@@ -37,10 +34,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_gravity="center"
                     android:id="@+id/dataContent"
-                    item_name='@{"appInfo"}'
-                    item_layout="@{R.layout.item_app}"
-                    item_source="@{appInfos}"
-                    onItemClick="@{onItemClick}"
+                    android:adapter="@{appInfos}"
                     android:layout_marginLeft="50dp"
                     android:layout_marginRight="50dp"
                     android:layout_width="wrap_content"
@@ -48,7 +42,7 @@
                 </androidx.recyclerview.widget.RecyclerView>
                 <org.kexie.android.common.widget.ProgressBar
                     android:layout_gravity="center"
-                    android:visibility="@{appInfos==null?View.VISIBLE:View.GONE}"
+                    android:visibility="@{appInfos.getData().size()!=0?View.VISIBLE:View.GONE}"
                     android:layout_width="300dp"
                     android:layout_height="200dp"/>
             </FrameLayout>

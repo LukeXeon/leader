@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
@@ -59,9 +60,12 @@ public class AppsFragment extends Fragment
                 .setHasFixedTransformationMatrix(true);
         binding.dataContent.setLayoutManager(new GridLayoutManager(getContext(),
                 5));
-        binding.setOnItemClick((adapter, view1, position) ->
-                viewModel.requestJumpBy((LiteAppInfo) adapter.getData().get(position)));
-        binding.setAppInfos(viewModel.getAppInfos());
+        GenericQuickAdapter<LiteAppInfo> genericQuickAdapter
+                = new GenericQuickAdapter<>(R.layout.item_app,"appInfo");
+        genericQuickAdapter.setOnItemClickListener((adapter, view1, position) ->
+                viewModel.requestJumpBy(genericQuickAdapter.getData().get(position)));
+        binding.setAppInfos(genericQuickAdapter);
+        viewModel.setAdapter(genericQuickAdapter);
         viewModel.loadAppInfo();
         //rx
         viewModel.getOnJumpTo()

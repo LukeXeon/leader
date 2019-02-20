@@ -23,10 +23,7 @@
 
         <variable
             name="functions"
-            type="androidx.databinding.ObservableList&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
-        <variable
-            name="onItemClick"
-            type="com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener"/>
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
     </data>
 
     <LinearLayout
@@ -228,9 +225,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ll_right_head"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="10dp">
+                android:layout_margin="30dp">
 
                 <TextView
                     async_font='@{"PingFang Regular.ttf"}'
@@ -254,10 +249,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_function_list"
-                item_name='@{"function"}'
-                item_layout="@{R.layout.item_desktop_function}"
-                item_source="@{functions}"
-                onItemClick="@{onItemClick}"
+                android:adapter="@{functions}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/function_text"

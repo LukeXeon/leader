@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
@@ -71,12 +72,18 @@ public class MediaBrowseFragment
         binding.dataContent.setLayoutManager(
                 new StaggeredGridLayoutManager(4,
                         StaggeredGridLayoutManager.VERTICAL));
-        binding.setOnItemClick((adapter, view1, position) -> {
-            LiteMediaInfo info = (LiteMediaInfo) adapter.getData().get(position);
+        GenericQuickAdapter<LiteMediaInfo> genericQuickAdapter
+                = new GenericQuickAdapter<>(
+                R.layout.item_media_info,
+                "mediaInfo");
+        genericQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
+            LiteMediaInfo info = genericQuickAdapter.getData().get(position);
             viewModel.requestJump(info);
             updateViewCallback = () -> adapter.remove(position);
         });
-        binding.setMediaInfos(viewModel.getMediaInfos());
+        genericQuickAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
+        binding.setMediaInfos(genericQuickAdapter);
+        viewModel.setAdapter(genericQuickAdapter);
         //liveData
         viewModel.getTitle().observe(this, binding::setTitle);
         //rx

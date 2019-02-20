@@ -2,9 +2,10 @@ package org.kexie.android.dng.media.viewmodel;
 
 import android.app.Application;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
-import org.kexie.android.common.databinding.OnListChangedCallback;
-import org.kexie.android.common.util.Collectors2;
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.media.model.MediaInfoProvider;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
@@ -15,8 +16,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableList;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -40,7 +39,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private Map<LiteMediaInfo, MediaInfo> mediaInfos = new HashMap<>();
 
-    private ObservableArrayList<LiteMediaInfo> liteMediaInfos = new ObservableArrayList<>();
+    private GenericQuickAdapter<LiteMediaInfo> adapter;
 
     private PublishSubject<String> loading = PublishSubject.create();
 
@@ -49,23 +48,6 @@ public class MediaBrowseViewModel extends AndroidViewModel
     public MediaBrowseViewModel(@NonNull Application application)
     {
         super(application);
-        liteMediaInfos.addOnListChangedCallback(
-                new OnListChangedCallback<ObservableList<LiteMediaInfo>>()
-                {
-                    @Override
-                    public void onItemRangeRemoved(
-                            ObservableList<LiteMediaInfo> sender,
-                            int positionStart,
-                            int itemCount)
-                    {
-
-                    }
-                });
-    }
-
-    public ObservableList<LiteMediaInfo> getMediaInfos()
-    {
-        return liteMediaInfos;
     }
 
     public LiveData<String> getTitle()
@@ -76,6 +58,11 @@ public class MediaBrowseViewModel extends AndroidViewModel
     public Observable<String> getLoading()
     {
         return loading;
+    }
+
+    public void setAdapter(GenericQuickAdapter<LiteMediaInfo> adapter)
+    {
+        this.adapter = adapter;
     }
 
     public void requestJump(LiteMediaInfo mediaInfo)
@@ -112,17 +99,21 @@ public class MediaBrowseViewModel extends AndroidViewModel
     {
         loading.onNext("加载中...");
         singleTask.execute(() -> {
-            Map<LiteMediaInfo, MediaInfo> map
-                    = StreamSupport.stream(TYPE_VIDEO.equals(type)
+            Handler handler = new Handler(Looper.getMainLooper());
+            mediaInfos.clear();
+            handler.post(() -> {
+                adapter.getData().clear();
+                adapter.notifyDataSetChanged();
+            });
+            StreamSupport.stream(TYPE_VIDEO.equals(type)
                     ? MediaInfoProvider.getVideoModels(getApplication())
                     : MediaInfoProvider.getPhotoModels(getApplication()))
-                    .collect(Collectors2.toLinkedHashMap(i -> new LiteMediaInfo(i.title, i.uri), i -> i));
-            mediaInfos.clear();
-            mediaInfos.putAll(map);
-            liteMediaInfos.clear();
-            StreamSupport.stream(map.entrySet())
-                    .map(Map.Entry::getKey)
-                    .forEach(liteMediaInfos::add);
+                    .forEach(x -> {
+                        LiteMediaInfo liteMediaInfo
+                                = new LiteMediaInfo(x.title, x.uri);
+                        mediaInfos.put(liteMediaInfo, x);
+                        handler.post(() -> adapter.addData(liteMediaInfo));
+                    });
             loading.onNext("");
             title.postValue(type);
         });

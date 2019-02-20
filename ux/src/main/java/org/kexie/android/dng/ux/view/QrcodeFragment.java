@@ -13,8 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
+import es.dmoral.toasty.Toasty;
 import mapper.Mapping;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/ux/login")
 public class QrcodeFragment extends Fragment
@@ -36,10 +41,20 @@ public class QrcodeFragment extends Fragment
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-
+        //liveData
+        viewModel.getQrcode().observe(this,binding::setQrCode);
+        viewModel.requestQrcode();
+        //rx
+        viewModel.getOnErrorMessage()
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> Toasty.error(getContext(), s).show());
+        viewModel.getOnSuccessMessage()
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> Toasty.success(getContext(), s).show());
     }
 }
