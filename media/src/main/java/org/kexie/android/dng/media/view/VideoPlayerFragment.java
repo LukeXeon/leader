@@ -66,7 +66,6 @@ public class VideoPlayerFragment
                 .setSaveDir(Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                         .getAbsolutePath()+"/dng")
-                .setOnBackListener(getFragmentManager()::popBackStack)
                 .setTitle(info.title)    // set title
                 .setVideoPath(info.uri)
                 .alwaysFullScreen()

@@ -59,12 +59,19 @@ public class DesktopViewModel
     }
 
     private static final int BORDER_SIZE = 250;
+
     private final MutableLiveData<String> time = new MutableLiveData<>();
+
     private final Map<Function, String> functionJumpTo = new ArrayMap<>();
-    private GenericQuickAdapter<Function> adapter;
+
     private final PublishSubject<Request> onJumpTo = PublishSubject.create();
+
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
+
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
+
+    private GenericQuickAdapter<Function> adapter;
+
     private Timer updateTimer;
 
     public DesktopViewModel(Application application)

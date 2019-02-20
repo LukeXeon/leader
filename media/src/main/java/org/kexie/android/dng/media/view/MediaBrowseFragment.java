@@ -41,8 +41,6 @@ public class MediaBrowseFragment
 
     private FragmentMediaBrowseBinding binding;
 
-    private Runnable updateViewCallback;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -79,8 +77,8 @@ public class MediaBrowseFragment
         genericQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
             LiteMediaInfo info = genericQuickAdapter.getData().get(position);
             viewModel.requestJump(info);
-            updateViewCallback = () -> adapter.remove(position);
         });
+        genericQuickAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
         genericQuickAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
         binding.setMediaInfos(genericQuickAdapter);
         viewModel.setAdapter(genericQuickAdapter);
@@ -107,13 +105,14 @@ public class MediaBrowseFragment
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    public void onActivityResult(int requestCode,
+                                 int resultCode,
+                                 @Nullable Intent data)
     {
         if (requestCode == MediaBrowseViewModel.REQUEST_TO_PHOTO
-                && Activity.RESULT_FIRST_USER == resultCode
-                && updateViewCallback != null)
+                && Activity.RESULT_FIRST_USER == resultCode)
         {
-            updateViewCallback.run();
+            viewModel.remove(data.getIntExtra("index", -1));
         }
     }
 

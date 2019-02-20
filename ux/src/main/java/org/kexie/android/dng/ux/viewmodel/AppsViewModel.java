@@ -24,12 +24,19 @@ import java8.util.stream.StreamSupport;
 public class AppsViewModel extends AndroidViewModel
 {
     private final ExecutorService singletTask = Executors.newSingleThreadExecutor();
+
     private final Map<LiteAppInfo, String> appInfos = new ArrayMap<>();
-    private GenericQuickAdapter<LiteAppInfo> adapter;
+
     private final PublishSubject<Intent> onJumpTo = PublishSubject.create();
+
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
+
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
+
+    private GenericQuickAdapter<LiteAppInfo> adapter;
+
     private Future task;
+
 
     public AppsViewModel(@NonNull Application application)
     {
@@ -56,7 +63,8 @@ public class AppsViewModel extends AndroidViewModel
             });
             StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
                     .forEach(x -> {
-                        LiteAppInfo appInfo = new LiteAppInfo(x.getName(), x.getIcon());
+                        LiteAppInfo appInfo
+                                = new LiteAppInfo(x.getName(), x.getIcon());
                         appInfos.put(appInfo, x.getPackageName());
                         handler.post(() -> adapter.addData(appInfo));
                     });

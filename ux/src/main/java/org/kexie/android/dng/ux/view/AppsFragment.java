@@ -70,7 +70,7 @@ public class AppsFragment extends Fragment
         //rx
         viewModel.getOnJumpTo()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe();
+                .subscribe(this::startActivity);
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());

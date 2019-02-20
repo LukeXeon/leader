@@ -5,18 +5,18 @@ import android.os.Parcelable;
 
 import com.amap.api.navi.model.NaviLatLng;
 
-public class BoxNavPoint
+public class BoxNaviPoint
         extends Point
         implements Parcelable
 {
     private final NaviLatLng naviLatLng;
 
-    BoxNavPoint(NaviLatLng naviLatLng)
+    BoxNaviPoint(NaviLatLng naviLatLng)
     {
         this.naviLatLng = naviLatLng;
     }
 
-    protected BoxNavPoint(Parcel in)
+    protected BoxNaviPoint(Parcel in)
     {
         naviLatLng = in.readParcelable(NaviLatLng.class.getClassLoader());
     }
@@ -33,18 +33,18 @@ public class BoxNavPoint
         return 0;
     }
 
-    public static final Creator<BoxNavPoint> CREATOR = new Creator<BoxNavPoint>()
+    public static final Creator<BoxNaviPoint> CREATOR = new Creator<BoxNaviPoint>()
     {
         @Override
-        public BoxNavPoint createFromParcel(Parcel in)
+        public BoxNaviPoint createFromParcel(Parcel in)
         {
-            return new BoxNavPoint(in);
+            return new BoxNaviPoint(in);
         }
 
         @Override
-        public BoxNavPoint[] newArray(int size)
+        public BoxNaviPoint[] newArray(int size)
         {
-            return new BoxNavPoint[size];
+            return new BoxNaviPoint[size];
         }
     };
 

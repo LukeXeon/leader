@@ -67,11 +67,13 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     public void requestJump(LiteMediaInfo mediaInfo)
     {
-        MediaInfo info = this.mediaInfos.get(mediaInfo);
+        MediaInfo info = mediaInfos.get(mediaInfo);
         if (info != null)
         {
+            int index = adapter.getData().indexOf(mediaInfo);
             Bundle bundle = new Bundle();
             bundle.putParcelable("info", info);
+            bundle.putInt("index", index);
             Request request = new Request.Builder()
                     .uri(info.type == MediaInfo.TYPE_PHOTO
                             ? "dng/media/photo"
@@ -82,6 +84,16 @@ public class MediaBrowseViewModel extends AndroidViewModel
                             : REQUEST_TO_VIDEO)
                     .build();
             onJump.onNext(request);
+        }
+    }
+
+    public void remove(int index)
+    {
+        if (index != -1)
+        {
+            LiteMediaInfo data = adapter.getItem(index);
+            adapter.remove(index);
+            mediaInfos.remove(data);
         }
     }
 

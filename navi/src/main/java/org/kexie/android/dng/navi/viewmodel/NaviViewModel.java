@@ -2,6 +2,7 @@ package org.kexie.android.dng.navi.viewmodel;
 
 import android.app.Application;
 
+import com.amap.api.maps.AMap;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
@@ -25,18 +26,30 @@ import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
-public class NavigationViewModel extends AndroidViewModel
+public class NaviViewModel extends AndroidViewModel
 {
-    private final AMapNavi navigation;
+
     private final Executor singleTask = Executors.newSingleThreadExecutor();
+
     private final MutableLiveData<String> loading = new MutableLiveData<>();
+
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
+
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
 
-    public NavigationViewModel(@NonNull Application application)
+    private final AMapNavi navigation;
+
+    private AMap mapController;
+
+    public NaviViewModel(@NonNull Application application)
     {
         super(application);
         navigation = AMapNavi.getInstance(application);
+    }
+
+    public void initMapController(AMap aMap)
+    {
+        this.mapController = aMap;
     }
 
     public void beginBy(Route route)

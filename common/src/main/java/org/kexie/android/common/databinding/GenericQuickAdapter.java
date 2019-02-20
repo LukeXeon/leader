@@ -17,6 +17,7 @@ public class GenericQuickAdapter<X>
     public GenericQuickAdapter(int layoutId, String name)
     {
         super(layoutId);
+        openLoadAnimation();
         this.mName = name;
     }
 

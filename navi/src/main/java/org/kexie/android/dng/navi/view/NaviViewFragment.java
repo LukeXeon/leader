@@ -2,6 +2,7 @@ package org.kexie.android.dng.navi.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class NavigationViewFragment
+public class NaviViewFragment
         extends Fragment
 {
     private AMapNaviView innerView;
@@ -27,12 +28,22 @@ public class NavigationViewFragment
     }
 
     @Override
+    public void onInflate(@NonNull Context context, @NonNull AttributeSet attrs, @Nullable Bundle savedInstanceState)
+    {
+        super.onInflate(context, attrs, savedInstanceState);
+        if (innerView == null)
+        {
+            innerView = new AMapNaviView(context);
+        }
+    }
+
+    @Override
     public void onAttach(@NonNull Context context)
     {
         super.onAttach(context);
-        if (innerView != null)
+        if (innerView == null)
         {
-            innerView = new AMapNaviView(getContext());
+            innerView = new AMapNaviView(context);
         }
     }
 

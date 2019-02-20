@@ -28,6 +28,7 @@ public class QueryFragment extends Fragment
     private static final String WAIT_QUERY = "wait query";
 
     private FragmentQueryBinding binding;
+
     private QueryViewModel viewModel;
 
     @Nullable
@@ -50,11 +51,13 @@ public class QueryFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
 
-        viewModel = ViewModelProviders.of(this).get(QueryViewModel.class);
+        viewModel = ViewModelProviders.of(this)
+                .get(QueryViewModel.class);
 
         //noinspection ConstantConditions
         viewModel.initMapController(((SupportMapFragment) (Object)
-                getChildFragmentManager().findFragmentById(R.id.map_view)).getMap());
+                getChildFragmentManager().findFragmentById(R.id.map_view))
+                .getMap());
 
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this)))

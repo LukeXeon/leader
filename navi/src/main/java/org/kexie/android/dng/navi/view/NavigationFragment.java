@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
 import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.viewmodel.NavigationViewModel;
+import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 
 import java.util.Objects;
 
@@ -28,7 +28,9 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 public class NavigationFragment extends Fragment
 {
     private static final String ARG = "route";
-    private NavigationViewModel viewModel;
+
+    private NaviViewModel viewModel;
+
     private FragmentNavigationBinding binding;
 
     public static NavigationFragment newInstance(Route route)
@@ -60,8 +62,12 @@ public class NavigationFragment extends Fragment
         Bundle bundle = getArguments();
         Route route = Objects.requireNonNull(bundle).getParcelable(ARG);
         viewModel = ViewModelProviders.of(this)
-                .get(NavigationViewModel.class);
-
+                .get(NaviViewModel.class);
+        viewModel.initMapController(
+                ((NaviViewFragment) getChildFragmentManager()
+                        .findFragmentById(R.id.fragment_navi))
+                        .getInnerView().getMap());
+        viewModel.beginBy(route);
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());

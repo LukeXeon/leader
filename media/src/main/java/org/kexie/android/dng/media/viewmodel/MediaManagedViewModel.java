@@ -14,6 +14,7 @@ public class MediaManagedViewModel extends AndroidViewModel
 {
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
+
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
 
     public MediaManagedViewModel(@NonNull Application application)

@@ -1,6 +1,7 @@
 package org.kexie.android.dng.media.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,7 +83,8 @@ public class PhotoViewFragment extends Fragment
                         {
                             fragment.onActivityResult(getTargetRequestCode(),
                                     Activity.RESULT_FIRST_USER,
-                                    null);
+                                    new Intent().putExtra("index", getArguments()
+                                            .getInt("index")));
                         }
                         getActivity().onBackPressed();
                     }

@@ -47,15 +47,25 @@ import java8.util.stream.StreamSupport;
 public class QueryViewModel extends AndroidViewModel
 {
     private static final String DEBUG_TEXT = "火车站";
+
     private static final String CITY = "西安";
+
     private final RouteSearch routeSearch;
+
     private final Executor singleTask = Executors.newSingleThreadExecutor();
+
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
+
     private final MutableLiveData<Map<LiteTip,String>> tips = new MutableLiveData<>();
+
     private final MutableLiveData<Map<LiteRoute,Route>> routes = new MutableLiveData<>();
+
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
+
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
+
     private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
+
     private AMap mapController;
 
     public QueryViewModel(@NonNull Application application)

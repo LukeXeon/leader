@@ -59,7 +59,7 @@ public abstract class Point
 
     public static Point box(NaviLatLng naviLatLng)
     {
-        return new BoxNavPoint(naviLatLng);
+        return new BoxNaviPoint(naviLatLng);
     }
 
     public static Point box(LatLonPoint latLonPoint)
