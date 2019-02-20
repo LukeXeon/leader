@@ -5,12 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amap.api.maps.AMap;
+import com.amap.api.navi.AMapNaviView;
+
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
-
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +26,7 @@ import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/navi/navi")
-public class NavigationFragment extends Fragment
+public class NaviFragment extends Fragment
 {
     private static final String ARG = "route";
 
@@ -33,14 +34,9 @@ public class NavigationFragment extends Fragment
 
     private FragmentNavigationBinding binding;
 
-    public static NavigationFragment newInstance(Route route)
-    {
-        Bundle args = new Bundle();
-        args.putParcelable(ARG, route);
-        NavigationFragment fragment = new NavigationFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private AMapNaviView naviView;
+
+    private AMap mapController;
 
     @Nullable
     @Override
@@ -56,23 +52,32 @@ public class NavigationFragment extends Fragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-        Route route = Objects.requireNonNull(bundle).getParcelable(ARG);
+        super.onViewCreated(view, savedInstanceState);
+        //initViews
         viewModel = ViewModelProviders.of(this)
                 .get(NaviViewModel.class);
-        viewModel.initMapController(
-                ((NaviViewFragment) getChildFragmentManager()
-                        .findFragmentById(R.id.fragment_navi))
-                        .getInnerView().getMap());
-        viewModel.beginBy(route);
+        naviView = ((NaviViewFragment) getChildFragmentManager()
+                .findFragmentById(R.id.fragment_navi))
+                .getInnerView();
+        mapController = naviView.getMap();
+        //dataBinding
+
+
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
+
+        Bundle bundle = getArguments();
+        if (bundle != null)
+        {
+            Route route = bundle.getParcelable(ARG);
+            viewModel.beginBy(route);
+        }
     }
 }

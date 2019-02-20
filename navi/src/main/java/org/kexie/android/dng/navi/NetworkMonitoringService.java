@@ -33,7 +33,7 @@ public class NetworkMonitoringService extends Service
         {
             Logger.d(text);
             JsonRoute entity = getGson().fromJson(text, JsonRoute.class);
-            //NavigationFragment.startOf(NetworkMonitoringService.this, netRoute);
+            //NaviFragment.startOf(NetworkMonitoringService.this, netRoute);
         }
 
         @Override

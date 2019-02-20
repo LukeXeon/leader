@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="org.kexie.android.dng.navi.R"/>
+
+        <variable
+            name="route"
+            type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
+    </data>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="450dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_marginTop="-160dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/map_corner">
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
+                app:cardPreventCornerOverlap="false"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="150dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rl_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+                    </androidx.recyclerview.widget.RecyclerView>
+
+                    <Button
+                        android:id="@+id/btn_summit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/btn_draw"
+                        android:text="确认"
+                        android:textColor="@color/white"
+                        android:textSize="30sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+        <com.fxc.roundcornerlayout.RoundCornerFrameLayout
+            app:roundedCornerRadius="15dp"
+            app:roundBottomRight="true"
+            app:roundBottomLeft="true"
+            app:roundTopLeft="true"
+            app:roundTopRight="true"
+            android:id="@+id/map_corner"
+            android:layout_width="380dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <fragment
+                    android:id="@+id/map_view"
+                    android:name="com.amap.api.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="@color/colorBlackAlpha12"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="10dp"
+                            android:src="@mipmap/image_search"/>
+
+                        <TextView
+                            android:id="@+id/tv_title"
+                            async_font='@{"PingFang Regular.ttf"}'
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:hint="方案名"
+                            android:text="@{route.name}"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/lightblue500"/>
+
+                    <TextView
+                        android:id="@+id/tv_info"
+                        async_font='@{"PingFang Regular.ttf"}'
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|right"
+                        android:hint="40分钟(19公里)"
+                        android:paddingRight="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:text='@{route.time+"("+route.length+")"}'
+                        android:textSize="20dp"/>
+                </LinearLayout>
+            </FrameLayout>
+        </com.fxc.roundcornerlayout.RoundCornerFrameLayout>
+
+    </RelativeLayout>
+</layout>

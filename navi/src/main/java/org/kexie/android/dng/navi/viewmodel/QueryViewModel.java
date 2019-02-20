@@ -4,7 +4,6 @@ import android.app.Application;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
-import com.amap.api.maps.AMap;
 import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
@@ -56,9 +55,9 @@ public class QueryViewModel extends AndroidViewModel
 
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
 
-    private final MutableLiveData<Map<LiteTip,String>> tips = new MutableLiveData<>();
+    private final MutableLiveData<Map<LiteTip, String>> tips = new MutableLiveData<>();
 
-    private final MutableLiveData<Map<LiteRoute,Route>> routes = new MutableLiveData<>();
+    private final MutableLiveData<Map<LiteRoute, Route>> routes = new MutableLiveData<>();
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
 
@@ -66,17 +65,10 @@ public class QueryViewModel extends AndroidViewModel
 
     private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
 
-    private AMap mapController;
-
     public QueryViewModel(@NonNull Application application)
     {
         super(application);
         routeSearch = new RouteSearch(application);
-    }
-
-    public void initMapController(AMap aMap)
-    {
-        mapController = aMap;
     }
 
     @MainThread

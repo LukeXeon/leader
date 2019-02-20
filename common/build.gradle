@@ -45,6 +45,9 @@ dependencies {
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
 
     //...
+    api 'com.github.vipulasri:timelineview:1.1.0'
+    api 'com.github.ishaan1995:ButtonProgressBar:1.0'
+    api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
     api 'com.squareup.retrofit2:adapter-rxjava:2.5.0'
     api 'com.squareup.retrofit2:converter-gson:2.5.0'
     api 'com.squareup.retrofit2:retrofit:2.5.0'

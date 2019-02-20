@@ -2,7 +2,6 @@ package org.kexie.android.dng.navi.viewmodel;
 
 import android.app.Application;
 
-import com.amap.api.maps.AMap;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
@@ -39,17 +38,10 @@ public class NaviViewModel extends AndroidViewModel
 
     private final AMapNavi navigation;
 
-    private AMap mapController;
-
     public NaviViewModel(@NonNull Application application)
     {
         super(application);
         navigation = AMapNavi.getInstance(application);
-    }
-
-    public void initMapController(AMap aMap)
-    {
-        this.mapController = aMap;
     }
 
     public void beginBy(Route route)
