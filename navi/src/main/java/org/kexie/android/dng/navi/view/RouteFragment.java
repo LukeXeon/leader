@@ -1,12 +1,13 @@
 package org.kexie.android.dng.navi.view;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
-import com.amap.api.maps.SupportMapFragment;
+import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
@@ -34,12 +35,7 @@ import mapper.Mapping;
 @Mapping("dng/navi/route")
 public class RouteFragment extends Fragment
 {
-
     private FragmentRouteBinding binding;
-
-    private AMap mapController;
-
-    private UiSettings uiSettings;
 
     @Nullable
     @Override
@@ -47,32 +43,39 @@ public class RouteFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
+        if (binding != null)
+        {
+            return binding.getRoot();
+        }
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_route, container,
                 false);
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        //noinspection ConstantConditions
-        mapController = ((SupportMapFragment) (Object)
-                getChildFragmentManager().findFragmentById(R.id.map_view))
-                .getMap();
-        uiSettings = mapController.getUiSettings();
+        TextureSupportMapFragment mapFragment
+                = TextureSupportMapFragment.class
+                .cast(getChildFragmentManager()
+                        .findFragmentById(R.id.map_view));
+        AMap mapController = mapFragment.getMap();
+        UiSettings uiSettings = mapController.getUiSettings();
         uiSettings.setZoomControlsEnabled(false);
-        Route route = getArguments().getParcelable("route");
-        if (route != null)
+        Bundle bundle = getArguments();
+        if (bundle != null)
         {
-            setBounds(route);
-            setLine(route);
+            Route route = bundle.getParcelable("route");
+            setBounds(mapController, route);
+            setLine(mapController, route);
         }
     }
 
-    private void setBounds(Route route)
+    private static void setBounds(AMap mapController, Route route)
     {
         List<Point> points = Route.getAllPoint(route);
         List<Point> boundPoints = Point.getBounds(points);
@@ -83,7 +86,7 @@ public class RouteFragment extends Fragment
     }
 
     //绘制一条纹理线
-    private void setLine(Route route)
+    private static void setLine(AMap mapController, Route route)
     {
         //四个点
         List<Point> points = Route.getAllPoint(route);

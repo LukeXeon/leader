@@ -65,7 +65,6 @@ public class NaviFragment extends Fragment
         mapController = naviView.getMap();
         //dataBinding
 
-
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());

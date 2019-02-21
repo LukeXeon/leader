@@ -51,7 +51,7 @@ public abstract class Point
     //Y
     public abstract double getLatitude();
 
-    //X
+    //SimpleApplyAdapter
     public abstract double getLongitude();
 
     @SuppressWarnings("unchecked")
@@ -101,7 +101,7 @@ public abstract class Point
                 continue;
             if (point.getLongitude() >= Math.max(p1.getLongitude(), p2.getLongitude()))   // 交点在p1p2延长线上
                 continue;
-            // 求交点的 X 坐标 --------------------------------------------------------------
+            // 求交点的 SimpleApplyAdapter 坐标 --------------------------------------------------------------
             double x = (point.getLongitude() - p1.getLongitude())
                     * (p2.getLatitude() - p1.getLatitude())
                     / (p2.getLongitude() - p1.getLongitude())

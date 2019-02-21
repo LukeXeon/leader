@@ -173,8 +173,7 @@ public class QueryViewModel extends AndroidViewModel
             Map<LiteRoute, Route> newRoutes = StreamSupport.stream(routeSearch
                     .calculateDriveRoute(driveRouteQuery)
                     .getPaths())
-                    .collect(Collectors2
-                            .toLinkedHashMap(path -> new LiteRoute.Builder()
+                    .collect(Collectors2.toLinkedHashMap(path -> new LiteRoute.Builder()
                                             .name(getPathName(path))
                                             .length(getPathLength(path))
                                             .time(getPathTime(path))
