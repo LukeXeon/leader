@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -53,9 +54,13 @@ public class QueryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
-
         viewModel = ViewModelProviders.of(this)
                 .get(QueryViewModel.class);
+
+        GenericQuickAdapter<String> genericQuickAdapter
+                = new GenericQuickAdapter<>(R.layout.item_tip,"tip");
+
+        viewModel.setAdapter(genericQuickAdapter);
 
         viewModel.getRoutes()
                 .observe(this, requests -> {

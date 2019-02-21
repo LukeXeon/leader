@@ -19,28 +19,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.lifecycle.ViewModel;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
+import mapper.Request;
 
 public class RouteMapViewModel extends ViewModel
 {
     private AMap mapController;
 
-    private Route path;
+    private Route route;
+
+    private DrivePath path;
+
+    private final PublishSubject<Request> onJump = PublishSubject.create();
 
     public void init(AMap aMap, Bundle bundle)
     {
         this.mapController = aMap;
         Point from = bundle.getParcelable("from");
         Point to = bundle.getParcelable("to");
-        DrivePath path = bundle.getParcelable("path");
-        this.path = new BoxRoute(from, to, path);
+        path = bundle.getParcelable("path");
+        route = new BoxRoute(from, to, path);
     }
 
     public void setBounds()
     {
-        List<Point> points = Point.getBounds(Route.getAllPoint(path));
+        List<Point> points = Point.getBounds(Route.getAllPoint(route));
         LatLngBounds bounds = new LatLngBounds(
                 points.get(0).unBox(LatLng.class),
                 points.get(1).unBox(LatLng.class)
@@ -52,7 +59,7 @@ public class RouteMapViewModel extends ViewModel
     public void drawLine()
     {
         //点
-        List<Point> points = Route.getAllPoint(path);
+        List<Point> points = Route.getAllPoint(route);
         //用一个数组来存放纹理
         List<BitmapDescriptor> texturesList = new ArrayList<>();
         texturesList.add(BitmapDescriptorFactory.fromResource(R.mipmap.map_1));
@@ -76,4 +83,32 @@ public class RouteMapViewModel extends ViewModel
         options.setCustomTextureIndex(texIndexList);
         mapController.addPolyline(options);
     }
+
+    public void jumpToDetails()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("path", path);
+        Request request = new Request.Builder()
+                .bundle(bundle)
+                .uri("dng/navi/details")
+                .build();
+        onJump.onNext(request);
+    }
+
+    public void jumpToNavi()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("route", route);
+        Request request = new Request.Builder()
+                .bundle(bundle)
+                .uri("dng/navi/navi")
+                .build();
+        onJump.onNext(request);
+    }
+
+    public Observable<Request> getOnJump()
+    {
+        return onJump;
+    }
+
 }

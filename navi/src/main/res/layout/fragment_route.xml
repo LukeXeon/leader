@@ -4,11 +4,15 @@
     <data>
 
         <import type="org.kexie.android.dng.navi.R"/>
-
         <variable
             name="route"
             type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
-
+        <variable
+            name="onOpenDetails"
+            type="android.view.View.OnClickListener"/>
+        <variable
+            name="onJumpToNavi"
+            type="android.view.View.OnClickListener"/>
     </data>
 
     <FrameLayout
@@ -57,6 +61,7 @@
                         </androidx.recyclerview.widget.RecyclerView>
 
                         <Button
+                            android:onClick="@{onJumpToNavi}"
                             android:id="@+id/btn_summit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -84,6 +89,7 @@
                 app:roundedCornerRadius="15dp">
 
                 <FrameLayout
+                    android:onClick="@{onOpenDetails}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 

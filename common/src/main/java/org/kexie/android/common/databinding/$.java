@@ -3,9 +3,9 @@ package org.kexie.android.common.databinding;
 import java.util.List;
 import java.util.Map;
 
-public final class BT
+public final class $
 {
-    private BT()
+    private $()
     {
         throw new AssertionError();
     }

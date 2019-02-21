@@ -1,6 +1,5 @@
 package org.kexie.android.dng.navi.view;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +18,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
+import mapper.Mapper;
 import mapper.Mapping;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/navi/route")
 public class RouteFragment extends Fragment
@@ -39,12 +44,12 @@ public class RouteFragment extends Fragment
         return binding.getRoot();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        binding.setLifecycleOwner(this);
         TextureSupportMapFragment mapFragment
                 = TextureSupportMapFragment.class
                 .cast(getChildFragmentManager()
@@ -57,9 +62,18 @@ public class RouteFragment extends Fragment
         {
             RouteMapViewModel viewModel1 = ViewModelProviders.of(this)
                     .get(RouteMapViewModel.class);
+            binding.setOnJumpToNavi(v -> viewModel1.jumpToNavi());
+            binding.setOnOpenDetails(v -> viewModel1.jumpToDetails());
             viewModel1.init(mapController, bundle);
             viewModel1.drawLine();
             viewModel1.setBounds();
+            viewModel1.getOnJump()
+                    .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                    .subscribe(request -> getFragmentManager()
+                            .beginTransaction()
+                            .add(getId(), Mapper.getOn(this, request))
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .commit());
             RouteInfoViewModel viewModel2 = ViewModelProviders.of(this)
                     .get(RouteInfoViewModel.class);
             viewModel2.getRouteInfo()
