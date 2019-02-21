@@ -38,13 +38,28 @@
             android:id="@+id/map_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-        <androidx.viewpager.widget.ViewPager
-            android:adapter="@{routeAdapter}"
-            android:layout_gravity="center"
-            android:clipChildren="false"
-            android:id="@+id/routes"
-            android:layout_width="500dp"
+        <LinearLayout
+            android:id="@+id/pager_root"
+            android:visibility="@{routeAdapter==null?View.GONE:View.VISIBLE}"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </androidx.viewpager.widget.ViewPager>
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+            <androidx.viewpager.widget.ViewPager
+                android:adapter="@{routeAdapter}"
+                android:layout_gravity="center"
+                android:clipChildren="false"
+                android:id="@+id/routes"
+                android:layout_width="500dp"
+                android:layout_height="match_parent">
+            </androidx.viewpager.widget.ViewPager>
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
     </FrameLayout>
 </layout>

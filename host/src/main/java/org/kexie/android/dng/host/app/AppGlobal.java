@@ -3,6 +3,8 @@ package org.kexie.android.dng.host.app;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
+import org.kexie.android.dng.host.BuildConfig;
+
 import androidx.multidex.MultiDexApplication;
 
 
@@ -12,6 +14,9 @@ public class AppGlobal extends MultiDexApplication
     public void onCreate()
     {
         super.onCreate();
-        Logger.addLogAdapter(new AndroidLogAdapter());
+        if (BuildConfig.DEBUG)
+        {
+            Logger.addLogAdapter(new AndroidLogAdapter());
+        }
     }
 }

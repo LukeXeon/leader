@@ -20,16 +20,31 @@ import androidx.annotation.WorkerThread;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import mapper.Request;
 
 public class RouteInfoViewModel extends AndroidViewModel
 {
     private final MutableLiveData<LiteRoute> routeInfo = new MutableLiveData<>();
 
-    public void loadInfo(Bundle bundle)
+    private final PublishSubject<Request> onJump = PublishSubject.create();
+
+    private DrivePath path;
+
+    public void init(Bundle bundle)
     {
-        DrivePath path = bundle.getParcelable("path");
+        path = bundle.getParcelable("path");
+    }
+
+    public PublishSubject<Request> getOnJump()
+    {
+        return onJump;
+    }
+
+    public void loadInfo()
+    {
         new Thread()
         {
             @Override
@@ -44,6 +59,17 @@ public class RouteInfoViewModel extends AndroidViewModel
                 routeInfo.postValue(liteRoute);
             }
         }.start();
+    }
+
+    public void jumpToDetails()
+    {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("path", path);
+        Request request = new Request.Builder()
+                .bundle(bundle)
+                .uri("dng/navi/details")
+                .build();
+        onJump.onNext(request);
     }
 
     public LiveData<LiteRoute> getRouteInfo()

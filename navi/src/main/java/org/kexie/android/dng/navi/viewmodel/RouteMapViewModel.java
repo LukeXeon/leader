@@ -2,7 +2,6 @@ package org.kexie.android.dng.navi.viewmodel;
 
 import android.os.Bundle;
 
-import com.amap.api.maps.AMap;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
@@ -28,35 +27,35 @@ import mapper.Request;
 
 public class RouteMapViewModel extends ViewModel
 {
-    private AMap mapController;
 
     private Route route;
 
-    private DrivePath path;
-
     private final PublishSubject<Request> onJump = PublishSubject.create();
 
-    public void init(AMap aMap, Bundle bundle)
+    public void init(Bundle bundle)
     {
-        this.mapController = aMap;
         Point from = bundle.getParcelable("from");
         Point to = bundle.getParcelable("to");
-        path = bundle.getParcelable("path");
+        DrivePath path = bundle.getParcelable("path");
         route = new BoxRoute(from, to, path);
     }
 
-    public void setBounds()
+    public LatLngBounds getBounds()
     {
-        List<Point> points = Point.getBounds(Route.getAllPoint(route));
-        LatLngBounds bounds = new LatLngBounds(
-                points.get(0).unBox(LatLng.class),
-                points.get(1).unBox(LatLng.class)
-        );
-        mapController.setMapStatusLimits(bounds);
+        LatLngBounds.Builder builder = LatLngBounds.builder();
+        StreamSupport.stream(Route.getAllPoint(route))
+                .map(x -> x.unBox(LatLng.class))
+                .forEach(builder::include);
+        LatLngBounds bounds = builder.build();
+        bounds = LatLngBounds.builder()
+                .include(Point.box(bounds.northeast).add(Point.form(0.05, 0.05)).unBox(LatLng.class))
+                .include(Point.box(bounds.southwest).add(Point.form(-0.05, -0.05)).unBox(LatLng.class))
+                .build();
+        return bounds;
     }
 
     //绘制一条纹理线
-    public void drawLine()
+    public PolylineOptions getLine()
     {
         //点
         List<Point> points = Route.getAllPoint(route);
@@ -81,18 +80,7 @@ public class RouteMapViewModel extends ViewModel
         options.setCustomTextureList(texturesList);
         //设置纹理对应的Index
         options.setCustomTextureIndex(texIndexList);
-        mapController.addPolyline(options);
-    }
-
-    public void jumpToDetails()
-    {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("path", path);
-        Request request = new Request.Builder()
-                .bundle(bundle)
-                .uri("dng/navi/details")
-                .build();
-        onJump.onNext(request);
+        return options;
     }
 
     public void jumpToNavi()

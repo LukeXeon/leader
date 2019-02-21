@@ -34,7 +34,7 @@ public class WeatherViewModel extends AndroidViewModel
                 .build();
         return retrofit.create(WallpaperProvider.class)
                 .getWallpaperInfo()
-                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .map(jsonWallpapers -> "http://cn.bing.com"
                         + jsonWallpapers.wallpapers.get(0).part)
                 .map(uri -> {

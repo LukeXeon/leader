@@ -4,6 +4,9 @@
     <data>
 
         <import type="org.kexie.android.dng.navi.R"/>
+
+        <import type="org.kexie.android.common.databinding.$"/>
+
         <variable
             name="route"
             type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
@@ -56,6 +59,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
+                            android:adapter='@{$.newAdapter(R.layout.item_step,"step",route.steps)}'
                             android:orientation="vertical"
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
                         </androidx.recyclerview.widget.RecyclerView>

@@ -40,7 +40,8 @@ public class DetailsFragment extends Fragment
         Bundle bundle = getArguments();
         if (bundle != null)
         {
-            viewModel.init(mapController, bundle);
+            viewModel.init(bundle);
+            mapController.addPolyline(viewModel.getLine());
             viewModel.getOnJump()
                     .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                     .subscribe(request -> getFragmentManager()

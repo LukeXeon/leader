@@ -7,11 +7,11 @@ import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import java8.util.function.BiFunction;
@@ -47,11 +47,15 @@ public abstract class Point
                 && ((Point) obj).getLongitude() == getLongitude());
     }
 
+    public Point add(Point point)
+    {
+        return form(getLongitude() + point.getLongitude(), getLatitude() + point.getLatitude());
+    }
 
     //Y
     public abstract double getLatitude();
 
-    //SimpleApplyAdapter
+    //x
     public abstract double getLongitude();
 
     @SuppressWarnings("unchecked")
@@ -128,33 +132,11 @@ public abstract class Point
         return latLonPoints;
     }
 
-    public static List<Point> getBounds(List<Point> points)
+    @NonNull
+    @Override
+    public String toString()
     {
-        double maxY, maxX, minY, minX;
-        maxX = maxY = Double.MIN_VALUE;
-        minX = minY = Double.MAX_VALUE;
-        for (Point point : points)
-        {
-            double x = point.getLongitude();
-            double y = point.getLatitude();
-            if (x < minX)
-            {
-                minX = x;
-            }
-            if (x > maxX)
-            {
-                maxX = x;
-            }
-            if (y < minY)
-            {
-                minY = y;
-            }
-            if (y > maxY)
-            {
-                maxY = y;
-            }
-        }
-        return Arrays.asList(Point.form(maxX, maxY), Point.form(minX, minY));
+        return String.format("longitude(x)=%s,latitude(y)=%s", getLongitude(), getLatitude());
     }
 }
 

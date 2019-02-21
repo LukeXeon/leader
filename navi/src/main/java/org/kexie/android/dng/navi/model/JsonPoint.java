@@ -19,7 +19,7 @@ public class JsonPoint
 
     }
 
-    JsonPoint(double latitude, double longitude)
+    JsonPoint(double longitude, double latitude)
     {
         this.latitude = latitude;
         this.longitude = longitude;

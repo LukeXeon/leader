@@ -13,6 +13,7 @@ import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.poisearch.PoiSearch;
 import com.amap.api.services.route.RouteSearch;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.navi.model.Point;
@@ -31,6 +32,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
@@ -113,7 +115,10 @@ public class QueryViewModel extends AndroidViewModel
         {
             singleTask.execute(() -> {
                 Point point = getTipPoint(tip, poiId);
-                Query query = new Query.Builder().to(point).build();
+                Query query = new Query.Builder()
+                        .from(Point.form(108.947167,34.309997))
+                        .to(point)
+                        .build();
                 routeQuery(query);
             });
         }
@@ -121,12 +126,12 @@ public class QueryViewModel extends AndroidViewModel
 
     public Observable<String> getOnSuccessMessage()
     {
-        return onSuccessMessage;
+        return onSuccessMessage.observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<String> getOnErrorMessage()
     {
-        return onErrorMessage;
+        return onErrorMessage.observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<String> getOnLoading()
@@ -145,6 +150,11 @@ public class QueryViewModel extends AndroidViewModel
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
+        LatLonPoint form = query.from == null ? null : query.from.unBox(LatLonPoint.class);
+
+
+        LatLonPoint to = query.to == null ? null : query.to.unBox(LatLonPoint.class);
+
         List<LatLonPoint> ways = query.ways == null
                 ? Collections.emptyList()
                 : StreamSupport.stream(query.ways)
@@ -153,13 +163,10 @@ public class QueryViewModel extends AndroidViewModel
 
         RouteSearch.DriveRouteQuery driveRouteQuery
                 = new RouteSearch.DriveRouteQuery(
-                new RouteSearch.FromAndTo(
-                        query.from.unBox(LatLonPoint.class),
-                        query.to.unBox(LatLonPoint.class)),
+                new RouteSearch.FromAndTo(form, to),
                 query.mode,
                 ways,
                 avoids, "");
-
         try
         {
             List<Request> requests = StreamSupport.stream(routeSearch
@@ -175,6 +182,7 @@ public class QueryViewModel extends AndroidViewModel
                                 .uri("dng/navi/route")
                                 .build();
                     }).collect(Collectors.toList());
+            Logger.d("route size "+requests.size());
             routes.postValue(requests);
         } catch (Exception e)
         {

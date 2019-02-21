@@ -95,7 +95,7 @@ public class DesktopViewModel
     loadFunction(List<FunctionInfo> functionRes)
     {
         return Observable.just(functionRes)
-                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .map(raw -> {
                     ZoomTransformation zoomTransformation
                             = new ZoomTransformation(BORDER_SIZE);
