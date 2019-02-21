@@ -7,7 +7,7 @@
         android:layout_height="match_parent">
         <fragment
             android:id="@+id/fragment_navi"
-            android:name="org.kexie.android.dng.navi.view.NaviViewFragment"
+            android:name="org.kexie.android.dng.navi.widget.NaviViewFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </RelativeLayout>

@@ -12,6 +12,7 @@ import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.widget.NaviViewFragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

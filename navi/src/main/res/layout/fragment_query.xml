@@ -16,8 +16,12 @@
         <import type="org.kexie.android.common.databinding.$"/>
 
         <variable
-            name="tips"
-            type="java.util.List&lt;org.kexie.android.dng.navi.viewmodel.entity.LiteTip&gt;" />
+            name="tipAdapter"
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;String&gt;"/>
+
+        <variable
+            name="routeAdapter"
+            type="org.kexie.android.dng.navi.widget.SimpleApplyAdapter"/>
 
         <variable
             name="actions"
@@ -29,6 +33,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+        <fragment
+            android:name="com.amap.api.maps.TextureSupportMapFragment"
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <androidx.viewpager.widget.ViewPager
+            android:adapter="@{routeAdapter}"
+            android:layout_gravity="center"
+            android:clipChildren="false"
+            android:id="@+id/routes"
+            android:layout_width="500dp"
+            android:layout_height="match_parent">
+        </androidx.viewpager.widget.ViewPager>
     </FrameLayout>
 </layout>

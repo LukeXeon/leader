@@ -16,11 +16,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import mapper.Mapper;
+import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-public class MapDetailsFragment extends Fragment
+@Mapping("dng/navi/details")
+public class DetailsFragment extends Fragment
 {
 
     @Override

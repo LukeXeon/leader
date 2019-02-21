@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -30,7 +31,6 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 @Mapping("dng/navi/query")
 public class QueryFragment extends Fragment
 {
-
     private FragmentQueryBinding binding;
 
     private QueryViewModel viewModel;
@@ -56,12 +56,11 @@ public class QueryFragment extends Fragment
         binding.setLifecycleOwner(this);
         viewModel = ViewModelProviders.of(this)
                 .get(QueryViewModel.class);
-
         GenericQuickAdapter<String> genericQuickAdapter
-                = new GenericQuickAdapter<>(R.layout.item_tip,"tip");
+                = new GenericQuickAdapter<>(R.layout.item_tip, "tip");
+        binding.setTipAdapter(genericQuickAdapter);
 
-        viewModel.setAdapter(genericQuickAdapter);
-
+        viewModel.bindAdapter(genericQuickAdapter);
         viewModel.getRoutes()
                 .observe(this, requests -> {
                     List<Fragment> fragments = StreamSupport.stream(requests)
@@ -69,7 +68,7 @@ public class QueryFragment extends Fragment
                             .collect(Collectors.toList());
                     SimpleApplyAdapter adapter = new SimpleApplyAdapter(
                             getChildFragmentManager(), fragments);
-
+                    binding.setRouteAdapter(adapter);
                 });
 
         viewModel.getOnErrorMessage()
@@ -78,7 +77,9 @@ public class QueryFragment extends Fragment
         viewModel.getOnSuccessMessage()
                 .as(autoDisposable(from(this)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
-
+        viewModel.getOnLoading()
+                .as(autoDisposable(from(this)))
+                .subscribe(ProgressFragment.makeObserver(this));
     }
 
     @Override

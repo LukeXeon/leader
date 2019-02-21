@@ -17,7 +17,6 @@ import com.amap.api.services.route.RouteSearch;
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Query;
-import org.kexie.android.dng.navi.model.Route;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +38,7 @@ import mapper.Request;
 
 public class QueryViewModel extends AndroidViewModel
 {
-    private static final String DEBUG_TEXT = "火车站";
+    public static final String DEBUG_TEXT = "火车站";
 
     private static final String CITY = "西安";
 
@@ -49,19 +48,19 @@ public class QueryViewModel extends AndroidViewModel
 
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
 
-    private final List<String> poiIds = new ArrayList<>();
-
     private final MutableLiveData<List<Request>> routes = new MutableLiveData<>();
+
+    private final PublishSubject<String> onLoading = PublishSubject.create();
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
 
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
 
-    private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
+    private final List<String> poiIds = new ArrayList<>();
 
     private GenericQuickAdapter<String> adapter;
 
-    public void setAdapter(GenericQuickAdapter<String> adapter)
+    public void bindAdapter(GenericQuickAdapter<String> adapter)
     {
         this.adapter = adapter;
     }
@@ -130,9 +129,9 @@ public class QueryViewModel extends AndroidViewModel
         return onErrorMessage;
     }
 
-    public Observable<Route> getOnJumpToNavigation()
+    public Observable<String> getOnLoading()
     {
-        return onJumpToNavigation;
+        return onLoading;
     }
 
     @WorkerThread

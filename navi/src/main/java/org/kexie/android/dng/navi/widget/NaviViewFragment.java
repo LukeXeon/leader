@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.view;
+package org.kexie.android.dng.navi.widget;
 
 import android.content.Context;
 import android.os.Bundle;
