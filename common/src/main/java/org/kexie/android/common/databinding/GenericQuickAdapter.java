@@ -27,4 +27,6 @@ public class GenericQuickAdapter<X>
         ViewDataBinding binding = DataBindingUtil.bind(helper.itemView);
         DataBindingReflectionUtil.setVariable(binding, mName, item);
     }
+
+
 }

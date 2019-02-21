@@ -15,18 +15,13 @@ public abstract class Route implements Parcelable
 
     public static List<Point> getAllPoint(Route route)
     {
-        List<Point> points = new ArrayList<>();
-        Point from = route.getFrom();
-        Point to = route.getTo();
-        if (from != null)
+        return new ArrayList<Point>()
         {
-            points.add(route.getFrom());
-        }
-        points.addAll(route.getWays());
-        if (to != null)
-        {
-            points.add(route.getTo());
-        }
-        return points;
+            {
+                add(route.getFrom());
+                addAll(route.getWays());
+                add(route.getTo());
+            }
+        };
     }
 }

@@ -19,4 +19,11 @@ public final class BT
     {
         return map == null || map.size() == 0;
     }
+
+    public static <X> GenericQuickAdapter<X> newAdapter(int layoutId, String name, List<X> data)
+    {
+        GenericQuickAdapter<X> adapter = new GenericQuickAdapter<>(layoutId, name);
+        adapter.setNewData(data);
+        return adapter;
+    }
 }

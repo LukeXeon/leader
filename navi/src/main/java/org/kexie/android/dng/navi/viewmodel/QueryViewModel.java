@@ -1,7 +1,9 @@
 package org.kexie.android.dng.navi.viewmodel;
 
 import android.app.Application;
-import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.amap.api.services.core.AMapException;
@@ -9,27 +11,17 @@ import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
-import com.amap.api.services.help.Tip;
 import com.amap.api.services.poisearch.PoiSearch;
-import com.amap.api.services.route.DrivePath;
-import com.amap.api.services.route.DriveStep;
 import com.amap.api.services.route.RouteSearch;
-import com.bumptech.glide.Glide;
 
-import org.kexie.android.common.util.Collectors2;
-import org.kexie.android.dng.navi.R;
-import org.kexie.android.dng.navi.model.BoxRoute;
+import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.viewmodel.entity.LiteRoute;
-import org.kexie.android.dng.navi.viewmodel.entity.LiteStep;
-import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
 
-import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -37,11 +29,13 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import mapper.Request;
 
 public class QueryViewModel extends AndroidViewModel
 {
@@ -55,9 +49,9 @@ public class QueryViewModel extends AndroidViewModel
 
     private final MutableLiveData<String> queryText = new MutableLiveData<>();
 
-    private final MutableLiveData<Map<LiteTip, String>> tips = new MutableLiveData<>();
+    private final List<String> poiIds = new ArrayList<>();
 
-    private final MutableLiveData<Map<LiteRoute, Route>> routes = new MutableLiveData<>();
+    private final MutableLiveData<List<Request>> routes = new MutableLiveData<>();
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
 
@@ -65,65 +59,64 @@ public class QueryViewModel extends AndroidViewModel
 
     private final PublishSubject<Route> onJumpToNavigation = PublishSubject.create();
 
+    private GenericQuickAdapter<String> adapter;
+
+    public void setAdapter(GenericQuickAdapter<String> adapter)
+    {
+        this.adapter = adapter;
+    }
+
     public QueryViewModel(@NonNull Application application)
     {
         super(application);
         routeSearch = new RouteSearch(application);
     }
 
+    public LiveData<List<Request>> getRoutes()
+    {
+        return routes;
+    }
+
     @MainThread
     public void tipQueryBy(String text)
     {
         singleTask.execute(() -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                adapter.getData().clear();
+                adapter.notifyDataSetChanged();
+                poiIds.clear();
+            });
             InputtipsQuery inputtipsQuery = new InputtipsQuery(text, CITY);
             Inputtips inputtips = new Inputtips(getApplication(), inputtipsQuery);
             try
             {
-                Map<LiteTip, String> rawResult = StreamSupport
-                        .stream(inputtips.requestInputtips())
+                StreamSupport.stream(inputtips.requestInputtips())
                         .filter(tip -> !TextUtils.isEmpty(tip.getPoiID()))
-                        .collect(Collectors2.toLinkedHashMap(x -> new LiteTip(x.getName()),
-                                Tip::getPoiID));
-
-                tips.postValue(rawResult);
-                //loading.postValue(null);
+                        .forEach(tip -> handler.post(() -> {
+                            adapter.addData(tip.getName());
+                            poiIds.add(tip.getPoiID());
+                        }));
             } catch (Exception e)
             {
                 e.printStackTrace();
                 onErrorMessage.onNext("输入提示查询失败,请检查网络连接");
-                //loading.postValue(null);
             }
         });
     }
 
     @MainThread
-    public void routeQueryBy(LiteTip tip)
+    public void routeQueryBy(String tip)
     {
-        Map<LiteTip, String> poi = tips.getValue();
-        if (poi != null)
+        int index = adapter.getData().indexOf(tip);
+        String poiId = poiIds.get(index);
+        if (poiId != null)
         {
-            String poiId = poi.get(tip);
-            if (poiId != null)
-            {
-                singleTask.execute(() -> {
-                    Point point = getTipPoint(tip.text, poiId);
-                    Query query = new Query.Builder().to(point).build();
-                    routeQuery(query);
-                });
-            }
-        }
-    }
-
-    public void requestJumpToNavigation(LiteRoute liteRoute)
-    {
-        Map<LiteRoute, Route> map = routes.getValue();
-        if (map != null)
-        {
-            Route route = map.get(liteRoute);
-            if (route != null)
-            {
-                onJumpToNavigation.onNext(route);
-            }
+            singleTask.execute(() -> {
+                Point point = getTipPoint(tip, poiId);
+                Query query = new Query.Builder().to(point).build();
+                routeQuery(query);
+            });
         }
     }
 
@@ -170,17 +163,20 @@ public class QueryViewModel extends AndroidViewModel
 
         try
         {
-            Map<LiteRoute, Route> newRoutes = StreamSupport.stream(routeSearch
+            List<Request> requests = StreamSupport.stream(routeSearch
                     .calculateDriveRoute(driveRouteQuery)
                     .getPaths())
-                    .collect(Collectors2.toLinkedHashMap(path -> new LiteRoute.Builder()
-                                            .name(getPathName(path))
-                                            .length(getPathLength(path))
-                                            .time(getPathTime(path))
-                                            .steps(getPathStep(path))
-                                            .build(),
-                                    path -> new BoxRoute(query.from, query.to, path)));
-            routes.postValue(newRoutes);
+                    .map(path -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("path", path);
+                        bundle.putParcelable("from", query.from);
+                        bundle.putParcelable("to", query.to);
+                        return new Request.Builder()
+                                .bundle(bundle)
+                                .uri("dng/navi/route")
+                                .build();
+                    }).collect(Collectors.toList());
+            routes.postValue(requests);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -214,115 +210,4 @@ public class QueryViewModel extends AndroidViewModel
         }
     }
 
-    private List<LiteStep> getPathStep(DrivePath path)
-    {
-        return StreamSupport.stream(path.getSteps())
-                .map(DriveStep::getAction)
-                .map(a -> {
-                    Drawable drawable = null;
-                    try
-                    {
-                        drawable = Glide.with(getApplication())
-                                .load(getActionRes(a))
-                                .submit()
-                                .get();
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                    return new LiteStep(a, drawable);
-                }).collect(Collectors.toList());
-    }
-
-    private static int getActionRes(String actionName)
-    {
-        if (actionName == null || actionName.equals(""))
-        {
-            return R.mipmap.dir3;
-        }
-        if ("左转".equals(actionName))
-        {
-            return R.mipmap.dir2;
-        }
-        if ("右转".equals(actionName))
-        {
-            return R.mipmap.dir1;
-        }
-        if ("向左前方行驶".equals(actionName) || "靠左".equals(actionName))
-        {
-            return R.mipmap.dir6;
-        }
-        if ("向右前方行驶".equals(actionName) || "靠右".equals(actionName))
-        {
-            return R.mipmap.dir5;
-        }
-        if ("向左后方行驶".equals(actionName) || "左转调头".equals(actionName))
-        {
-            return R.mipmap.dir7;
-        }
-        if ("向右后方行驶".equals(actionName))
-        {
-            return R.mipmap.dir8;
-        }
-        if ("直行".equals(actionName))
-        {
-            return R.mipmap.dir3;
-        }
-        if ("减速行驶".equals(actionName))
-        {
-            return R.mipmap.dir4;
-        }
-        return R.mipmap.dir3;
-    }
-
-    private static String getPathTime(DrivePath path)
-    {
-        long second = path.getDuration();
-        if (second > 3600)
-        {
-            long hour = second / 3600;
-            long miniate = (second % 3600) / 60;
-            return hour + "小时" + miniate + "分钟";
-        }
-        if (second >= 60)
-        {
-            long miniate = second / 60;
-            return miniate + "分钟";
-        }
-        return second + "秒";
-    }
-
-    @SuppressWarnings("All")
-    private static String getPathLength(DrivePath path)
-    {
-        int lenMeter = (int) path.getDistance();
-        if (lenMeter > 10000) // 10 km
-        {
-            float dis = lenMeter / 1000;
-            return dis + "千米";
-        }
-        if (lenMeter > 1000)
-        {
-            float dis = (float) lenMeter / 1000;
-            DecimalFormat fnum = new DecimalFormat("##0.0");
-            String dstr = fnum.format(dis);
-            return dstr + "千米";
-        }
-        if (lenMeter > 100)
-        {
-            float dis = lenMeter / 50 * 50;
-            return dis + "米";
-        }
-        float dis = lenMeter / 10 * 10;
-        if (dis == 0)
-        {
-            dis = 10;
-        }
-        return dis + "米";
-    }
-
-    private static String getPathName(DrivePath path)
-    {
-        return path.getStrategy();
-    }
 }

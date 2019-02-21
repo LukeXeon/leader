@@ -58,5 +58,6 @@ public class Test extends Fragment
                 .map(x -> Mapper.getOn(this, request))
                 .collect(Collectors.toList());
         viewPager.setAdapter(new SimpleApplyAdapter(getChildFragmentManager(), fragments));
+        viewPager.setCurrentItem(1);
     }
 }

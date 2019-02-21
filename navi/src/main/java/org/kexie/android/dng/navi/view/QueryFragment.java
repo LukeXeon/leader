@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
+import org.kexie.android.dng.navi.widget.SimpleApplyAdapter;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +18,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
+import mapper.Mapper;
 import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
@@ -23,7 +29,6 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 @Mapping("dng/navi/query")
 public class QueryFragment extends Fragment
 {
-    private static final String WAIT_QUERY = "wait query";
 
     private FragmentQueryBinding binding;
 
@@ -52,12 +57,23 @@ public class QueryFragment extends Fragment
         viewModel = ViewModelProviders.of(this)
                 .get(QueryViewModel.class);
 
+        viewModel.getRoutes()
+                .observe(this, requests -> {
+                    List<Fragment> fragments = StreamSupport.stream(requests)
+                            .map(request -> Mapper.getOn(this, request))
+                            .collect(Collectors.toList());
+                    SimpleApplyAdapter adapter = new SimpleApplyAdapter(
+                            getChildFragmentManager(), fragments);
+
+                });
+
         viewModel.getOnErrorMessage()
                 .as(autoDisposable(from(this)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
         viewModel.getOnSuccessMessage()
                 .as(autoDisposable(from(this)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
+
     }
 
     @Override

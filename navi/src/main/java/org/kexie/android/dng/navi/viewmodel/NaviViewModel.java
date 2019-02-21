@@ -7,7 +7,7 @@ import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 
 import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.widget.NavControllerCallbacks;
+import org.kexie.android.dng.navi.widget.NaviCallbacks;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +53,7 @@ public class NaviViewModel extends AndroidViewModel
                 Lock lock = new ReentrantLock();
                 Condition condition = lock.newCondition();
                 navigation.addAMapNaviListener(
-                        new NavControllerCallbacks()
+                        new NaviCallbacks()
                         {
                             public void onCalculateRouteFailure(int code)
                             {
