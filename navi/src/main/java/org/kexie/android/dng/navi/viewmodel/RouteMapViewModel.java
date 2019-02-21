@@ -8,6 +8,7 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.services.route.DrivePath;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.model.BoxRoute;
@@ -70,12 +71,12 @@ public class RouteMapViewModel extends ViewModel
                 .collect(Collectors.toList());
         PolylineOptions options = new PolylineOptions();
         options.width(20);//设置宽度
-        LatLng[] rawPoints = StreamSupport.stream(points)
+        List<LatLng> rawPoints = StreamSupport.stream(points)
                 .map(p -> p.unBox(LatLng.class))
-                .collect(Collectors.toList())
-                .toArray(new LatLng[0]);
+                .collect(Collectors.toList());
+        Logger.d(rawPoints.size());
         //加入点
-        options.add(rawPoints);
+        options.addAll(rawPoints);
         //加入对应的颜色,使用setCustomTextureList 即表示使用多纹理；
         options.setCustomTextureList(texturesList);
         //设置纹理对应的Index

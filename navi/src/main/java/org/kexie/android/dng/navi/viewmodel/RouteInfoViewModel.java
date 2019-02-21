@@ -33,8 +33,11 @@ public class RouteInfoViewModel extends AndroidViewModel
 
     private DrivePath path;
 
+    private Bundle nextData;
+
     public void init(Bundle bundle)
     {
+        this.nextData = bundle;
         path = bundle.getParcelable("path");
     }
 
@@ -63,10 +66,8 @@ public class RouteInfoViewModel extends AndroidViewModel
 
     public void jumpToDetails()
     {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("path", path);
         Request request = new Request.Builder()
-                .bundle(bundle)
+                .bundle(nextData)
                 .uri("dng/navi/details")
                 .build();
         onJump.onNext(request);

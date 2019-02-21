@@ -9,11 +9,17 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.route.DrivePath;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
+import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.viewmodel.RouteInfoViewModel;
 import org.kexie.android.dng.navi.viewmodel.RouteMapViewModel;
+import org.kexie.android.dng.navi.widget.DrivingRouteOverlay;
+
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -84,13 +90,14 @@ public class RouteFragment extends Fragment
             viewModel1.init(bundle);
             mapController.setMapStatusLimits(viewModel1.getBounds());
             mapController.moveCamera(CameraUpdateFactory.zoomTo(8f));
-            mapController.addPolyline(viewModel1.getLine());
+            //mapController.addPolyline(viewModel1.getLine());
+            test(mapController,bundle);
             viewModel1.getOnJump()
                     .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                    .subscribe(this::jumpTo);
+                    .subscribe(this::jumpToAndBack);
             RouteInfoViewModel viewModel2 = ViewModelProviders.of(this)
                     .get(RouteInfoViewModel.class);
-            binding.setOnOpenDetails(v -> viewModel2.jumpToDetails());
+            mapController.setOnMapClickListener(latLng -> viewModel2.jumpToDetails());
             viewModel2.getRouteInfo()
                     .observe(this, binding::setRoute);
             viewModel2.loadInfo();
@@ -101,12 +108,27 @@ public class RouteFragment extends Fragment
         }
     }
 
+    private void test(AMap aMap,Bundle bundle)
+    {
+        Point from = bundle.getParcelable("from");
+        Point to = bundle.getParcelable("to");
+        DrivePath path = bundle.getParcelable("path");
+        DrivingRouteOverlay overlay = new DrivingRouteOverlay(getContext(),aMap,path,from.unBox(LatLonPoint.class),to.unBox(LatLonPoint.class), Collections.emptyList());
+        overlay.addToMap();
+    }
+
+    private void jumpToAndBack(Request request)
+    {
+        jumpTo(request);
+        getActivity().onBackPressed();
+    }
+
     private void jumpTo(Request request)
     {
-        getParentFragment()
-                .getFragmentManager()
+        int id = getParentFragment().getId();
+        getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .add(getId(), Mapper.getOn(this, request))
+                .add(id, Mapper.getOn(this, request))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
