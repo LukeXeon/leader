@@ -46,7 +46,7 @@ public class NaviGuideInfoList extends ExpandableListView
         {
             GuideInfo header = new GuideInfo();
             header.setGroupIconType(-1);
-            header.setGroupName("起点");
+            header.setGroupName("当前地点");
             dataList.add(0, header);
 
             GuideInfo footer = new GuideInfo();

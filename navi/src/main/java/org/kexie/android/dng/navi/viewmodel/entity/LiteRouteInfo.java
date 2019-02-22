@@ -1,20 +1,14 @@
 package org.kexie.android.dng.navi.viewmodel.entity;
 
-import java.util.List;
-
-public class LiteRoute
+public class LiteRouteInfo
 {
-    public final String name;
     public final String time;
     public final String length;
-    public final List<LiteStep> steps;
 
-    private LiteRoute(Builder builder)
+    private LiteRouteInfo(Builder builder)
     {
-        name = builder.name;
         time = builder.time;
         length = builder.length;
-        steps = builder.steps;
     }
 
     public static final class Builder
@@ -22,7 +16,6 @@ public class LiteRoute
         private String name;
         private String time;
         private String length;
-        private List<LiteStep> steps;
 
         public Builder()
         {
@@ -46,15 +39,9 @@ public class LiteRoute
             return this;
         }
 
-        public Builder steps(List<LiteStep> val)
+        public LiteRouteInfo build()
         {
-            steps = val;
-            return this;
-        }
-
-        public LiteRoute build()
-        {
-            return new LiteRoute(this);
+            return new LiteRouteInfo(this);
         }
     }
 }

@@ -9,7 +9,7 @@
 
         <variable
             name="route"
-            type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
+            type="org.kexie.android.dng.navi.viewmodel.entity.LiteRouteInfo"/>
 
         <variable
             name="onJumpToNavi"
@@ -103,52 +103,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:background="@color/colorBlackAlpha12"
+                        android:background="@color/colorBlackAlpha54"
                         android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginLeft="10dp"
-                                android:src="@mipmap/image_search"/>
-
-                            <TextView
-                                android:id="@+id/tv_title"
-                                async_font='@{"PingFang Regular.ttf"}'
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="20dp"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginBottom="5dp"
-                                android:hint="方案名"
-                                android:text="@{route.name}"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="2dp"
-                            android:background="@color/lightblue500"/>
 
                         <TextView
                             android:id="@+id/tv_info"
                             async_font='@{"PingFang Regular.ttf"}'
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
                             android:gravity="center_vertical|right"
                             android:hint="40分钟(19公里)"
+                            android:textColorHint="@android:color/white"
+                            android:textColor="@android:color/white"
                             android:paddingRight="20dp"
                             android:text='@{route.time+"("+route.length+")"}'
-                            android:textSize="20dp"/>
+                            android:textSize="25dp"/>
                     </LinearLayout>
                 </FrameLayout>
             </com.fxc.roundcornerlayout.RoundCornerFrameLayout>

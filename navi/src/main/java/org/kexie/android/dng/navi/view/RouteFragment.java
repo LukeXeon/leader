@@ -66,6 +66,7 @@ public class RouteFragment extends Fragment
                     .get(NaviViewModel.class);
             int id = bundle.getInt("pathId");
             binding.infosList.setGuideData(viewModel.getGuideInfo(id));
+            binding.setRoute(viewModel.getRouteInfo(id));
         }
     }
 

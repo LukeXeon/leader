@@ -7,6 +7,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.navi.AMapNavi;
+import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.AMapNaviGuide;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.AMapNaviStep;
@@ -20,10 +21,12 @@ import com.amap.api.services.poisearch.PoiSearch;
 import org.kexie.android.dng.navi.model.NaviCompat;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Query;
+import org.kexie.android.dng.navi.viewmodel.entity.LiteRouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 import org.kexie.android.dng.navi.widget.NaviCallbacks;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,6 +94,11 @@ public class NaviViewModel extends AndroidViewModel
                             .build();
                 }).collect(Collectors.toList());
         routes.setValue(requests);
+    }
+
+    public void startNavi()
+    {
+        navigation.startNavi(NaviType.EMULATOR);
     }
 
     public void query(LiteTip tip)
@@ -166,7 +174,7 @@ public class NaviViewModel extends AndroidViewModel
     }
 
     @WorkerThread
-    public void loadRoute(Query query)
+    private void loadRoute(Query query)
     {
         try
         {
@@ -255,6 +263,15 @@ public class NaviViewModel extends AndroidViewModel
         return getGuideInfo(NaviCompat.getNaviPath(navigation).get(id));
     }
 
+    public LiteRouteInfo getRouteInfo(int id)
+    {
+        NaviPath path = NaviCompat.getNaviPath(navigation).get(id);
+        return new LiteRouteInfo.Builder()
+                .length(getPathLength(path.getAllLength()))
+                .time(getPathTime(path.getAllTime()))
+                .build();
+    }
+
     private static List<GuideInfo> getGuideInfo(NaviPath naviPath)
     {
         List<GuideInfo> steps = new ArrayList<>();
@@ -304,6 +321,50 @@ public class NaviViewModel extends AndroidViewModel
             e.printStackTrace();
         }
         return steps;
+    }
+
+    private static String getPathTime(int time)
+    {
+        if ((long) time > 3600)
+        {
+            long hour = (long) time / 3600;
+            long miniate = ((long) time % 3600) / 60;
+            return hour + "小时" + miniate + "分钟";
+        }
+        if ((long) time >= 60)
+        {
+            long miniate = (long) time / 60;
+            return miniate + "分钟";
+        }
+        return (long) time + "秒";
+    }
+
+
+    private static String getPathLength(int path)
+    {
+        if (path > 10000) // 10 km
+        {
+            float dis = path / 1000;
+            return dis + "千米";
+        }
+        if (path > 1000)
+        {
+            float dis = (float) path / 1000;
+            DecimalFormat fnum = new DecimalFormat("##0.0");
+            String dstr = fnum.format(dis);
+            return dstr + "千米";
+        }
+        if (path > 100)
+        {
+            float dis = path / 50 * 50;
+            return dis + "米";
+        }
+        float dis = path / 10 * 10;
+        if (dis == 0)
+        {
+            dis = 10;
+        }
+        return dis + "米";
     }
 
     public Observable<String> getOnLoading()
