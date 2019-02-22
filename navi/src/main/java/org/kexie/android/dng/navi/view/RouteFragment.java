@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.navi.view.RouteOverLay;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
@@ -18,10 +20,14 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import mapper.Mapper;
 import mapper.Mapping;
 import mapper.Request;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/navi/route")
 public class RouteFragment extends Fragment
@@ -29,6 +35,8 @@ public class RouteFragment extends Fragment
     private FragmentRouteBinding binding;
 
     private AMap mapController;
+
+    NaviViewModel viewModel;
 
     @Nullable
     @Override
@@ -62,21 +70,39 @@ public class RouteFragment extends Fragment
         Bundle bundle = getArguments();
         if (bundle != null)
         {
-            NaviViewModel viewModel = ViewModelProviders.of(getParentFragment())
+            viewModel = ViewModelProviders.of(getActivity())
                     .get(NaviViewModel.class);
             int id = bundle.getInt("pathId");
+
+            binding.setOnJumpToNavi(v -> viewModel.jumpToNavi(id));
+            mapController.setOnMapClickListener(latLng ->{
+                Logger.d(latLng);
+                viewModel.jumpToDetails(id);
+            });
+
+            RouteOverLay routeOverLay = new RouteOverLay(mapController,
+                    viewModel.getPath(id),
+                    getContext().getApplicationContext());
+
+            routeOverLay.setTrafficLine(false);
+            routeOverLay.addToMap();
+
             binding.infosList.setGuideData(viewModel.getGuideInfo(id));
             binding.setRoute(viewModel.getRouteInfo(id));
+            viewModel.getOnJump()
+                    .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                    .subscribe(this::jumpTo);
         }
     }
 
-
     private void jumpTo(Request request)
     {
-        int id = getParentFragment().getId();
-        getActivity().getSupportFragmentManager()
+        Logger.d(request);
+        Fragment parent = getParentFragment();
+        parent.getFragmentManager()
                 .beginTransaction()
-                .add(id, Mapper.getOn(this, request))
+                .addToBackStack(null)
+                .add(parent.getId(), Mapper.getOn(parent, request))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

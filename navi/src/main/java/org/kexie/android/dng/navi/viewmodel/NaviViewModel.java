@@ -17,13 +17,14 @@ import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiSearch;
+import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.navi.model.NaviCompat;
+import org.kexie.android.dng.navi.widget.NaviCompat;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Query;
+import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteRouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
-import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 import org.kexie.android.dng.navi.widget.NaviCallbacks;
 
 import java.text.DecimalFormat;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -54,9 +56,12 @@ import mapper.Request;
 
 public class NaviViewModel extends AndroidViewModel
 {
+
     private final Executor singleTask = Executors.newSingleThreadExecutor();
 
     private final MutableLiveData<List<Request>> routes = new MutableLiveData<>();
+
+    private final PublishSubject<Request> onJump = PublishSubject.create();
 
     private final PublishSubject<String> onLoading = PublishSubject.create();
 
@@ -77,6 +82,30 @@ public class NaviViewModel extends AndroidViewModel
         return routes;
     }
 
+    public void jumpToDetails(int id)
+    {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("pathId", id);
+        Request request = new Request.Builder()
+                .uri("dng/navi/details")
+                .bundle(bundle)
+                .build();
+        onJump.onNext(request);
+    }
+
+    public void jumpToNavi(int id)
+    {
+        Logger.d(id);
+        Bundle bundle = new Bundle();
+        bundle.putInt("pathId",id);
+        Request request = new Request.Builder()
+                .uri("dng/navi/navi")
+                .bundle(bundle)
+                .build();
+        onJump.onNext(request);
+    }
+
     private void setRoute(int[] paths)
     {
         if (paths == null)
@@ -84,7 +113,8 @@ public class NaviViewModel extends AndroidViewModel
             routes.setValue(null);
             return;
         }
-        List<Request> requests = IntStreams.of(paths).boxed()
+        List<Request> requests = IntStreams.of(paths)
+                .boxed()
                 .map(id -> {
                     Bundle bundle = new Bundle();
                     bundle.putInt("pathId", id);
@@ -136,6 +166,11 @@ public class NaviViewModel extends AndroidViewModel
         });
     }
 
+    public Observable<Request> getOnJump()
+    {
+        return onJump.observeOn(AndroidSchedulers.mainThread());
+    }
+
     @WorkerThread
     private Point loadLocation()
     {
@@ -174,7 +209,7 @@ public class NaviViewModel extends AndroidViewModel
     }
 
     @WorkerThread
-    private void loadRoute(Query query)
+    public void loadRoute(Query query)
     {
         try
         {
@@ -258,6 +293,12 @@ public class NaviViewModel extends AndroidViewModel
         }
     }
 
+    public AMapNaviPath getPath(int id)
+    {
+        return Objects.requireNonNull(NaviCompat.getNaviPath(navigation).get(id))
+                .amapNaviPath;
+    }
+
     public List<GuideInfo> getGuideInfo(int id)
     {
         return getGuideInfo(NaviCompat.getNaviPath(navigation).get(id));
@@ -269,6 +310,7 @@ public class NaviViewModel extends AndroidViewModel
         return new LiteRouteInfo.Builder()
                 .length(getPathLength(path.getAllLength()))
                 .time(getPathTime(path.getAllTime()))
+                .name(path.amapNaviPath.getLabels())
                 .build();
     }
 
@@ -338,7 +380,6 @@ public class NaviViewModel extends AndroidViewModel
         }
         return (long) time + "秒";
     }
-
 
     private static String getPathLength(int path)
     {

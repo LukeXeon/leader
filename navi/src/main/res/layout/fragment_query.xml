@@ -39,6 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <LinearLayout
+            android:background="@color/colorBlackAlpha26"
             android:clipChildren="false"
             android:id="@+id/pager_root"
             android:visibility="@{routeAdapter==null?View.GONE:View.VISIBLE}"

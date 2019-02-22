@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.model;
+package org.kexie.android.dng.navi.widget;
 
 import com.amap.api.col.n3.ik;
 import com.amap.api.col.n3.ip;

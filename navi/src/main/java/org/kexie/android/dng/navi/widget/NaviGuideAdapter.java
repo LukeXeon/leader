@@ -85,12 +85,12 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
             {
                 holder = new GroupHolder();
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.lbs_naviguide_item_group, null);
-                holder.ivGroupIcon = (ImageView) convertView.findViewById(R.id.iv_groupIcon);
-                holder.tvBefore = (TextView) convertView.findViewById(R.id.tv_before);
-                holder.tvGroupName = (TextView) convertView.findViewById(R.id.tv_groupName);
-                holder.tvAfter = (TextView) convertView.findViewById(R.id.tv_after);
-                holder.tvGroupDetail = (TextView) convertView.findViewById(R.id.tv_groupDetail);
-                holder.ivAction = (ImageView) convertView.findViewById(R.id.iv_action);
+                holder.ivGroupIcon = convertView.findViewById(R.id.iv_groupIcon);
+                holder.tvBefore = convertView.findViewById(R.id.tv_before);
+                holder.tvGroupName = convertView.findViewById(R.id.tv_groupName);
+                holder.tvAfter = convertView.findViewById(R.id.tv_after);
+                holder.tvGroupDetail = convertView.findViewById(R.id.tv_groupDetail);
+                holder.ivAction = convertView.findViewById(R.id.iv_action);
                 holder.line = convertView.findViewById(R.id.line);
 
                 convertView.setTag(holder);
@@ -165,8 +165,8 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
                 holder = new ChildHolder();
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.lbs_naviguide_item_child, null);
 
-                holder.ivChildIcon = (ImageView) convertView.findViewById(R.id.iv_childIcon);
-                holder.tvChildDetail = (TextView) convertView.findViewById(R.id.tv_childDetail);
+                holder.ivChildIcon = convertView.findViewById(R.id.iv_childIcon);
+                holder.tvChildDetail = convertView.findViewById(R.id.tv_childDetail);
                 holder.line = convertView.findViewById(R.id.line);
                 convertView.setTag(holder);
             } else

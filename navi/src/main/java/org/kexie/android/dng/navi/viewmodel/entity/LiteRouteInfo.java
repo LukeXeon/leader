@@ -2,11 +2,13 @@ package org.kexie.android.dng.navi.viewmodel.entity;
 
 public class LiteRouteInfo
 {
+    public final String name;
     public final String time;
     public final String length;
 
     private LiteRouteInfo(Builder builder)
     {
+        name = builder.name;
         time = builder.time;
         length = builder.length;
     }

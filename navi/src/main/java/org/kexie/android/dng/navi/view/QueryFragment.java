@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.view;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,11 +8,14 @@ import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.TextureSupportMapFragment;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
+import org.kexie.android.dng.navi.model.Point;
+import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.TipViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
@@ -58,11 +62,15 @@ public class QueryFragment extends Fragment
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        Logger.d("test");
+
         binding.setLifecycleOwner(this);
         binding.pagerRoot.setOnTouchListener((x, y) -> true);
         binding.routePager.setPageTransformer(false, new ScaleTransformer());
@@ -75,6 +83,8 @@ public class QueryFragment extends Fragment
         AMap mapController = TextureSupportMapFragment.class
                 .cast(getChildFragmentManager()
                         .findFragmentById(R.id.map_view)).getMap();
+
+
 
         GenericQuickAdapter<LiteTip> tipsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_tip, "tip");
@@ -113,7 +123,25 @@ public class QueryFragment extends Fragment
                 .subscribe(ProgressFragment.makeObserver(this));
 
 
+        //test
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                Logger.d("begin");
+                Query q = new Query.Builder()
+                        .from(Point.form(109.200903, 24.40092))
+                        .to(Point.form(109.29154, 24.298327))
+                        .build();
+                naviViewModel.loadRoute(q);
+                Logger.d("end");
+            }
+        }.start();
+
     }
+
+
 
     @Override
     public void onDestroyView()

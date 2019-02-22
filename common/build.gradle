@@ -44,6 +44,7 @@ dependencies {
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
 
     //...
+    api 'com.jakewharton.rxbinding3:rxbinding-core:3.0.0-alpha2'
     api 'com.github.vipulasri:timelineview:1.1.0'
     api 'com.github.ishaan1995:ButtonProgressBar:1.0'
     api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
