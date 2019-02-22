@@ -10,6 +10,7 @@
         <variable
             name="route"
             type="org.kexie.android.dng.navi.viewmodel.entity.LiteRoute"/>
+
         <variable
             name="onJumpToNavi"
             type="android.view.View.OnClickListener"/>
@@ -29,11 +30,11 @@
             android:orientation="vertical">
 
             <FrameLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/map_corner"
-                android:layout_marginTop="-160dp">
-
+                android:layout_marginTop="-120dp">
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -41,45 +42,44 @@
                     app:cardElevation="10dp"
                     app:cardPreventCornerOverlap="false"
                     app:cardUseCompatPadding="true">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="150dp"
-                        android:layout_marginRight="15dp"
-                        android:layout_marginBottom="15dp"
-                        android:orientation="vertical">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rl_list"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:adapter='@{$.newAdapter(R.layout.item_step,"step",route.steps)}'
-                            android:orientation="vertical"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
-                        </androidx.recyclerview.widget.RecyclerView>
-
-                        <Button
-                            android:onClick="@{onJumpToNavi}"
-                            android:id="@+id/btn_summit"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="bottom"
-                            android:layout_marginTop="10dp"
-                            android:background="@drawable/btn_draw"
-                            android:text="确认"
-                            android:textColor="@color/white"
-                            android:textSize="30sp"/>
-                    </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </FrameLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_below="@+id/map_corner"
+                android:layout_marginBottom="25dp"
+                android:orientation="vertical">
+
+                <org.kexie.android.dng.navi.widget.NaviGuideInfoList
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/infos_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+                </org.kexie.android.dng.navi.widget.NaviGuideInfoList>
+
+                <Button
+                    android:onClick="@{onJumpToNavi}"
+                    android:id="@+id/btn_summit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/btn_draw"
+                    android:text="确认"
+                    android:textColor="@color/white"
+                    android:textSize="30sp"/>
+            </LinearLayout>
+
             <com.fxc.roundcornerlayout.RoundCornerFrameLayout
                 android:id="@+id/map_corner"
-                android:layout_width="380dp"
-                android:layout_height="250dp"
+                android:layout_width="360dp"
+                android:layout_height="210dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:background="@android:color/white"

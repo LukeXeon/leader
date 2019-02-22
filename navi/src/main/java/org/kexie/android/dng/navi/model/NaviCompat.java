@@ -4,8 +4,10 @@ import com.amap.api.col.n3.ik;
 import com.amap.api.col.n3.ip;
 import com.amap.api.col.n3.ir;
 import com.amap.api.navi.AMapNavi;
+import com.amap.api.navi.model.NaviPath;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 public final class NaviCompat
 {
@@ -46,4 +48,18 @@ public final class NaviCompat
         throw new AssertionError();
     }
 
+    @SuppressWarnings("unchecked")
+    public static Map<Integer, NaviPath> getNaviPath(AMapNavi navi)
+    {
+        try
+        {
+            Object inner = sInnerNavi.get(navi);
+            Object impl = sNaviImpl.get(inner);
+            Object manager = sNaviPathManager.get(impl);
+            return (Map<Integer, NaviPath>) sAllNaviPath.get(manager);
+        } catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

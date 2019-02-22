@@ -16,8 +16,8 @@
         <import type="org.kexie.android.common.databinding.$"/>
 
         <variable
-            name="tipAdapter"
-            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;String&gt;"/>
+            name="tipsAdapter"
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.navi.viewmodel.entity.LiteTip&gt;"/>
 
         <variable
             name="routeAdapter"
@@ -39,6 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <LinearLayout
+            android:clipChildren="false"
             android:id="@+id/pager_root"
             android:visibility="@{routeAdapter==null?View.GONE:View.VISIBLE}"
             android:orientation="horizontal"
@@ -52,7 +53,7 @@
                 android:adapter="@{routeAdapter}"
                 android:layout_gravity="center"
                 android:clipChildren="false"
-                android:id="@+id/routes"
+                android:id="@+id/routePager"
                 android:layout_width="500dp"
                 android:layout_height="match_parent">
             </androidx.viewpager.widget.ViewPager>

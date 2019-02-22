@@ -77,7 +77,6 @@ public class NaviFragment extends Fragment
         if (bundle != null)
         {
             Route route = bundle.getParcelable(ARG);
-            viewModel.beginBy(route);
         }
     }
 }

@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">navi</string>
+    <string name="poi_input_type_start">从</string>
+    <string name="poi_input_type_dest">到</string>
+    <string name="poi_input_type_mid">经</string>
+    <string name="navi_guide_from">出发</string>
+    <string name="navi_guide_end">到达终点</string>
     <string name="user_info_url"><![CDATA[http://172.20.10.5:8080/navigator/device/user/info/]]></string>
 </resources>
