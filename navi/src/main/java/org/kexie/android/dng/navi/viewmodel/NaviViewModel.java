@@ -2,13 +2,18 @@ package org.kexie.android.dng.navi.viewmodel;
 
 import android.app.Application;
 
+import com.amap.api.col.n3.ik;
+import com.amap.api.col.n3.ip;
+import com.amap.api.col.n3.ir;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.widget.NaviCallbacks;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -27,6 +32,48 @@ import java8.util.stream.StreamSupport;
 
 public class NaviViewModel extends AndroidViewModel
 {
+
+    private final static Field sInnerNavi;
+
+    private final static Field sNaviImpl;
+
+    private final static Field sNaviPath;
+
+    private final static Field sNaviPathManager;
+
+    private final static Field sAllNaviPath;
+
+    private final static Field sWayCount;
+
+    static
+    {
+        try
+        {
+            //get inner -> get ir
+            sInnerNavi = AMapNavi.class.getDeclaredField("mINavi");
+            //get impl -> get ik
+            sNaviImpl = ir.class.getDeclaredField("m");
+            //get path -> get NaviPath
+            sNaviPath = ik.class.getDeclaredField("c");
+            //get allPathManager -> get ip
+            sNaviPathManager = ik.class.getDeclaredField("b");
+            //get allPath -> get Map<int,NaviPath>
+            sAllNaviPath = ip.class.getDeclaredField("h");
+
+            sWayCount = ik.class.getDeclaredField("h");
+
+
+            sInnerNavi.setAccessible(true);
+            sNaviImpl.setAccessible(true);
+            sNaviPath.setAccessible(true);
+            sNaviPathManager.setAccessible(true);
+            sAllNaviPath.setAccessible(true);
+            sWayCount.setAccessible(true);
+        } catch (Exception e)
+        {
+            throw new RuntimeException("compat load failed", e);
+        }
+    }
 
     private final Executor singleTask = Executors.newSingleThreadExecutor();
 
@@ -70,8 +117,8 @@ public class NaviViewModel extends AndroidViewModel
                                 lock.lock();
                                 navigation.removeAMapNaviListener(this);
                                 navigation.selectRouteId(ints[0]);
+                                Logger.d(ints.length);
                                 navigation.startNavi(NaviType.EMULATOR);
-                                //calculateResult.postValue(true);
                                 condition.signalAll();
                                 lock.unlock();
                             }

@@ -90,8 +90,8 @@ public class RouteFragment extends Fragment
             viewModel1.init(bundle);
             mapController.setMapStatusLimits(viewModel1.getBounds());
             mapController.moveCamera(CameraUpdateFactory.zoomTo(8f));
-            //mapController.addPolyline(viewModel1.getLine());
-            test(mapController,bundle);
+            mapController.addPolyline(viewModel1.getLine());
+            //test(mapController,bundle);
             viewModel1.getOnJump()
                     .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                     .subscribe(this::jumpToAndBack);

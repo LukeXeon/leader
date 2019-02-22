@@ -79,7 +79,7 @@ public class BoxRoute
     {
         return StreamSupport.stream(path.getSteps())
                 .map(DriveStep::getPolyline)
-                .map(l -> l.get(0))
+                .flatMap(StreamSupport::stream)
                 .map(Point::box)
                 .collect(Collectors.toList());
     }
