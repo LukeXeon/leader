@@ -6,6 +6,8 @@ import android.os.Bundle;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.AMapNaviGuide;
@@ -17,15 +19,14 @@ import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.poisearch.PoiSearch;
-import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.navi.widget.NaviCompat;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteRouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
 import org.kexie.android.dng.navi.widget.NaviCallbacks;
+import org.kexie.android.dng.navi.widget.NaviCompat;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -61,8 +62,6 @@ public class NaviViewModel extends AndroidViewModel
 
     private final MutableLiveData<List<Request>> routes = new MutableLiveData<>();
 
-    private final PublishSubject<Request> onJump = PublishSubject.create();
-
     private final PublishSubject<String> onLoading = PublishSubject.create();
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
@@ -80,30 +79,6 @@ public class NaviViewModel extends AndroidViewModel
     public LiveData<List<Request>> getRoutes()
     {
         return routes;
-    }
-
-    public void jumpToDetails(int id)
-    {
-
-        Bundle bundle = new Bundle();
-        bundle.putInt("pathId", id);
-        Request request = new Request.Builder()
-                .uri("dng/navi/details")
-                .bundle(bundle)
-                .build();
-        onJump.onNext(request);
-    }
-
-    public void jumpToNavi(int id)
-    {
-        Logger.d(id);
-        Bundle bundle = new Bundle();
-        bundle.putInt("pathId",id);
-        Request request = new Request.Builder()
-                .uri("dng/navi/navi")
-                .bundle(bundle)
-                .build();
-        onJump.onNext(request);
     }
 
     private void setRoute(int[] paths)
@@ -164,11 +139,6 @@ public class NaviViewModel extends AndroidViewModel
             loadRoute(query);
             onLoading.onNext("");
         });
-    }
-
-    public Observable<Request> getOnJump()
-    {
-        return onJump.observeOn(AndroidSchedulers.mainThread());
     }
 
     @WorkerThread
@@ -427,5 +397,20 @@ public class NaviViewModel extends AndroidViewModel
     protected void onCleared()
     {
         navigation.destroy();
+    }
+
+    public LatLngBounds getBounds(int id)
+    {
+        LatLngBounds.Builder builder = LatLngBounds.builder();
+        StreamSupport.stream(getPath(id).getCoordList())
+                .map(Point::box)
+                .map(x -> x.unBox(LatLng.class))
+                .forEach(builder::include);
+        LatLngBounds bounds = builder.build();
+        bounds = LatLngBounds.builder()
+                .include(Point.box(bounds.northeast).add(Point.form(0.4, 0.1)).unBox(LatLng.class))
+                .include(Point.box(bounds.southwest).add(Point.form(-0.4, -0.05)).unBox(LatLng.class))
+                .build();
+        return bounds;
     }
 }

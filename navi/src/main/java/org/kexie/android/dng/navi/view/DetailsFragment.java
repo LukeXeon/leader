@@ -7,18 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.navi.view.RouteOverLay;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentDetailsBinding;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.RouteViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import mapper.Mapper;
@@ -59,6 +60,7 @@ public class DetailsFragment extends Fragment
                 = TextureSupportMapFragment.class
                 .cast(getChildFragmentManager()
                         .findFragmentById(R.id.map_view));
+
         AMap mapController = mapFragment.getMap();
         Bundle bundle = getArguments();
         if (bundle != null)
@@ -71,13 +73,21 @@ public class DetailsFragment extends Fragment
                     viewModel.getPath(id),
                     getContext().getApplicationContext());
 
+            RouteViewModel routeViewModel = ViewModelProviders.of(this)
+                    .get(RouteViewModel.class);
+
+            mapController.setMapStatusLimits(viewModel.getBounds(id));
+
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
 
             routeOverLay.setTrafficLine(false);
             routeOverLay.addToMap();
 
-            binding.setOnToNavi(v -> viewModel.jumpToNavi(id));
+            binding.setOnToNavi(v -> routeViewModel.jumpToNavi());
             binding.setOnBack(v -> getActivity().onBackPressed());
-            viewModel.getOnJump()
+            routeViewModel.getOnJump()
                     .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                     .subscribe(request -> {
                         getActivity().onBackPressed();
@@ -85,7 +95,6 @@ public class DetailsFragment extends Fragment
                                 .beginTransaction()
                                 .addToBackStack(null)
                                 .add(getId(), Mapper.getOn(this, request))
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .commit();
                     });
         }

@@ -73,6 +73,7 @@ public class QueryFragment extends Fragment
 
         binding.setLifecycleOwner(this);
         binding.pagerRoot.setOnTouchListener((x, y) -> true);
+        binding.routePager.setOffscreenPageLimit(3);
         binding.routePager.setPageTransformer(false, new ScaleTransformer());
 
         naviViewModel = ViewModelProviders.of(getActivity())
@@ -83,7 +84,6 @@ public class QueryFragment extends Fragment
         AMap mapController = TextureSupportMapFragment.class
                 .cast(getChildFragmentManager()
                         .findFragmentById(R.id.map_view)).getMap();
-
 
 
         GenericQuickAdapter<LiteTip> tipsAdapter

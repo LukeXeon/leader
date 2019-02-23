@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="onBack"
@@ -10,6 +12,7 @@
     </data>
     <LinearLayout
         android:id="@+id/root"
+        android:transitionName="shared_map_view"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

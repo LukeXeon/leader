@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.navi.view.RouteOverLay;
@@ -14,6 +15,7 @@ import com.orhanobut.logger.Logger;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.RouteViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +38,9 @@ public class RouteFragment extends Fragment
 
     private AMap mapController;
 
-    NaviViewModel viewModel;
+    private NaviViewModel naviViewModel;
+
+    private RouteViewModel routeViewModel;
 
     @Nullable
     @Override
@@ -44,9 +48,12 @@ public class RouteFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-        binding = DataBindingUtil.inflate(inflater,
-                R.layout.fragment_route, container,
-                false);
+        if (binding == null)
+        {
+            binding = DataBindingUtil.inflate(inflater,
+                    R.layout.fragment_route, container,
+                    false);
+        }
         return binding.getRoot();
     }
 
@@ -55,6 +62,7 @@ public class RouteFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        Logger.d(this);
         binding.setLifecycleOwner(this);
         TextureSupportMapFragment mapFragment
                 = TextureSupportMapFragment.class
@@ -70,26 +78,36 @@ public class RouteFragment extends Fragment
         Bundle bundle = getArguments();
         if (bundle != null)
         {
-            viewModel = ViewModelProviders.of(getActivity())
+            naviViewModel = ViewModelProviders.of(getActivity())
                     .get(NaviViewModel.class);
+
+            routeViewModel = ViewModelProviders.of(this)
+                    .get(RouteViewModel.class);
+
+            routeViewModel.init(bundle);
+
             int id = bundle.getInt("pathId");
 
-            binding.setOnJumpToNavi(v -> viewModel.jumpToNavi(id));
-            mapController.setOnMapClickListener(latLng ->{
-                Logger.d(latLng);
-                viewModel.jumpToDetails(id);
-            });
+            binding.setOnJumpToDetails(v -> routeViewModel.jumpToDetails());
+
+            binding.setOnJumpToNavi(v -> routeViewModel.jumpToNavi());
+
+            mapController.setMapStatusLimits(naviViewModel.getBounds(id));
+
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
+            mapController.moveCamera(CameraUpdateFactory.zoomOut());
 
             RouteOverLay routeOverLay = new RouteOverLay(mapController,
-                    viewModel.getPath(id),
+                    naviViewModel.getPath(id),
                     getContext().getApplicationContext());
 
             routeOverLay.setTrafficLine(false);
             routeOverLay.addToMap();
 
-            binding.infosList.setGuideData(viewModel.getGuideInfo(id));
-            binding.setRoute(viewModel.getRouteInfo(id));
-            viewModel.getOnJump()
+            binding.infosList.setGuideData(naviViewModel.getGuideInfo(id));
+            binding.setRoute(naviViewModel.getRouteInfo(id));
+            routeViewModel.getOnJump()
                     .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                     .subscribe(this::jumpTo);
         }
@@ -97,13 +115,21 @@ public class RouteFragment extends Fragment
 
     private void jumpTo(Request request)
     {
-        Logger.d(request);
         Fragment parent = getParentFragment();
-        parent.getFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(parent.getId(), Mapper.getOn(parent, request))
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+        try
+        {
+            parent.getFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(parent.getId(),Mapper.getOn(parent, request))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit();
+        }catch (Exception e)
+        {
+            Logger.d(e);
+        }
+
+
+
     }
 }

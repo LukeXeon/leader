@@ -6,13 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.navi.AMapNaviView;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
+import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.model.Route;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.widget.NaviViewFragment;
+
+import java.util.stream.StreamSupport;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -82,4 +87,6 @@ public class NaviFragment extends Fragment
             Route route = bundle.getParcelable(ARG);
         }
     }
+
+
 }

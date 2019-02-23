@@ -14,6 +14,11 @@
         <variable
             name="onJumpToNavi"
             type="android.view.View.OnClickListener"/>
+
+        <variable
+            name="onJumpToDetails"
+            type="android.view.View.OnClickListener"/>
+
     </data>
 
     <FrameLayout
@@ -89,20 +94,18 @@
                 app:roundTopRight="true"
                 app:roundedCornerRadius="15dp">
 
-                <FrameLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
                     <fragment
                         android:id="@+id/map_view"
                         android:name="com.amap.api.maps.TextureSupportMapFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
+                        android:layout_alignParentBottom="true"
                         android:background="@color/colorBlackAlpha26"
                         android:orientation="vertical">
 
@@ -149,7 +152,12 @@
                             android:text='@{route.time+"("+route.length+")"}'
                             android:textSize="25dp"/>
                     </LinearLayout>
-                </FrameLayout>
+                    <FrameLayout
+                        android:onClick="@{onJumpToDetails}"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                    </FrameLayout>
+                </RelativeLayout>
             </com.fxc.roundcornerlayout.RoundCornerFrameLayout>
 
         </RelativeLayout>
