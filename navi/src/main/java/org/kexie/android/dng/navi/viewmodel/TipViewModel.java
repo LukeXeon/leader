@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -31,9 +33,9 @@ public class TipViewModel extends AndroidViewModel
 
     private final Executor singleTask = Executors.newSingleThreadExecutor();
 
-    private final MutableLiveData<String> queryText = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isShowTips = new MutableLiveData<>();
 
-    private final PublishSubject<String> onLoading = PublishSubject.create();
+    private final MutableLiveData<String> queryText = new MutableLiveData<>();
 
     private final PublishSubject<String> onErrorMessage = PublishSubject.create();
 
@@ -41,19 +43,18 @@ public class TipViewModel extends AndroidViewModel
 
     private GenericQuickAdapter<LiteTip> adapter;
 
-    public void bindAdapter(GenericQuickAdapter<LiteTip> adapter)
-    {
-        this.adapter = adapter;
-    }
 
     public TipViewModel(@NonNull Application application)
     {
         super(application);
+        isShowTips.setValue(false);
     }
 
     @MainThread
     public void query(String text)
     {
+        Logger.d(text);
+        isShowTips.setValue(false);
         singleTask.execute(() -> {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(() -> {
@@ -68,14 +69,31 @@ public class TipViewModel extends AndroidViewModel
                         .filter(tip -> !TextUtils.isEmpty(tip.getPoiID()))
                         .map(x -> new LiteTip(x.getName(), x.getPoiID()))
                         .forEach(tip -> handler.post(() -> adapter.addData(tip)));
+                isShowTips.postValue(true);
+                onSuccessMessage.onNext("搜索成功");
             } catch (Exception e)
             {
+                isShowTips.postValue(false);
                 e.printStackTrace();
                 onErrorMessage.onNext("输入提示查询失败,请检查网络连接");
             }
         });
     }
 
+    public void bindAdapter(GenericQuickAdapter<LiteTip> adapter)
+    {
+        this.adapter = adapter;
+    }
+
+    public LiveData<Boolean> getIsShowTips()
+    {
+        return isShowTips;
+    }
+
+    public LiveData<String> getQueryText()
+    {
+        return queryText;
+    }
 
     public Observable<String> getOnSuccessMessage()
     {
@@ -85,10 +103,5 @@ public class TipViewModel extends AndroidViewModel
     public Observable<String> getOnErrorMessage()
     {
         return onErrorMessage.observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Observable<String> getOnLoading()
-    {
-        return onLoading.observeOn(AndroidSchedulers.mainThread());
     }
 }

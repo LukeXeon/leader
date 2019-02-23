@@ -539,8 +539,7 @@ public class IjkPlayerView extends FrameLayout
         }
         if (mIsAlwaysFullScreen)
         {
-            _exit();
-            return true;
+            return _exit();
         } else if (mIsFullscreen)
         {
             mAttachActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -1360,12 +1359,13 @@ public class IjkPlayerView extends FrameLayout
     /**
      * 从总显示全屏状态退出处理{@link #alwaysFullScreen()}
      */
-    private void _exit()
+    private boolean _exit()
     {
         if (System.currentTimeMillis() - mExitTime > 2000)
         {
             Toasty.warning(mAttachActivity, "再按一次退出", Toast.LENGTH_SHORT).show();
             mExitTime = System.currentTimeMillis();
+            return true;
         } else
         {
             //mAttachActivity.finish();
@@ -1373,6 +1373,7 @@ public class IjkPlayerView extends FrameLayout
             {
                 onBackListener.onBack();
             }
+            return false;
         }
     }
 

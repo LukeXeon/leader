@@ -11,7 +11,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk {
-            abiFilters "armeabi-v7a","x86"
+            abiFilters "armeabi-v7a"
         }
 //        ndk {
 //            abiFilters "armeabi-v7a"
@@ -39,6 +39,7 @@ dependencies {
     implementation project(':ux')
     implementation project(':navi')
     implementation project(':media')
+    implementation project(':asr')
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'

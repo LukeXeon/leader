@@ -29,6 +29,11 @@
         <variable
             name="query"
             type="String"/>
+
+        <variable
+            name="isShowTips"
+            type="Boolean"/>
+
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -38,6 +43,126 @@
             android:id="@+id/map_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_marginLeft="120dp"
+            android:layout_marginRight="120dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick='@{actions.get("开始查询")}'
+                        android:visibility="@{!isShowTips?View.VISIBLE:View.GONE}"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="10dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardUseCompatPadding="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:hint="查找地点"
+                                android:singleLine="true"
+                                android:textColor="@color/grey1000"
+                                android:textColorHint="@color/grey600"
+                                android:textSize="35sp"
+                                android:textStyle="bold"/>
+
+                            <ImageView
+                                async_src='@{"image_search"}'
+                                android:layout_width="50dp"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginBottom="5dp"
+                                android:scaleType="centerInside"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{isShowTips?View.VISIBLE:View.GONE}"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="10dp"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardUseCompatPadding="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:hint="TEXT"
+                                android:singleLine="true"
+                                android:text="@{query}"
+                                android:textColor="@color/grey1000"
+                                android:textColorHint="@color/grey600"
+                                android:textSize="35sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </FrameLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-10dp"
+                    android:visibility="@{isShowTips?View.VISIBLE:View.GONE}"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="10dp"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardUseCompatPadding="true">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:adapter="@{tipsAdapter}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="20dp"/>
+
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+        </LinearLayout>
+
         <LinearLayout
             android:background="@color/colorBlackAlpha26"
             android:clipChildren="false"
@@ -63,5 +188,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"/>
         </LinearLayout>
+
     </FrameLayout>
 </layout>

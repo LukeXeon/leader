@@ -8,14 +8,11 @@ import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.TextureSupportMapFragment;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
-import org.kexie.android.dng.navi.model.Point;
-import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.TipViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
@@ -43,6 +40,7 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 @Mapping("dng/navi/query")
 public class QueryFragment extends Fragment
 {
+
     private FragmentQueryBinding binding;
 
     private NaviViewModel naviViewModel;
@@ -55,6 +53,7 @@ public class QueryFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
+
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_query,
                 container,
@@ -69,12 +68,11 @@ public class QueryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        Logger.d("test");
-
         binding.setLifecycleOwner(this);
         binding.pagerRoot.setOnTouchListener((x, y) -> true);
         binding.routePager.setOffscreenPageLimit(3);
-        binding.routePager.setPageTransformer(false, new ScaleTransformer());
+        binding.routePager.setPageTransformer(false,
+                new ScaleTransformer());
 
         naviViewModel = ViewModelProviders.of(getActivity())
                 .get(NaviViewModel.class);
@@ -84,6 +82,8 @@ public class QueryFragment extends Fragment
         AMap mapController = TextureSupportMapFragment.class
                 .cast(getChildFragmentManager()
                         .findFragmentById(R.id.map_view)).getMap();
+
+        //getActivity().addOnBackPressedCallback(this,naviViewModel);
 
 
         GenericQuickAdapter<LiteTip> tipsAdapter
@@ -96,6 +96,12 @@ public class QueryFragment extends Fragment
         binding.setTipsAdapter(tipsAdapter);
 
         tipViewModel.bindAdapter(tipsAdapter);
+
+        tipViewModel.getIsShowTips()
+                .observe(this,binding::setIsShowTips);
+
+        tipViewModel.getQueryText()
+                .observe(this,binding::setQuery);
 
         naviViewModel.getRoutes()
                 .observe(this, requests -> {
@@ -118,29 +124,31 @@ public class QueryFragment extends Fragment
         Observable.merge(naviViewModel.getOnSuccessMessage(), tipViewModel.getOnSuccessMessage())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
-        Observable.merge(naviViewModel.getOnLoading(), tipViewModel.getOnLoading())
+        naviViewModel.getOnLoading()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(ProgressFragment.makeObserver(this));
 
 
+        tipViewModel.query(TipViewModel.DEBUG_TEXT);
         //test
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                Logger.d("begin");
-                Query q = new Query.Builder()
-                        .from(Point.form(109.200903, 24.40092))
-                        .to(Point.form(109.29154, 24.298327))
-                        .build();
-                naviViewModel.loadRoute(q);
-                Logger.d("end");
-            }
-        }.start();
+
+
+//        new Thread()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                  Logger.d("begin");
+//                Query q = new Query.Builder()
+//                        .from(Point.form(109.200903, 24.40092))
+//                        .to(Point.form(109.29154, 24.298327))
+//                        .build();
+//                naviViewModel.loadRoute(q);
+//                Logger.d("end");
+//            }
+//        }.start();
 
     }
-
 
 
     @Override

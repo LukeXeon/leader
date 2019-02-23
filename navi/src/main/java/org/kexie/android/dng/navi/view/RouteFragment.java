@@ -116,20 +116,12 @@ public class RouteFragment extends Fragment
     private void jumpTo(Request request)
     {
         Fragment parent = getParentFragment();
-        try
-        {
-            parent.getFragmentManager()
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .add(parent.getId(),Mapper.getOn(parent, request))
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
-        }catch (Exception e)
-        {
-            Logger.d(e);
-        }
-
-
-
+        parent.getFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .hide(parent)
+                .add(parent.getId(),Mapper.getOn(parent, request))
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 }

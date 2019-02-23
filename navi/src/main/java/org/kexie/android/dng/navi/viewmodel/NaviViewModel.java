@@ -42,6 +42,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import androidx.lifecycle.AndroidViewModel;
@@ -55,7 +56,7 @@ import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 import mapper.Request;
 
-public class NaviViewModel extends AndroidViewModel
+public class NaviViewModel extends AndroidViewModel implements OnBackPressedCallback
 {
 
     private final Executor singleTask = Executors.newSingleThreadExecutor();
@@ -70,10 +71,14 @@ public class NaviViewModel extends AndroidViewModel
 
     private final AMapNavi navigation;
 
+    private final AMapLocationClient locationClient;
+
     public NaviViewModel(@NonNull Application application)
     {
         super(application);
         navigation = AMapNavi.getInstance(application);
+        locationClient = new AMapLocationClient(getApplication());
+        locationClient.startLocation();
     }
 
     public LiveData<List<Request>> getRoutes()
@@ -133,7 +138,7 @@ public class NaviViewModel extends AndroidViewModel
                 }
             }
             Query query = new Query.Builder()
-                    .from(points.get(1))
+                    .from(points.get(0))
                     .to(points.get(1))
                     .build();
             loadRoute(query);
@@ -146,11 +151,13 @@ public class NaviViewModel extends AndroidViewModel
     {
         try
         {
+            AMapLocation location = locationClient.getLastKnownLocation();
+            if (location != null)
+            {
+                return Point.form(location.getLongitude(), location.getLatitude());
+            }
             Lock lock = new ReentrantLock();
             Condition condition = lock.newCondition();
-            AMapLocationClient locationClient
-                    = new AMapLocationClient(getApplication());
-            locationClient.startLocation();
             locationClient.setLocationListener(
                     new AMapLocationListener()
                     {
@@ -164,11 +171,9 @@ public class NaviViewModel extends AndroidViewModel
                         }
                     });
             lock.lock();
-            locationClient.startLocation();
             condition.await();
             lock.unlock();
-            locationClient.stopLocation();
-            AMapLocation location = locationClient.getLastKnownLocation();
+            location = locationClient.getLastKnownLocation();
             return Point.form(location.getLongitude(), location.getLatitude());
         } catch (Exception e)
         {
@@ -179,7 +184,7 @@ public class NaviViewModel extends AndroidViewModel
     }
 
     @WorkerThread
-    public void loadRoute(Query query)
+    private void loadRoute(Query query)
     {
         try
         {
@@ -397,6 +402,7 @@ public class NaviViewModel extends AndroidViewModel
     protected void onCleared()
     {
         navigation.destroy();
+        locationClient.stopLocation();
     }
 
     public LatLngBounds getBounds(int id)
@@ -412,5 +418,16 @@ public class NaviViewModel extends AndroidViewModel
                 .include(Point.box(bounds.southwest).add(Point.form(-0.4, -0.05)).unBox(LatLng.class))
                 .build();
         return bounds;
+    }
+
+    @Override
+    public boolean handleOnBackPressed()
+    {
+        if (routes.getValue() != null)
+        {
+            routes.setValue(null);
+            return true;
+        }
+        return false;
     }
 }
