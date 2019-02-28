@@ -37,12 +37,8 @@ public final class AppInfoProvider
         {
             localArrayList = new ArrayList<>();
             localIterator = localList.iterator();
-            while (true)
+            while (localIterator.hasNext())
             {
-                if (!localIterator.hasNext())
-                {
-                    break;
-                }
                 ResolveInfo localResolveInfo = (ResolveInfo) localIterator.next();
                 AppInfo localAppBean = new AppInfo();
                 localAppBean.setIcon(localResolveInfo.activityInfo.loadIcon(localPackageManager));
@@ -88,10 +84,8 @@ public final class AppInfoProvider
         {
             localArrayList = new ArrayList<>();
             localIterator = localList.iterator();
-            while (true)
+            while (localIterator.hasNext())
             {
-                if (!localIterator.hasNext())
-                    break;
                 ResolveInfo localResolveInfo = localIterator.next();
                 AppInfo localAppBean = new AppInfo();
                 localAppBean.setIcon(localResolveInfo.activityInfo.loadIcon(localPackageManager));

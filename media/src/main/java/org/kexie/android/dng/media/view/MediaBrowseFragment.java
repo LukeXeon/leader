@@ -9,14 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.common.databinding.RxEvent;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
+import org.kexie.android.dng.media.model.entity.MediaType;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import java.util.Map;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,15 +27,10 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import mapper.Mapper;
 import mapper.Mapping;
 import mapper.Request;
-
-import static com.uber.autodispose.AutoDispose.autoDisposable;
-import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/media/browse")
 public class MediaBrowseFragment
@@ -41,6 +39,11 @@ public class MediaBrowseFragment
     private MediaBrowseViewModel viewModel;
 
     private FragmentMediaBrowseBinding binding;
+
+    private GenericQuickAdapter<Media> mediasAdapter;
+
+    private static final int REQUEST_TO_PHOTO = 1000;
+    private static final int REQUEST_TO_VIDEO = 1001;
 
     @Nullable
     @Override
@@ -66,38 +69,64 @@ public class MediaBrowseFragment
                 .get(MediaBrowseViewModel.class);
         //dataBinding
         binding.getRoot().setOnTouchListener((v, event) -> true);
+
         Map<String, View.OnClickListener> actions = getActions();
+
         binding.setActions(actions);
-        binding.dataContent.setLayoutManager(
-                new StaggeredGridLayoutManager(4,
-                        StaggeredGridLayoutManager.VERTICAL));
-        GenericQuickAdapter<Media> genericQuickAdapter
-                = new GenericQuickAdapter<>(
-                R.layout.item_media_info,
-                BR.mediaInfo);
-        genericQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
-            Media info = genericQuickAdapter.getData().get(position);
-            viewModel.requestJump(info);
+
+        mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
+
+        mediasAdapter.setOnItemClickListener((adapter, view1, position) -> {
+            Media info = mediasAdapter.getData().get(position);
+            switch (info.type)
+            {
+                case MediaType.TYPE_PHOTO:
+                {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("media", info);
+                    Request request = new Request.Builder()
+                            .uri("dng/media/photo")
+                            .code(REQUEST_TO_PHOTO)
+                            .bundle(bundle)
+                            .build();
+                    jumpTo(request);
+                }
+                break;
+                case MediaType.TYPE_VIDEO:
+                {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("media", info);
+                    Request request = new Request.Builder()
+                            .uri("dng/media/video")
+                            .code(REQUEST_TO_VIDEO)
+                            .bundle(bundle)
+                            .build();
+                    jumpTo(request);
+                }
+                break;
+            }
         });
-        genericQuickAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
-        genericQuickAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
-        binding.setMedias(genericQuickAdapter);
-        viewModel.setAdapter(genericQuickAdapter);
+
+        mediasAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
+
+        mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
+
+        viewModel.medias.observe(this,mediasAdapter::setNewData);
+
+        binding.setMedias(mediasAdapter);
+
         //liveData
-        viewModel.getTitle().observe(this, binding::setTitle);
+        viewModel.title.observe(this, binding::setTitle);
         //rx
-        viewModel.getOnJump()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(this::jumpTo);
-        viewModel.getLoading()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+        viewModel.onLoading.as(RxEvent.bind(this))
                 .subscribe(ProgressFragment.makeObserver(this));
+
         viewModel.loadPhoto();
     }
 
     private void jumpTo(Request request)
     {
-        getFragmentManager()
+        requireFragmentManager()
                 .beginTransaction()
                 .add(getId(), Mapper.getOn(this, request))
                 .addToBackStack(null)
@@ -110,10 +139,16 @@ public class MediaBrowseFragment
                                  int resultCode,
                                  @Nullable Intent data)
     {
-        if (requestCode == MediaBrowseViewModel.REQUEST_TO_PHOTO
+        if (requestCode == REQUEST_TO_PHOTO
                 && Activity.RESULT_FIRST_USER == resultCode)
         {
-            viewModel.remove(data.getIntExtra("index", -1));
+            Media media = Objects.requireNonNull(data)
+                    .getParcelableExtra("media");
+            int index = mediasAdapter.getData().indexOf(media);
+            if (index != -1)
+            {
+                mediasAdapter.remove(index);
+            }
         }
     }
 

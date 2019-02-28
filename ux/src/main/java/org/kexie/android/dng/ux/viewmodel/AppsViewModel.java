@@ -22,13 +22,14 @@ public class AppsViewModel extends AndroidViewModel
 {
     public final MutableLiveData<List<App>> apps = new MutableLiveData<>();
 
+    public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+
     public AppsViewModel(@NonNull Application application)
     {
         super(application);
-        loadAppInfo();
     }
 
-    private void loadAppInfo()
+    public void loadAppInfo()
     {
         Observable.<Context>just(getApplication())
                 .observeOn(Schedulers.io())
@@ -41,6 +42,7 @@ public class AppsViewModel extends AndroidViewModel
                     @Override
                     public void onSubscribe(Disposable d)
                     {
+                        isLoading.postValue(true);
                     }
 
                     @Override
@@ -58,7 +60,7 @@ public class AppsViewModel extends AndroidViewModel
                     @Override
                     public void onComplete()
                     {
-
+                        isLoading.postValue(false);
                     }
                 });
     }

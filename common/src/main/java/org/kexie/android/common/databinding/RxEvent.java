@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner;
 import io.reactivex.ObservableConverter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
-public class RxEvent
+public final class RxEvent
 {
     private RxEvent()
     {
@@ -20,8 +20,7 @@ public class RxEvent
     bind(LifecycleOwner owner)
     {
         return x -> x.observeOn(AndroidSchedulers.mainThread())
-                .filter(x2 -> Lifecycle.State
-                .STARTED.isAtLeast(owner.getLifecycle().getCurrentState()))
+                .filter(x2 -> owner.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED))
                 .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider
                         .from(owner, Lifecycle.Event.ON_DESTROY)));
     }

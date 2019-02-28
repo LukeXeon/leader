@@ -56,6 +56,9 @@
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
                     android:adapter="@{medias}"
+                    app:spanCount="4"
+                    app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
                 </androidx.recyclerview.widget.RecyclerView>

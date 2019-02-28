@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.common.widget.BlurViewUtil;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentInfoBinding;
 
@@ -13,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import mapper.Mapping;
 
 @Mapping("dng/ux/info")
@@ -43,7 +43,13 @@ public class InfoFragment extends Fragment
 
         binding.setOnBack(v -> requireActivity().onBackPressed());
 
-        BlurViewUtil.initUseFragment(this,binding.blurView);
+        binding.blurView.setupWith((ViewGroup) view)
+                .setFrameClearDrawable(requireActivity().getWindow()
+                        .getDecorView()
+                        .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(requireContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
 
         getChildFragmentManager()
                 .beginTransaction()

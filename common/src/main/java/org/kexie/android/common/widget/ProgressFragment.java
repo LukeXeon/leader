@@ -164,7 +164,7 @@ public final class ProgressFragment
         public void run()
         {
             this.removeCallbacksAndMessages(null);
-            progressFragment.getFragmentManager()
+            progressFragment.requireFragmentManager()
                     .beginTransaction()
                     .remove(progressFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)

@@ -5,11 +5,12 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 
 import org.kexie.android.dng.media.model.entity.MediaInfo;
+import org.kexie.android.dng.media.model.entity.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MediaInfoProvider
+public class MediaInfoLoader
 {
     public static List<MediaInfo> getPhotoModels(Context context)
     {
@@ -48,7 +49,7 @@ public class MediaInfoProvider
             if (size < 5 * 1024 * 1024)
             {//<5M
                 MediaInfo materialBean
-                        = new MediaInfo(title, path, MediaInfo.TYPE_PHOTO);
+                        = new MediaInfo(title, path, MediaType.TYPE_PHOTO);
                 list.add(materialBean);
             }
         }
@@ -94,7 +95,7 @@ public class MediaInfoProvider
 
                     String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)); // 路径
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME));
-                    MediaInfo mediaModel = new MediaInfo(title, path, MediaInfo.TYPE_VIDEO);
+                    MediaInfo mediaModel = new MediaInfo(title, path, MediaType.TYPE_VIDEO);
                     list.add(mediaModel);
                 }
             }

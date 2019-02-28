@@ -36,7 +36,6 @@
                 android:layout_height="match_parent">
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_gravity="center"
-                    android:id="@+id/dataContent"
                     android:adapter="@{adapter}"
                     android:layout_marginLeft="50dp"
                     android:layout_marginRight="50dp"

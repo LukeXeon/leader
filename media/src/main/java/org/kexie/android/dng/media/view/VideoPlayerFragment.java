@@ -16,6 +16,8 @@ import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
 
+import java.util.Objects;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,15 +55,16 @@ public class VideoPlayerFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        MediaInfo info = getArguments().getParcelable("info");
-        getActivity().addOnBackPressedCallback(this,
+        MediaInfo info = requireArguments().getParcelable("info");
+        requireActivity().addOnBackPressedCallback(this,
                 this);
         //dataBinding
         player = binding.playerView;
         Glide.with(this)
-                .load(info.uri)
+                .load(Objects.requireNonNull(info).uri)
                 .apply(RequestOptions.fitCenterTransform())
                 .into(player.mPlayerThumb);
+
         binding.playerView.init()
                 .setSaveDir(Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
@@ -89,7 +92,6 @@ public class VideoPlayerFragment
         super.onDestroyView();
         if (player != null)
         {
-            Logger.d(this + " onDestroyView");
             player.onDestroy();
             player = null;
         }
