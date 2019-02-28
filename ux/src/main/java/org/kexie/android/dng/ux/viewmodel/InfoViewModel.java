@@ -22,6 +22,7 @@ import java8.util.Objects;
 public class InfoViewModel extends AndroidViewModel
 {
     private Gson gson = new Gson();
+
     public final MutableLiveData<User> user = new MutableLiveData<>();
 
     public InfoViewModel(@NonNull Application application)

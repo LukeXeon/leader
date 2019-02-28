@@ -16,6 +16,8 @@ import org.kexie.android.dng.navi.databinding.FragmentDetailsBinding;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.RouteViewModel;
 
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -58,10 +60,9 @@ public class DetailsFragment extends Fragment
 
         TextureSupportMapFragment mapFragment
                 = TextureSupportMapFragment.class
-                .cast(getChildFragmentManager()
-                        .findFragmentById(R.id.map_view));
+                .cast(getChildFragmentManager().findFragmentById(R.id.map_view));
 
-        AMap mapController = mapFragment.getMap();
+        AMap mapController = Objects.requireNonNull(mapFragment).getMap();
         Bundle bundle = getArguments();
         if (bundle != null)
         {

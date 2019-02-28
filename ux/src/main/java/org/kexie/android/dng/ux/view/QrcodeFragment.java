@@ -22,6 +22,7 @@ import mapper.Mapping;
 public class QrcodeFragment extends Fragment
 {
     private FragmentQrcodeBinding binding;
+
     private LoginViewModel viewModel;
 
     @Nullable

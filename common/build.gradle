@@ -30,49 +30,51 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //android appcompat
+    //android support
     api 'androidx.appcompat:appcompat:1.1.0-alpha02'
     api 'androidx.multidex:multidex:2.0.1'
     api 'androidx.legacy:legacy-support-v13:1.0.0'
     api 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha02'
     api 'com.google.android.material:material:1.1.0-alpha03'
+    api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
+    api 'me.jessyan:autosize:1.1.2'
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     //api 'androidx.percentlayout:percentlayout:1.0.0'
     //api 'com.google.guava:guava:27.0.1-android'
 
-    //java8
-    api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
-
-    //...
-    api 'com.jakewharton.rxbinding3:rxbinding-core:3.0.0-alpha2'
+    //ui widget
     api 'com.github.vipulasri:timelineview:1.1.0'
     api 'com.github.ishaan1995:ButtonProgressBar:1.0'
     api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
+    api 'com.eightbitlab:blurview:1.5.0'
+    api 'com.github.chrisbanes:PhotoView:2.3.0'
+    api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
+    api 'com.github.castorflex.verticalviewpager:library:19.0.1'
+    api 'com.getbase:floatingactionbutton:1.10.1'
+    api 'com.github.GrenderG:Toasty:1.4.0'
+    api 'com.makeramen:roundedimageview:2.3.0'
+    api 'de.hdodenhof:circleimageview:3.0.0'
+    //api 'com.flipboard:bottomsheet-core:1.5.3'
+
+    //util framework
+    api 'com.jakewharton.rxbinding3:rxbinding-core:3.0.0-alpha2'
     api 'com.squareup.retrofit2:adapter-rxjava:2.5.0'
     api 'com.squareup.retrofit2:converter-gson:2.5.0'
     api 'com.squareup.retrofit2:retrofit:2.5.0'
     api 'com.uber.autodispose:autodispose:1.1.0'
     api 'com.uber.autodispose:autodispose-android-archcomponents:1.1.0'
-    api 'com.eightbitlab:blurview:1.5.0'
-    api 'com.github.chrisbanes:PhotoView:2.3.0'
-    api 'me.jessyan:autosize:1.1.2'
-    api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
-    api 'com.github.castorflex.verticalviewpager:library:19.0.1'
     api 'com.github.bumptech.glide:glide:4.9.0'
     api 'com.neovisionaries:nv-websocket-client:2.6'
-    api 'com.getbase:floatingactionbutton:1.10.1'
-    api 'com.flipboard:bottomsheet-core:1.5.3'
-    api 'com.github.GrenderG:Toasty:1.4.0'
-    api 'com.makeramen:roundedimageview:2.3.0'
     api 'com.squareup.okhttp3:okhttp:3.13.1'
     api 'com.google.code.gson:gson:2.8.5'
-    api 'de.hdodenhof:circleimageview:3.0.0'
+    api 'com.github.LukeXeon.Mapper:mapper-core:1.0.2'
     api 'com.blankj:utilcode:1.23.4'
-    api 'com.orhanobut:logger:2.2.0'
     api 'io.reactivex.rxjava2:rxjava:2.2.6'
     api 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    api 'com.github.LukeXeon.Mapper:mapper-core:1.0.2'
+    api 'com.orhanobut:logger:2.2.0'
 
+    //annotation processor
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 
     testImplementation 'junit:junit:4.12'
