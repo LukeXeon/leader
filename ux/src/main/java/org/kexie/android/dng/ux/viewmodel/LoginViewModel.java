@@ -9,6 +9,7 @@ import org.kexie.android.dng.ux.model.LoginModule;
 import org.kexie.android.dng.ux.model.entity.JsonPollingResult;
 import org.kexie.android.dng.ux.model.entity.JsonQrcode;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -23,12 +24,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginViewModel extends AndroidViewModel
 {
-
-    private final MutableLiveData<Drawable> qrcode = new MutableLiveData<>();
-    private final Executor singleTask = Executors.newSingleThreadExecutor();
-    private final PublishSubject<String> onErrorMessage = PublishSubject.create();
-    private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
     private final LoginModule loginModule;
+
+    private final Executor singleTask = Executors.newSingleThreadExecutor();
+
+    public final MutableLiveData<Drawable> qrcode = new MutableLiveData<>();
+
+    public final PublishSubject<String> onError = PublishSubject.create();
+
+    public final PublishSubject<String> onSuccess = PublishSubject.create();
+
 
     public LoginViewModel(@NonNull Application application)
     {
@@ -39,11 +44,7 @@ public class LoginViewModel extends AndroidViewModel
                 .baseUrl("")
                 .build();
         loginModule = retrofit.create(LoginModule.class);
-    }
-
-    public MutableLiveData<Drawable> getQrcode()
-    {
-        return qrcode;
+        requestQrcode();
     }
 
     public void requestQrcode()
@@ -57,7 +58,7 @@ public class LoginViewModel extends AndroidViewModel
                 {
                     JsonQrcode qrcode = response.body();
                     Drawable resource = Glide.with(getApplication())
-                            .load(qrcode.value)
+                            .load(Objects.requireNonNull(qrcode).value)
                             .submit().get();
                     this.qrcode.postValue(resource);
                     polling();
@@ -80,7 +81,7 @@ public class LoginViewModel extends AndroidViewModel
             {
                 return;
             }
-            switch (pollingResponse.body().statusCode)
+            switch (Objects.requireNonNull(pollingResponse.body()).statusCode)
             {
                 case JsonPollingResult.CODE_STATE_CONTINUE:
                 {
@@ -107,13 +108,4 @@ public class LoginViewModel extends AndroidViewModel
         }
     }
 
-    public PublishSubject<String> getOnErrorMessage()
-    {
-        return onErrorMessage;
-    }
-
-    public PublishSubject<String> getOnSuccessMessage()
-    {
-        return onSuccessMessage;
-    }
 }

@@ -3,6 +3,8 @@ package org.kexie.android.common.databinding;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
+import java.util.Objects;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 
@@ -11,10 +13,10 @@ public class GenericQuickAdapter<X>
         extends BaseQuickAdapter<X, BaseViewHolder>
 {
 
-    private final String mName;
+    private final int mName;
 
     @SuppressWarnings("WeakerAccess")
-    public GenericQuickAdapter(int layoutId, String name)
+    public GenericQuickAdapter(int layoutId, int name)
     {
         super(layoutId);
         openLoadAnimation();
@@ -25,8 +27,6 @@ public class GenericQuickAdapter<X>
     protected void convert(BaseViewHolder helper, X item)
     {
         ViewDataBinding binding = DataBindingUtil.bind(helper.itemView);
-        DataBindingReflectionUtil.setVariable(binding, mName, item);
+        Objects.requireNonNull(binding).setVariable(mName,item);
     }
-
-
 }

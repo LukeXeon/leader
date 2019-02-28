@@ -5,7 +5,7 @@
     <data>
         <variable
             name="mediaInfo"
-            type="org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo"/>
+            type="org.kexie.android.dng.media.viewmodel.entity.Media"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"

@@ -87,7 +87,7 @@ public class QueryFragment extends Fragment
 
 
         GenericQuickAdapter<LiteTip> tipsAdapter
-                = new GenericQuickAdapter<>(R.layout.item_tip, "tip");
+                = new GenericQuickAdapter<>(R.layout.item_tip, 0);
 
         tipsAdapter.setOnItemClickListener(
                 (adapter, view1, position) -> naviViewModel

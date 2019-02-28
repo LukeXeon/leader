@@ -1,1 +1,1 @@
-include ':host', ':common', ':navi', ':media', ':playerview', ':ux', ':asr'
+include ':host', ':common', ':navi', ':media', ':ijkplayer', ':ux', ':asr'

@@ -10,10 +10,11 @@ import android.view.ViewGroup;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
+import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
-import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import java.util.Map;
 
@@ -70,17 +71,17 @@ public class MediaBrowseFragment
         binding.dataContent.setLayoutManager(
                 new StaggeredGridLayoutManager(4,
                         StaggeredGridLayoutManager.VERTICAL));
-        GenericQuickAdapter<LiteMediaInfo> genericQuickAdapter
+        GenericQuickAdapter<Media> genericQuickAdapter
                 = new GenericQuickAdapter<>(
                 R.layout.item_media_info,
-                "mediaInfo");
+                BR.mediaInfo);
         genericQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
-            LiteMediaInfo info = genericQuickAdapter.getData().get(position);
+            Media info = genericQuickAdapter.getData().get(position);
             viewModel.requestJump(info);
         });
         genericQuickAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
         genericQuickAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
-        binding.setMediaInfos(genericQuickAdapter);
+        binding.setMedias(genericQuickAdapter);
         viewModel.setAdapter(genericQuickAdapter);
         //liveData
         viewModel.getTitle().observe(this, binding::setTitle);

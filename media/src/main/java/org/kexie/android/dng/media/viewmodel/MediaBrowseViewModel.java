@@ -8,7 +8,7 @@ import android.os.Looper;
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.media.model.MediaInfoProvider;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
-import org.kexie.android.dng.media.viewmodel.entity.LiteMediaInfo;
+import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +37,9 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private MutableLiveData<String> title = new MutableLiveData<>();
 
-    private Map<LiteMediaInfo, MediaInfo> mediaInfos = new HashMap<>();
+    private Map<Media, MediaInfo> mediaInfos = new HashMap<>();
 
-    private GenericQuickAdapter<LiteMediaInfo> adapter;
+    private GenericQuickAdapter<Media> adapter;
 
     private PublishSubject<String> loading = PublishSubject.create();
 
@@ -60,12 +60,12 @@ public class MediaBrowseViewModel extends AndroidViewModel
         return loading;
     }
 
-    public void setAdapter(GenericQuickAdapter<LiteMediaInfo> adapter)
+    public void setAdapter(GenericQuickAdapter<Media> adapter)
     {
         this.adapter = adapter;
     }
 
-    public void requestJump(LiteMediaInfo mediaInfo)
+    public void requestJump(Media mediaInfo)
     {
         MediaInfo info = mediaInfos.get(mediaInfo);
         if (info != null)
@@ -91,7 +91,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
     {
         if (index != -1)
         {
-            LiteMediaInfo data = adapter.getItem(index);
+            Media data = adapter.getItem(index);
             adapter.remove(index);
             mediaInfos.remove(data);
         }
@@ -121,8 +121,8 @@ public class MediaBrowseViewModel extends AndroidViewModel
                     ? MediaInfoProvider.getVideoModels(getApplication())
                     : MediaInfoProvider.getPhotoModels(getApplication()))
                     .forEach(x -> {
-                        LiteMediaInfo liteMediaInfo
-                                = new LiteMediaInfo(x.title, x.uri);
+                        Media liteMediaInfo
+                                = new Media(x.title, x.uri);
                         mediaInfos.put(liteMediaInfo, x);
                         handler.post(() -> adapter.addData(liteMediaInfo));
                     });

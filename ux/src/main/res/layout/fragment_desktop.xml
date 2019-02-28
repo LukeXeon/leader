@@ -11,7 +11,7 @@
 
         <variable
             name="user"
-            type="org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo"/>
+            type="org.kexie.android.dng.ux.viewmodel.entity.LiteUser"/>
 
         <variable
             name="actions"

@@ -2,7 +2,7 @@ package org.kexie.android.dng.ux.viewmodel.entity;
 
 import android.graphics.drawable.Drawable;
 
-public class UserInfo
+public class User
 {
     public final Drawable headImage;
     public final String username;
@@ -12,7 +12,7 @@ public class UserInfo
     public final String carNumber;
     public final String phone;
 
-    private UserInfo(Builder builder)
+    private User(Builder builder)
     {
         headImage = builder.headImage;
         username = builder.username;
@@ -73,9 +73,9 @@ public class UserInfo
             return this;
         }
 
-        public UserInfo build()
+        public User build()
         {
-            return new UserInfo(this);
+            return new User(this);
         }
 
         public Builder headImage(Drawable val)

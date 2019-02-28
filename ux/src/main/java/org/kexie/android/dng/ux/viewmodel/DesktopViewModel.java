@@ -1,42 +1,36 @@
 package org.kexie.android.dng.ux.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestOptions;
+import com.orhanobut.logger.Logger;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.util.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
+import org.kexie.android.dng.ux.model.entity.FunctionInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.collection.ArrayMap;
 import androidx.core.util.Pair;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 import io.reactivex.Observable;
-import io.reactivex.exceptions.Exceptions;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
-import java8.util.stream.Stream;
+import java8.util.Objects;
+import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
-import mapper.Request;
 
 
 public class DesktopViewModel
@@ -44,54 +38,25 @@ public class DesktopViewModel
         implements LifecycleObserver
 {
 
-    private final static class FunctionInfo
-    {
-        private final String name;
-        private final int iconRes;
-        private final String uri;
-
-        private FunctionInfo(String name, int iconRes, String uri)
-        {
-            this.iconRes = iconRes;
-            this.name = name;
-            this.uri = uri;
-        }
-    }
-
     private static final int BORDER_SIZE = 250;
 
-    private final MutableLiveData<String> time = new MutableLiveData<>();
+    public final MutableLiveData<String> time = new MutableLiveData<>();
 
-    private final Map<Function, String> functionJumpTo = new ArrayMap<>();
+    public final MutableLiveData<List<Function>> functions = new MutableLiveData<>();
 
-    private final PublishSubject<Request> onJumpTo = PublishSubject.create();
+    public final PublishSubject<String> onError = PublishSubject.create();
 
-    private final PublishSubject<String> onErrorMessage = PublishSubject.create();
-
-    private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
-
-    private GenericQuickAdapter<Function> adapter;
+    public final PublishSubject<String> onSuccess = PublishSubject.create();
 
     private Timer updateTimer;
 
     public DesktopViewModel(Application application)
     {
         super(application);
+        loadDefaultFunctions();
     }
 
-    public void requestJumpBy(Function function)
-    {
-        String uri = functionJumpTo.get(function);
-        if (uri != null)
-        {
-            onJumpTo.onNext(new Request.Builder().uri(uri).build());
-        } else
-        {
-            onErrorMessage.onNext("跳转到" + function.name + "失败");
-        }
-    }
-
-    private Observable<Stream<Pair<FunctionInfo, FutureTarget<Drawable>>>>
+    private Observable<List<Function>>
     loadFunction(List<FunctionInfo> functionRes)
     {
         return Observable.just(functionRes)
@@ -104,49 +69,59 @@ public class DesktopViewModel
                                     Glide.with(this.getApplication())
                                             .load(info.iconRes)
                                             .apply(RequestOptions.bitmapTransform(zoomTransformation))
-                                            .submit()));
+                                            .submit()))
+                            .map(x -> {
+                                try
+                                {
+                                    assert x.first != null;
+                                    assert x.second != null;
+                                    Logger.d(x.first.name);
+                                    return new Function(x.first.name, x.second.get(), x.first.uri);
+                                } catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    return null;
+                                }
+                            }).filter(Objects::nonNull)
+                            .collect(Collectors.toList());
                 });
     }
 
-    @SuppressLint("CheckResult")
-    public void loadDefaultFunctions()
+    private void loadDefaultFunctions()
     {
         loadFunction(new LinkedList<FunctionInfo>()
         {
             {
-                add(functionBy("天气", R.mipmap.image_weather, "dng/ux/weather"));
-                add(functionBy("多媒体", R.mipmap.image_media, "dng/media/browse"));
-                add(functionBy("APPS", R.mipmap.image_apps, "dng/ux/apps"));
+                add(FunctionInfo.from("天气", R.mipmap.image_weather, "dng/ux/weather"));
+                add(FunctionInfo.from("多媒体", R.mipmap.image_media, "dng/media/browse"));
+                add(FunctionInfo.from("APPS", R.mipmap.image_apps, "dng/ux/apps"));
             }
-        }).subscribe(stream -> {
-            Handler handler = new Handler(Looper.getMainLooper());
-            functionJumpTo.clear();
-            handler.post(() -> {
-                adapter.getData().clear();
-                adapter.notifyDataSetChanged();
-            });
-            stream.forEach(x -> {
-                try
-                {
-                    Function function = new Function(x.first.name, x.second.get());
-                    functionJumpTo.put(function, x.first.uri);
-                    handler.post(() -> adapter.addData(function));
-                } catch (Exception e)
-                {
-                    Exceptions.propagate(e);
-                }
-            });
+        }).subscribe(new Observer<List<Function>>()
+        {
+            @Override
+            public void onSubscribe(Disposable d)
+            {
+
+            }
+
+            @Override
+            public void onNext(List<Function> functions)
+            {
+                DesktopViewModel.this.functions.postValue(functions);
+            }
+
+            @Override
+            public void onError(Throwable e)
+            {
+
+            }
+
+            @Override
+            public void onComplete()
+            {
+
+            }
         });
-    }
-
-    public void setAdapter(GenericQuickAdapter<Function> adapter)
-    {
-        this.adapter = adapter;
-    }
-
-    private static FunctionInfo functionBy(String name, int icon, String path)
-    {
-        return new FunctionInfo(name, icon, path);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -167,26 +142,6 @@ public class DesktopViewModel
     void endTimer()
     {
         updateTimer.cancel();
-    }
-
-    public Observable<Request> getOnJumpTo()
-    {
-        return onJumpTo;
-    }
-
-    public LiveData<String> getTime()
-    {
-        return time;
-    }
-
-    public Observable<String> getOnErrorMessage()
-    {
-        return onErrorMessage;
-    }
-
-    public Observable<String> getOnSuccessMessage()
-    {
-        return onSuccessMessage;
     }
 
 }

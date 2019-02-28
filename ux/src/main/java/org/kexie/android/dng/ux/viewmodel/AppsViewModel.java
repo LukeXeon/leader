@@ -1,115 +1,65 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
-import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
+import android.content.Context;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.model.AppInfoProvider;
-import org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo;
+import org.kexie.android.dng.ux.viewmodel.entity.App;
 
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class AppsViewModel extends AndroidViewModel
 {
-    private final ExecutorService singletTask = Executors.newSingleThreadExecutor();
-
-    private final Map<LiteAppInfo, String> appInfos = new ArrayMap<>();
-
-    private final PublishSubject<Intent> onJumpTo = PublishSubject.create();
-
-    private final PublishSubject<String> onErrorMessage = PublishSubject.create();
-
-    private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
-
-    private GenericQuickAdapter<LiteAppInfo> adapter;
-
-    private Future task;
-
+    public final MutableLiveData<List<App>> apps = new MutableLiveData<>();
 
     public AppsViewModel(@NonNull Application application)
     {
         super(application);
+        loadAppInfo();
     }
 
-    public void setAdapter(GenericQuickAdapter<LiteAppInfo> adapter)
+    private void loadAppInfo()
     {
-        this.adapter = adapter;
-    }
+        Observable.<Context>just(getApplication())
+                .observeOn(Schedulers.io())
+                .map(context -> StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
+                        .map(x -> new App(x.getName(), x.getIcon(), x.getPackageName()))
+                        .collect(Collectors.toList()))
+                .subscribe(new Observer<List<App>>()
+                {
 
-    public void loadAppInfo()
-    {
-        if (task != null && !task.isCancelled())
-        {
-            task.cancel(true);
-        }
-        task = singletTask.submit(() -> {
-            Handler handler = new Handler(Looper.getMainLooper());
-            appInfos.clear();
-            handler.post(() -> {
-                adapter.getData().clear();
-                adapter.notifyDataSetChanged();
-            });
-            StreamSupport.stream(AppInfoProvider.getLaunchApps(getApplication()))
-                    .forEach(x -> {
-                        LiteAppInfo appInfo
-                                = new LiteAppInfo(x.getName(), x.getIcon());
-                        appInfos.put(appInfo, x.getPackageName());
-                        handler.post(() -> adapter.addData(appInfo));
-                    });
-        });
-    }
+                    @Override
+                    public void onSubscribe(Disposable d)
+                    {
+                    }
 
-    public void requestJumpBy(LiteAppInfo liteAppInfo)
-    {
-        String packageName = appInfos.get(liteAppInfo);
-        if (packageName != null)
-        {
-            Intent intent = getApplication()
-                    .getPackageManager()
-                    .getLaunchIntentForPackage(packageName);
-            if (intent != null)
-            {
-                onJumpTo.onNext(intent);
-                onSuccessMessage.onNext("正在打开");
-                return;
-            }
-        }
-        onErrorMessage.onNext(String.format("%s跳转失败", liteAppInfo.name));
-    }
+                    @Override
+                    public void onNext(List<App> apps)
+                    {
+                        AppsViewModel.this.apps.postValue(apps);
+                    }
 
-    public Observable<Intent> getOnJumpTo()
-    {
-        return onJumpTo;
-    }
+                    @Override
+                    public void onError(Throwable e)
+                    {
 
-    public Observable<String> getOnErrorMessage()
-    {
-        return onErrorMessage;
-    }
+                    }
 
-    public Observable<String> getOnSuccessMessage()
-    {
-        return onSuccessMessage;
-    }
+                    @Override
+                    public void onComplete()
+                    {
 
-    @Override
-    protected void onCleared()
-    {
-        if (task != null && !task.isCancelled())
-        {
-            task.cancel(true);
-        }
+                    }
+                });
     }
 }

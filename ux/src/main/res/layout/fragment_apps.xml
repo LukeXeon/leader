@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.View"/>
         <import type="org.kexie.android.dng.ux.R"/>
         <variable
-            name="appInfos"
-            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo&gt;"/>
+            name="adapter"
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.App&gt;"/>
+        <variable
+            name="isLoading"
+            type="Boolean"/>
     </data>
     <eightbitlab.com.blurview.BlurView
         android:id="@+id/blurView"
@@ -34,15 +37,17 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:layout_gravity="center"
                     android:id="@+id/dataContent"
-                    android:adapter="@{appInfos}"
+                    android:adapter="@{adapter}"
                     android:layout_marginLeft="50dp"
                     android:layout_marginRight="50dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="5"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                 </androidx.recyclerview.widget.RecyclerView>
                 <org.kexie.android.common.widget.ProgressBar
                     android:layout_gravity="center"
-                    android:visibility="@{appInfos.getData().size()!=0?View.VISIBLE:View.GONE}"
+                    android:visibility="@{isLoading?View.VISIBLE:View.GONE}"
                     android:layout_width="300dp"
                     android:layout_height="200dp"/>
             </FrameLayout>

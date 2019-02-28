@@ -6,14 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.common.databinding.RxEvent;
+import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
 import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
-import org.kexie.android.dng.ux.viewmodel.entity.SimpleUserInfo;
+import org.kexie.android.dng.ux.viewmodel.entity.LiteUser;
 
 import java.util.Map;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +24,6 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
@@ -29,14 +31,13 @@ import mapper.Mapper;
 import mapper.Mapping;
 import mapper.Request;
 
-import static com.uber.autodispose.AutoDispose.autoDisposable;
-import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
-
 @Mapping("dng/ux/main")
 public class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;
+
     private DesktopViewModel viewModel;
+
     private InfoViewModel infoViewModel;
 
 
@@ -58,43 +59,64 @@ public class DesktopFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        setRetainInstance(false);
+
         viewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
+
         infoViewModel = ViewModelProviders.of(this)
                 .get(InfoViewModel.class);
+
+        binding.setLifecycleOwner(this);
+
         getLifecycle().addObserver(viewModel);
         //dataBinding
-        GenericQuickAdapter<Function> genericQuickAdapter
-                = new GenericQuickAdapter<>(
-                R.layout.item_desktop_function,
-                "function");
-        genericQuickAdapter.setOnItemClickListener((adapter, view1, position)
-                -> viewModel.requestJumpBy(genericQuickAdapter.getData()
-                .get(position)));
-        binding.setActions(getActions());
-        binding.setFunctions(genericQuickAdapter);
-        viewModel.setAdapter(genericQuickAdapter);
-        viewModel.loadDefaultFunctions();
+        GenericQuickAdapter<Function> functionsAdapter
+                = new GenericQuickAdapter<>(R.layout.item_desktop_function, BR.function);
+
+        functionsAdapter.setOnItemClickListener((adapter, view1, position) -> {
+            String uri = Objects.requireNonNull(functionsAdapter.getItem(position)).uri;
+            Request request = new Request.Builder().uri(uri).build();
+            jumpTo(request);
+        });
+
+        viewModel.functions.observe(this,functionsAdapter::setNewData);
+
+        binding.setFunctions(functionsAdapter);
+
+        Map<String, View.OnClickListener> actions = new ArrayMap<String, View.OnClickListener>()
+        {
+            {
+                put("个人信息", v -> jumpTo(new Request.Builder().uri("dng/ux/info").build()));
+                put("导航", v -> jumpTo(new Request.Builder().uri("dng/navi/query").build()));
+            }
+        };
+
+        binding.setActions(actions);
+
+        binding.setFunctions(functionsAdapter);
         //liveData
-        Transformations.map(infoViewModel.getUser(),
-                input -> new SimpleUserInfo(input.headImage, input.username, input.carNumber))
+        Transformations.map(infoViewModel.user,
+                input -> new LiteUser(input.headImage, input.username, input.carNumber))
                 .observe(this, binding::setUser);
-        viewModel.getTime().observe(this, binding::setTime);
+
+
+
+        viewModel.time.observe(this, binding::setTime);
         //rx
-        viewModel.getOnErrorMessage()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(s -> Toasty.error(getContext(), s).show());
-        viewModel.getOnSuccessMessage()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(s -> Toasty.success(getContext(), s).show());
-        viewModel.getOnJumpTo()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(this::jumpTo);
+        viewModel.onError
+                .as(RxEvent.bind(this))
+                .subscribe(s -> Toasty.error(requireContext(), s).show());
+
+        viewModel.onSuccess
+                .as(RxEvent.bind(this))
+                .subscribe(s -> Toasty.success(requireContext(), s).show());
     }
 
     private void jumpTo(Request request)
     {
-        getFragmentManager()
+        requireFragmentManager()
                 .beginTransaction()
                 .add(getId(), Mapper.getOn(this, request))
                 .addToBackStack(null)
@@ -102,14 +124,4 @@ public class DesktopFragment extends Fragment
                 .commit();
     }
 
-    public Map<String, View.OnClickListener> getActions()
-    {
-        return new ArrayMap<String, View.OnClickListener>()
-        {
-            {
-                put("个人信息", v -> jumpTo(new Request.Builder().uri("dng/ux/info").build()));
-                put("导航", v -> jumpTo(new Request.Builder().uri("dng/navi/query").build()));
-            }
-        };
-    }
 }

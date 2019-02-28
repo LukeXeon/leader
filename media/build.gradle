@@ -35,7 +35,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
-    implementation project(':playerview')
+    implementation project(':ijkplayer')
     annotationProcessor 'com.github.LukeXeon.Mapper:mapper-compiler:1.0.2'
 //    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {
 //        exclude group: 'com.dou361.ijkplayer-armv7a',

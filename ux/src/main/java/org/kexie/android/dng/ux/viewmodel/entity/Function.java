@@ -6,10 +6,14 @@ public class Function
 {
     public final Drawable icon;
     public final String name;
+    public final String uri;
 
-    public Function(String name,Drawable icon)
+    public Function(String name,
+                    Drawable icon,
+                    String uri)
     {
         this.name = name;
         this.icon = icon;
+        this.uri = uri;
     }
 }

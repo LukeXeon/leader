@@ -9,9 +9,11 @@ import org.kexie.android.dng.ux.model.WallpaperProvider;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import io.reactivex.Observable;
-import io.reactivex.exceptions.Exceptions;
+import androidx.lifecycle.MutableLiveData;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import java8.util.Objects;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -19,12 +21,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherViewModel extends AndroidViewModel
 {
+    public final MutableLiveData<Drawable> wallpaper = new MutableLiveData<>();
+
     public WeatherViewModel(@NonNull Application application)
     {
         super(application);
+        loadWallpaper();
     }
 
-    private Observable<Drawable> loadWallpaper()
+    private void loadWallpaper()
     {
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -32,7 +37,7 @@ public class WeatherViewModel extends AndroidViewModel
                 .baseUrl("http://cn.bing.com")
                 .client(new OkHttpClient())
                 .build();
-        return retrofit.create(WallpaperProvider.class)
+        retrofit.create(WallpaperProvider.class)
                 .getWallpaperInfo()
                 .observeOn(Schedulers.io())
                 .map(jsonWallpapers -> "http://cn.bing.com"
@@ -43,7 +48,34 @@ public class WeatherViewModel extends AndroidViewModel
                         return Glide.with(getApplication()).load(uri).submit().get();
                     } catch (Exception e)
                     {
-                        throw Exceptions.propagate(e);
+                        e.printStackTrace();
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .subscribe(new Observer<Drawable>()
+                {
+                    @Override
+                    public void onSubscribe(Disposable d)
+                    {
+
+                    }
+
+                    @Override
+                    public void onNext(Drawable drawable)
+                    {
+                        wallpaper.postValue(drawable);
+                    }
+
+                    @Override
+                    public void onError(Throwable e)
+                    {
+
+                    }
+
+                    @Override
+                    public void onComplete()
+                    {
+
                     }
                 });
     }

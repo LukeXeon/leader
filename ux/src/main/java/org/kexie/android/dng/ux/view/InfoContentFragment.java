@@ -41,14 +41,16 @@ public class InfoContentFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()
+
+        setRetainInstance(false);
+
+        viewModel = ViewModelProviders.of(requireActivity()
                 .getSupportFragmentManager()
                 .findFragmentByTag("dng/ux/main"))
                 .get(InfoViewModel.class);
         binding.setLifecycleOwner(this);
-        //dataBinding
 
         //liveData
-        viewModel.getUser().observe(this, binding::setUser);
+        viewModel.user.observe(this, binding::setUser);
     }
 }

@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="appInfo"
-            type="org.kexie.android.dng.ux.viewmodel.entity.LiteAppInfo"/>
+            name="app"
+            type="org.kexie.android.dng.ux.viewmodel.entity.App"/>
     </data>
 
     <LinearLayout
@@ -22,7 +22,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginTop="30dp"
-            android:src="@{appInfo.icon}"/>
+            android:src="@{app.icon}"/>
 
         <TextView
             android:id="@+id/tv_text"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:text="@{appInfo.name}"
+            android:text="@{app.name}"
             android:textColor="#FFF"/>
 
     </LinearLayout>

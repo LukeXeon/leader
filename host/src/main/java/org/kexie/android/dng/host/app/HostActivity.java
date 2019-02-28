@@ -1,12 +1,10 @@
 package org.kexie.android.dng.host.app;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import org.kexie.android.common.util.SystemUtil;
 import org.kexie.android.dng.host.R;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -31,12 +29,6 @@ public final class HostActivity extends AppCompatActivity
                                 .build()), "dng/ux/main")
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
-    }
-
-    @SuppressLint("MissingSuperCall")
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState)
-    {
     }
 
 }
