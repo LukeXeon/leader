@@ -25,7 +25,7 @@ import org.kexie.android.dng.navi.model.Query;
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteRouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
-import org.kexie.android.dng.navi.widget.NaviCallbacks;
+import org.kexie.android.dng.navi.widget.NaviCallback;
 import org.kexie.android.dng.navi.widget.NaviCompat;
 
 import java.text.DecimalFormat;
@@ -191,7 +191,7 @@ public class NaviViewModel extends AndroidViewModel implements OnBackPressedCall
             Lock lock = new ReentrantLock();
             Condition condition = lock.newCondition();
             navigation.addAMapNaviListener(
-                    new NaviCallbacks()
+                    new NaviCallback()
                     {
                         public void onCalculateRouteFailure(int code)
                         {

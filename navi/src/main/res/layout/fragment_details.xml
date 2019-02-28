@@ -12,7 +12,6 @@
     </data>
     <LinearLayout
         android:id="@+id/root"
-        android:transitionName="shared_map_view"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

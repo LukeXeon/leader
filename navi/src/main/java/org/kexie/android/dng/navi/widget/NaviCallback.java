@@ -20,7 +20,7 @@ import com.autonavi.tbt.TrafficFacilityInfo;
  * Created by Luke on 2018/12/27.
  */
 
-public abstract class NaviCallbacks
+public abstract class NaviCallback
         implements AMapNaviListener
 {
     @Override

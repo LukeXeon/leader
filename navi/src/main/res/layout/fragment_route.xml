@@ -58,14 +58,14 @@
                 android:layout_marginBottom="25dp"
                 android:orientation="vertical">
 
-                <org.kexie.android.dng.navi.widget.NaviGuideInfoList
+                <org.kexie.android.dng.navi.widget.NaviGuideInfoListView
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:id="@+id/infos_list"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1">
-                </org.kexie.android.dng.navi.widget.NaviGuideInfoList>
+                </org.kexie.android.dng.navi.widget.NaviGuideInfoListView>
 
                 <Button
                     android:onClick="@{onJumpToNavi}"

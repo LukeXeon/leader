@@ -12,20 +12,20 @@ import java.util.List;
  * Created by hongming.wang on 2017/6/22.
  */
 
-public class NaviGuideInfoList extends ExpandableListView
+public class NaviGuideInfoListView extends ExpandableListView
 {
 
-    public NaviGuideInfoList(Context context)
+    public NaviGuideInfoListView(Context context)
     {
         super(context);
     }
 
-    public NaviGuideInfoList(Context context, AttributeSet attrs)
+    public NaviGuideInfoListView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
     }
 
-    public NaviGuideInfoList(Context context, AttributeSet attrs, int defStyleAttr)
+    public NaviGuideInfoListView(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
     }
