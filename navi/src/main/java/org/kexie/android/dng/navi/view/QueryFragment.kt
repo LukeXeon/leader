@@ -7,7 +7,12 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.logger.Logger
 import com.uber.autodispose.AutoDispose.autoDisposable
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
@@ -92,7 +97,7 @@ class QueryFragment:Fragment() {
         requireActivity().addOnBackPressedCallback(
                 this,
                 OnBackPressedCallback {
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    if (lifecycle.currentState.isAtLeast(RESUMED)) {
                         if (inputTipViewModel.inputTips.value?.size != 0) {
                             inputTipViewModel.inputTips.value = emptyList()
                             return@OnBackPressedCallback true
@@ -109,8 +114,8 @@ class QueryFragment:Fragment() {
         Observable.merge(naviViewModel.onSuccess, inputTipViewModel.onSuccess)
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter {
-                    lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-                }.`as`(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                    lifecycle.currentState.isAtLeast(RESUMED)
+                }.`as`(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe {
                     Toasty.success(requireContext(), it).show()
                 }
@@ -118,8 +123,8 @@ class QueryFragment:Fragment() {
         Observable.merge(naviViewModel.onError, inputTipViewModel.onError)
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter {
-                    lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-                }.`as`(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                    lifecycle.currentState.isAtLeast(RESUMED)
+                }.`as`(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe {
                     Toasty.error(requireContext(), it).show()
                 }

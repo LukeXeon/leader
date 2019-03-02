@@ -55,12 +55,12 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
         navi.startNavi(NaviType.EMULATOR)
     }
 
-    fun query(start: Point, end: Point, ways: List<Point>) {
-        val query = Query.Builder()
-                .from(start)
-                .to(end)
-                .ways(ways)
-                .build()!!
+    fun select(id: Int)
+    {
+        navi.selectRouteId(id)
+    }
+
+    fun query(query: Query) {
         query(Observable.just(query))
     }
 
@@ -103,6 +103,8 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
         query(query)
 
     }
+
+
 
     private fun query(query: Observable<Query>) {
 

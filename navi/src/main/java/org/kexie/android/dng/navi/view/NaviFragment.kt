@@ -6,12 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
+import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.amap.api.maps.AMap
 import com.amap.api.navi.AMapNaviView
+import com.uber.autodispose.AutoDispose.autoDisposable
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
+import es.dmoral.toasty.Toasty
+import io.reactivex.android.schedulers.AndroidSchedulers
 import mapper.Mapping
+import org.kexie.android.common.widget.ProgressFragment
 import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding
+import org.kexie.android.dng.navi.model.Query
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 import org.kexie.android.dng.navi.widget.NaviViewFragment
 
@@ -63,6 +72,36 @@ class NaviFragment : Fragment() {
 
             viewModel = ViewModelProviders.of(this)
                     .get(NaviViewModel::class.java)
+
+            val bundle = arguments
+            if (bundle != null) {
+                val query = bundle.getParcelable<Query>("query")!!
+                viewModel.query(query)
+
+                viewModel.onError.observeOn(AndroidSchedulers.mainThread())
+                        .filter {
+                            lifecycle.currentState.isAtLeast(RESUMED)
+                        }.`as`(autoDisposable(from(this, ON_DESTROY)))
+                        .subscribe {
+                            Toasty.error(requireContext(), it).show()
+                        }
+
+                viewModel.onSuccess.observeOn(AndroidSchedulers.mainThread())
+                        .filter {
+                            lifecycle.currentState.isAtLeast(RESUMED)
+                        }.`as`(autoDisposable(from(this, ON_DESTROY)))
+                        .subscribe {
+                            Toasty.error(requireContext(), it).show()
+                        }
+
+                viewModel.routes.observe(this, Observer {
+                    if (it.size == 1) {
+                        viewModel.select(it.keys.toList()[1])
+                    }
+                })
+
+                ProgressFragment.observe(viewModel.isLoading, this)
+            }
         }
     }
 }
