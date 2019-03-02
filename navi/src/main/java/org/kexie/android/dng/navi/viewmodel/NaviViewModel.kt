@@ -76,7 +76,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                             }
                     val search = PoiSearch(getApplication(), query)
                     try {
-                        val item = search.searchPOIId(it.poiId);
+                        val item = search.searchPOIId(it.poiId)
                         val point =
                                 if (item.enter != null)
                                     item.enter
@@ -87,7 +87,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                                         item.latLonPoint
                         Point.box(point)
                     } catch (e: AMapException) {
-                        throw Exceptions.propagate(e);
+                        throw Exceptions.propagate(e)
                     }
                 }
 
@@ -123,7 +123,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     override fun onNext(t: Map<Int, RouteInfo>) {
-                        routes.value = t;
+                        routes.value = t
                         onSuccess.onNext("路径规划成功")
                     }
 
@@ -145,6 +145,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
             navi.addAMapNaviListener(
                     object : NaviCallback() {
+                        @Suppress("OverridingDeprecatedMember")
                         override fun onCalculateRouteFailure(code: Int) {
                             lock.lock()
                             navi.removeAMapNaviListener(this)
@@ -153,6 +154,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                             lock.unlock()
                         }
 
+                        @Suppress("OverridingDeprecatedMember")
                         override fun onCalculateRouteSuccess(ints: IntArray) {
                             lock.lock()
                             navi.removeAMapNaviListener(this)
@@ -206,7 +208,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                 .name(path.amapNaviPath.labels)
                 .path(path.amapNaviPath)
                 .guideInfos(getGuideInfo(path))
-                .build();
+                .build()
     }
 
     companion object {
@@ -230,7 +232,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                 for (i in startSeg until count + startSeg) {
                     val step = aMapNaviSteps[i]
                     traffics += step.trafficLightNumber
-                    var roadName = ""
+                    var roadName: String
                     if (i == count + startSeg - 1 && j == aMapNaviGuides.size - 1) {
                         roadName = "终点"
                     } else if (i == count + startSeg - 1 && j + 1 < aMapNaviGuides.size - 1) {
@@ -243,6 +245,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     val lbsGuidStep = GuideInfo.Step(step.iconType,
                             roadName, step.length)
                     group.steps.add(lbsGuidStep)
+
                 }
                 group.groupTrafficLights = traffics
                 steps.add(group)
