@@ -13,9 +13,9 @@ import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.NaviViewModel2;
 import org.kexie.android.dng.navi.viewmodel.TipViewModel;
-import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
+import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 import org.kexie.android.dng.navi.widget.ScaleTransformer;
 import org.kexie.android.dng.navi.widget.SimpleApplyAdapter;
 
@@ -38,12 +38,12 @@ import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Mapping("dng/navi/query")
-public class QueryFragment extends Fragment
+public class QueryFragment2 extends Fragment
 {
 
     private FragmentQueryBinding binding;
 
-    private NaviViewModel naviViewModel;
+    private NaviViewModel2 naviViewModel2;
 
     private TipViewModel tipViewModel;
 
@@ -74,8 +74,8 @@ public class QueryFragment extends Fragment
         binding.routePager.setPageTransformer(false,
                 new ScaleTransformer());
 
-        naviViewModel = ViewModelProviders.of(getActivity())
-                .get(NaviViewModel.class);
+        naviViewModel2 = ViewModelProviders.of(getActivity())
+                .get(NaviViewModel2.class);
         tipViewModel = ViewModelProviders.of(this)
                 .get(TipViewModel.class);
 
@@ -83,14 +83,13 @@ public class QueryFragment extends Fragment
                 .cast(getChildFragmentManager()
                         .findFragmentById(R.id.map_view)).getMap();
 
-        //getActivity().addOnBackPressedCallback(this,naviViewModel);
+        //getActivity().addOnBackPressedCallback(this,naviViewModel2);
 
 
-        GenericQuickAdapter<LiteTip> tipsAdapter
+        GenericQuickAdapter<InputTip> tipsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_tip, 0);
 
-        tipsAdapter.setOnItemClickListener(
-                (adapter, view1, position) -> naviViewModel
+        tipsAdapter.setOnItemClickListener((adapter, view1, position) -> naviViewModel2
                         .query(tipsAdapter.getData().get(position)));
 
         binding.setTipsAdapter(tipsAdapter);
@@ -103,7 +102,7 @@ public class QueryFragment extends Fragment
         tipViewModel.getQueryText()
                 .observe(this,binding::setQuery);
 
-        naviViewModel.getRoutes()
+        naviViewModel2.getRoutes()
                 .observe(this, requests -> {
                     if (requests == null)
                     {
@@ -118,13 +117,13 @@ public class QueryFragment extends Fragment
                     binding.setRouteAdapter(adapter);
                 });
 
-        Observable.merge(naviViewModel.getOnErrorMessage(), tipViewModel.getOnErrorMessage())
+        Observable.merge(naviViewModel2.getOnErrorMessage(), tipViewModel.getOnErrorMessage())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(getContext(), s).show());
-        Observable.merge(naviViewModel.getOnSuccessMessage(), tipViewModel.getOnSuccessMessage())
+        Observable.merge(naviViewModel2.getOnSuccessMessage(), tipViewModel.getOnSuccessMessage())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(getContext(), s).show());
-        naviViewModel.getOnLoading()
+        naviViewModel2.getOnLoading()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(ProgressFragment.makeObserver(this));
 
@@ -143,7 +142,7 @@ public class QueryFragment extends Fragment
 //                        .from(Point.form(109.200903, 24.40092))
 //                        .to(Point.form(109.29154, 24.298327))
 //                        .build();
-//                naviViewModel.loadRoute(q);
+//                naviViewModel2.loadRoute(q);
 //                Logger.d("end");
 //            }
 //        }.start();

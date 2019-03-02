@@ -6,4 +6,15 @@
     <string name="navi_guide_from">出发</string>
     <string name="navi_guide_end">到达终点</string>
     <string name="user_info_url"><![CDATA[http://172.20.10.5:8080/navigator/device/user/info/]]></string>
+    <string name="string_back">返回</string>
+    <string name="string_start_navi">开始导航</string>
+    <string name="string_start_query">开始查询</string>
+    <string name="string_find_poi">查找地点</string>
+    <string name="text">TEXT</string>
+    <string name="string_submit">确认</string>
+    <string name="string_navi_name">方案名</string>
+    <string name="test_text1">40分钟(19公里)</string>
+    <string name="string_from">从</string>
+    <string name="string_start_poi">开始位置</string>
+    <string name="string_start">出发</string>
 </resources>

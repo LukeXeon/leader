@@ -16,7 +16,7 @@ public class BoxServicePoint
         this.latLonPoint = latLonPoint;
     }
 
-    protected BoxServicePoint(Parcel in)
+    private BoxServicePoint(Parcel in)
     {
         latLonPoint = in.readParcelable(LatLonPoint.class.getClassLoader());
     }

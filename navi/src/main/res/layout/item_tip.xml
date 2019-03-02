@@ -4,8 +4,8 @@
 
     <data>
         <variable
-            name="tip"
-            type="org.kexie.android.dng.navi.viewmodel.entity.LiteTip"/>
+            name="inputTip"
+            type="org.kexie.android.dng.navi.viewmodel.entity.InputTip"/>
     </data>
 
     <LinearLayout
@@ -39,7 +39,7 @@
                 android:layout_weight="1"
                 android:gravity="right|center_vertical"
                 android:singleLine="true"
-                android:text='@{tip.text}'
+                android:text='@{inputTip.text}'
                 android:textSize="30sp"/>
         </LinearLayout>
 

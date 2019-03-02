@@ -13,10 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import mapper.Mapper;
-import mapper.Mapping;
 import mapper.Request;
 
-@Mapping("dng/navi/test")
 public class Test extends Fragment
 {
     private TestBinding binding;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -16,7 +17,7 @@
 
         <variable
             name="tipsAdapter"
-            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.navi.viewmodel.entity.LiteTip&gt;"/>
+            type="org.kexie.android.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.navi.viewmodel.entity.InputTip&gt;"/>
 
         <variable
             name="routeAdapter"
@@ -66,7 +67,7 @@
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:onClick='@{actions.get("开始查询")}'
+                        android:onClick='@{actions.get(@string/string_start_query)}'
                         android:visibility="@{!isShowTips?View.VISIBLE:View.GONE}"
                         app:cardBackgroundColor="@android:color/white"
                         app:cardCornerRadius="20dp"
@@ -86,12 +87,13 @@
                                 android:layout_marginLeft="20dp"
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:hint="查找地点"
+                                android:hint="@string/string_find_poi"
                                 android:singleLine="true"
                                 android:textColor="@color/grey1000"
                                 android:textColorHint="@color/grey600"
                                 android:textSize="35sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold"
+                                tools:ignore="RtlHardcoded"/>
 
                             <ImageView
                                 async_src='@{"image_search"}'
@@ -100,7 +102,8 @@
                                 android:layout_marginTop="5dp"
                                 android:layout_marginRight="10dp"
                                 android:layout_marginBottom="5dp"
-                                android:scaleType="centerInside"/>
+                                android:scaleType="centerInside"
+                                tools:ignore="RtlHardcoded"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -126,13 +129,14 @@
                                 android:layout_marginLeft="20dp"
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
-                                android:hint="TEXT"
+                                android:hint="@string/text"
                                 android:singleLine="true"
                                 android:text="@{query}"
                                 android:textColor="@color/grey1000"
                                 android:textColorHint="@color/grey600"
                                 android:textSize="35sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold"
+                                tools:ignore="RtlHardcoded"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 

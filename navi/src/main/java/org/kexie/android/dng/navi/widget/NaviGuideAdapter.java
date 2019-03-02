@@ -1,7 +1,6 @@
 package org.kexie.android.dng.navi.widget;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,15 +146,18 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
 
             }
 
-        } catch (Throwable e)
+        } catch (Throwable ignored)
         {
         }
         return convertView;
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup
-            parent)
+    public View getChildView(int groupPosition,
+                             int childPosition,
+                             boolean isLastChild,
+                             View convertView,
+                             ViewGroup parent)
     {
         try
         {
@@ -271,7 +273,7 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
                     return R.drawable.action9;
                 }
                 id = defaultIconTypes[iconType];
-            } catch (Throwable e)
+            } catch (Throwable ignored)
             {
             }
         } else
@@ -281,25 +283,6 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
         return id;
     }
 
-
-    private Drawable getIconDrawable(int iconType)
-    {
-        Drawable drawable = mContext.getResources().getDrawable(R.drawable.action0);
-        int defaultSize = defaultIconTypes.length;
-        if (iconType >= 0)
-        {
-            try
-            {
-                drawable = mContext.getResources().getDrawable(defaultIconTypes[iconType]);
-            } catch (Throwable e)
-            {
-            }
-        } else
-        {
-            drawable = mContext.getResources().getDrawable(getCustomIconType(iconType));
-        }
-        return drawable;
-    }
 
     //  public static final int MainAction_NULL = 0x0;    //!< 无基本导航动作
 //  public static final int MainAction_Turn_Left        = 0x1;  //!< 左转
@@ -390,7 +373,7 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
         View line;
     }
 
-    public static String formatKM(int d)
+    private static String formatKM(int d)
     {
         if (d == 0)
         {
@@ -400,15 +383,15 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
         {
             return d + "米";
         }
-        if ((100 <= d) && (d < 1000))
+        if (d < 1000)
         {
             return d + "米";
         }
-        if ((1000 <= d) && (d < 10000))
+        if (d < 10000)
         {
             return (d / 10) * 10 / 1000.0D + "公里";
         }
-        if ((10000 <= d) && (d < 100000))
+        if (d < 100000)
         {
             return (d / 100) * 100 / 1000.0D + "公里";
         }

@@ -125,7 +125,9 @@ public abstract class NaviCallback
     }
 
     @Override
-    public void updateIntervalCameraInfo(AMapNaviCameraInfo aMapNaviCameraInfo, AMapNaviCameraInfo aMapNaviCameraInfo1, int i)
+    public void updateIntervalCameraInfo(AMapNaviCameraInfo aMapNaviCameraInfo,
+                                         AMapNaviCameraInfo aMapNaviCameraInfo1,
+                                         int i)
     {
 
     }

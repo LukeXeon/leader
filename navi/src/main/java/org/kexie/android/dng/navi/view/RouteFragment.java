@@ -10,37 +10,30 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.navi.view.RouteOverLay;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
-import org.kexie.android.dng.navi.viewmodel.RouteViewModel;
+import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
+
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import mapper.Mapper;
-import mapper.Mapping;
 import mapper.Request;
 
-import static com.uber.autodispose.AutoDispose.autoDisposable;
-import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
-
-@Mapping("dng/navi/route")
 public class RouteFragment extends Fragment
 {
     private FragmentRouteBinding binding;
 
     private AMap mapController;
 
-    private NaviViewModel naviViewModel;
-
-    private RouteViewModel routeViewModel;
+    private NaviViewModel viewModel;
 
     @Nullable
     @Override
@@ -62,65 +55,78 @@ public class RouteFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        Logger.d(this);
+
         binding.setLifecycleOwner(this);
+
+        viewModel = ViewModelProviders.of(
+                Objects.requireNonNull(requireParentFragment()
+                        .getTargetFragment()))
+                .get(NaviViewModel.class);
+
         TextureSupportMapFragment mapFragment
                 = TextureSupportMapFragment.class
-                .cast(getChildFragmentManager()
-                        .findFragmentById(R.id.map_view));
-        mapController = mapFragment.getMap();
+                .cast(getChildFragmentManager().findFragmentById(R.id.map_view));
+
+        mapController = Objects.requireNonNull(mapFragment).getMap();
+
         UiSettings uiSettings = mapController.getUiSettings();
+
         uiSettings.setScrollGesturesEnabled(false);
+
         uiSettings.setZoomGesturesEnabled(false);
+
         uiSettings.setTiltGesturesEnabled(false);
+
         uiSettings.setRotateGesturesEnabled(false);
+
         uiSettings.setZoomControlsEnabled(false);
-        Bundle bundle = getArguments();
-        if (bundle != null)
-        {
-            naviViewModel = ViewModelProviders.of(getActivity())
-                    .get(NaviViewModel.class);
 
-            routeViewModel = ViewModelProviders.of(this)
-                    .get(RouteViewModel.class);
+        binding.setOnJumpToDetails(v -> {
+            Request request = new Request.Builder().uri("dng/navi/details").build();
+            jumpTo(request);
+        });
 
-            routeViewModel.init(bundle);
-
-            int id = bundle.getInt("pathId");
-
-            binding.setOnJumpToDetails(v -> routeViewModel.jumpToDetails());
-
-            binding.setOnJumpToNavi(v -> routeViewModel.jumpToNavi());
-
-            mapController.setMapStatusLimits(naviViewModel.getBounds(id));
-
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-
-            RouteOverLay routeOverLay = new RouteOverLay(mapController,
-                    naviViewModel.getPath(id),
-                    getContext().getApplicationContext());
-
-            routeOverLay.setTrafficLine(false);
-            routeOverLay.addToMap();
-
-            binding.infosList.setGuideData(naviViewModel.getGuideInfo(id));
-            binding.setRoute(naviViewModel.getRouteInfo(id));
-            routeViewModel.getOnJump()
-                    .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                    .subscribe(this::jumpTo);
-        }
     }
+
+    public void apply(int id)
+    {
+        viewModel.routeInfos
+                .observe(this, routeInfos -> {
+                    RouteInfo routeInfo = Objects.requireNonNull(routeInfos.get(id));
+
+                    mapController.setMapStatusLimits(routeInfo.bounds);
+
+                    mapController.moveCamera(CameraUpdateFactory.zoomOut());
+                    mapController.moveCamera(CameraUpdateFactory.zoomOut());
+                    mapController.moveCamera(CameraUpdateFactory.zoomOut());
+
+                    RouteOverLay routeOverLay = new RouteOverLay(mapController,
+                            routeInfo.path,
+                            requireContext().getApplicationContext());
+                    routeOverLay.setTrafficLine(false);
+                    routeOverLay.addToMap();
+
+                    binding.infosList.setGuideData(routeInfo.guideInfos);
+
+                    binding.setOnJumpToNavi(x -> {
+                        Request request = new Request.Builder()
+                                .uri("dng/navi/navi")
+                                .build();
+                        jumpTo(request);
+                    });
+
+                });
+    }
+
 
     private void jumpTo(Request request)
     {
-        Fragment parent = getParentFragment();
-        parent.getFragmentManager()
+        Fragment parent = requireParentFragment();
+        parent.requireFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
                 .hide(parent)
-                .add(parent.getId(),Mapper.getOn(parent, request))
+                .add(parent.getId(), Mapper.getOn(parent, request))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

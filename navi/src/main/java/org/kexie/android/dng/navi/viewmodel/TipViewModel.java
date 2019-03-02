@@ -10,7 +10,7 @@ import com.amap.api.services.help.InputtipsQuery;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
-import org.kexie.android.dng.navi.viewmodel.entity.LiteTip;
+import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -41,7 +41,7 @@ public class TipViewModel extends AndroidViewModel
 
     private final PublishSubject<String> onSuccessMessage = PublishSubject.create();
 
-    private GenericQuickAdapter<LiteTip> adapter;
+    private GenericQuickAdapter<InputTip> adapter;
 
 
     public TipViewModel(@NonNull Application application)
@@ -67,7 +67,7 @@ public class TipViewModel extends AndroidViewModel
             {
                 StreamSupport.stream(inputtips.requestInputtips())
                         .filter(tip -> !TextUtils.isEmpty(tip.getPoiID()))
-                        .map(x -> new LiteTip(x.getName(), x.getPoiID()))
+                        .map(x -> new InputTip(x.getName(), x.getPoiID()))
                         .forEach(tip -> handler.post(() -> adapter.addData(tip)));
                 isShowTips.postValue(true);
                 onSuccessMessage.onNext("搜索成功");
@@ -80,7 +80,7 @@ public class TipViewModel extends AndroidViewModel
         });
     }
 
-    public void bindAdapter(GenericQuickAdapter<LiteTip> adapter)
+    public void bindAdapter(GenericQuickAdapter<InputTip> adapter)
     {
         this.adapter = adapter;
     }

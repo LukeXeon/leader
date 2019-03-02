@@ -16,7 +16,7 @@ public class BoxMapPoint
         this.latLng = latLng;
     }
 
-    protected BoxMapPoint(Parcel in)
+    private BoxMapPoint(Parcel in)
     {
         latLng = in.readParcelable(LatLng.class.getClassLoader());
     }

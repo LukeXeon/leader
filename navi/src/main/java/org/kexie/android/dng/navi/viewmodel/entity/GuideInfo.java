@@ -19,7 +19,7 @@ public class GuideInfo
     private List<Step> steps;
 
     public GuideInfo() {
-        steps = new ArrayList();
+        steps = new ArrayList<>();
     }
 
     public List<Step> getSteps() {

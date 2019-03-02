@@ -16,7 +16,7 @@ public class BoxNaviPoint
         this.naviLatLng = naviLatLng;
     }
 
-    protected BoxNaviPoint(Parcel in)
+    private BoxNaviPoint(Parcel in)
     {
         naviLatLng = in.readParcelable(NaviLatLng.class.getClassLoader());
     }

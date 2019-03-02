@@ -10,8 +10,6 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.navi.model.JsonRoute;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -32,7 +30,7 @@ public class NetworkMonitoringService extends Service
                 throws Exception
         {
             Logger.d(text);
-            JsonRoute entity = getGson().fromJson(text, JsonRoute.class);
+
             //NaviFragment.startOf(NetworkMonitoringService.this, netRoute);
         }
 

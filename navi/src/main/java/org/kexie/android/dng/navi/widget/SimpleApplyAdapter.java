@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.widget;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -10,13 +11,12 @@ import androidx.fragment.app.FragmentPagerAdapter;
 public class SimpleApplyAdapter
         extends FragmentPagerAdapter
 {
-    private final List<Fragment> fragments;
+    private final List<Fragment> fragments = new ArrayList<>();
 
     public SimpleApplyAdapter(@NonNull FragmentManager fragmentManager,
                               List<Fragment> fragments)
     {
         super(fragmentManager);
-        this.fragments = fragments;
     }
 
     @NonNull

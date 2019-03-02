@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="2dp"
-                android:text="从"
+                android:text="@string/string_from"
                 android:textColor="@color/soft_black"
                 android:textSize="@dimen/guide_detail_text_size"
                 android:visibility="visible" />
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/tv_before"
-                android:text="开始位置"
+                android:text="@string/string_start_poi"
                 android:textColor="@color/soft_black"
                 android:textSize="@dimen/guide_group_name_text_size"
                 android:textStyle="bold" />
@@ -56,7 +56,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="2dp"
                 android:layout_toRightOf="@id/tv_groupName"
-                android:text="出发"
+                android:text="@string/string_start"
                 android:textColor="@color/soft_black"
                 android:textSize="@dimen/guide_detail_text_size"
                 android:visibility="visible" />
@@ -76,7 +76,6 @@
             android:id="@+id/tv_groupDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="红落定"
             android:textColor="@color/soft_black"
             android:textSize="@dimen/guide_detail_text_size" />
 

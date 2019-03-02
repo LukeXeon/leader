@@ -6,18 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amap.api.maps.AMap;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.navi.AMapNaviView;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding;
-import org.kexie.android.dng.navi.model.Point;
-import org.kexie.android.dng.navi.model.Route;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.NaviViewModel2;
 import org.kexie.android.dng.navi.widget.NaviViewFragment;
-
-import java.util.stream.StreamSupport;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,17 +20,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
-import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Mapping("dng/navi/navi")
 public class NaviFragment extends Fragment
 {
     private static final String ARG = "route";
 
-    private NaviViewModel viewModel;
+    private NaviViewModel2 viewModel;
 
     private FragmentNavigationBinding binding;
 
@@ -64,7 +56,7 @@ public class NaviFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         //initViews
         viewModel = ViewModelProviders.of(getActivity())
-                .get(NaviViewModel.class);
+                .get(NaviViewModel2.class);
 
         viewModel.startNavi();
 
@@ -84,7 +76,7 @@ public class NaviFragment extends Fragment
         Bundle bundle = getArguments();
         if (bundle != null)
         {
-            Route route = bundle.getParcelable(ARG);
+           bundle.getParcelable(ARG);
         }
     }
 

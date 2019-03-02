@@ -11,7 +11,6 @@ public class Query
     public final Point from;
     public final Point to;
     public final List<Point> ways;
-    public final List<List<Point>> avoids;
     public final int mode;
 
     private Query(Builder builder)
@@ -19,7 +18,6 @@ public class Query
         from = builder.from;
         to = builder.to;
         ways = builder.ways;
-        avoids = builder.avoids;
         mode = builder.mode;
     }
 
@@ -28,7 +26,6 @@ public class Query
         private Point from;
         private Point to;
         private List<Point> ways;
-        private List<List<Point>> avoids;
         private int mode;
 
         public Builder()
@@ -53,11 +50,6 @@ public class Query
             return this;
         }
 
-        public Builder avoids(List<List<Point>> val)
-        {
-            avoids = val;
-            return this;
-        }
 
         public Builder mode(int val)
         {

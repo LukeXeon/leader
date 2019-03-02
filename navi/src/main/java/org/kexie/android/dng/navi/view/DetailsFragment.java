@@ -13,7 +13,7 @@ import com.amap.api.navi.view.RouteOverLay;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentDetailsBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.NaviViewModel2;
 import org.kexie.android.dng.navi.viewmodel.RouteViewModel;
 
 import java.util.Objects;
@@ -25,17 +25,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import mapper.Mapper;
-import mapper.Mapping;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Mapping("dng/navi/details")
 public class DetailsFragment extends Fragment
 {
     private FragmentDetailsBinding binding;
 
-    private NaviViewModel viewModel;
+    private NaviViewModel2 viewModel;
 
     @Nullable
     @Override
@@ -67,7 +65,7 @@ public class DetailsFragment extends Fragment
         if (bundle != null)
         {
             viewModel = ViewModelProviders.of(getActivity())
-                    .get(NaviViewModel.class);
+                    .get(NaviViewModel2.class);
             int id = bundle.getInt("pathId");
 
             RouteOverLay routeOverLay = new RouteOverLay(mapController,
