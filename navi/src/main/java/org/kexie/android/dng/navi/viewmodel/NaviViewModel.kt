@@ -48,6 +48,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         worker.start()
+        routes.value = emptyMap()
     }
 
     fun start() {

@@ -58,7 +58,9 @@ class NaviFragment : Fragment() {
                     .get(NaviViewModel::class.java)
 
             viewModel.start()
+
         } else {
+
             viewModel = ViewModelProviders.of(this)
                     .get(NaviViewModel::class.java)
         }

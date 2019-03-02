@@ -28,10 +28,14 @@
             type="java.util.Map&lt;String,Action&gt;"/>
         <variable
             name="query"
-            type="String"/>
+            type="androidx.lifecycle.MutableLiveData&lt;String&gt;"/>
 
         <variable
             name="isShowTips"
+            type="Boolean"/>
+
+        <variable
+            name="isShowRoutes"
             type="Boolean"/>
 
     </data>
@@ -68,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:onClick='@{actions.get(@string/string_start_query)}'
-                        android:visibility="@{!isShowTips?View.VISIBLE:View.GONE}"
+                        android:visibility="@{!safeUnbox(isShowTips)?View.VISIBLE:View.GONE}"
                         app:cardBackgroundColor="@android:color/white"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="10dp"
@@ -110,7 +114,7 @@
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="@{isShowTips?View.VISIBLE:View.GONE}"
+                        android:visibility="@{safeUnbox(isShowTips)?View.VISIBLE:View.GONE}"
                         app:cardBackgroundColor="@android:color/white"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="10dp"
@@ -123,7 +127,7 @@
                             android:layout_margin="10dp"
                             android:orientation="horizontal">
 
-                            <TextView
+                            <EditText
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="20dp"
@@ -131,7 +135,7 @@
                                 android:gravity="center_vertical"
                                 android:hint="@string/text"
                                 android:singleLine="true"
-                                android:text="@{query}"
+                                android:text="@={query}"
                                 android:textColor="@color/grey1000"
                                 android:textColorHint="@color/grey600"
                                 android:textSize="35sp"
@@ -146,7 +150,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-10dp"
-                    android:visibility="@{isShowTips?View.VISIBLE:View.GONE}"
+                    android:visibility="@{safeUnbox(isShowTips)?View.VISIBLE:View.GONE}"
                     app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="10dp"
@@ -170,7 +174,7 @@
             android:background="@color/colorBlackAlpha26"
             android:clipChildren="false"
             android:id="@+id/pager_root"
-            android:visibility="@{routeAdapter==null?View.GONE:View.VISIBLE}"
+            android:visibility="@{safeUnbox(isShowRoutes)?View.VISIBLE:View.GONE}"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

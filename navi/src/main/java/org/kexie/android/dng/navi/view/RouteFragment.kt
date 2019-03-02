@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.amap.api.maps.AMap
 import com.amap.api.maps.CameraUpdateFactory
@@ -37,7 +36,7 @@ class RouteFragment : Fragment() {
         if (binding == null) {
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.fragment_route, container,
-                    false)
+                    false)!!
         }
         return binding!!.root
     }
@@ -75,73 +74,72 @@ class RouteFragment : Fragment() {
 
     fun apply(id: Int) {
 
-        viewModel.routes.observe(this, Observer {
+        val it = viewModel.routes.value!!
 
-            mapController.clear()
+        mapController.clear()
 
-            val routeInfo = it.getValue(id)
+        val routeInfo = it.getValue(id)
 
-            mapController.setMapStatusLimits(routeInfo.bounds)
+        mapController.setMapStatusLimits(routeInfo.bounds)
 
-            val routeOverLay = RouteOverLay(mapController,
-                    routeInfo.path,
-                    requireContext().applicationContext)
+        val routeOverLay = RouteOverLay(mapController,
+                routeInfo.path,
+                requireContext().applicationContext)
 
-            routeOverLay.isTrafficLine = true
+        routeOverLay.isTrafficLine = true
 
-            routeOverLay.addToMap()
+        routeOverLay.addToMap()
 
-            mapController.moveCamera(CameraUpdateFactory.zoomOut())
-            mapController.moveCamera(CameraUpdateFactory.zoomOut())
-            mapController.moveCamera(CameraUpdateFactory.zoomOut())
+        mapController.moveCamera(CameraUpdateFactory.zoomOut())
+        mapController.moveCamera(CameraUpdateFactory.zoomOut())
+        mapController.moveCamera(CameraUpdateFactory.zoomOut())
 
-            binding!!.infosList.setGuideData(routeInfo.guideInfos)
+        binding!!.infosList.setGuideData(routeInfo.guideInfos)
 
-            binding!!.setOnJumpToNavi {
+        binding!!.setOnJumpToNavi {
 
-                val request = Request.Builder()
-                        .uri("dng/navi/navi")
-                        .build()
+            val request = Request.Builder()
+                    .uri("dng/navi/navi")
+                    .build()
 
-                val parent = requireParentFragment()
+            val parent = requireParentFragment()
 
-                val manager = parent.requireFragmentManager()
+            val manager = parent.requireFragmentManager()
 
-                manager.beginTransaction()
-                        .addToBackStack(null)
-                        .runOnCommit {
-                            manager.popBackStack()
-                        }
-                        .add(parent.id, Mapper.getOn(targetFragment!!, request))
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit()
-            }
+            manager.beginTransaction()
+                    .addToBackStack(null)
+                    .runOnCommit {
+                        manager.popBackStack()
+                    }
+                    .add(parent.id, Mapper.getOn(targetFragment!!, request))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit()
+        }
 
-            binding!!.setOnJumpToDetails {
+        binding!!.setOnJumpToDetails {
 
-                val bundle = Bundle()
+            val bundle = Bundle()
 
-                bundle.putInt("pathId", id)
+            bundle.putInt("pathId", id)
 
-                val request = Request.Builder()
-                        .code(1)
-                        .bundle(bundle)
-                        .uri("dng/navi/details")
-                        .build()
+            val request = Request.Builder()
+                    .code(1)
+                    .bundle(bundle)
+                    .uri("dng/navi/details")
+                    .build()
 
-                val parent = requireParentFragment()
+            val parent = requireParentFragment()
 
-                val manager = parent.requireFragmentManager()
+            val manager = parent.requireFragmentManager()
 
-                manager.beginTransaction()
-                        .addToBackStack(null)
-                        .add(parent.id, Mapper.getOn(targetFragment!!, request))
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit()
-            }
-        })
+            manager.beginTransaction()
+                    .addToBackStack(null)
+                    .add(parent.id, Mapper.getOn(targetFragment!!, request))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit()
+
+        }
     }
-
 
 }
 
@@ -167,7 +165,7 @@ class RouteAdapter(var ids: List<Int>,
                     .uri("dng/navi/route")
                     .code(1)
                     .build()
-            fragment = Mapper.getOn(root.targetFragment!!, request) as RouteFragment
+            fragment = Mapper.getOn(root, request) as RouteFragment
             fragments.put(position, fragment)
             fragment.apply(ids[position])
             fragment

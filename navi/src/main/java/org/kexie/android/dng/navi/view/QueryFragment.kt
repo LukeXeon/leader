@@ -8,17 +8,21 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import com.orhanobut.logger.Logger
 import com.uber.autodispose.AutoDispose.autoDisposable
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
 import es.dmoral.toasty.Toasty
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import mapper.BR
 import mapper.Mapping
+import org.kexie.android.common.databinding.GenericQuickAdapter
 import org.kexie.android.common.widget.ProgressFragment
 import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding
 import org.kexie.android.dng.navi.viewmodel.InputTipViewModel
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
+import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import org.kexie.android.dng.navi.widget.ScaleTransformer
 
 @Mapping("dng/navi/query")
@@ -48,7 +52,7 @@ class QueryFragment:Fragment() {
 
         binding.lifecycleOwner = this
 
-        naviViewModel = ViewModelProviders.of(targetFragment!!)
+        naviViewModel = ViewModelProviders.of(this)
                 .get(NaviViewModel::class.java)
 
         inputTipViewModel = ViewModelProviders.of(this)
@@ -60,15 +64,29 @@ class QueryFragment:Fragment() {
 
         binding.routePager.setPageTransformer(false, ScaleTransformer())
 
+        val tipAdapter = GenericQuickAdapter<InputTip>(R.layout.item_tip, BR.inputTip)
+
+        binding.tipsAdapter = tipAdapter
+
+        binding.query = queryText
+
+        inputTipViewModel.inputTips.observe(this,
+                Observer {
+                    binding.isShowTips = !it.isEmpty()
+                    tipAdapter.setNewData(it)
+                })
+
         Transformations.map(naviViewModel.routes) {
             it.keys.toList()
         }.observe(this, Observer {
-            routeAdapter.ids = it;
+            binding.isShowRoutes = !it.isEmpty()
+            routeAdapter.ids = it
             routeAdapter.notifyDataSetChanged()
         })
 
         queryText.observe(this, Observer {
-            inputTipViewModel.query(it)
+            Logger.d(it)
+            //inputTipViewModel.query(it)
         })
 
         requireActivity().addOnBackPressedCallback(
@@ -107,5 +125,6 @@ class QueryFragment:Fragment() {
                 }
 
         ProgressFragment.observe(naviViewModel.isLoading, this)
+
     }
 }

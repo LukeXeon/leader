@@ -20,8 +20,6 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
 
     private val singleTask = Executors.newSingleThreadExecutor()
 
-    val isShow = MutableLiveData<Boolean>()
-
     val inputTips = MutableLiveData<List<InputTip>>()
 
     val onError = PublishSubject.create<String>()
@@ -29,13 +27,12 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
     val onSuccess = PublishSubject.create<String>()
 
     init {
-        isShow.value = false
+        inputTips.value = emptyList()
     }
 
     @MainThread
     fun query(text: String) {
         Logger.d(text)
-        isShow.setValue(false)
         singleTask.execute {
             val inputTipsQuery = InputtipsQuery(text, CITY)
             val inputTips = Inputtips(getApplication(), inputTipsQuery)
@@ -46,17 +43,12 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
                         .map { x -> InputTip(x.getName(), x.getPoiID()) }
                         .toList()
 
-                isShow.postValue(true)
-
                 this.inputTips.postValue(newTips)
 
                 onSuccess.onNext("搜索成功")
 
             } catch (e: Exception) {
                 e.printStackTrace()
-
-                isShow.postValue(false)
-
                 onError.onNext("输入提示查询失败,请检查网络连接")
             }
         }

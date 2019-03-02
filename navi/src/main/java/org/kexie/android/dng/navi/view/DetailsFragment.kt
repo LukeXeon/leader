@@ -21,6 +21,7 @@ import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 
 @Mapping("dng/navi/details")
 class DetailsFragment : Fragment() {
+
     private lateinit var binding: FragmentDetailsBinding
 
     private lateinit var viewModel: NaviViewModel
