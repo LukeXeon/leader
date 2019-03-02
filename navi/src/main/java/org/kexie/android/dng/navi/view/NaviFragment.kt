@@ -43,21 +43,24 @@ class NaviFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         //initViews
 
-        viewModel = ViewModelProviders.of(targetFragment!!)
-                .get(NaviViewModel::class.java)
+        val fragment = childFragmentManager
+                .findFragmentById(R.id.fragment_navi) as NaviViewFragment
 
-
-        naviView = (childFragmentManager.findFragmentById(R.id.fragment_navi) as NaviViewFragment)
-                .innerView
+        naviView = fragment.innerView
 
         mapController = naviView.map
-        //dataBinding
 
+        val target = targetFragment;
+
+        if (target != null) {
+
+            viewModel = ViewModelProviders.of(target)
+                    .get(NaviViewModel::class.java)
+
+            viewModel.start()
+        } else {
+            viewModel = ViewModelProviders.of(this)
+                    .get(NaviViewModel::class.java)
+        }
     }
-
-    companion object {
-
-    }
-
-
 }

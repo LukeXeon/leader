@@ -83,10 +83,6 @@ class RouteFragment : Fragment() {
 
             mapController.setMapStatusLimits(routeInfo.bounds)
 
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-            mapController.moveCamera(CameraUpdateFactory.zoomOut());
-
             val routeOverLay = RouteOverLay(mapController,
                     routeInfo.path,
                     requireContext().applicationContext)
@@ -95,13 +91,17 @@ class RouteFragment : Fragment() {
 
             routeOverLay.addToMap()
 
+            mapController.moveCamera(CameraUpdateFactory.zoomOut())
+            mapController.moveCamera(CameraUpdateFactory.zoomOut())
+            mapController.moveCamera(CameraUpdateFactory.zoomOut())
+
             binding!!.infosList.setGuideData(routeInfo.guideInfos)
 
             binding!!.setOnJumpToNavi {
-                
+
                 val request = Request.Builder()
                         .uri("dng/navi/navi")
-                        .build();
+                        .build()
 
                 val parent = requireParentFragment()
 

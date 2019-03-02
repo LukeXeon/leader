@@ -8,6 +8,7 @@ import com.amap.api.maps.AMapException
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.LatLngBounds
 import com.amap.api.navi.AMapNavi
+import com.amap.api.navi.enums.NaviType
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
 import com.amap.api.services.poisearch.PoiSearch
@@ -18,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.Exceptions
 import io.reactivex.functions.BiFunction
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.navi.model.Point
 import org.kexie.android.dng.navi.model.Query
@@ -30,7 +32,7 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
-class NaviViewModel(application: Application) : AndroidViewModel(application){
+class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     private val navi = AMapNavi.getInstance(application)
 
@@ -48,10 +50,23 @@ class NaviViewModel(application: Application) : AndroidViewModel(application){
         worker.start()
     }
 
+    fun start() {
+        navi.startNavi(NaviType.EMULATOR)
+    }
+
+    fun query(start: Point, end: Point, ways: List<Point>) {
+        val query = Query.Builder()
+                .from(start)
+                .to(end)
+                .ways(ways)
+                .build()!!
+        query(Observable.just(query))
+    }
+
     fun query(inputTip: InputTip, location: Point) {
         isLoading.value = true
         val target = Observable.just(inputTip)
-                .observeOn(AndroidSchedulers.from(worker.looper))
+                .observeOn(Schedulers.io())
                 .map {
                     val query = PoiSearch.Query(it.text, "")
                             .apply {
@@ -75,23 +90,31 @@ class NaviViewModel(application: Application) : AndroidViewModel(application){
                     }
                 }
 
-        Observable.zip(target, Observable.just(location),
-                BiFunction<Point, Point, Map<Int, RouteInfo>> { t1, t2 ->
-
+        val query = Observable.zip(target, Observable.just(location),
+                BiFunction<Point, Point, Query> { t1, t2 ->
                     Logger.d(Thread.currentThread())
-
-                    val query = Query.Builder()
+                    Query.Builder()
                             .from(t1)
                             .to(t2)
                             .build()!!
-                    val ids = getRouteIds(query)
+                })
+
+        query(query)
+
+    }
+
+    private fun query(query: Observable<Query>) {
+
+        query.observeOn(AndroidSchedulers.from(worker.looper))
+                .map {
+                    val ids = getRouteIds(it)
                     if (ids.isEmpty())
                         emptyMap()
                     else
                         ids.map {
                             it to getRouteInfo(it)
                         }.toMap()
-                })
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Map<Int, RouteInfo>> {
                     override fun onSubscribe(d: Disposable) {

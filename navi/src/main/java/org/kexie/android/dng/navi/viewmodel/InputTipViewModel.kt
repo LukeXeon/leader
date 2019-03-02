@@ -37,18 +37,18 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
         Logger.d(text)
         isShow.setValue(false)
         singleTask.execute {
-            val inputtipsQuery = InputtipsQuery(text, CITY)
-            val inputtips = Inputtips(getApplication(), inputtipsQuery)
+            val inputTipsQuery = InputtipsQuery(text, CITY)
+            val inputTips = Inputtips(getApplication(), inputTipsQuery)
             try {
 
-                val newTips = inputtips.requestInputtips()
+                val newTips = inputTips.requestInputtips()
                         .filter { tip -> !TextUtils.isEmpty(tip.getPoiID()) }
                         .map { x -> InputTip(x.getName(), x.getPoiID()) }
                         .toList()
 
                 isShow.postValue(true)
 
-                inputTips.postValue(newTips)
+                this.inputTips.postValue(newTips)
 
                 onSuccess.onNext("搜索成功")
 

@@ -12,6 +12,7 @@ import com.uber.autodispose.AutoDispose.autoDisposable
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
 import es.dmoral.toasty.Toasty
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import mapper.Mapping
 import org.kexie.android.common.widget.ProgressFragment
 import org.kexie.android.dng.navi.R
@@ -88,6 +89,7 @@ class QueryFragment:Fragment() {
         )
 
         Observable.merge(naviViewModel.onSuccess, inputTipViewModel.onSuccess)
+                .observeOn(AndroidSchedulers.mainThread())
                 .filter {
                     lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
                 }.`as`(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
@@ -96,6 +98,7 @@ class QueryFragment:Fragment() {
                 }
 
         Observable.merge(naviViewModel.onError, inputTipViewModel.onError)
+                .observeOn(AndroidSchedulers.mainThread())
                 .filter {
                     lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
                 }.`as`(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
