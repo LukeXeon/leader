@@ -46,11 +46,11 @@ class NaviFragment : Fragment() {
         val fragment = childFragmentManager
                 .findFragmentById(R.id.fragment_navi) as NaviViewFragment
 
-        naviView = fragment.innerView
+        naviView = fragment.innerView!!
 
         mapController = naviView.map
 
-        val target = targetFragment;
+        val target = targetFragment
 
         if (target != null) {
 
