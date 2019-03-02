@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +14,17 @@ import android.widget.TextView;
 import org.kexie.android.common.R;
 import org.kexie.android.common.databinding.ViewProgressBinding;
 
+import java.util.Objects;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import eightbitlab.com.blurview.RenderScriptBlur;
-import io.reactivex.functions.Consumer;
 
 public final class ProgressFragment
         extends Fragment
@@ -78,6 +80,7 @@ public final class ProgressFragment
                 {
                     updatePercent(++value);
                     mHandler.postDelayed(this, 10);
+                    setMessage("加载中" + value + "%");
                 }
             }
         });
@@ -111,42 +114,43 @@ public final class ProgressFragment
         this.msg = message;
     }
 
-    public static Consumer<String> makeObserver(Fragment root)
+    public static void observe(LiveData<Boolean> liveData, Fragment root)
     {
-        return new Observer(root);
+        liveData.observe(root, new ObserverImpl(root));
     }
 
-    private static final class Observer
+    private static final class ObserverImpl
             extends Handler
-            implements Consumer<String>,
+            implements Observer<Boolean>,
             OnBackPressedCallback,
             Runnable
     {
         private final ProgressFragment progressFragment = new ProgressFragment();
 
-        private Observer(Fragment fragment)
+        private ObserverImpl(Fragment fragment)
         {
             super(Looper.getMainLooper());
             progressFragment.setTargetFragment(fragment, 0);
             progressFragment.mHandler = this;
+            progressFragment.setMessage("加载中");
         }
 
         @Override
-        public void accept(String s)
+        public void onChanged(Boolean aBoolean)
         {
-            Fragment target = progressFragment.getTargetFragment();
-            if (!TextUtils.isEmpty(s))
+            Fragment target = Objects.requireNonNull(progressFragment.getTargetFragment());
+            if (aBoolean != null && aBoolean)
             {
-                progressFragment.setMessage(s);
                 if (!progressFragment.isAdded())
                 {
-                    target.getFragmentManager()
+                    target.requireFragmentManager()
                             .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .add(target.getId(), progressFragment)
                             .show(progressFragment)
                             .commit();
-                    target.getActivity().addOnBackPressedCallback(this);
+                    target.requireActivity()
+                            .addOnBackPressedCallback(this);
                 }
             } else
             {
@@ -169,7 +173,8 @@ public final class ProgressFragment
                     .remove(progressFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                     .commit();
-            progressFragment.getActivity().removeOnBackPressedCallback(this);
+            progressFragment.requireActivity()
+                    .removeOnBackPressedCallback(this);
         }
     }
 }

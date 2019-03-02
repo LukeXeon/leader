@@ -21,7 +21,7 @@
 
         <variable
             name="routeAdapter"
-            type="org.kexie.android.dng.navi.widget.SimpleApplyAdapter"/>
+            type="org.kexie.android.dng.navi.view.RouteAdapter"/>
 
         <variable
             name="actions"

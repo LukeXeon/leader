@@ -13,6 +13,7 @@ class HolderFragment:Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         naviViewModel = ViewModelProviders.of(this).get(NaviViewModel::class.java)
 
     }

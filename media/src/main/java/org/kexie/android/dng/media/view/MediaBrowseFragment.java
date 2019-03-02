@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.common.databinding.GenericQuickAdapter;
-import org.kexie.android.common.databinding.RxEvent;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
@@ -111,15 +110,14 @@ public class MediaBrowseFragment
 
         mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
 
-        viewModel.medias.observe(this,mediasAdapter::setNewData);
+        viewModel.medias.observe(this, mediasAdapter::setNewData);
 
         binding.setMedias(mediasAdapter);
 
         //liveData
         viewModel.title.observe(this, binding::setTitle);
-        //rx
-        viewModel.onLoading.as(RxEvent.bind(this))
-                .subscribe(ProgressFragment.makeObserver(this));
+
+        ProgressFragment.observe(viewModel.isLoading, this);
 
         viewModel.loadPhoto();
     }

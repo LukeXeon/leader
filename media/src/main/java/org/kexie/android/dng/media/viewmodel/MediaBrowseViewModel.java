@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
@@ -30,7 +29,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     public final MutableLiveData<List<Media>> medias = new MutableLiveData<>();
 
-    public final PublishSubject<String> onLoading = PublishSubject.create();
+    public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();;
 
     public MediaBrowseViewModel(@NonNull Application application)
     {
@@ -49,7 +48,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
 
     private void internalLoad(String type)
     {
-        onLoading.onNext("加载中...");
+        isLoading.setValue(true);
         singleTask.execute(() -> {
             List<Media> medias = StreamSupport.stream(TYPE_VIDEO.equals(type)
                     ? MediaInfoLoader.getVideoModels(getApplication())
@@ -57,7 +56,7 @@ public class MediaBrowseViewModel extends AndroidViewModel
                     .map(x -> new Media(x.title, x.uri, x.type))
                     .collect(Collectors.toList());
             this.medias.postValue(medias);
-            onLoading.onNext("");
+            isLoading.postValue(false);
             title.postValue(type);
         });
     }
