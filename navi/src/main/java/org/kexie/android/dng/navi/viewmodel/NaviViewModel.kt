@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import com.amap.api.maps.AMapException
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.LatLngBounds
-import com.amap.api.navi.AMapNavi
 import com.amap.api.navi.enums.NaviType
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
@@ -29,12 +28,13 @@ import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo
 import org.kexie.android.dng.navi.widget.NaviCallback
 import org.kexie.android.dng.navi.widget.NaviCompat
 import java.text.DecimalFormat
-import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+typealias NaviController = com.amap.api.navi.AMapNavi;
 
 class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val navi = AMapNavi.getInstance(application)
+    private val navi = NaviController.getInstance(application)
 
     private val worker = HandlerThread(javaClass.name + " worker")
 
@@ -61,10 +61,11 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun query(query: Query) {
-        query(Observable.just(query))
+        query0(Observable.just(query))
     }
 
     fun query(inputTip: InputTip, location: Point) {
+
         isLoading.value = true
         val target = Observable.just(inputTip)
                 .observeOn(Schedulers.io())
@@ -93,20 +94,18 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
         val query = Observable.zip(target, Observable.just(location),
                 BiFunction<Point, Point, Query> { t1, t2 ->
-                    Logger.d(Thread.currentThread())
                     Query.Builder()
-                            .from(t1)
-                            .to(t2)
+                            .to(t1)
+                            .from(t2)
+                            .mode(10)
                             .build()!!
-                })
+                }).observeOn(Schedulers.io())
 
-        query(query)
+        query0(query)
 
     }
 
-
-
-    private fun query(query: Observable<Query>) {
+    private fun query0(query: Observable<Query>) {
 
         query.observeOn(AndroidSchedulers.from(worker.looper))
                 .map {
@@ -114,8 +113,8 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     if (ids.isEmpty())
                         emptyMap()
                     else
-                        ids.map {
-                            it to getRouteInfo(it)
+                        ids.map { x ->
+                            x to getRouteInfo(x)
                         }.toMap()
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -134,7 +133,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     override fun onComplete() {
-
+                        isLoading.value = false
                     }
                 })
     }
@@ -145,51 +144,53 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
             val condition = lock.newCondition()
 
+            var result: IntArray? = null
+
             navi.addAMapNaviListener(
                     object : NaviCallback() {
                         @Suppress("OverridingDeprecatedMember")
                         override fun onCalculateRouteFailure(code: Int) {
-                            lock.lock()
-                            navi.removeAMapNaviListener(this)
-                            Logger.d("error code $code")
-                            condition.signalAll()
-                            lock.unlock()
+                            lock.withLock {
+                                navi.removeAMapNaviListener(this)
+                                Logger.d("error code $code")
+                                condition.signalAll()
+                            }
                         }
 
                         @Suppress("OverridingDeprecatedMember")
                         override fun onCalculateRouteSuccess(ints: IntArray) {
-                            lock.lock()
-                            navi.removeAMapNaviListener(this)
-                            condition.signalAll()
-                            lock.unlock()
+                            lock.withLock {
+                                navi.removeAMapNaviListener(this)
+                                result = ints
+                                condition.signalAll()
+                            }
                         }
                     })
 
-            lock.lock()
+            lock.withLock {
 
-            val form = if (query.from == null)
-                emptyList()
-            else
-                listOf(query.from.unBox(NaviLatLng::class.java))
+                val form = if (query.from == null)
+                    emptyList()
+                else
+                    listOf(query.from.unBox(NaviLatLng::class.java))
 
-            val to = if (query.to == null)
-                emptyList()
-            else
-                listOf(query.to.unBox(NaviLatLng::class.java))
+                val to = if (query.to == null)
+                    emptyList()
+                else
+                    listOf(query.to.unBox(NaviLatLng::class.java))
+                val ways = if (query.ways.isNullOrEmpty())
+                    emptyList()
+                else
+                    query.ways.map { p -> p.unBox(NaviLatLng::class.java) }
+                            .toList()
 
-            val ways = if (query.ways == null || query.ways.size == 0)
-                emptyList()
-            else
-                query.ways.map { p -> p.unBox(NaviLatLng::class.java) }
-                        .toList()
+                navi.calculateDriveRoute(form, to, ways, query.mode)
 
-            navi.calculateDriveRoute(form, to, ways, 10)
+                condition.await()
 
-            condition.await()
+            }
 
-            lock.unlock()
-
-            navi.naviPaths.keys.toTypedArray()
+            result?.toTypedArray() ?: emptyArray()
         } catch (e: Exception) {
             e.printStackTrace()
             throw Exceptions.propagate(e)
@@ -315,8 +316,10 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                             .add(Point.form(-0.4, -0.05))
                             .unBox(LatLng::class.java))
                     .build()
+
             return bounds
         }
+
     }
 
 }

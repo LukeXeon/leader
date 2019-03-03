@@ -38,7 +38,7 @@ public class Test extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        getFragmentManager()
+        requireFragmentManager()
                 .beginTransaction()
                 .add(getId(), Mapper.getOn(this,
                         new Request.Builder().uri("dng/navi/query").build()))

@@ -21,7 +21,7 @@
 
         <variable
             name="routeAdapter"
-            type="org.kexie.android.dng.navi.view.RouteAdapter"/>
+            type="androidx.viewpager.widget.PagerAdapter"/>
 
         <variable
             name="actions"

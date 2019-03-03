@@ -114,7 +114,7 @@ public final class ProgressFragment
         this.msg = message;
     }
 
-    public static void observe(LiveData<Boolean> liveData, Fragment root)
+    public static void observeWith(LiveData<Boolean> liveData, Fragment root)
     {
         liveData.observe(root, new ObserverImpl(root));
     }
@@ -168,13 +168,16 @@ public final class ProgressFragment
         public void run()
         {
             this.removeCallbacksAndMessages(null);
-            progressFragment.requireFragmentManager()
-                    .beginTransaction()
-                    .remove(progressFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                    .commit();
-            progressFragment.requireActivity()
-                    .removeOnBackPressedCallback(this);
+            if (progressFragment.isAdded())
+            {
+                progressFragment.requireFragmentManager()
+                        .beginTransaction()
+                        .remove(progressFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                        .commit();
+                progressFragment.requireActivity()
+                        .removeOnBackPressedCallback(this);
+            }
         }
     }
 }

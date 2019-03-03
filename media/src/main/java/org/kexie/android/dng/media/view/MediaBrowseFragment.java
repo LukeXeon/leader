@@ -117,7 +117,7 @@ public class MediaBrowseFragment
         //liveData
         viewModel.title.observe(this, binding::setTitle);
 
-        ProgressFragment.observe(viewModel.isLoading, this);
+        ProgressFragment.observeWith(viewModel.isLoading, this);
 
         viewModel.loadPhoto();
     }

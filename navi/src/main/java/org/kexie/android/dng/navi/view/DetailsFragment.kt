@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.TextureSupportMapFragment
 import com.amap.api.navi.view.RouteOverLay
 import mapper.Mapper
@@ -19,12 +17,15 @@ import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentDetailsBinding
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 
+
 @Mapping("dng/navi/details")
 class DetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailsBinding
 
     private lateinit var viewModel: NaviViewModel
+
+    private lateinit var mapController:MapController
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -48,7 +49,7 @@ class DetailsFragment : Fragment() {
                 .findFragmentById(R.id.map_view)
                 as TextureSupportMapFragment
 
-        val mapController = mapFragment.map!!
+        mapController = mapFragment.map!!
 
         val bundle = arguments
 
@@ -57,53 +58,57 @@ class DetailsFragment : Fragment() {
             viewModel = ViewModelProviders.of(targetFragment!!)
                     .get(NaviViewModel::class.java)
 
-            val id = bundle.getInt("pathId")
+            val pathId = bundle.getInt("pathId")
 
-            viewModel.routes.observe(this,
-                    Observer {
+            apply(pathId)
 
-                        mapController.clear()
+        }
 
-                        val routeInfo = it.getValue(id)
+    }
 
-                        mapController.setMapStatusLimits(routeInfo.bounds)
+    private fun apply(pathId:Int) {
 
-                        val routeOverLay = RouteOverLay(mapController,
-                                routeInfo.path,
-                                requireContext().applicationContext)
+        val paths = viewModel.routes.value!!
 
-                        routeOverLay.isTrafficLine = true
+        val routeInfo = paths.getValue(pathId)
 
-                        routeOverLay.addToMap()
+        mapController.setMapStatusLimits(routeInfo.bounds)
 
-                        mapController.moveCamera(CameraUpdateFactory.zoomOut())
-                        mapController.moveCamera(CameraUpdateFactory.zoomOut())
-                        mapController.moveCamera(CameraUpdateFactory.zoomOut())
+        val routeOverLay = RouteOverLay(mapController,
+                routeInfo.path,
+                requireContext().applicationContext)
 
-                        binding.setOnBack { requireActivity().onBackPressed() }
+        routeOverLay.isTrafficLine = true
 
-                        binding.setOnToNavi {
+        routeOverLay.addToMap()
 
-                            val request = Request.Builder()
-                                    .uri("dng/navi/navi")
-                                    .build();
+        with(mapController)
+        {
+            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
+            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
+            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
+        }
 
-                            val parent = requireParentFragment()
+        binding.setOnBack { requireActivity().onBackPressed() }
 
-                            val manager = parent.requireFragmentManager()
+        binding.setOnToNavi {
 
-                            manager.beginTransaction()
-                                    .addToBackStack(null)
-                                    .runOnCommit {
-                                        manager.popBackStack()
-                                    }
-                                    .add(id, Mapper.getOn(targetFragment!!, request))
-                                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                    .commit()
+            val request = Request.Builder()
+                    .uri("dng/navi/navi")
+                    .code(1)
+                    .build();
 
-                        }
-                    })
+            viewModel.select(pathId)
 
+            val target = targetFragment!!
+
+            val manager = target.requireFragmentManager()
+            requireActivity().onBackPressed()
+            manager.beginTransaction()
+                    .addToBackStack(null)
+                    .add(target.id, Mapper.getOn(target, request))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit()
         }
     }
 }

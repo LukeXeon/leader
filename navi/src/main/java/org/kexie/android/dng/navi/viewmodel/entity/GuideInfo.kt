@@ -12,7 +12,7 @@ class GuideInfo {
     var groupTrafficLights: Int = 0
     var groupIconType: Int = 0
     var groupToll: Int = 0
-    val steps: ArrayList<Step> = ArrayList()
+    val steps: MutableList<Step> = ArrayList()
 
     class Step(val stepIconType: Int, roadName: String, val stepDistance: Int) {
         var stepRoadName: String? = null
@@ -29,5 +29,7 @@ class GuideInfo {
         }
     }
 }
+
+
 
 

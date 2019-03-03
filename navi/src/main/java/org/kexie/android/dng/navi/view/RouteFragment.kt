@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.collection.SparseArrayCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProviders
-import com.amap.api.maps.AMap
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.TextureSupportMapFragment
 import com.amap.api.navi.view.RouteOverLay
@@ -26,9 +24,12 @@ class RouteFragment : Fragment() {
 
     private var binding: FragmentRouteBinding? = null
 
-    private lateinit var mapController: AMap
+    private val id = MutableLiveData<Int>()
+
+    private lateinit var mapController: MapController
 
     private lateinit var viewModel: NaviViewModel
+
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -46,9 +47,11 @@ class RouteFragment : Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        binding!!.lifecycleOwner = this
+        val binding = this.binding!!
 
-        viewModel = ViewModelProviders.of(targetFragment!!)
+        binding.lifecycleOwner = this
+
+        viewModel = ViewModelProviders.of(requireParentFragment())
                 .get(NaviViewModel::class.java)
 
         @Suppress("CAST_NEVER_SUCCEEDS")
@@ -58,27 +61,29 @@ class RouteFragment : Fragment() {
 
         mapController = mapFragment.map
 
-        val uiSettings = mapController.uiSettings
+        with(mapController.uiSettings)
+        {
+            isScrollGesturesEnabled = false
+            isZoomGesturesEnabled = false
+            isTiltGesturesEnabled = false
+            isRotateGesturesEnabled = false
+            isZoomControlsEnabled = false
+        }
 
-        uiSettings.isScrollGesturesEnabled = false
-
-        uiSettings.isZoomGesturesEnabled = false
-
-        uiSettings.isTiltGesturesEnabled = false
-
-        uiSettings.isRotateGesturesEnabled = false
-
-        uiSettings.isZoomControlsEnabled = false
-
+        val bundle = arguments
+        if (bundle != null) {
+            val pathId = bundle.getInt("pathId")
+            apply(pathId)
+        }
     }
 
-    fun apply(id: Int) {
+    private fun apply(pathId:Int) {
 
-        val it = viewModel.routes.value!!
+        val binding = this.binding!!
 
-        mapController.clear()
+        val paths = viewModel.routes.value!!
 
-        val routeInfo = it.getValue(id)
+        val routeInfo = paths.getValue(pathId)
 
         mapController.setMapStatusLimits(routeInfo.bounds)
 
@@ -90,17 +95,23 @@ class RouteFragment : Fragment() {
 
         routeOverLay.addToMap()
 
-        mapController.moveCamera(CameraUpdateFactory.zoomOut())
-        mapController.moveCamera(CameraUpdateFactory.zoomOut())
-        mapController.moveCamera(CameraUpdateFactory.zoomOut())
+        with(mapController)
+        {
+            moveCamera(CameraUpdateFactory.zoomOut())
+            moveCamera(CameraUpdateFactory.zoomOut())
+            moveCamera(CameraUpdateFactory.zoomOut())
+        }
 
-        binding!!.infosList.setGuideData(routeInfo.guideInfos)
+        binding.infosList.setGuideData(routeInfo.guideInfos)
 
-        binding!!.setOnJumpToNavi {
+        binding.setOnJumpToNavi {
 
             val request = Request.Builder()
                     .uri("dng/navi/navi")
+                    .code(1)
                     .build()
+
+            viewModel.select(pathId)
 
             val parent = requireParentFragment()
 
@@ -108,19 +119,16 @@ class RouteFragment : Fragment() {
 
             manager.beginTransaction()
                     .addToBackStack(null)
-                    .runOnCommit {
-                        manager.popBackStack()
-                    }
-                    .add(parent.id, Mapper.getOn(targetFragment!!, request))
+                    .add(parent.id, Mapper.getOn(parent, request))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit()
         }
 
-        binding!!.setOnJumpToDetails {
+        binding.setOnJumpToDetails {
 
             val bundle = Bundle()
 
-            bundle.putInt("pathId", id)
+            bundle.putInt("pathId", pathId)
 
             val request = Request.Builder()
                     .code(1)
@@ -134,41 +142,9 @@ class RouteFragment : Fragment() {
 
             manager.beginTransaction()
                     .addToBackStack(null)
-                    .add(parent.id, Mapper.getOn(targetFragment!!, request))
+                    .add(parent.id, Mapper.getOn(parent, request))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit()
-
-        }
-    }
-
-}
-
-
-class RouteAdapter(var ids: List<Int>,
-              var root: Fragment)
-    : FragmentPagerAdapter(root.requireFragmentManager()) {
-
-    private val fragments = SparseArrayCompat<RouteFragment>()
-
-    override fun getCount(): Int {
-        return ids.size
-    }
-
-    override fun getItem(position: Int): Fragment {
-
-        var fragment = fragments[position]
-        return if (fragment != null) {
-            fragment.apply(ids[position])
-            fragment
-        } else {
-            val request = Request.Builder()
-                    .uri("dng/navi/route")
-                    .code(1)
-                    .build()
-            fragment = Mapper.getOn(root, request) as RouteFragment
-            fragments.put(position, fragment)
-            fragment.apply(ids[position])
-            fragment
         }
     }
 }
