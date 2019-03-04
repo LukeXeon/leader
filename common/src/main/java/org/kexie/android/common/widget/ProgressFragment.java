@@ -32,7 +32,7 @@ public final class ProgressFragment
     private ViewProgressBinding binding;
     private RoundCornerImageView mProgressIv;
     private ImageView mBotIv;
-    private String msg;
+    private TextView mProgressMessage;
     private Handler mHandler;
 
     @Override
@@ -57,18 +57,16 @@ public final class ProgressFragment
         super.onViewCreated(view, savedInstanceState);
         binding.getRoot().setOnTouchListener((x, y) -> true);
         binding.rootView.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(
-                        getActivity().getWindow()
+                .setFrameClearDrawable(requireActivity().getWindow()
                                 .getDecorView()
                                 .getBackground())
                 .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
-        TextView mProgressMessage = view.findViewById(R.id.progress_message);
+        mProgressMessage = view.findViewById(R.id.progress_message);
         //新增进度条
         mProgressIv = view.findViewById(R.id.p_cover_iv);
         mBotIv = view.findViewById(R.id.p_bot_iv);
-        mProgressMessage.setText(msg);
         mHandler.post(new Runnable()
         {
             private int value = 0;
@@ -105,13 +103,15 @@ public final class ProgressFragment
         super.onDestroyView();
         binding = null;
         mBotIv = null;
-        msg = null;
         mProgressIv = null;
     }
 
     private void setMessage(String message)
     {
-        this.msg = message;
+        if (mProgressMessage != null)
+        {
+            mProgressMessage.setText(message);
+        }
     }
 
     public static void observeWith(LiveData<Boolean> liveData, Fragment root)

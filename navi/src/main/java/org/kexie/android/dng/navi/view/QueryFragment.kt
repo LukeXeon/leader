@@ -8,29 +8,28 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.*
 import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
 import androidx.lifecycle.Lifecycle.State.RESUMED
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.PagerAdapter
 import com.amap.api.maps.AMap
 import com.amap.api.maps.TextureSupportMapFragment
 import com.amap.api.maps.model.MyLocationStyle
-import com.orhanobut.logger.Logger
 import com.uber.autodispose.AutoDispose.autoDisposable
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
 import es.dmoral.toasty.Toasty
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import mapper.BR
 import mapper.Mapper
 import mapper.Mapping
 import mapper.Request
 import org.kexie.android.common.databinding.GenericQuickAdapter
 import org.kexie.android.common.widget.ProgressFragment
+import org.kexie.android.dng.navi.BR
 import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentQueryBinding
 import org.kexie.android.dng.navi.model.Point
-import org.kexie.android.dng.navi.viewmodel.DEBUG_TEXT
 import org.kexie.android.dng.navi.viewmodel.InputTipViewModel
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
@@ -41,66 +40,60 @@ typealias MapController = AMap
 @Mapping("dng/navi/query")
 class QueryFragment:Fragment() {
 
-    private lateinit var naviViewModel: NaviViewModel
+    private lateinit var mNaviViewModel: NaviViewModel
 
-    private lateinit var inputTipViewModel: InputTipViewModel
+    private lateinit var mInputTipViewModel: InputTipViewModel
 
     private lateinit var mTipsAdapter: GenericQuickAdapter<InputTip>
 
-    private lateinit var binding: FragmentQueryBinding
+    private lateinit var mBinding: FragmentQueryBinding
 
-    private lateinit var mapController: MapController
-
-    private val queryText = MutableLiveData<String>()
+    private lateinit var mMapController: MapController
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        binding = DataBindingUtil.inflate(inflater,
+        mBinding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_query,
                 container,
                 false)
-        return binding.root
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        naviViewModel = ViewModelProviders.of(this)
+        mNaviViewModel = ViewModelProviders.of(this)
                 .get(NaviViewModel::class.java)
 
-        inputTipViewModel = ViewModelProviders.of(this)
+        mInputTipViewModel = ViewModelProviders.of(this)
                 .get(InputTipViewModel::class.java)
 
         @Suppress("CAST_NEVER_SUCCEEDS")
         val mapFragment = childFragmentManager
                 .findFragmentById(R.id.map_view) as TextureSupportMapFragment
 
-        lifecycle.addObserver(LifecycleEventObserver { lifecycleOwner: LifecycleOwner, event: Lifecycle.Event ->
-            Logger.d("" + lifecycleOwner.lifecycle.currentState + " " + event)
-        })
-
-        mapController = mapFragment.map
+        mMapController = mapFragment.map
 
         mTipsAdapter = GenericQuickAdapter<InputTip>(R.layout.item_tip, BR.inputTip)
                 .apply {
                     setOnItemClickListener { adapter,
                                              view,
                                              position ->
-                        val point = with(mapController.myLocation)
+                        val point = with(mMapController.myLocation)
                         {
                             Point.form(longitude, latitude)
                         }
-                        naviViewModel.query(data[position]!!, point)
+                        mNaviViewModel.query(data[position]!!, point)
                     }
                 }
 
-        binding.apply {
+        mBinding.apply {
             lifecycleOwner = this@QueryFragment
             routePager.setPageTransformer(false, ScaleTransformer())
             routePager.offscreenPageLimit = 3
-            query = queryText
+            query = mInputTipViewModel.queryText
             tipsAdapter = mTipsAdapter
         }
 
@@ -110,19 +103,21 @@ class QueryFragment:Fragment() {
 
                 }
 
-        mapController.apply {
+        mMapController.apply {
             myLocationStyle = layoutStyle
             isMyLocationEnabled = true
             uiSettings.isMyLocationButtonEnabled = true
         }
 
-        inputTipViewModel.inputTips.observe(this,
+        mInputTipViewModel.inputTips.observe(this,
                 Observer {
-                    binding.isShowTips = !it.isEmpty()
+                    if (!it.isEmpty()) {
+                        mBinding.isShowTips = true
+                    }
                     mTipsAdapter.setNewData(it)
                 })
 
-        Transformations.map(naviViewModel.routes) {
+        Transformations.map(mNaviViewModel.routes) {
             it.keys
         }.observe(this, Observer {
             val isEmpty = it.isEmpty()
@@ -140,26 +135,22 @@ class QueryFragment:Fragment() {
                     Mapper.getOn(this, request)
                 }
 
-            binding.apply {
+            mBinding.apply {
                 isShowRoutes = !isEmpty
-                routeAdapter = fastFragmentAdapter(fragments)
+                routeAdapter = wrapToAdapter(fragments)
             }
-        })
-
-        queryText.observe(this, Observer {
-            inputTipViewModel.query(it)
         })
 
         requireActivity().addOnBackPressedCallback(
                 this,
                 OnBackPressedCallback {
-                    if (lifecycle.currentState == RESUMED) {
-                        if (!naviViewModel.routes.value.isNullOrEmpty()) {
-                            naviViewModel.routes.value = emptyMap()
+                    if (!isHidden) {
+                        if (!mNaviViewModel.routes.value.isNullOrEmpty()) {
+                            mNaviViewModel.routes.value = emptyMap()
                             return@OnBackPressedCallback true
                         }
-                        if (!inputTipViewModel.inputTips.value.isNullOrEmpty()) {
-                            inputTipViewModel.inputTips.value = emptyList()
+                        if (!mInputTipViewModel.inputTips.value.isNullOrEmpty()) {
+                            mInputTipViewModel.inputTips.value = emptyList()
                             return@OnBackPressedCallback true
                         }
                     }
@@ -167,7 +158,7 @@ class QueryFragment:Fragment() {
                 }
         )
 
-        Observable.merge(naviViewModel.onSuccess, inputTipViewModel.onSuccess)
+        mNaviViewModel.onSuccess.mergeWith(mInputTipViewModel.onSuccess)
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter {
                     lifecycle.currentState.isAtLeast(RESUMED)
@@ -176,7 +167,7 @@ class QueryFragment:Fragment() {
                     Toasty.success(requireContext(), it).show()
                 }
 
-        Observable.merge(naviViewModel.onError, inputTipViewModel.onError)
+        mNaviViewModel.onError.mergeWith(mInputTipViewModel.onError)
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter {
                     lifecycle.currentState.isAtLeast(RESUMED)
@@ -185,13 +176,12 @@ class QueryFragment:Fragment() {
                     Toasty.error(requireContext(), it).show()
                 }
 
-        ProgressFragment.observeWith(naviViewModel.isLoading, this)
-
-        queryText.value = DEBUG_TEXT
+        ProgressFragment.observeWith(mNaviViewModel.isLoading, this)
 
     }
 
-    private fun fastFragmentAdapter(list: List<Fragment>): PagerAdapter {
+    private fun wrapToAdapter(list: List<Fragment>): PagerAdapter {
+
         return object : FragmentPagerAdapter(childFragmentManager) {
             override fun getCount(): Int {
                 return list.size
@@ -201,6 +191,7 @@ class QueryFragment:Fragment() {
                 return list[position]
             }
         }
+
     }
 }
 

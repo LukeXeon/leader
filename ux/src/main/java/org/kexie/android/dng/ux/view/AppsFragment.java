@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import eightbitlab.com.blurview.RenderScriptBlur;
 import mapper.Mapping;
 
 @Mapping("dng/ux/apps")
@@ -57,13 +56,6 @@ public class AppsFragment extends Fragment
 
         viewModel = ViewModelProviders.of(this).get(AppsViewModel.class);
         //dataBinding
-        binding.blurView.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
 
         GenericQuickAdapter<App> adapter
                 = new GenericQuickAdapter<>(R.layout.item_app, BR.app);

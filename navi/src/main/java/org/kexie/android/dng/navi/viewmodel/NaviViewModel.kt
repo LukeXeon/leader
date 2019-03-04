@@ -61,12 +61,14 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun query(query: Query) {
+        isLoading.value = true
         query0(Observable.just(query))
     }
 
     fun query(inputTip: InputTip, location: Point) {
 
         isLoading.value = true
+
         val target = Observable.just(inputTip)
                 .observeOn(Schedulers.io())
                 .map {
@@ -92,7 +94,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-        val query = Observable.zip(target, Observable.just(location),
+        val query = target.zipWith(Observable.just(location),
                 BiFunction<Point, Point, Query> { t1, t2 ->
                     Query.Builder()
                             .to(t1)

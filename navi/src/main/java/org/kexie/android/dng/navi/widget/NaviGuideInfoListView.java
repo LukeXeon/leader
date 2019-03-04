@@ -8,6 +8,8 @@ import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
 
 import java.util.List;
 
+import androidx.databinding.BindingAdapter;
+
 /**
  * Created by hongming.wang on 2017/6/22.
  */
@@ -57,5 +59,11 @@ public class NaviGuideInfoListView extends ExpandableListView
             NaviGuideAdapter adapter = new NaviGuideAdapter(getContext(), dataList);
             setAdapter(adapter);
         }
+    }
+
+    @BindingAdapter("data")
+    public static void setGuideData(NaviGuideInfoListView view, List<GuideInfo> dataList)
+    {
+        view.setGuideData(dataList);
     }
 }

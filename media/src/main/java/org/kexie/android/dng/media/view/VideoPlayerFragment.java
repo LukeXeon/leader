@@ -10,13 +10,10 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dl7.player.media.IjkPlayerView;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
-import org.kexie.android.dng.media.model.entity.MediaInfo;
-
-import java.util.Objects;
+import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -55,25 +52,28 @@ public class VideoPlayerFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        MediaInfo info = requireArguments().getParcelable("info");
+        Media info = requireArguments().getParcelable("media");
         requireActivity().addOnBackPressedCallback(this,
                 this);
         //dataBinding
-        player = binding.playerView;
-        Glide.with(this)
-                .load(Objects.requireNonNull(info).uri)
-                .apply(RequestOptions.fitCenterTransform())
-                .into(player.mPlayerThumb);
+        if (info != null)
+        {
+            player = binding.playerView;
+            Glide.with(this)
+                    .load(info.uri)
+                    .apply(RequestOptions.fitCenterTransform())
+                    .into(player.mPlayerThumb);
 
-        binding.playerView.init()
-                .setSaveDir(Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                        .getAbsolutePath()+"/dng")
-                .setTitle(info.title)    // set title
-                .setVideoPath(info.uri)
-                .alwaysFullScreen()
-                .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
-                .start();   // Start playing
+            binding.playerView.init()
+                    .setSaveDir(Environment
+                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                            .getAbsolutePath() + "/dng")
+                    .setTitle(info.title)    // set title
+                    .setVideoPath(info.uri)
+                    .alwaysFullScreen()
+                    .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
+                    .start();   // Start playing
+        }
     }
 
     @Override

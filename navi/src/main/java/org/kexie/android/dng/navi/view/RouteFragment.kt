@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProviders
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.TextureSupportMapFragment
@@ -23,8 +22,6 @@ import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 class RouteFragment : Fragment() {
 
     private var binding: FragmentRouteBinding? = null
-
-    private val id = MutableLiveData<Int>()
 
     private lateinit var mapController: MapController
 
@@ -85,6 +82,8 @@ class RouteFragment : Fragment() {
 
         val routeInfo = paths.getValue(pathId)
 
+        binding.route = routeInfo
+
         mapController.setMapStatusLimits(routeInfo.bounds)
 
         val routeOverLay = RouteOverLay(mapController,
@@ -102,8 +101,6 @@ class RouteFragment : Fragment() {
             moveCamera(CameraUpdateFactory.zoomOut())
         }
 
-        binding.infosList.setGuideData(routeInfo.guideInfos)
-
         binding.setOnJumpToNavi {
 
             val request = Request.Builder()
@@ -118,6 +115,7 @@ class RouteFragment : Fragment() {
             val manager = parent.requireFragmentManager()
 
             manager.beginTransaction()
+                    .hide(parent)
                     .addToBackStack(null)
                     .add(parent.id, Mapper.getOn(parent, request))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -141,6 +139,7 @@ class RouteFragment : Fragment() {
             val manager = parent.requireFragmentManager()
 
             manager.beginTransaction()
+                    .hide(parent)
                     .addToBackStack(null)
                     .add(parent.id, Mapper.getOn(parent, request))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

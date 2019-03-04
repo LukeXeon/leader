@@ -59,6 +59,7 @@ dependencies {
     //api 'com.flipboard:bottomsheet-core:1.5.3'
 
     //util framework
+    api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
     api 'com.jakewharton.rxbinding3:rxbinding-core:3.0.0-alpha2'
     api 'com.squareup.retrofit2:adapter-rxjava:2.5.0'
     api 'com.squareup.retrofit2:converter-gson:2.5.0'

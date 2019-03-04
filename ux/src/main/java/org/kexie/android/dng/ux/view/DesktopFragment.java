@@ -118,6 +118,7 @@ public class DesktopFragment extends Fragment
     {
         requireFragmentManager()
                 .beginTransaction()
+                .hide(this)
                 .add(getId(), Mapper.getOn(this, request))
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

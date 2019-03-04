@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
@@ -68,6 +69,12 @@ class NaviFragment : Fragment() {
 
             viewModel.start()
 
+            requireActivity().addOnBackPressedCallback(this, OnBackPressedCallback {
+                requireFragmentManager().popBackStack()
+                requireFragmentManager().popBackStack()
+                return@OnBackPressedCallback true
+            })
+
         } else {
 
             viewModel = ViewModelProviders.of(this)
@@ -104,8 +111,10 @@ class NaviFragment : Fragment() {
                             viewModel.select(x)
                         }
                     })
+
                 }
             }
+
         }
 
         ProgressFragment.observeWith(viewModel.isLoading, this)

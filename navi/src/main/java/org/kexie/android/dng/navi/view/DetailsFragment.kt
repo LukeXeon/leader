@@ -103,8 +103,11 @@ class DetailsFragment : Fragment() {
             val target = targetFragment!!
 
             val manager = target.requireFragmentManager()
-            requireActivity().onBackPressed()
+
+            requireFragmentManager()
+
             manager.beginTransaction()
+                    .hide(target)
                     .addToBackStack(null)
                     .add(target.id, Mapper.getOn(target, request))
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
