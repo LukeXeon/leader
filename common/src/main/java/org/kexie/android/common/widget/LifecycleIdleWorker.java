@@ -22,9 +22,9 @@ public class LifecycleIdleWorker implements LifecycleOwner
 
     private final HandlerThread mWorkerThread = new HandlerThread(toString());
 
-    private final Handler mWorker;
-
     private final LifecycleRegistry mLifecycleRegistry = new LifecycleRegistry(this);
+
+    private final Handler mWorker;
 
     public LifecycleIdleWorker()
     {
