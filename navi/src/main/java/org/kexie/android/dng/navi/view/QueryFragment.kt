@@ -178,6 +178,8 @@ class QueryFragment:Fragment() {
 
         ProgressFragment.observeWith(mNaviViewModel.isLoading, this)
 
+        mBinding.isShowTips = true
+
     }
 
     private fun wrapToAdapter(list: List<Fragment>): PagerAdapter {
