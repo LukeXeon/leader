@@ -5,7 +5,6 @@
 
         <import type="org.kexie.android.dng.navi.R"/>
 
-
         <variable
             name="route"
             type="org.kexie.android.dng.navi.viewmodel.entity.RouteInfo"/>

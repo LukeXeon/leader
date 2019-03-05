@@ -128,6 +128,8 @@
                             android:orientation="horizontal">
 
                             <EditText
+                                android:id="@+id/edit_query"
+                                android:background="@null"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="20dp"

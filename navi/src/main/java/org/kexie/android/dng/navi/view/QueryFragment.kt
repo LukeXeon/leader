@@ -180,6 +180,8 @@ class QueryFragment:Fragment() {
 
         mBinding.isShowTips = true
 
+        //mInputTipViewModel.queryText.value = DEBUG_TEXT
+
     }
 
     private fun wrapToAdapter(list: List<Fragment>): PagerAdapter {
