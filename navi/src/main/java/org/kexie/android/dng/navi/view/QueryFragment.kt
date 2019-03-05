@@ -78,8 +78,8 @@ class QueryFragment:Fragment() {
 
         mTipsAdapter = GenericQuickAdapter<InputTip>(R.layout.item_tip, BR.inputTip)
                 .apply {
-                    setOnItemClickListener { adapter,
-                                             view,
+                    setOnItemClickListener { _,
+                                             _,
                                              position ->
                         val point = with(mMapController.myLocation)
                         {
