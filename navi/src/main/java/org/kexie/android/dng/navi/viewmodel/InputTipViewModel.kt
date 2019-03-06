@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.amap.api.services.help.Inputtips
 import com.amap.api.services.help.InputtipsQuery
 import com.orhanobut.logger.Logger
-import io.reactivex.disposables.Disposable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import java.util.concurrent.TimeUnit
@@ -21,7 +21,11 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
 
     private val worker = HandlerThread(toString()).apply { start() }
 
-    private val disposable: Disposable
+    private val querySubject = PublishSubject.create<String>().apply {
+        debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.from(worker.looper))
+                .subscribe(this@InputTipViewModel::query0)
+    }
 
     val inputTips = MutableLiveData<List<InputTip>>()
             .apply {
@@ -29,20 +33,16 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
             }
 
     val queryText = MutableLiveData<String>()
-            .apply {
-                val subject = PublishSubject.create<String>()
-                observeForever {
-                    subject.onNext(it)
-                }
-                disposable = subject.debounce(500, TimeUnit.MILLISECONDS)
-                        .subscribe(this@InputTipViewModel::query)
-            }
 
     val onError = PublishSubject.create<String>()
 
     val onSuccess = PublishSubject.create<String>()
 
-    private fun query(it: String) {
+    fun query(it: String) {
+        querySubject.onNext(it)
+    }
+
+    private fun query0(it: String) {
         Logger.d(it)
         if (it.isEmpty()) {
             this.inputTips.postValue(emptyList())
@@ -65,7 +65,6 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun onCleared() {
-        disposable.dispose()
         worker.quitSafely()
     }
 }

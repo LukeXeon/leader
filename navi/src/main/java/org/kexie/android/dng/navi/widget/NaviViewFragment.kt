@@ -9,8 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.amap.api.navi.AMapNaviView
 
+typealias NaviView = AMapNaviView
+
 class NaviViewFragment : Fragment() {
-    var innerView: AMapNaviView? = null
+    var innerView: NaviView? = null
         private set
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -22,14 +24,14 @@ class NaviViewFragment : Fragment() {
     override fun onInflate(context: Context, attrs: AttributeSet, savedInstanceState: Bundle?) {
         super.onInflate(context, attrs, savedInstanceState)
         if (innerView == null) {
-            innerView = AMapNaviView(context)
+            innerView = NaviView(context)
         }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (innerView == null) {
-            innerView = AMapNaviView(context)
+            innerView = NaviView(context)
         }
     }
 

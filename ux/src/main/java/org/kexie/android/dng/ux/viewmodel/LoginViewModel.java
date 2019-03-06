@@ -1,9 +1,11 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import com.bumptech.glide.Glide;
+import com.mylhyl.zxing.scanner.encode.QREncode;
 
 import org.kexie.android.dng.ux.model.LoginModule;
 import org.kexie.android.dng.ux.model.entity.JsonPollingResult;
@@ -17,14 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.subjects.PublishSubject;
-import okhttp3.OkHttpClient;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LoginViewModel extends AndroidViewModel
 {
-    private final LoginModule loginModule;
+    private LoginModule loginModule;
 
     private final Executor singleTask = Executors.newSingleThreadExecutor();
 
@@ -38,13 +37,26 @@ public class LoginViewModel extends AndroidViewModel
     public LoginViewModel(@NonNull Application application)
     {
         super(application);
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient())
-                .baseUrl("")
-                .build();
-        loginModule = retrofit.create(LoginModule.class);
-        requestQrcode();
+
+        singleTask.execute(()-> qrcode.postValue(getQrcode("test data")));
+
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .client(new OkHttpClient())
+//                .baseUrl("")
+//                .build();
+//        loginModule = retrofit.create(LoginModule.class);
+//        requestQrcode();
+    }
+
+    private Drawable getQrcode(String s)
+    {
+        Bitmap bitmap = new QREncode.Builder(getApplication())
+                .setContents(s)
+                .build()
+                .encodeAsBitmap();
+
+        return new BitmapDrawable(getApplication().getResources(), bitmap);
     }
 
     public void requestQrcode()
@@ -57,9 +69,9 @@ public class LoginViewModel extends AndroidViewModel
                 if (response.code() == 200)
                 {
                     JsonQrcode qrcode = response.body();
-                    Drawable resource = Glide.with(getApplication())
-                            .load(Objects.requireNonNull(qrcode).value)
-                            .submit().get();
+
+                    Drawable resource = getQrcode(Objects.requireNonNull(qrcode).value);
+
                     this.qrcode.postValue(resource);
                     polling();
                 }

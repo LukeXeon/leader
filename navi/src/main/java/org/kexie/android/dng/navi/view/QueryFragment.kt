@@ -109,13 +109,19 @@ class QueryFragment:Fragment() {
             uiSettings.isMyLocationButtonEnabled = true
         }
 
-        mInputTipViewModel.inputTips.observe(this,
-                Observer {
-                    if (!it.isEmpty()) {
-                        mBinding.isShowTips = true
-                    }
-                    mTipsAdapter.setNewData(it)
-                })
+        mInputTipViewModel.apply {
+            inputTips.observe(this@QueryFragment,
+                    Observer {
+                        if (!it.isEmpty()) {
+                            mBinding.isShowTips = true
+                        }
+                        mTipsAdapter.setNewData(it)
+                    })
+            queryText.observe(this@QueryFragment,
+                    Observer {
+                        query(it)
+                    })
+        }
 
         Transformations.map(mNaviViewModel.routes) {
             it.keys
@@ -176,6 +182,7 @@ class QueryFragment:Fragment() {
                     Toasty.error(requireContext(), it).show()
                 }
 
+
         ProgressFragment.observeWith(mNaviViewModel.isLoading, this)
 
         mBinding.isShowTips = true
@@ -198,5 +205,3 @@ class QueryFragment:Fragment() {
 
     }
 }
-
-

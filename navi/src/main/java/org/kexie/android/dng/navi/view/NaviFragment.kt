@@ -12,7 +12,6 @@ import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.amap.api.maps.AMap
-import com.amap.api.navi.AMapNaviView
 import com.uber.autodispose.AutoDispose.autoDisposable
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from
 import es.dmoral.toasty.Toasty
@@ -23,7 +22,10 @@ import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentNavigationBinding
 import org.kexie.android.dng.navi.model.Query
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
+import org.kexie.android.dng.navi.widget.NaviView
 import org.kexie.android.dng.navi.widget.NaviViewFragment
+
+
 
 const val ARG = "route"
 
@@ -34,7 +36,7 @@ class NaviFragment : Fragment() {
 
     private lateinit var binding: FragmentNavigationBinding
 
-    private lateinit var naviView: AMapNaviView
+    private lateinit var naviView: NaviView
 
     private lateinit var mapController: AMap
 

@@ -10,14 +10,12 @@
             name="onBack"
             type="Action"/>
     </data>
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/blurView"
-        app:blurOverlayColor="@android:color/transparent"
+    <FrameLayout
+        async_background='@{"image_background"}'
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
             android:onClick='@{onBack}'
-            android:background="@color/translucent_whitesmoke"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <androidx.cardview.widget.CardView
@@ -36,5 +34,5 @@
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
-    </eightbitlab.com.blurview.BlurView>
+    </FrameLayout>
 </layout>

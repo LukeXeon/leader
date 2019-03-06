@@ -42,8 +42,8 @@
             android:layout_width="280dp"
             android:layout_height="280dp">
             <com.makeramen.roundedimageview.RoundedImageView
-                android:layout_margin="5dp"
                 android:src="@{qrCode}"
+                android:layout_margin="1dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"

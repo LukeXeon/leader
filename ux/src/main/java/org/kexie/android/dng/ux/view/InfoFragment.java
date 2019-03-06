@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import eightbitlab.com.blurview.RenderScriptBlur;
 import mapper.Mapping;
 
 @Mapping("dng/ux/info")
@@ -43,17 +42,9 @@ public class InfoFragment extends Fragment
 
         binding.setOnBack(v -> requireActivity().onBackPressed());
 
-        binding.blurView.setupWith((ViewGroup) view)
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(requireContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
-
         getChildFragmentManager()
                 .beginTransaction()
-                .add(R.id.info_host, new QrcodeFragment())
+                .add(R.id.info_host, new InfoContentFragment())
                 .commit();
     }
 }
