@@ -72,22 +72,14 @@ class DetailsFragment : Fragment() {
 
         val routeInfo = paths.getValue(pathId)
 
-        mapController.setMapStatusLimits(routeInfo.bounds)
-
-        val routeOverLay = RouteOverLay(mapController,
+        RouteOverLay(mapController,
                 routeInfo.path,
                 requireContext().applicationContext)
-
-        routeOverLay.isTrafficLine = true
-
-        routeOverLay.addToMap()
-
-        with(mapController)
-        {
-            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
-            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
-            moveCamera(com.amap.api.maps.CameraUpdateFactory.zoomOut())
-        }
+                .apply {
+                    isTrafficLine = true
+                    addToMap()
+                    zoomToSpan()
+                }
 
         binding.setOnBack { requireActivity().onBackPressed() }
 
@@ -103,8 +95,6 @@ class DetailsFragment : Fragment() {
             val target = targetFragment!!
 
             val manager = target.requireFragmentManager()
-
-            requireFragmentManager()
 
             manager.beginTransaction()
                     .hide(target)

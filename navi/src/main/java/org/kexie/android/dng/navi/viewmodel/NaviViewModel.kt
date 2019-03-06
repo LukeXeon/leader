@@ -5,8 +5,6 @@ import android.os.HandlerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.amap.api.maps.AMapException
-import com.amap.api.maps.model.LatLng
-import com.amap.api.maps.model.LatLngBounds
 import com.amap.api.navi.enums.NaviType
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
@@ -37,8 +35,16 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     private val navi = NaviController.getInstance(application)
 
     private val worker = HandlerThread(javaClass.name + " worker")
+            .apply {
+                start()
+            }
 
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
+            .apply {
+                value = emptyMap()
+            }
+
+    val select = MutableLiveData<Int>()
 
     val isLoading = MutableLiveData<Boolean>()
 
@@ -46,18 +52,15 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     val onSuccess = PublishSubject.create<String>()
 
-    init {
-        worker.start()
-        routes.value = emptyMap()
-    }
-
     fun start() {
         navi.startNavi(NaviType.EMULATOR)
     }
 
-    fun select(id: Int)
-    {
-        navi.selectRouteId(id)
+    fun select(id: Int) {
+        select.value = id
+        if (id != NO_SELECT) {
+            navi.selectRouteId(id)
+        }
     }
 
     fun query(query: Query) {
@@ -207,7 +210,6 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     private fun getRouteInfo(id: Int): RouteInfo {
         val path = NaviCompat.getNaviPath(navi)[id]!!
         return RouteInfo.Builder()
-                .bounds(getBounds(path))
                 .length(getPathLength(path.allLength))
                 .time(getPathTime(path.allTime))
                 .name(path.amapNaviPath.labels)
@@ -217,6 +219,8 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     companion object {
+
+        val NO_SELECT = Int.MIN_VALUE
 
         private fun getGuideInfo(naviPath: NaviPath): List<GuideInfo> {
             val steps = ArrayList<GuideInfo>()
@@ -295,33 +299,5 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
             return dis.toString() + "米"
         }
 
-        private fun getBounds(naviPath: NaviPath): LatLngBounds {
-            val builder = LatLngBounds.builder()!!
-            naviPath.coordList
-                    .filter {
-                        it != null
-                    }.map {
-                        Point.box(it)
-                    }
-                    .map {
-                        it.unBox(LatLng::class.java)
-                    }
-                    .forEach {
-                        builder.include(it)
-                    }
-            var bounds = builder.build()
-            bounds = LatLngBounds.builder()
-                    .include(Point.box(bounds.northeast)
-                            .add(Point.form(0.4, 0.1))
-                            .unBox(LatLng::class.java))
-                    .include(Point.box(bounds.southwest)
-                            .add(Point.form(-0.4, -0.05))
-                            .unBox(LatLng::class.java))
-                    .build()
-
-            return bounds
-        }
-
     }
-
 }

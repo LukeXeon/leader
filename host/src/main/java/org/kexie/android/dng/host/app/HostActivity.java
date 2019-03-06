@@ -26,7 +26,7 @@ public final class HostActivity extends AppCompatActivity
                 .add(R.id.fragment_container,
                         Mapper.getOn(this, new Request.Builder()
                                 .uri("dng/ux/main")
-                                .build()), "dng/ux/main")
+                                .build()))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

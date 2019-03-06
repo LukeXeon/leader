@@ -8,7 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProviders
-import com.amap.api.maps.CameraUpdateFactory
+import com.amap.api.maps.AMap
 import com.amap.api.maps.TextureSupportMapFragment
 import com.amap.api.navi.view.RouteOverLay
 import mapper.Mapper
@@ -18,6 +18,8 @@ import org.kexie.android.dng.navi.R
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel
 
+typealias MapController = AMap
+
 @Mapping("dng/navi/route")
 class RouteFragment : Fragment() {
 
@@ -26,7 +28,6 @@ class RouteFragment : Fragment() {
     private lateinit var mapController: MapController
 
     private lateinit var viewModel: NaviViewModel
-
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -74,7 +75,7 @@ class RouteFragment : Fragment() {
         }
     }
 
-    private fun apply(pathId:Int) {
+    private fun apply(pathId: Int) {
 
         val binding = this.binding!!
 
@@ -84,22 +85,14 @@ class RouteFragment : Fragment() {
 
         binding.route = routeInfo
 
-        mapController.setMapStatusLimits(routeInfo.bounds)
-
-        val routeOverLay = RouteOverLay(mapController,
+        RouteOverLay(mapController,
                 routeInfo.path,
                 requireContext().applicationContext)
-
-        routeOverLay.isTrafficLine = true
-
-        routeOverLay.addToMap()
-
-        with(mapController)
-        {
-            moveCamera(CameraUpdateFactory.zoomOut())
-            moveCamera(CameraUpdateFactory.zoomOut())
-            moveCamera(CameraUpdateFactory.zoomOut())
-        }
+                .apply {
+                    isTrafficLine = true
+                    addToMap()
+                    zoomToSpan(200)
+                }
 
         binding.setOnJumpToNavi {
 
@@ -123,27 +116,7 @@ class RouteFragment : Fragment() {
         }
 
         binding.setOnJumpToDetails {
-
-            val bundle = Bundle()
-
-            bundle.putInt("pathId", pathId)
-
-            val request = Request.Builder()
-                    .code(1)
-                    .bundle(bundle)
-                    .uri("dng/navi/details")
-                    .build()
-
-            val parent = requireParentFragment()
-
-            val manager = parent.requireFragmentManager()
-
-            manager.beginTransaction()
-                    .hide(parent)
-                    .addToBackStack(null)
-                    .add(parent.id, Mapper.getOn(parent, request))
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit()
+            viewModel.select(pathId)
         }
     }
 }

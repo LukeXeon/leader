@@ -10,6 +10,7 @@ import org.kexie.android.common.databinding.RxEvent;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
+import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
 import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
@@ -40,6 +41,8 @@ public class DesktopFragment extends Fragment
 
     private InfoViewModel infoViewModel;
 
+    private AppsViewModel appsViewModel;
+
 
     @NonNull
     @Override
@@ -65,8 +68,13 @@ public class DesktopFragment extends Fragment
         viewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
 
+        appsViewModel = ViewModelProviders.of(this)
+                .get(AppsViewModel.class);
+
         infoViewModel = ViewModelProviders.of(this)
                 .get(InfoViewModel.class);
+
+        appsViewModel.loadAppInfo();
 
         binding.setLifecycleOwner(this);
 
@@ -77,19 +85,25 @@ public class DesktopFragment extends Fragment
 
         functionsAdapter.setOnItemClickListener((adapter, view1, position) -> {
             String uri = Objects.requireNonNull(functionsAdapter.getItem(position)).uri;
-            Request request = new Request.Builder().uri(uri).build();
-            jumpTo(request);
+            Request request = new Request.Builder().code(1).uri(uri).build();
+            if ("dng/ux/apps".equals(uri))
+            {
+                jumpToNoHide(request);
+            } else
+            {
+                jumpTo(request);
+            }
         });
 
-        viewModel.functions.observe(this,functionsAdapter::setNewData);
+        viewModel.functions.observe(this, functionsAdapter::setNewData);
 
         binding.setFunctions(functionsAdapter);
 
         Map<String, View.OnClickListener> actions = new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("个人信息", v -> jumpTo(new Request.Builder().uri("dng/ux/info").build()));
-                put("导航", v -> jumpTo(new Request.Builder().uri("dng/navi/query").build()));
+                put("个人信息", v -> jumpToNoHide(new Request.Builder().code(1).uri("dng/ux/content").build()));
+                put("导航", v -> jumpTo(new Request.Builder().code(1).uri("dng/navi/query").build()));
             }
         };
 
@@ -102,7 +116,6 @@ public class DesktopFragment extends Fragment
                 .observe(this, binding::setUser);
 
 
-
         viewModel.time.observe(this, binding::setTime);
         //rx
         viewModel.onError
@@ -112,6 +125,8 @@ public class DesktopFragment extends Fragment
         viewModel.onSuccess
                 .as(RxEvent.bind(this))
                 .subscribe(s -> Toasty.success(requireContext(), s).show());
+
+
     }
 
     private void jumpTo(Request request)
@@ -119,6 +134,17 @@ public class DesktopFragment extends Fragment
         requireFragmentManager()
                 .beginTransaction()
                 .hide(this)
+                .add(getId(), Mapper.getOn(this, request))
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
+
+
+    private void jumpToNoHide(Request request)
+    {
+        requireFragmentManager()
+                .beginTransaction()
                 .add(getId(), Mapper.getOn(this, request))
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

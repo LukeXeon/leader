@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import eightbitlab.com.blurview.RenderScriptBlur;
 
 public final class ProgressFragment
         extends Fragment
@@ -56,13 +55,7 @@ public final class ProgressFragment
     {
         super.onViewCreated(view, savedInstanceState);
         binding.getRoot().setOnTouchListener((x, y) -> true);
-        binding.rootView.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                                .getDecorView()
-                                .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
+
         mProgressMessage = view.findViewById(R.id.progress_message);
         //新增进度条
         mProgressIv = view.findViewById(R.id.p_cover_iv);
@@ -77,9 +70,12 @@ public final class ProgressFragment
                 if (value < 100)
                 {
                     updatePercent(++value);
-                    mHandler.postDelayed(this, 10);
                     setMessage("加载中" + value + "%");
+                } else
+                {
+                    value = 0;
                 }
+                mHandler.postDelayed(this, 50);
             }
         });
     }

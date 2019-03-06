@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import mapper.Mapping;
 
 @Mapping("dng/ux/apps")
@@ -50,11 +51,21 @@ public class AppsFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        binding.rootView.setupWith((ViewGroup) view.getParent())
+                .setFrameClearDrawable(requireActivity().getWindow()
+                        .getDecorView()
+                        .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
+
         view.setOnTouchListener((x, y) -> true);
 
         setRetainInstance(false);
 
-        viewModel = ViewModelProviders.of(this).get(AppsViewModel.class);
+        viewModel = ViewModelProviders.of(Objects.requireNonNull(getTargetFragment()))
+                .get(AppsViewModel.class);
         //dataBinding
 
         GenericQuickAdapter<App> adapter
@@ -77,8 +88,6 @@ public class AppsFragment extends Fragment
         viewModel.apps.observe(this, adapter::setNewData);
 
         viewModel.isLoading.observe(this, binding::setIsLoading);
-
-        viewModel.loadAppInfo();
 
     }
 }

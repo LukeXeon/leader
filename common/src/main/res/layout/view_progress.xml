@@ -2,13 +2,13 @@
 <layout>
     <data>
     </data>
-    <eightbitlab.com.blurview.BlurView
+    <FrameLayout
         android:id="@+id/rootView"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:blurOverlayColor="@color/colorBlackAlpha12">
+        android:background="@color/colorBlackAlpha26">
         <RelativeLayout
             android:layout_gravity="center"
             android:layout_width="match_parent"
@@ -98,6 +98,6 @@
                 android:src="@mipmap/head"/>
 
         </RelativeLayout>
-    </eightbitlab.com.blurview.BlurView>
+    </FrameLayout>
 </layout>
 

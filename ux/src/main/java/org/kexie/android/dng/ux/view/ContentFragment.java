@@ -6,21 +6,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.databinding.FragmentInfoContentBinding;
-import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
+import org.kexie.android.dng.ux.databinding.FragmentContentBinding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import eightbitlab.com.blurview.RenderScriptBlur;
 import mapper.Mapping;
 
-@Mapping("dng/ux/info/content")
-public class InfoContentFragment extends Fragment
+@Mapping("dng/ux/content")
+public class ContentFragment extends Fragment
 {
-    private FragmentInfoContentBinding binding;
-    private InfoViewModel viewModel;
+    private FragmentContentBinding binding;
 
     @Nullable
     @Override
@@ -29,28 +27,33 @@ public class InfoContentFragment extends Fragment
                              @Nullable Bundle savedInstanceState)
     {
         binding = DataBindingUtil.inflate(inflater,
-                R.layout.fragment_info_content, container,
+                R.layout.fragment_content,
+                container,
                 false);
-
         return binding.getRoot();
     }
 
-    @SuppressWarnings("All")
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
 
+        binding.rootView.setupWith((ViewGroup) view.getRootView())
+                .setFrameClearDrawable(requireActivity().getWindow()
+                        .getDecorView()
+                        .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
+
         setRetainInstance(false);
 
-        viewModel = ViewModelProviders.of(requireActivity()
-                .getSupportFragmentManager()
-                .findFragmentByTag("dng/ux/main"))
-                .get(InfoViewModel.class);
-        binding.setLifecycleOwner(this);
+        binding.setOnBack(v -> requireActivity().onBackPressed());
 
-        //liveData
-        viewModel.user.observe(this, binding::setUser);
+        getChildFragmentManager()
+                .beginTransaction()
+                .add(R.id.info_host, new InfoFragment())
+                .commit();
     }
 }
