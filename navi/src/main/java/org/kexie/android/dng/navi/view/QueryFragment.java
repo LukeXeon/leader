@@ -28,7 +28,6 @@ import org.kexie.android.dng.navi.viewmodel.InputTipViewModel;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
-import org.kexie.android.dng.navi.widget.ScaleTransformer;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,17 +38,13 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.OnRebindCallback;
-import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import es.dmoral.toasty.Toasty;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import java8.util.stream.Collectors;
-import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 
 import static androidx.lifecycle.Lifecycle.Event.ON_DESTROY;
@@ -110,93 +105,13 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
         binding.setIsShowQuery(false);
         binding.setStartQuery(v -> binding.setIsShowQuery(true));
         binding.setLifecycleOwner(this);
-        binding.routePager.setPageTransformer(false, new ScaleTransformer());
-        binding.routePager.setOffscreenPageLimit(3);
-        binding.pagerRoot.setOnTouchListener((v, event) -> binding.routePager.onTouchEvent(event));
-        
         binding.setQueryText(inputTipViewModel.getQueryText());
         binding.setTipsAdapter(inputTipQuickAdapter);
-        binding.addOnRebindCallback(new OnRebindCallback()
-        {
-            @Override
-            public void onBound(ViewDataBinding binding)
-            {
-                ViewPager pager = QueryFragment.this.binding.routePager;
-                PagerAdapter adapter = pager.getAdapter();
-                if (adapter != null)
-                {
-                    int count = adapter.getCount();
-                    int[] arr = IntStreams.iterate(0, x -> x < count, x -> x + 1)
-                            .toArray();
-                    pager.setCurrentItem(median(arr));
-                }
-            }
+        binding.routePager.setOffscreenPageLimit(3);
 
-            private int median(int[] nums)
-            {
-                if (nums.length == 0)
-                    return 0;
-                int start = 0;
-                int end = nums.length - 1;
-                int index = partition(nums, start, end);
-                if (nums.length % 2 == 0)
-                {
-                    while (index != nums.length / 2 - 1)
-                    {
-                        if (index > nums.length / 2 - 1)
-                        {
-                            index = partition(nums, start, index - 1);
-                        } else
-                        {
-                            index = partition(nums, index + 1, end);
-                        }
-                    }
-                } else
-                {
-                    while (index != nums.length / 2)
-                    {
-                        if (index > nums.length / 2)
-                        {
-                            index = partition(nums, start, index - 1);
-                        } else
-                        {
-                            index = partition(nums, index + 1, end);
-                        }
-                    }
-                }
-                return nums[index];
-            }
-
-            private int partition(int nums[], int start, int end)
-            {
-                int left = start;
-                int right = end;
-                int pivot = nums[left];
-                while (left < right)
-                {
-                    while (left < right && nums[right] >= pivot)
-                    {
-                        right--;
-                    }
-                    if (left < right)
-                    {
-                        nums[left] = nums[right];
-                        left++;
-                    }
-                    while (left < right && nums[left] <= pivot)
-                    {
-                        left++;
-                    }
-                    if (left < right)
-                    {
-                        nums[right] = nums[left];
-                        right--;
-                    }
-                }
-                nums[left] = pivot;
-                return left;
-            }
-        });
+        
+        //binding.routePager.setPageTransformer(false, new ScaleTransformer());
+        //binding.pagerRoot.setOnTouchListener((v, event) -> binding.routePager.onTouchEvent(event));
 
         TextureSupportMapFragment mapFragment = TextureSupportMapFragment
                 .class.cast(getChildFragmentManager()
