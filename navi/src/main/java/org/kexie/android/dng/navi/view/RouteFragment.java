@@ -6,10 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.TextureSupportMapFragment;
-import com.amap.api.maps.UiSettings;
-import com.amap.api.navi.view.RouteOverLay;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
@@ -17,7 +13,6 @@ import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
 import java.util.Map;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,8 +26,6 @@ public final class RouteFragment extends Fragment
     private FragmentRouteBinding binding;
 
     private NaviViewModel naviViewModel;
-
-    private AMap mapController;
 
     @NonNull
     @Override
@@ -60,23 +53,11 @@ public final class RouteFragment extends Fragment
 
         naviViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
                 .get(NaviViewModel.class);
-
-        TextureSupportMapFragment mapFragment = TextureSupportMapFragment
-                .class.cast(getChildFragmentManager().findFragmentById(R.id.map_view));
-
-        mapController = Objects.requireNonNull(mapFragment).getMap();
-
-        UiSettings uiSettings = mapController.getUiSettings();
-        uiSettings.setScrollGesturesEnabled(false);
-        uiSettings.setZoomGesturesEnabled(false);
-        uiSettings.setTiltGesturesEnabled(false);
-        uiSettings.setRotateGesturesEnabled(false);
-        uiSettings.setZoomControlsEnabled(false);
-
         Bundle bundle = getArguments();
         if (bundle != null)
         {
-
+            int id = bundle.getInt("pathId");
+            apply(id);
         }
     }
 
@@ -96,15 +77,6 @@ public final class RouteFragment extends Fragment
                 binding.setOnJumpToNavi(v -> {
 
                 });
-
-                RouteOverLay routeOverLay = new RouteOverLay(mapController,
-                        routeInfo.path,
-                        requireContext().getApplicationContext());
-                routeOverLay.setTrafficLine(true);
-                routeOverLay.addToMap();
-                routeOverLay.zoomToSpan(200);
-
-
             }
         }
     }

@@ -22,7 +22,8 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
 
     private val worker = HandlerThread(toString()).apply { start() }
 
-    private val querySubject = PublishSubject.create<Pair<String, Point>>()
+    private val querySubject
+            = PublishSubject.create<Pair<String, Point>>()
             .apply {
         debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.from(worker.looper))
@@ -54,16 +55,14 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
 
         val point = pair.second.unBox(LatLonPoint::class.java)
 
-        val search = GeocodeSearch(getApplication());
-        val query = RegeocodeQuery(point, 200f, GeocodeSearch.AMAP)
-        val city = search.getFromLocation(query).city
-
-        Logger.d("$text $city")
-
-
-        val inputTipsQuery = InputtipsQuery(text, city)
-        val inputTips = Inputtips(getApplication(), inputTipsQuery)
         try {
+            val search = GeocodeSearch(getApplication());
+            val query = RegeocodeQuery(point, 200f, GeocodeSearch.AMAP)
+            val city = search.getFromLocation(query).city
+            Logger.d("$text $city")
+
+            val inputTipsQuery = InputtipsQuery(text, city)
+            val inputTips = Inputtips(getApplication(), inputTipsQuery)
             val newTips = inputTips.requestInputtips()
                     .filter { tip -> !TextUtils.isEmpty(tip.poiID) }
                     .map { x -> InputTip(x.name, x.poiID) }

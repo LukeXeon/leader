@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
@@ -82,10 +83,11 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-        naviViewModel = ViewModelProviders.of(this)
+        naviViewModel = ViewModelProviders.of(requireParentFragment())
                 .get(NaviViewModel.class);
         inputTipViewModel = ViewModelProviders.of(this)
                 .get(InputTipViewModel.class);
@@ -102,7 +104,7 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
             naviViewModel.query(inputTip, point);
         });
 
-        binding.setOnBack(v -> naviViewModel.start(NaviViewModel.NO_SELECT));
+        binding.setOnBack(v -> naviViewModel.getCurrentShow().setValue(NaviViewModel.NO_SELECT));
         binding.setOnToNavi(v -> naviViewModel.isNavigating().setValue(true));
         binding.setIsShowSelect(false);
         binding.setIsShowQuery(false);
@@ -110,6 +112,8 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
         binding.setLifecycleOwner(this);
         binding.routePager.setPageTransformer(false, new ScaleTransformer());
         binding.routePager.setOffscreenPageLimit(3);
+        binding.pagerRoot.setOnTouchListener((v, event) -> binding.routePager.onTouchEvent(event));
+        
         binding.setQueryText(inputTipViewModel.getQueryText());
         binding.setTipsAdapter(inputTipQuickAdapter);
         binding.addOnRebindCallback(new OnRebindCallback()
@@ -229,12 +233,10 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
                     if (x != null)
                     {
                         fragments = StreamSupport.stream(x.keySet())
-                                .map(id -> {
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt("pathId", id);
-                                    return bundle;
-                                }).map(bundle -> ARouter.getInstance().build("/navi/route"))
-                                .map(postcard -> (Fragment)postcard.navigation())
+                                .map(id -> ARouter.getInstance()
+                                        .build("/navi/route")
+                                        .withInt("pathId", id))
+                                .map(postcard -> (Fragment) postcard.navigation())
                                 .collect(Collectors.toList());
                     } else
                     {
@@ -329,27 +331,24 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
     @Override
     public boolean handleOnBackPressed()
     {
-        if (!isHidden())
+        Boolean isSelect = binding.getIsShowSelect();
+        if (isSelect != null && isSelect)
         {
-            Boolean isSelect = binding.getIsShowSelect();
-            if (isSelect != null && isSelect)
-            {
-                naviViewModel.start(NaviViewModel.NO_SELECT);
-                return true;
-            }
-            Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
-            if (routeInfos != null && !routeInfos.isEmpty())
-            {
-                naviViewModel.getRoutes().setValue(Collections.emptyMap());
-                return true;
-            }
-            List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
-            if (inputTips != null && !inputTips.isEmpty())
-            {
-                inputTipViewModel.getQueryText().setValue("");
-                inputTipViewModel.getInputTips().setValue(Collections.emptyList());
-                return true;
-            }
+            naviViewModel.getCurrentShow().setValue(NaviViewModel.NO_SELECT);
+            return true;
+        }
+        Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
+        if (routeInfos != null && !routeInfos.isEmpty())
+        {
+            naviViewModel.getRoutes().setValue(Collections.emptyMap());
+            return true;
+        }
+        List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
+        if (inputTips != null && !inputTips.isEmpty())
+        {
+            inputTipViewModel.getQueryText().setValue("");
+            inputTipViewModel.getInputTips().setValue(Collections.emptyList());
+            return true;
         }
         return false;
     }

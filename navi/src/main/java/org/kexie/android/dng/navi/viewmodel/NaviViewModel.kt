@@ -55,10 +55,6 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     val onSuccess = PublishSubject.create<String>()
 
-    fun show(id: Int) {
-        currentShow.value = id;
-    }
-
     fun start(id: Int) {
         navi.selectRouteId(id)
         navi.startNavi(NaviType.EMULATOR)

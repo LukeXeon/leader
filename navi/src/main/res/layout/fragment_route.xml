@@ -25,142 +25,96 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
-        <RelativeLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="450dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="@android:color/transparent"
-            android:orientation="vertical">
-
-            <FrameLayout
-
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/map_corner"
-                android:layout_marginTop="-120dp">
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="10dp"
-                    app:cardPreventCornerOverlap="false"
-                    app:cardUseCompatPadding="true">
-                </androidx.cardview.widget.CardView>
-            </FrameLayout>
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_below="@+id/map_corner"
-                android:layout_marginBottom="25dp"
+                android:layout_margin="15dp"
                 android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="10dp"
+                            android:src="@mipmap/image_search"/>
+
+                        <TextView
+                            android:singleLine="true"
+                            android:id="@+id/tv_title"
+                            async_font='@{"PingFang Regular.ttf"}'
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:hint="@string/string_navi_name"
+                            android:text="@{route.name}"
+                            android:textColor="@android:color/black"
+                            android:textColorHint="@android:color/black"
+                            android:textSize="30dp"/>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/lightblue500"/>
+
+                    <TextView
+                        android:singleLine="true"
+                        android:id="@+id/tv_info"
+                        async_font='@{"PingFang Regular.ttf"}'
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|right"
+                        android:hint="@string/test_text1"
+                        android:paddingRight="20dp"
+                        android:text='@{route.time+"("+route.length+")"}'
+                        android:textColor="@android:color/black"
+                        android:textColorHint="@android:color/black"
+                        android:textSize="30sp"
+                        tools:ignore="RtlHardcoded"/>
+                </LinearLayout>
+
                 <org.kexie.android.dng.navi.widget.NaviGuideInfoListView
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
                     android:id="@+id/infos_list"
                     data="@{route.guideInfos}"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:layout_weight="1">
                 </org.kexie.android.dng.navi.widget.NaviGuideInfoListView>
 
                 <Button
-                    android:onClick="@{onJumpToNavi}"
                     android:id="@+id/btn_summit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/btn_draw"
+                    android:onClick="@{onJumpToNavi}"
                     android:text="@string/string_submit"
                     android:textColor="@color/white"
                     android:textSize="30sp"/>
             </LinearLayout>
-
-            <com.fxc.roundcornerlayout.RoundCornerFrameLayout
-                android:id="@+id/map_corner"
-                android:layout_width="360dp"
-                android:layout_height="210dp"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/white"
-                app:roundBottomLeft="true"
-                app:roundBottomRight="true"
-                app:roundTopLeft="true"
-                app:roundTopRight="true"
-                app:roundedCornerRadius="15dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <fragment
-                        android:id="@+id/map_view"
-                        android:name="com.amap.api.maps.TextureSupportMapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:background="@color/colorBlackAlpha26"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginLeft="10dp"
-                                android:src="@mipmap/image_search"/>
-
-                            <TextView
-                                android:id="@+id/tv_title"
-                                async_font='@{"PingFang Regular.ttf"}'
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="20dp"
-                                android:hint="@string/string_navi_name"
-                                android:textColorHint="@android:color/white"
-                                android:textColor="@android:color/white"
-                                android:text="@{route.name}"
-                                android:textSize="25sp"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/lightblue500"/>
-
-                        <TextView
-                            android:id="@+id/tv_info"
-                            async_font='@{"PingFang Regular.ttf"}'
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|right"
-                            android:hint="@string/test_text1"
-                            android:textColorHint="@android:color/white"
-                            android:textColor="@android:color/white"
-                            android:paddingRight="20dp"
-                            android:text='@{route.time+"("+route.length+")"}'
-                            android:textSize="25dp"
-                            tools:ignore="RtlHardcoded"/>
-                    </LinearLayout>
-                    <FrameLayout
-                        android:onClick="@{onJumpToDetails}"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                    </FrameLayout>
-                </RelativeLayout>
-            </com.fxc.roundcornerlayout.RoundCornerFrameLayout>
-
-        </RelativeLayout>
+        </androidx.cardview.widget.CardView>
     </FrameLayout>
 
 </layout>
