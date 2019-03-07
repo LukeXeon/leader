@@ -3,8 +3,6 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
 
-
-
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
@@ -12,6 +10,12 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
     }
 
     buildTypes {
@@ -36,7 +40,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':ijkplayer')
-    annotationProcessor 'com.github.LukeXeon.Mapper:mapper-compiler:1.0.2'
+    annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
+
 //    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {
 //        exclude group: 'com.dou361.ijkplayer-armv7a',
 //                module: 'jjdxm-ijkplayer-armv7a'

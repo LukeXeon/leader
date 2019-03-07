@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
@@ -40,7 +42,6 @@ import androidx.databinding.OnRebindCallback;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -49,15 +50,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import java8.util.stream.Collectors;
 import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
-import mapper.Mapper;
-import mapper.Mapping;
-import mapper.Request;
 
 import static androidx.lifecycle.Lifecycle.Event.ON_DESTROY;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Mapping("dng/navi/query")
+@Route(path = "/navi/query")
 public final class QueryFragment extends Fragment implements OnBackPressedCallback
 {
     private FragmentQueryBinding binding;
@@ -65,8 +63,6 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
     private NaviViewModel naviViewModel;
 
     private InputTipViewModel inputTipViewModel;
-
-    private TextureSupportMapFragment mapFragment;
 
     private AMap mapController;
 
@@ -85,7 +81,6 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
                 false);
         return binding.getRoot();
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
@@ -107,21 +102,8 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
             naviViewModel.query(inputTip, point);
         });
 
-        binding.setOnBack(v -> naviViewModel.select(NaviViewModel.Companion.getNO_SELECT()));
-        binding.setOnToNavi(v -> {
-            clearView();
-            Request request = new Request.Builder()
-                    .uri("dng/navi/navi")
-                    .code(1)
-                    .build();
-            Fragment naviFragment = Mapper.getOn(this, request);
-            requireFragmentManager().beginTransaction()
-                    .hide(this)
-                    .add(getId(), naviFragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
-        });
+        binding.setOnBack(v -> naviViewModel.start(NaviViewModel.NO_SELECT));
+        binding.setOnToNavi(v -> naviViewModel.isNavigating().setValue(true));
         binding.setIsShowSelect(false);
         binding.setIsShowQuery(false);
         binding.setStartQuery(v -> binding.setIsShowQuery(true));
@@ -212,36 +194,33 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
             }
         });
 
-        mapFragment = TextureSupportMapFragment.newInstance();
-        mapController = mapFragment.getMap();
-        mapController.setOnMapLoadedListener(() -> {
-            MyLocationStyle myLocationStyle = new MyLocationStyle().interval(1000);
-            mapController.setMyLocationStyle(myLocationStyle);
-            mapController.setOnMyLocationChangeListener(location -> {
-                MyLocationStyle myLocationStyle1 = new MyLocationStyle()
-                        .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-                mapController.setMyLocationStyle(myLocationStyle1);
-                mapController.setOnMyLocationChangeListener(null);
-            });
-            mapController.setMyLocationEnabled(true);
-            mapController.getUiSettings().setMyLocationButtonEnabled(true);
-            mapController.setOnMapLoadedListener(null);
+        TextureSupportMapFragment mapFragment = TextureSupportMapFragment
+                .class.cast(getChildFragmentManager()
+                .findFragmentById(R.id.map_view));
+        mapController = Objects.requireNonNull(mapFragment).getMap();
+        MyLocationStyle myLocationStyle = new MyLocationStyle().interval(1000);
+        mapController.setMyLocationStyle(myLocationStyle);
+        mapController.setOnMyLocationChangeListener(location -> {
+            MyLocationStyle myLocationStyle1 = new MyLocationStyle()
+                    .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
+            mapController.setMyLocationStyle(myLocationStyle1);
+            mapController.setOnMyLocationChangeListener(null);
         });
-
-        getChildFragmentManager()
-                .beginTransaction()
-                .add(R.id.map_view, Objects.requireNonNull(Fragment.class.cast(mapFragment)))
-                .commitAllowingStateLoss();
+        mapController.setMyLocationEnabled(true);
+        mapController.getUiSettings().setMyLocationButtonEnabled(true);
+        mapController.setOnMapLoadedListener(null);
 
         inputTipViewModel.getInputTips()
                 .observe(this, data -> {
                     binding.setIsShowTips(data != null && !data.isEmpty());
                     inputTipQuickAdapter.setNewData(data);
                 });
+
         inputTipViewModel.getQueryText()
                 .observe(this, data -> {
                     binding.setIsShowQuery(!TextUtils.isEmpty(data));
-                    inputTipViewModel.query(data);
+                    Location location = mapController.getMyLocation();
+                    inputTipViewModel.query(data, Point.form(location.getLongitude(), location.getLatitude()));
                 });
 
         naviViewModel.getRoutes()
@@ -254,11 +233,8 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
                                     Bundle bundle = new Bundle();
                                     bundle.putInt("pathId", id);
                                     return bundle;
-                                }).map(bundle -> new Request.Builder()
-                                        .uri("dng/navi/route")
-                                        .bundle(bundle)
-                                        .build())
-                                .map(request -> Mapper.getOn(this, request))
+                                }).map(bundle -> ARouter.getInstance().build("/navi/route"))
+                                .map(postcard -> (Fragment)postcard.navigation())
                                 .collect(Collectors.toList());
                     } else
                     {
@@ -267,9 +243,9 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
                     binding.setIsShowRoutes(!fragments.isEmpty());
                     binding.setRouteAdapter(wrapToAdapter(fragments));
                 });
-        naviViewModel.getSelect()
+        naviViewModel.getCurrentShow()
                 .observe(this, select -> {
-                    if (select != null && select != NaviViewModel.Companion.getNO_SELECT())
+                    if (select != null && select != NaviViewModel.NO_SELECT)
                     {
                         if (mapController == null)
                         {
@@ -330,17 +306,6 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
         requireActivity().addOnBackPressedCallback(this, this);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    private void clearView()
-    {
-        while (handleOnBackPressed()) ;
-        getChildFragmentManager().beginTransaction()
-                .remove(Objects.requireNonNull(Fragment.class.cast(mapFragment)))
-                .commitAllowingStateLoss();
-        mapFragment = null;
-        mapController = null;
-    }
-
     private PagerAdapter wrapToAdapter(List<Fragment> fragments)
     {
         return new FragmentPagerAdapter(getChildFragmentManager())
@@ -369,7 +334,7 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
             Boolean isSelect = binding.getIsShowSelect();
             if (isSelect != null && isSelect)
             {
-                naviViewModel.select(NaviViewModel.Companion.getNO_SELECT());
+                naviViewModel.start(NaviViewModel.NO_SELECT);
                 return true;
             }
             Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();

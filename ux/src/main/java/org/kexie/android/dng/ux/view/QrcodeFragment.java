@@ -5,7 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.kexie.android.common.databinding.RxEvent;
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentQrcodeBinding;
 import org.kexie.android.dng.ux.viewmodel.LoginViewModel;
@@ -14,11 +15,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
-import mapper.Mapping;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
-@Mapping("dng/ux/login")
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
+
+@Route(path = "/ux/login")
 public class QrcodeFragment extends Fragment
 {
     private FragmentQrcodeBinding binding;
@@ -43,19 +48,16 @@ public class QrcodeFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
         setRetainInstance(false);
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-        //liveData
         viewModel.qrcode.observe(this,binding::setQrCode);
-        viewModel.requestQrcode();
-        //rx
-
-        viewModel.onError.as(RxEvent.bind(this))
+        viewModel.onError.observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(requireContext(), s).show());
-
-        viewModel.onSuccess.as(RxEvent.bind(this))
+        viewModel.onSuccess.observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(requireContext(), s).show());
+        viewModel.requestQrcode();
     }
 }

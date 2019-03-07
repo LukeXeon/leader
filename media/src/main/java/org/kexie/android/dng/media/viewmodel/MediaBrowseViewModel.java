@@ -19,8 +19,8 @@ import java8.util.stream.StreamSupport;
 
 public class MediaBrowseViewModel extends AndroidViewModel
 {
-
     private static final String TYPE_PHOTO = "相册";
+
     private static final String TYPE_VIDEO = "视频";
 
     private final Executor singleTask = Executors.newSingleThreadExecutor();

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dl7.player.media.IjkPlayerView;
@@ -20,9 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import mapper.Mapping;
 
-@Mapping("dng/media/video")
+@Route(path = "/media/video")
 public class VideoPlayerFragment
         extends Fragment
         implements OnBackPressedCallback
@@ -53,9 +53,7 @@ public class VideoPlayerFragment
     {
         super.onViewCreated(view, savedInstanceState);
         Media info = requireArguments().getParcelable("media");
-        requireActivity().addOnBackPressedCallback(this,
-                this);
-        //dataBinding
+        requireActivity().addOnBackPressedCallback(this, this);
         if (info != null)
         {
             player = binding.playerView;

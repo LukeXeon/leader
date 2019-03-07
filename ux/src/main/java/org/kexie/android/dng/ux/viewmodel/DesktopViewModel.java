@@ -92,9 +92,9 @@ public class DesktopViewModel
         loadFunction(new LinkedList<FunctionInfo>()
         {
             {
-                add(FunctionInfo.from("天气", R.mipmap.image_weather, "dng/ux/weather"));
-                add(FunctionInfo.from("多媒体", R.mipmap.image_media, "dng/media/browse"));
-                add(FunctionInfo.from("APPS", R.mipmap.image_apps, "dng/ux/apps"));
+                add(FunctionInfo.from("天气", R.mipmap.image_weather, "/ux/weather"));
+                add(FunctionInfo.from("多媒体", R.mipmap.image_media, "/media/browse"));
+                add(FunctionInfo.from("APPS", R.mipmap.image_apps, "/ux/apps"));
             }
         }).subscribe(new Observer<List<Function>>()
         {

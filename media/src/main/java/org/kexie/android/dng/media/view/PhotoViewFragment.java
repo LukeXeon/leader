@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import org.kexie.android.common.util.AnimationAdapter;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
@@ -25,9 +27,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
-import mapper.Mapping;
 
-@Mapping("dng/media/photo")
+@Route(path = "/media/photo")
 public class PhotoViewFragment extends Fragment
 {
 
@@ -53,15 +54,20 @@ public class PhotoViewFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        //dataBinding
-        initBlurView();
+        setRetainInstance(false);
 
         binding.setLifecycleOwner(this);
-
+        binding.blurView.setupWith(binding.photo)
+                .setFrameClearDrawable(
+                        requireActivity()
+                                .getWindow()
+                                .getDecorView()
+                                .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
         binding.getRoot().setOnTouchListener((v, event) -> true);
-
         binding.setInfo(requireArguments().getParcelable("media"));
-
         binding.setHide(false);
 
         Fragment target = getTargetFragment();
@@ -99,19 +105,6 @@ public class PhotoViewFragment extends Fragment
 
             binding.setActions(actions);
         }
-    }
-
-    private void initBlurView()
-    {
-        binding.blurView.setupWith(binding.photo)
-                .setFrameClearDrawable(
-                        requireActivity()
-                                .getWindow()
-                                .getDecorView()
-                                .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
     }
 
     private void doHideAnimation()

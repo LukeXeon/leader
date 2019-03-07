@@ -40,6 +40,7 @@ public class LoginViewModel extends AndroidViewModel
 
         singleTask.execute(()-> qrcode.postValue(getQrcode("test data")));
 
+
 //        Retrofit retrofit = new Retrofit.Builder()
 //                .addConverterFactory(GsonConverterFactory.create())
 //                .client(new OkHttpClient())

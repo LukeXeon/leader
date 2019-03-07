@@ -27,9 +27,10 @@ public class AppsViewModel extends AndroidViewModel
     public AppsViewModel(@NonNull Application application)
     {
         super(application);
+        reload();
     }
 
-    public void loadAppInfo()
+    public void reload()
     {
         Observable.<Context>just(getApplication())
                 .observeOn(Schedulers.io())

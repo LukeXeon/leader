@@ -5,8 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import org.kexie.android.common.databinding.GenericQuickAdapter;
-import org.kexie.android.common.databinding.RxEvent;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
@@ -25,24 +28,25 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
-import mapper.Mapper;
-import mapper.Mapping;
-import mapper.Request;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
-@Mapping("dng/ux/main")
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
+
+@Route(path = "/ux/main")
 public class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;
 
-    private DesktopViewModel viewModel;
+    private DesktopViewModel desktopViewModel;
 
     private InfoViewModel infoViewModel;
 
     private AppsViewModel appsViewModel;
-
 
     @NonNull
     @Override
@@ -62,93 +66,75 @@ public class DesktopFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
         setRetainInstance(false);
 
-        viewModel = ViewModelProviders.of(this)
-                .get(DesktopViewModel.class);
-
-        appsViewModel = ViewModelProviders.of(this)
-                .get(AppsViewModel.class);
-
-        infoViewModel = ViewModelProviders.of(this)
-                .get(InfoViewModel.class);
-
-        appsViewModel.loadAppInfo();
-
-        binding.setLifecycleOwner(this);
-
-        getLifecycle().addObserver(viewModel);
-        //dataBinding
         GenericQuickAdapter<Function> functionsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_desktop_function, BR.function);
-
         functionsAdapter.setOnItemClickListener((adapter, view1, position) -> {
             String uri = Objects.requireNonNull(functionsAdapter.getItem(position)).uri;
-            Request request = new Request.Builder().code(1).uri(uri).build();
-            if ("dng/ux/apps".equals(uri))
+            Postcard postcard = ARouter.getInstance().build(uri);
+            if ("/ux/apps".equals(uri))
             {
-                jumpToNoHide(request);
+                jumpToNoHide(postcard);
             } else
             {
-                jumpTo(request);
+                jumpTo(postcard);
             }
         });
 
-        viewModel.functions.observe(this, functionsAdapter::setNewData);
+        desktopViewModel = ViewModelProviders.of(this)
+                .get(DesktopViewModel.class);
+        desktopViewModel.functions.observe(this, functionsAdapter::setNewData);
+        desktopViewModel.time.observe(this, binding::setTime);
+        desktopViewModel.onError.observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> Toasty.error(requireContext(), s).show());
+        desktopViewModel.onSuccess.observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> Toasty.success(requireContext(), s).show());
+        getLifecycle().addObserver(desktopViewModel);
 
-        binding.setFunctions(functionsAdapter);
+        appsViewModel = ViewModelProviders.of(requireActivity())
+                .get(AppsViewModel.class);
 
-        Map<String, View.OnClickListener> actions = new ArrayMap<String, View.OnClickListener>()
-        {
-            {
-                put("个人信息", v -> jumpToNoHide(new Request.Builder().code(1).uri("dng/ux/content").build()));
-                put("导航", v -> jumpTo(new Request.Builder().code(1).uri("dng/navi/query").build()));
-            }
-        };
-
-        binding.setActions(actions);
-
-        binding.setFunctions(functionsAdapter);
-        //liveData
+        infoViewModel = ViewModelProviders.of(requireActivity())
+                .get(InfoViewModel.class);
         Transformations.map(infoViewModel.user,
                 input -> new LiteUser(input.headImage, input.username, input.carNumber))
                 .observe(this, binding::setUser);
 
-
-        viewModel.time.observe(this, binding::setTime);
-        //rx
-        viewModel.onError
-                .as(RxEvent.bind(this))
-                .subscribe(s -> Toasty.error(requireContext(), s).show());
-
-        viewModel.onSuccess
-                .as(RxEvent.bind(this))
-                .subscribe(s -> Toasty.success(requireContext(), s).show());
-
+        Map<String, View.OnClickListener> actions
+                = new ArrayMap<String, View.OnClickListener>()
+        {
+            {
+                put("个人信息", v -> jumpToNoHide(ARouter.getInstance().build("/ux/content")));
+                put("导航", v -> getTransaction(ARouter.getInstance().build("/navi/query")));
+            }
+        };
+        binding.setActions(actions);
+        binding.setLifecycleOwner(this);
+        binding.setFunctions(functionsAdapter);
+        binding.setFunctions(functionsAdapter);
 
     }
 
-    private void jumpTo(Request request)
+    private FragmentTransaction getTransaction(Postcard postcard)
     {
-        requireFragmentManager()
+        Fragment fragment = (Fragment) postcard.navigation();
+        return requireFragmentManager()
                 .beginTransaction()
-                .hide(this)
-                .add(getId(), Mapper.getOn(this, request))
+                .add(getId(), fragment)
                 .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
     }
 
-
-    private void jumpToNoHide(Request request)
+    private void jumpToNoHide(Postcard postcard)
     {
-        requireFragmentManager()
-                .beginTransaction()
-                .add(getId(), Mapper.getOn(this, request))
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+        getTransaction(postcard).commit();
     }
 
+    private void jumpTo(Postcard postcard)
+    {
+        getTransaction(postcard).hide(this).commit();
+    }
 }

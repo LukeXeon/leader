@@ -5,6 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentContentBinding;
 
@@ -13,9 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import eightbitlab.com.blurview.RenderScriptBlur;
-import mapper.Mapping;
 
-@Mapping("dng/ux/content")
+@Route(path = "/ux/content")
 public class ContentFragment extends Fragment
 {
     private FragmentContentBinding binding;
@@ -38,7 +40,10 @@ public class ContentFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        setRetainInstance(false);
 
+        binding.setLifecycleOwner(this);
+        binding.setOnBack(v -> requireActivity().onBackPressed());
         binding.rootView.setupWith((ViewGroup) view.getRootView())
                 .setFrameClearDrawable(requireActivity().getWindow()
                         .getDecorView()
@@ -47,13 +52,13 @@ public class ContentFragment extends Fragment
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
 
-        setRetainInstance(false);
-
-        binding.setOnBack(v -> requireActivity().onBackPressed());
+        Fragment fragment = (Fragment) ARouter.getInstance()
+                .build("/ux/info")
+                .navigation();
 
         getChildFragmentManager()
                 .beginTransaction()
-                .add(R.id.info_host, new InfoFragment())
+                .add(R.id.info_host, fragment)
                 .commit();
     }
 }

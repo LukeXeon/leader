@@ -1,9 +1,10 @@
 package org.kexie.android.dng.ux.view;
 
-import androidx.fragment.app.Fragment;
-import mapper.Mapping;
+import com.alibaba.android.arouter.facade.annotation.Route;
 
-@Mapping("dng/ux/weather")
+import androidx.fragment.app.Fragment;
+
+@Route(path = "/ux/weather")
 public class WeatherFragment extends Fragment
 {
 

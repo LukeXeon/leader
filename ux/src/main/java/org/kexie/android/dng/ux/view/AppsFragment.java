@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
@@ -22,15 +24,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
-import mapper.Mapping;
 
-@Mapping("dng/ux/apps")
+@Route(path = "/ux/apps")
 public class AppsFragment extends Fragment
 {
 
     private FragmentAppsBinding binding;
 
-    private AppsViewModel viewModel;
+    private AppsViewModel appsViewModel;
 
     @Nullable
     @Override
@@ -51,28 +52,11 @@ public class AppsFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
-        binding.rootView.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
-
         view.setOnTouchListener((x, y) -> true);
-
         setRetainInstance(false);
-
-        viewModel = ViewModelProviders.of(Objects.requireNonNull(getTargetFragment()))
-                .get(AppsViewModel.class);
-        //dataBinding
 
         GenericQuickAdapter<App> adapter
                 = new GenericQuickAdapter<>(R.layout.item_app, BR.app);
-
-        binding.setAdapter(adapter);
-
         adapter.setOnItemClickListener((adapter1, view1, position) -> {
             String packName = Objects.requireNonNull(adapter.getItem(position))
                     .packageName;
@@ -85,9 +69,21 @@ public class AppsFragment extends Fragment
             }
         });
 
-        viewModel.apps.observe(this, adapter::setNewData);
+        appsViewModel = ViewModelProviders.of(requireActivity())
+                .get(AppsViewModel.class);
+        appsViewModel.apps.observe(this, adapter::setNewData);
+        appsViewModel.isLoading.observe(this, binding::setIsLoading);
 
-        viewModel.isLoading.observe(this, binding::setIsLoading);
+        binding.setAdapter(adapter);
+        binding.setLifecycleOwner(this);
+        binding.rootView.setupWith((ViewGroup) view.getParent())
+                .setFrameClearDrawable(requireActivity().getWindow()
+                        .getDecorView()
+                        .getBackground())
+                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+                .setBlurRadius(20f)
+                .setHasFixedTransformationMatrix(true);
+
 
     }
 }

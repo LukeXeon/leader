@@ -24,7 +24,7 @@ class NetworkMonitoringService : Service() {
                                    text: String?) {
             Logger.d(text)
 
-            //NaviFragment.startOf(NetworkMonitoringService.this, netRoute);
+            //NaviFragment2.startOf(NetworkMonitoringService.this, netRoute);
         }
 
         @Throws(Exception::class)

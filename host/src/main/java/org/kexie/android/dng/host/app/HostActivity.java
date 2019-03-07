@@ -2,15 +2,17 @@ package org.kexie.android.dng.host.app;
 
 import android.os.Bundle;
 
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.orhanobut.logger.Logger;
+
 import org.kexie.android.common.util.SystemUtil;
 import org.kexie.android.dng.host.R;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import mapper.Mapper;
-import mapper.Request;
 
 public final class HostActivity extends AppCompatActivity
 {
@@ -21,12 +23,16 @@ public final class HostActivity extends AppCompatActivity
         SystemUtil.hideSystemUi(getWindow());
         DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
+
+        Fragment fragment = (Fragment) ARouter.getInstance()
+                .build("/ux/main")
+                .navigation();
+
+        Logger.d(fragment);
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container,
-                        Mapper.getOn(this, new Request.Builder()
-                                .uri("dng/ux/main")
-                                .build()))
+                .add(R.id.fragment_container, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }

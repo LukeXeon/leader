@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+
 import org.kexie.android.common.databinding.GenericQuickAdapter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.BR;
@@ -27,11 +31,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
-import mapper.Mapper;
-import mapper.Mapping;
-import mapper.Request;
 
-@Mapping("dng/media/browse")
+@Route(path = "/media/browse")
 public class MediaBrowseFragment
         extends Fragment
 {
@@ -64,69 +65,75 @@ public class MediaBrowseFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = ViewModelProviders.of(this)
-                .get(MediaBrowseViewModel.class);
-        //dataBinding
-        binding.getRoot().setOnTouchListener((v, event) -> true);
-
-        Map<String, View.OnClickListener> actions = getActions();
-
-        binding.setActions(actions);
+        setRetainInstance(false);
 
         mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
-
         mediasAdapter.setOnItemClickListener((adapter, view1, position) -> {
             Media info = mediasAdapter.getData().get(position);
             switch (info.type)
             {
                 case MediaType.TYPE_PHOTO:
                 {
-                    Bundle bundle = new Bundle();
+                    Postcard postcard = ARouter.getInstance()
+                            .build("/media/photo");
+                    Bundle bundle = postcard.getExtras();
                     bundle.putParcelable("media", info);
-                    Request request = new Request.Builder()
-                            .uri("dng/media/photo")
-                            .code(REQUEST_TO_PHOTO)
-                            .bundle(bundle)
-                            .build();
-                    jumpTo(request);
+                    Fragment fragment = (Fragment) postcard.navigation();
+                    fragment.setTargetFragment(this, REQUEST_TO_PHOTO);
+                    jumpTo(fragment);
                 }
                 break;
                 case MediaType.TYPE_VIDEO:
                 {
-                    Bundle bundle = new Bundle();
+                    Postcard postcard = ARouter.getInstance()
+                            .build("/media/video");
+                    Bundle bundle = postcard.getExtras();
                     bundle.putParcelable("media", info);
-                    Request request = new Request.Builder()
-                            .uri("dng/media/video")
-                            .code(REQUEST_TO_VIDEO)
-                            .bundle(bundle)
-                            .build();
-                    jumpTo(request);
+                    Fragment fragment = (Fragment) postcard.navigation();
+                    fragment.setTargetFragment(this, REQUEST_TO_VIDEO);
+                    jumpTo(fragment);
                 }
                 break;
             }
         });
-
         mediasAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
-
         mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
 
+        viewModel = ViewModelProviders.of(this)
+                .get(MediaBrowseViewModel.class);
         viewModel.medias.observe(this, mediasAdapter::setNewData);
+        viewModel.title.observe(this, binding::setTitle);
+        viewModel.loadPhoto();
 
+        Map<String, View.OnClickListener> actions
+                = new ArrayMap<String, View.OnClickListener>()
+        {
+            {
+                put("相册", v ->{
+                    viewModel.loadPhoto();
+                    binding.dataContent.stopScroll();
+                    binding.dataContent.stopNestedScroll();
+                });
+                put("视频",v ->{
+                    viewModel.loadVideo();
+                    binding.dataContent.stopScroll();
+                    binding.dataContent.stopNestedScroll();
+                });
+            }
+        };
+        binding.setLifecycleOwner(this);
+        binding.getRoot().setOnTouchListener((v, event) -> true);
+        binding.setActions(actions);
         binding.setMedias(mediasAdapter);
 
-        //liveData
-        viewModel.title.observe(this, binding::setTitle);
-
         ProgressFragment.observeWith(viewModel.isLoading, this);
-
-        viewModel.loadPhoto();
     }
 
-    private void jumpTo(Request request)
+    private void jumpTo(Fragment fragment)
     {
         requireFragmentManager()
                 .beginTransaction()
-                .add(getId(), Mapper.getOn(this, request))
+                .add(getId(), fragment)
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
@@ -148,24 +155,5 @@ public class MediaBrowseFragment
                 mediasAdapter.remove(index);
             }
         }
-    }
-
-    private Map<String, View.OnClickListener> getActions()
-    {
-        return new ArrayMap<String, View.OnClickListener>()
-        {
-            {
-                put("相册", v ->{
-                    viewModel.loadPhoto();
-                    binding.dataContent.stopScroll();
-                    binding.dataContent.stopNestedScroll();
-                });
-                put("视频",v ->{
-                    viewModel.loadVideo();
-                    binding.dataContent.stopScroll();
-                    binding.dataContent.stopNestedScroll();
-                });
-            }
-        };
     }
 }

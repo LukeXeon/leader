@@ -1,5 +1,6 @@
 package org.kexie.android.dng.host.app;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -17,6 +18,9 @@ public class AppGlobal extends MultiDexApplication
         if (BuildConfig.DEBUG)
         {
             Logger.addLogAdapter(new AndroidLogAdapter());
+            ARouter.openLog();     // Print log
+            ARouter.openDebug();
         }
+        ARouter.init(this);
     }
 }

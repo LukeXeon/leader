@@ -8,6 +8,7 @@ import com.amap.api.maps.AMapException
 import com.amap.api.navi.enums.NaviType
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
+import com.amap.api.services.core.PoiItem
 import com.amap.api.services.poisearch.PoiSearch
 import com.orhanobut.logger.Logger
 import io.reactivex.Observable
@@ -44,7 +45,9 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                 value = emptyMap()
             }
 
-    val select = MutableLiveData<Int>()
+    val isNavigating =  MutableLiveData<Boolean>()
+
+    val currentShow = MutableLiveData<Int>()
 
     val isLoading = MutableLiveData<Boolean>()
 
@@ -52,15 +55,13 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     val onSuccess = PublishSubject.create<String>()
 
-    fun start() {
-        navi.startNavi(NaviType.EMULATOR)
+    fun show(id: Int) {
+        currentShow.value = id;
     }
 
-    fun select(id: Int) {
-        select.value = id
-        if (id != NO_SELECT) {
-            navi.selectRouteId(id)
-        }
+    fun start(id: Int) {
+        navi.selectRouteId(id)
+        navi.startNavi(NaviType.EMULATOR)
     }
 
     fun query(query: Query) {
@@ -83,15 +84,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     val search = PoiSearch(getApplication(), query)
                     try {
                         val item = search.searchPOIId(it.poiId)
-                        val point =
-                                if (item.enter != null)
-                                    item.enter
-                                else
-                                    if (item.exit != null)
-                                        item.exit
-                                    else
-                                        item.latLonPoint
-                        Point.box(point)
+                        getPoiPoint(item)
                     } catch (e: AMapException) {
                         throw Exceptions.propagate(e)
                     }
@@ -154,10 +147,10 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
             navi.addAMapNaviListener(
                     object : NaviCallback() {
                         @Suppress("OverridingDeprecatedMember")
-                        override fun onCalculateRouteFailure(code: Int) {
+                        override fun onCalculateRouteFailure(i: Int) {
                             lock.withLock {
                                 navi.removeAMapNaviListener(this)
-                                Logger.d("error code $code")
+                                Logger.d("error code $i")
                                 condition.signalAll()
                             }
                         }
@@ -220,7 +213,20 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
 
-        val NO_SELECT = Int.MIN_VALUE
+        const val NO_SELECT = Int.MIN_VALUE
+
+        private fun getPoiPoint(item: PoiItem): Point {
+
+            val point =
+                    if (item.enter != null)
+                        item.enter
+                    else
+                        if (item.exit != null)
+                            item.exit
+                        else
+                            item.latLonPoint
+            return Point.box(point)
+        }
 
         private fun getGuideInfo(naviPath: NaviPath): List<GuideInfo> {
             val steps = ArrayList<GuideInfo>()
