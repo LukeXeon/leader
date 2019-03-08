@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.navi.R;
-import org.kexie.android.dng.navi.databinding.FragmentRouteBinding;
+import org.kexie.android.dng.navi.databinding.FragmentNaviRouteBinding;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 @Route(path = "/navi/route")
 public final class RouteFragment extends Fragment
 {
-    private FragmentRouteBinding binding;
+    private FragmentNaviRouteBinding binding;
 
     private NaviViewModel naviViewModel;
 
@@ -36,7 +36,7 @@ public final class RouteFragment extends Fragment
         if (binding == null)
         {
             binding = DataBindingUtil.inflate(inflater,
-                    R.layout.fragment_route,
+                    R.layout.fragment_navi_route,
                     container,
                     false);
         }
@@ -57,26 +57,17 @@ public final class RouteFragment extends Fragment
         if (bundle != null)
         {
             int id = bundle.getInt("pathId");
-            apply(id);
-        }
-    }
-
-    private void apply(int id)
-    {
-        Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
-
-        if (routeInfos != null)
-        {
-            RouteInfo routeInfo = routeInfos.get(id);
-            if (routeInfo != null)
+            Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
+            if (routeInfos != null)
             {
-                binding.setRoute(routeInfo);
-                binding.setOnJumpToNavi(v -> {
+                RouteInfo routeInfo = routeInfos.get(id);
+                if (routeInfo != null)
+                {
+                    binding.setRoute(routeInfo);
+                    binding.setOnJumpToNavi(v -> {
 
-                });
-                binding.setOnJumpToNavi(v -> {
-
-                });
+                    });
+                }
             }
         }
     }

@@ -108,7 +108,7 @@ public class DesktopFragment extends Fragment
         {
             {
                 put("个人信息", v -> jumpToNoHide(ARouter.getInstance().build("/ux/content")));
-                put("导航", v -> jumpTo(ARouter.getInstance().build("/navi/main")));
+                put("导航", v -> jumpTo(ARouter.getInstance().build("/navi/navi")));
             }
         };
         binding.setActions(actions);

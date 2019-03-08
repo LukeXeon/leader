@@ -6,7 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.amap.api.maps.AMapException
 import com.amap.api.navi.enums.NaviType
-import com.amap.api.navi.model.AMapNaviLocation
 import com.amap.api.navi.model.NaviInfo
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
@@ -54,9 +53,9 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     val naviInfo = MutableLiveData<NaviInfo>()
 
-    val location = MutableLiveData<AMapNaviLocation>()
+    val location = MutableLiveData<Point>()
 
-    val isNavigating =  MutableLiveData<Boolean>()
+    val isRunning =  MutableLiveData<Boolean>()
 
     val currentShow = MutableLiveData<Int>()
 

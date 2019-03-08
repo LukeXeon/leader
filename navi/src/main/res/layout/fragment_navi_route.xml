@@ -13,10 +13,6 @@
             name="onJumpToNavi"
             type="android.view.View.OnClickListener"/>
 
-        <variable
-            name="onJumpToDetails"
-            type="android.view.View.OnClickListener"/>
-
     </data>
 
     <FrameLayout

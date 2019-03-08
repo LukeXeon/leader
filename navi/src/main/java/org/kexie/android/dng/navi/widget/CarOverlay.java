@@ -133,7 +133,6 @@ public class CarOverlay {
      * @param aMap
      * @param mLatLng
      * @param bearing
-     * @param zoom zoom为-1表示使用默认zoom
      */
     public void draw(AMap aMap, LatLng mLatLng, float bearing) {
         if (aMap == null || mLatLng == null || carDescriptor == null) {
