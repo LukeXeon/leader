@@ -17,7 +17,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.Exceptions
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.navi.model.Point
@@ -26,7 +25,7 @@ import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo
 import org.kexie.android.dng.navi.widget.NaviCallback
-import org.kexie.android.dng.navi.widget.NaviCompat
+import org.kexie.android.dng.navi.widget.NaviUtil
 import java.text.DecimalFormat
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -53,11 +52,9 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     val naviInfo = MutableLiveData<NaviInfo>()
 
-    val location = MutableLiveData<Point>()
-
     val isRunning =  MutableLiveData<Boolean>()
 
-    val currentShow = MutableLiveData<Int>()
+    val currentSelect = MutableLiveData<Int>()
 
     val isLoading = MutableLiveData<Boolean>()
 
@@ -75,11 +72,11 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
         query0(Observable.just(query))
     }
 
-    fun query(inputTip: InputTip, location: Point) {
+    fun query(inputTip: InputTip) {
 
         isLoading.value = true
 
-        val target = Observable.just(inputTip)
+        val query = Observable.just(inputTip)
                 .observeOn(Schedulers.io())
                 .map {
                     val query = PoiSearch.Query(it.text, "")
@@ -94,16 +91,12 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     } catch (e: AMapException) {
                         throw Exceptions.propagate(e)
                     }
-                }
-
-        val query = target.zipWith(Observable.just(location),
-                BiFunction<Point, Point, Query> { t1, t2 ->
+                }.map {
                     Query.Builder()
-                            .to(t1)
-                            .from(t2)
+                            .to(it)
                             .mode(10)
                             .build()!!
-                }).observeOn(Schedulers.io())
+                }
 
         query0(query)
 
@@ -173,11 +166,6 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
             lock.withLock {
 
-                val form = if (query.from == null)
-                    emptyList()
-                else
-                    listOf(query.from.unBox(NaviLatLng::class.java))
-
                 val to = if (query.to == null)
                     emptyList()
                 else
@@ -188,7 +176,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     query.ways.map { p -> p.unBox(NaviLatLng::class.java) }
                             .toList()
 
-                navi.calculateDriveRoute(form, to, ways, query.mode)
+                navi.calculateDriveRoute(to, ways, query.mode)
 
                 condition.await()
 
@@ -207,7 +195,7 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getRouteInfo(id: Int): RouteInfo {
-        val path = NaviCompat.getNaviPath(navi)[id]!!
+        val path = NaviUtil.getNaviPath(navi)[id]!!
         return RouteInfo.Builder()
                 .length(getPathLength(path.allLength))
                 .time(getPathTime(path.allTime))

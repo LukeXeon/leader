@@ -95,8 +95,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="1">
-                </org.kexie.android.dng.navi.widget.NaviGuideInfoListView>
+                    android:layout_weight="1"/>
 
                 <Button
                     android:id="@+id/btn_summit"

@@ -1,10 +1,18 @@
 package org.kexie.android.dng.navi.widget;
 
+import com.amap.api.col.n3.ik;
+import com.amap.api.col.n3.ip;
+import com.amap.api.col.n3.ir;
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.navi.model.NaviPath;
 import com.autonavi.amap.mapcore.IPoint;
 import com.autonavi.amap.mapcore.MapProjection;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * 包名： com.amap.navi.demo.util
@@ -20,7 +28,41 @@ import com.autonavi.amap.mapcore.MapProjection;
 public class NaviUtil
 {
 
-    public static float calculateDistance(NaviLatLng start, NaviLatLng end) {
+    private final static Field sInnerNavi;
+    private final static Field sNaviImpl;
+    private final static Field sNaviPath;
+    private final static Field sNaviPathManager;
+    private final static Field sAllNaviPath;
+
+
+    static
+    {
+        try
+        {
+            //get inner -> get ir
+            sInnerNavi = AMapNavi.class.getDeclaredField("mINavi");
+            //get impl -> get ik
+            sNaviImpl = ir.class.getDeclaredField("m");
+            //get path -> get NaviPath
+            sNaviPath = ik.class.getDeclaredField("c");
+            //get allPathManager -> get ip
+            sNaviPathManager = ik.class.getDeclaredField("b");
+            //get allPath -> get Map<int,NaviPath>
+            sAllNaviPath = ip.class.getDeclaredField("h");
+
+            sInnerNavi.setAccessible(true);
+            sNaviImpl.setAccessible(true);
+            sNaviPath.setAccessible(true);
+            sNaviPathManager.setAccessible(true);
+            sAllNaviPath.setAccessible(true);
+        } catch (Exception e)
+        {
+            throw new RuntimeException("compat load failed", e);
+        }
+    }
+
+    public static float calculateDistance(NaviLatLng start, NaviLatLng end)
+    {
         double x1 = start.getLongitude();
         double y1 = start.getLatitude();
         double x2 = end.getLongitude();
@@ -29,7 +71,8 @@ public class NaviUtil
     }
 
 
-    public static NaviLatLng getPointForDis(NaviLatLng sPt, NaviLatLng ePt, double dis) {
+    public static NaviLatLng getPointForDis(NaviLatLng sPt, NaviLatLng ePt, double dis)
+    {
         double lSegLength = calculateDistance(sPt, ePt);
         NaviLatLng pt = new NaviLatLng();
         double preResult = dis / lSegLength;
@@ -45,9 +88,11 @@ public class NaviUtil
      * @param secondPoi
      * @return
      */
-    public static float getRotate(NaviLatLng startPoi, NaviLatLng secondPoi) {
+    public static float getRotate(NaviLatLng startPoi, NaviLatLng secondPoi)
+    {
         float rotate = 0;
-        try {
+        try
+        {
             IPoint point1 = new IPoint();
             IPoint point2 = new IPoint();
             MapProjection.lonlat2Geo(startPoi.getLongitude(), startPoi.getLatitude(), point1);
@@ -59,7 +104,8 @@ public class NaviUtil
             rotate = (float) (Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180);
             rotate = rotate + 90;
             return rotate;
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
         return rotate;
@@ -80,12 +126,14 @@ public class NaviUtil
             * EARTHRADIUSINMETERS;
 
 
-    public static double clip(double n, double minValue, double maxValue) {
+    public static double clip(double n, double minValue, double maxValue)
+    {
         return Math.min(Math.max(n, minValue), maxValue);
     }
 
     public static IPoint lonlat2Geo(double latitude, double longitude,
-                                    int levelOfDetail) {
+                                    int levelOfDetail)
+    {
         IPoint rPnt = new IPoint();
         latitude = clip(latitude, MINLATITUDE, MAXLATITUDE) * Math.PI / 180;
         longitude = clip(longitude, MINLONGITUDE, MAXLONGITUDE) * Math.PI / 180;
@@ -104,19 +152,39 @@ public class NaviUtil
     }
 
 
-
-    public static String formatKM(int d) {
-        if (d == 0) {
+    public static String formatKM(int d)
+    {
+        if (d == 0)
+        {
             return "0米";
-        } else if (d < 100) {
+        } else if (d < 100)
+        {
             return d + "米";
-        } else if ((100 <= d) && (d < 1000)) {
+        } else if ((100 <= d) && (d < 1000))
+        {
             return d + "米";
-        } else if ((1000 <= d) && (d < 10000)) {
+        } else if ((1000 <= d) && (d < 10000))
+        {
             return (d / 10) * 10 / 1000.0D + "公里";
-        } else if ((10000 <= d) && (d < 100000)) {
+        } else if ((10000 <= d) && (d < 100000))
+        {
             return (d / 100) * 100 / 1000.0D + "公里";
         }
         return (d / 1000) + "公里";
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<Integer, NaviPath> getNaviPath(AMapNavi navi)
+    {
+        try
+        {
+            Object inner = sInnerNavi.get(navi);
+            Object impl = sNaviImpl.get(inner);
+            Object manager = sNaviPathManager.get(impl);
+            return (Map<Integer, NaviPath>) sAllNaviPath.get(manager);
+        } catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

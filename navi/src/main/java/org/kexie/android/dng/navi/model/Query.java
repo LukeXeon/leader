@@ -11,14 +11,12 @@ import java.util.List;
 
 public class Query implements Parcelable
 {
-    public final Point from;
     public final Point to;
     public final List<? extends Point> ways;
     public final int mode;
 
     private Query(Builder builder)
     {
-        from = builder.from;
         to = builder.to;
         ways = builder.ways;
         mode = builder.mode;
@@ -26,19 +24,12 @@ public class Query implements Parcelable
 
     public static final class Builder
     {
-        private Point from;
         private Point to;
         private List<Point> ways;
         private int mode;
 
         public Builder()
         {
-        }
-
-        public Builder from(Point val)
-        {
-            from = val;
-            return this;
         }
 
         public Builder to(Point val)
@@ -66,9 +57,8 @@ public class Query implements Parcelable
         }
     }
 
-    protected Query(Parcel in)
+    private Query(Parcel in)
     {
-        from = in.readParcelable(Point.class.getClassLoader());
         to = in.readParcelable(Point.class.getClassLoader());
         ways = in.createTypedArrayList(JsonPoint.CREATOR);
         mode = in.readInt();
@@ -77,7 +67,6 @@ public class Query implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        dest.writeParcelable(from, flags);
         dest.writeParcelable(to, flags);
         dest.writeTypedList(ways);
         dest.writeInt(mode);

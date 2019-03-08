@@ -21,9 +21,8 @@ import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviBinding;
 import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
-import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -32,6 +31,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 @Route(path = "/navi/navi")
@@ -42,6 +42,8 @@ public final class NaviFragment extends Fragment
     private AMap mapController;
 
     private NaviViewModel naviViewModel;
+
+    private List<RouteOverLay> routeOverLays;
 
     @NonNull
     @Override
@@ -66,47 +68,47 @@ public final class NaviFragment extends Fragment
         binding.setLifecycleOwner(this);
 
         naviViewModel = ViewModelProviders.of(this).get(NaviViewModel.class);
-        naviViewModel.getCurrentShow().observe(this, select -> {
-            if (select != null && select != NaviViewModel.NO_SELECT)
+        naviViewModel.getRoutes().observe(this, routeInfos -> {
+            if (!routeInfos.isEmpty())
             {
-                Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes()
-                        .getValue();
-                if (routeInfos != null)
-                {
-                    Context context = requireContext().getApplicationContext();
-                    mapController.moveCamera(CameraUpdateFactory.changeTilt(0));
-                    StreamSupport.stream(routeInfos.entrySet())
-                            .forEach(entry -> {
-                                RouteOverLay routeOverLay = new RouteOverLay(
-                                        mapController,
-                                        entry.getValue().path,
-                                        context);
-                                routeOverLay.setTrafficLine(true);
-                                routeOverLay.setArrowOnRoute(true);
-                                routeOverLay.setLightsVisible(true);
-                                routeOverLay.setTrafficLightsVisible(true);
-                                if (entry.getKey() == (int) select)
-                                {
-                                    routeOverLay.setTransparency(1);
-                                    routeOverLay.setZindex(1);
-                                    routeOverLay.addToMap();
-                                    routeOverLay.zoomToSpan(300);
-                                } else
-                                {
-                                    routeOverLay.setTransparency(0.4f);
-                                    routeOverLay.addToMap();
-                                }
-                            });
-                }
+                Context context = requireContext().getApplicationContext();
+                mapController.moveCamera(CameraUpdateFactory.changeTilt(0));
+                List<RouteOverLay> overLays = StreamSupport.stream(routeInfos.entrySet())
+                        .map(entry -> new RouteOverLay(
+                                mapController,
+                                entry.getValue().path,
+                                context))
+                        .collect(Collectors.toList());
+                StreamSupport.stream(overLays).forEach(routeOverLay -> {
+                    routeOverLay.setTrafficLine(true);
+                    routeOverLay.setArrowOnRoute(true);
+                    routeOverLay.setLightsVisible(true);
+                    routeOverLay.setTrafficLightsVisible(true);
+                    routeOverLay.setTransparency(0.4f);
+                    routeOverLay.addToMap();
+                });
+                overLays.get(0).zoomToSpan(200);
+                routeOverLays = overLays;
             } else
             {
-                Location location = mapController.getMyLocation();
                 mapController.clear();
-                mapController.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(Point.form(
-                                location.getLongitude(),
-                                location.getLatitude())
-                                .unBox(LatLng.class), 10));
+                Location location = mapController.getMyLocation();
+                if (location != null)
+                {
+                    mapController.moveCamera(CameraUpdateFactory.newLatLngZoom(Point.form(
+                            location.getLongitude(),
+                            location.getLatitude())
+                            .unBox(LatLng.class), 10));
+                }
+            }
+        });
+        naviViewModel.getCurrentSelect().observe(this, select -> {
+            if (select != null && select != NaviViewModel.NO_SELECT)
+            {
+
+            } else
+            {
+
             }
         });
         naviViewModel.isRunning().observe(this, isRun -> {
@@ -126,6 +128,7 @@ public final class NaviFragment extends Fragment
                     .commit();
         });
         naviViewModel.isRunning().setValue(false);
+
         TextureSupportMapFragment mapFragment = TextureSupportMapFragment
                 .class.cast(getChildFragmentManager()
                 .findFragmentById(R.id.map_view));
@@ -136,12 +139,7 @@ public final class NaviFragment extends Fragment
             MyLocationStyle myLocationStyle1 = new MyLocationStyle()
                     .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
             mapController.setMyLocationStyle(myLocationStyle1);
-            AMap.OnMyLocationChangeListener listener = location1 -> naviViewModel
-                    .getLocation()
-                    .setValue(Point.form(location1.getLongitude(),
-                            location1.getLatitude()));
-            listener.onMyLocationChange(location);
-            mapController.setOnMyLocationChangeListener(listener);
+            mapController.setOnMyLocationChangeListener(null);
         });
         mapController.setMyLocationEnabled(true);
         mapController.getUiSettings().setMyLocationButtonEnabled(true);

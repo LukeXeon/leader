@@ -16,7 +16,6 @@ import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.BR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryBinding;
-import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.viewmodel.InputTipViewModel;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
@@ -27,14 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.SparseArrayCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import es.dmoral.toasty.Toasty;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import java8.util.stream.Collectors;
@@ -45,7 +44,7 @@ import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = "/navi/query")
-public final class QueryFragment extends Fragment implements OnBackPressedCallback
+public final class QueryFragment extends Fragment
 {
     private FragmentNaviQueryBinding binding;
 
@@ -55,13 +54,14 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
 
     private GenericQuickAdapter<InputTip> inputTipQuickAdapter;
 
+    private RouteAdapter routeAdapter;
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_navi_query,
                 container,
@@ -81,68 +81,58 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
         inputTipQuickAdapter = new GenericQuickAdapter<>(R.layout.item_tip, BR.inputTip);
         inputTipQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
             InputTip inputTip = Objects.requireNonNull(inputTipQuickAdapter.getItem(position));
-            Point location = naviViewModel.getLocation().getValue();
-            if (location != null)
-            {
-                naviViewModel.query(inputTip, location);
-            } else
-            {
-                Toasty.error(requireContext(), "获取定位失败").show();
-            }
+            naviViewModel.query(inputTip);
         });
 
-        binding.setIsShowSelect(false);
+        binding.setIsShowTips(false);
         binding.setIsShowQuery(false);
         binding.setStartQuery(v -> binding.setIsShowQuery(true));
         binding.setLifecycleOwner(this);
         binding.setQueryText(inputTipViewModel.getQueryText());
         binding.setTipsAdapter(inputTipQuickAdapter);
         binding.routePager.initStack(3, StackPageTransformer.Orientation.VERTICAL);
+        binding.routePager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
+        {
+            @Override
+            public void onPageSelected(int position)
+            {
+                if (routeAdapter != null && !routeAdapter.fragments.isEmpty())
+                {
+                    int index = routeAdapter.fragments.keyAt(position);
+                    naviViewModel.getCurrentSelect().setValue(index);
+                }
+                else
+                {
+                    naviViewModel.getCurrentSelect().setValue(NaviViewModel.NO_SELECT);
+                }
+            }
+        });
 
         inputTipViewModel.getInputTips()
                 .observe(this, data -> {
                     binding.setIsShowTips(data != null && !data.isEmpty());
                     inputTipQuickAdapter.setNewData(data);
                 });
-
         inputTipViewModel.getQueryText()
                 .observe(this, data -> {
                     binding.setIsShowQuery(!TextUtils.isEmpty(data));
-                    Point point = naviViewModel.getLocation().getValue();
-                    if (point != null)
-                    {
-                        inputTipViewModel.query(data, point);
-                    } else
-                    {
-                        Toasty.error(requireContext(), "获取定位失败").show();
-                    }
+                    inputTipViewModel.query(data);
                 });
 
         naviViewModel.getRoutes().observe(this, x -> {
-            List<Fragment> fragments;
+            List<Integer> ids;
             if (x != null)
             {
-                fragments = StreamSupport.stream(x.keySet())
-                        .map(id -> ARouter.getInstance()
-                                .build("/navi/route")
-                                .withInt("pathId", id))
-                        .map(postcard -> (Fragment) postcard.navigation())
+                ids = StreamSupport.stream(x.keySet())
                         .collect(Collectors.toList());
+                Collections.reverse(ids);
             } else
             {
-                fragments = Collections.emptyList();
+                ids = Collections.emptyList();
             }
-            binding.setIsShowRoutes(!fragments.isEmpty());
-            binding.setRouteAdapter(wrapToAdapter(fragments));
-        });
-        naviViewModel.getCurrentShow().observe(this, data -> {
-            if (data == null || data == NaviViewModel.NO_SELECT)
-            {
-                binding.setIsShowSelect(false);
-            } else
-            {
-                binding.setIsShowSelect(true);
-            }
+            binding.setIsShowRoutes(!ids.isEmpty());
+            routeAdapter = new RouteAdapter(ids);
+            binding.setRouteAdapter(routeAdapter);
         });
         naviViewModel.getOnError().mergeWith(inputTipViewModel.getOnError())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -155,51 +145,53 @@ public final class QueryFragment extends Fragment implements OnBackPressedCallba
 
         ProgressFragment.observeWith(naviViewModel.isLoading(), this);
 
-        requireActivity().addOnBackPressedCallback(this, this);
+        requireActivity().addOnBackPressedCallback(this, () -> {
+            Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
+            if (routeInfos != null && !routeInfos.isEmpty())
+            {
+                naviViewModel.getCurrentSelect().setValue(NaviViewModel.NO_SELECT);
+                naviViewModel.getRoutes().setValue(Collections.emptyMap());
+                return true;
+            }
+            List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
+            if (inputTips != null && !inputTips.isEmpty())
+            {
+                inputTipViewModel.getQueryText().setValue("");
+                inputTipViewModel.getInputTips().setValue(Collections.emptyList());
+                return true;
+            }
+            return false;
+        });
     }
 
-    private PagerAdapter wrapToAdapter(List<Fragment> fragments)
+    private final class RouteAdapter extends FragmentPagerAdapter
     {
-        return new FragmentPagerAdapter(getChildFragmentManager())
-        {
+        private final SparseArrayCompat<Fragment> fragments = new SparseArrayCompat<>();
 
-            @NonNull
-            @Override
-            public Fragment getItem(int position)
-            {
-                return fragments.get(position);
-            }
+        private RouteAdapter(List<Integer> ids)
+        {
+            super(getChildFragmentManager());
+            StreamSupport.stream(ids).forEach(id -> {
+                Fragment fragment = (Fragment) ARouter
+                        .getInstance()
+                        .build("/navi/route")
+                        .withInt("pathId", id)
+                        .navigation();
+                fragments.put(id, fragment);
+            });
+        }
 
-            @Override
-            public int getCount()
-            {
-                return fragments.size();
-            }
-        };
-    }
+        @NonNull
+        @Override
+        public Fragment getItem(int position)
+        {
+            return fragments.valueAt(position);
+        }
 
-    @Override
-    public boolean handleOnBackPressed()
-    {
-        Boolean isSelect = binding.getIsShowSelect();
-        if (isSelect != null && isSelect)
+        @Override
+        public int getCount()
         {
-            naviViewModel.getCurrentShow().setValue(NaviViewModel.NO_SELECT);
-            return true;
+            return fragments.size();
         }
-        Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
-        if (routeInfos != null && !routeInfos.isEmpty())
-        {
-            naviViewModel.getRoutes().setValue(Collections.emptyMap());
-            return true;
-        }
-        List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
-        if (inputTips != null && !inputTips.isEmpty())
-        {
-            inputTipViewModel.getQueryText().setValue("");
-            inputTipViewModel.getInputTips().setValue(Collections.emptyList());
-            return true;
-        }
-        return false;
     }
 }

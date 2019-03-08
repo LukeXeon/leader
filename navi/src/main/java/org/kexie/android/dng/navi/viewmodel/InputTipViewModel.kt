@@ -5,30 +5,39 @@ import android.os.HandlerThread
 import android.text.TextUtils
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.amap.api.services.core.LatLonPoint
-import com.amap.api.services.geocoder.GeocodeSearch
-import com.amap.api.services.geocoder.RegeocodeQuery
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.location.AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
 import com.amap.api.services.help.Inputtips
 import com.amap.api.services.help.InputtipsQuery
 import com.orhanobut.logger.Logger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
-import org.kexie.android.dng.navi.model.Point
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import java.util.concurrent.TimeUnit
 
 
 class InputTipViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val locationSource = AMapLocationClient(application)
+            .apply {
+                stopLocation()
+                setLocationOption(AMapLocationClientOption().apply {
+                    interval = 1000
+                    locationMode = Hight_Accuracy
+                    isNeedAddress = true
+                })
+                startLocation()
+            }
+
     private val worker = HandlerThread(toString()).apply { start() }
 
-    private val querySubject
-            = PublishSubject.create<Pair<String, Point>>()
+    private val querySubject = PublishSubject.create<String>()
             .apply {
-        debounce(500, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.from(worker.looper))
-        .subscribe(this@InputTipViewModel::query0)
-    }
+                debounce(500, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.from(worker.looper))
+                        .subscribe(this@InputTipViewModel::query0)
+            }
 
     val inputTips = MutableLiveData<List<InputTip>>()
             .apply {
@@ -41,24 +50,21 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
 
     val onSuccess = PublishSubject.create<String>()
 
-    fun query(text: String, location: Point) {
-        querySubject.onNext(text to location)
+    fun query(text: String) {
+        querySubject.onNext(text)
     }
 
-    private fun query0(pair: Pair<String, Point>) {
-        val text = pair.first
-
+    private fun query0(text: String) {
         if (text.isEmpty()) {
             this.inputTips.postValue(emptyList())
             return
         }
+        val location = locationSource.lastKnownLocation;
 
-        val point = pair.second.unBox(LatLonPoint::class.java)
+        Logger.d(location.toString())
 
+        val city = location.city;
         try {
-            val search = GeocodeSearch(getApplication());
-            val query = RegeocodeQuery(point, 200f, GeocodeSearch.AMAP)
-            val city = search.getFromLocation(query).city
             Logger.d("$text $city")
 
             val inputTipsQuery = InputtipsQuery(text, city)
@@ -76,6 +82,7 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun onCleared() {
+        locationSource.stopLocation()
         worker.quitSafely()
     }
 }
