@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/pager_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -61,16 +61,22 @@
             android:orientation="horizontal"
             android:visibility="@{safeUnbox(isShowRoutes)?View.VISIBLE:View.GONE}">
 
+            <Space
+                android:id="@+id/map_view_space"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
             <org.kexie.android.dng.navi.widget.StackViewPager
                 android:id="@+id/routePager"
                 android:layout_width="450dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="right"
                 android:adapter="@{routeAdapter}"
                 android:clipChildren="false"/>
-        </FrameLayout>
+        </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/tip_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="120dp"
@@ -170,6 +176,7 @@
                 </FrameLayout>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/tip_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-10dp"

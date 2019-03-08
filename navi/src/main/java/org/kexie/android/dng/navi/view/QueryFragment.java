@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -100,8 +101,7 @@ public final class QueryFragment extends Fragment
                 {
                     int index = routeAdapter.fragments.keyAt(position);
                     naviViewModel.getCurrentSelect().setValue(index);
-                }
-                else
+                } else
                 {
                     naviViewModel.getCurrentSelect().setValue(NaviViewModel.NO_SELECT);
                 }
@@ -110,7 +110,9 @@ public final class QueryFragment extends Fragment
 
         inputTipViewModel.getInputTips()
                 .observe(this, data -> {
-                    binding.setIsShowTips(data != null && !data.isEmpty());
+                    boolean isShow = data != null && !data.isEmpty();
+                    alphaAnimation(binding.tipList, isShow);
+                    binding.setIsShowTips(isShow);
                     inputTipQuickAdapter.setNewData(data);
                 });
         inputTipViewModel.getQueryText()
@@ -130,7 +132,9 @@ public final class QueryFragment extends Fragment
             {
                 ids = Collections.emptyList();
             }
-            binding.setIsShowRoutes(!ids.isEmpty());
+            boolean isShow = !ids.isEmpty();
+            switchRouteAnimation(isShow);
+            binding.setIsShowRoutes(isShow);
             routeAdapter = new RouteAdapter(ids);
             binding.setRouteAdapter(routeAdapter);
         });
@@ -162,6 +166,19 @@ public final class QueryFragment extends Fragment
             }
             return false;
         });
+    }
+
+    private void switchRouteAnimation(boolean isShow)
+    {
+        alphaAnimation(binding.pagerRoot, isShow);
+        alphaAnimation(binding.tipRoot, !isShow);
+    }
+
+    private void alphaAnimation(View view, boolean isShow)
+    {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(isShow ? 0 : 1, isShow ? 1 : 0);
+        alphaAnimation.setDuration(500);
+        view.startAnimation(alphaAnimation);
     }
 
     private final class RouteAdapter extends FragmentPagerAdapter

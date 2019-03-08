@@ -11,6 +11,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.model.LatLng;
@@ -33,6 +34,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 @Route(path = "/navi/navi")
 public final class NaviFragment extends Fragment
@@ -87,7 +89,13 @@ public final class NaviFragment extends Fragment
                     routeOverLay.setTransparency(0.4f);
                     routeOverLay.addToMap();
                 });
-                overLays.get(0).zoomToSpan(200);
+
+                CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(overLays
+                                .get(0)
+                                .getAMapNaviPath()
+                                .getBoundsForPath(),
+                        200, AutoSizeUtils.dp2px(requireContext(),450), 300, 300);
+                mapController.animateCamera(update);
                 routeOverLays = overLays;
             } else
             {

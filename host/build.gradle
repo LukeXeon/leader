@@ -47,7 +47,7 @@ dependencies {
     implementation project(':navi')
     implementation project(':media')
     implementation project(':asr')
-
+    annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'

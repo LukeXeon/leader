@@ -19,6 +19,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.Exceptions
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import okhttp3.*
 import org.kexie.android.dng.navi.model.Point
 import org.kexie.android.dng.navi.model.Query
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo
@@ -26,7 +27,10 @@ import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo
 import org.kexie.android.dng.navi.widget.NaviCallback
 import org.kexie.android.dng.navi.widget.NaviUtil
+import java.io.IOException
 import java.text.DecimalFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 typealias NaviController = com.amap.api.navi.AMapNavi;
@@ -61,6 +65,10 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
     val onError = PublishSubject.create<String>()
 
     val onSuccess = PublishSubject.create<String>()
+
+    init {
+        ping()
+    }
 
     fun start(id: Int) {
         navi.selectRouteId(id)
@@ -101,6 +109,8 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
         query0(query)
 
     }
+
+
 
     private fun query0(query: Observable<Query>) {
 
@@ -203,6 +213,24 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                 .path(path.amapNaviPath)
                 .guideInfos(getGuideInfo(path))
                 .build()
+    }
+
+    private fun ping() {
+        val okHttpClient = OkHttpClient.Builder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .build()
+        val request = Request.Builder()
+                .get()
+                .url("https://www.baidu.com")
+                .build()
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onError.onNext("网络异常,请检查网络连接")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+            }
+        })
     }
 
     companion object {
