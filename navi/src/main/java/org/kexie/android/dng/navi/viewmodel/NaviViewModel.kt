@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.amap.api.maps.AMapException
 import com.amap.api.navi.enums.NaviType
+import com.amap.api.navi.model.AMapNaviLocation
+import com.amap.api.navi.model.NaviInfo
 import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
 import com.amap.api.services.core.PoiItem
@@ -34,6 +36,11 @@ typealias NaviController = com.amap.api.navi.AMapNavi;
 class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     private val navi = NaviController.getInstance(application)
+            .apply {
+                addAMapNaviListener(object : NaviCallback() {
+
+                })
+            }
 
     private val worker = HandlerThread(javaClass.name + " worker")
             .apply {
@@ -44,6 +51,10 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
             .apply {
                 value = emptyMap()
             }
+
+    val naviInfo = MutableLiveData<NaviInfo>()
+
+    val location = MutableLiveData<AMapNaviLocation>()
 
     val isNavigating =  MutableLiveData<Boolean>()
 
