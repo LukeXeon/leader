@@ -15,6 +15,7 @@ import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.navi.view.RouteOverLay;
 
@@ -89,12 +90,19 @@ public final class NaviFragment extends Fragment
                     routeOverLay.setTransparency(0.4f);
                     routeOverLay.addToMap();
                 });
-
-                CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(overLays
-                                .get(0)
-                                .getAMapNaviPath()
-                                .getBoundsForPath(),
-                        200, AutoSizeUtils.dp2px(requireContext(),450), 300, 300);
+                LatLngBounds latLngBounds = overLays.get(0)
+                        .getAMapNaviPath()
+                        .getBoundsForPath();
+                for (RouteOverLay overLay : overLays.subList(1, overLays.size()))
+                {
+                    LatLngBounds bounds = overLay.getAMapNaviPath().getBoundsForPath();
+                    if (bounds.contains(latLngBounds))
+                    {
+                        latLngBounds = bounds;
+                    }
+                }
+                CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(latLngBounds,
+                        200, AutoSizeUtils.dp2px(requireContext(), 450), 300, 300);
                 mapController.animateCamera(update);
                 routeOverLays = overLays;
             } else
