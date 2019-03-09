@@ -42,10 +42,13 @@ public class BasicThreadFactory implements ThreadFactory
      *
      * @param builder the {@code Builder} object
      */
-    private BasicThreadFactory(Builder builder) {
-        if (builder.wrappedFactory == null) {
+    private BasicThreadFactory(Builder builder)
+    {
+        if (builder.wrappedFactory == null)
+        {
             wrappedFactory = Executors.defaultThreadFactory();
-        } else {
+        } else
+        {
             wrappedFactory = builder.wrappedFactory;
         }
 
@@ -59,59 +62,73 @@ public class BasicThreadFactory implements ThreadFactory
 
     /**
      * 获取包装工厂
+     *
      * @return 不会返回null
      */
-    public final ThreadFactory getWrappedFactory() {
+    public final ThreadFactory getWrappedFactory()
+    {
         return wrappedFactory;
     }
 
     /**
      * 获取命名模式
+     *
      * @return
      */
-    public final String getNamingPattern() {
+    public final String getNamingPattern()
+    {
         return namingPattern;
     }
 
     /**
      * 获取是否为后台线程标识
+     *
      * @return
      */
-    public final Boolean getDaemonFlag() {
+    public final Boolean getDaemonFlag()
+    {
         return daemonFlag;
     }
 
     /**
      * 获取优先级
+     *
      * @return
      */
-    public final Integer getPriority() {
+    public final Integer getPriority()
+    {
         return priority;
     }
 
     /**
      * 获取非捕获异常处理器
+     *
      * @return
      */
-    public final Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
+    public final Thread.UncaughtExceptionHandler getUncaughtExceptionHandler()
+    {
         return uncaughtExceptionHandler;
     }
 
     /**
      * 获取创建的线程数量
+     *
      * @return
      */
-    public long getThreadCount() {
+    public long getThreadCount()
+    {
         return threadCounter.get();
     }
 
     /**
      * 创建新线程
+     *
      * @param r
      * @return
      */
     @Override
-    public Thread newThread(Runnable r) {
+    public Thread newThread(Runnable r)
+    {
         Thread t = getWrappedFactory().newThread(r);
         initializeThread(t);
 
@@ -120,24 +137,30 @@ public class BasicThreadFactory implements ThreadFactory
 
     /**
      * 初始化线程
+     *
      * @param t
      */
-    private void initializeThread(Thread t) {
+    private void initializeThread(Thread t)
+    {
 
-        if (getNamingPattern() != null) {
+        if (getNamingPattern() != null)
+        {
             Long count = Long.valueOf(threadCounter.incrementAndGet());
             t.setName(String.format(getNamingPattern(), count));
         }
 
-        if (getUncaughtExceptionHandler() != null) {
+        if (getUncaughtExceptionHandler() != null)
+        {
             t.setUncaughtExceptionHandler(getUncaughtExceptionHandler());
         }
 
-        if (getPriority() != null) {
+        if (getPriority() != null)
+        {
             t.setPriority(getPriority().intValue());
         }
 
-        if (getDaemonFlag() != null) {
+        if (getDaemonFlag() != null)
+        {
             t.setDaemon(getDaemonFlag().booleanValue());
         }
     }
@@ -145,7 +168,8 @@ public class BasicThreadFactory implements ThreadFactory
     /**
      * 创建器类
      */
-    public static class Builder {
+    public static class Builder
+    {
 
         //包装工厂
         private ThreadFactory wrappedFactory;
@@ -164,11 +188,14 @@ public class BasicThreadFactory implements ThreadFactory
 
         /**
          * 创建包装工厂
+         *
          * @param factory
          * @return
          */
-        public Builder wrappedFactory(ThreadFactory factory) {
-            if (factory == null) {
+        public Builder wrappedFactory(ThreadFactory factory)
+        {
+            if (factory == null)
+            {
                 throw new NullPointerException(
                         "Wrapped ThreadFactory must not be null!");
             }
@@ -179,11 +206,14 @@ public class BasicThreadFactory implements ThreadFactory
 
         /**
          * 设置命名模式
+         *
          * @param pattern
          * @return
          */
-        public Builder namingPattern(String pattern) {
-            if (pattern == null) {
+        public Builder namingPattern(String pattern)
+        {
+            if (pattern == null)
+            {
                 throw new NullPointerException(
                         "Naming pattern must not be null!");
             }
@@ -194,32 +224,39 @@ public class BasicThreadFactory implements ThreadFactory
 
         /**
          * 设置后台标识
+         *
          * @param f
          * @return
          */
-        public Builder daemon(boolean f) {
+        public Builder daemon(boolean f)
+        {
             daemonFlag = Boolean.valueOf(f);
             return this;
         }
 
         /**
          * 设置优先级
+         *
          * @param prio
          * @return
          */
-        public Builder priority(int prio) {
+        public Builder priority(int prio)
+        {
             priority = Integer.valueOf(prio);
             return this;
         }
 
         /**
          * 设置非捕获异常处理器
+         *
          * @param handler
          * @return
          */
         public Builder uncaughtExceptionHandler(
-                Thread.UncaughtExceptionHandler handler) {
-            if (handler == null) {
+                Thread.UncaughtExceptionHandler handler)
+        {
+            if (handler == null)
+            {
                 throw new NullPointerException(
                         "Uncaught exception handler must not be null!");
             }
@@ -231,7 +268,8 @@ public class BasicThreadFactory implements ThreadFactory
         /**
          * 重置构建参数
          */
-        public void reset() {
+        public void reset()
+        {
             wrappedFactory = null;
             exceptionHandler = null;
             namingPattern = null;
@@ -241,9 +279,11 @@ public class BasicThreadFactory implements ThreadFactory
 
         /**
          * 构建基类线程工厂
+         *
          * @return
          */
-        public BasicThreadFactory build() {
+        public BasicThreadFactory build()
+        {
             BasicThreadFactory factory = new BasicThreadFactory(this);
             reset();
             return factory;

@@ -14,11 +14,13 @@ import com.amap.api.navi.model.AMapModelCross
 import com.amap.api.navi.model.AMapNaviCross
 import com.amap.api.navi.model.NaviInfo
 import com.autonavi.ae.gmap.gloverlay.GLCrossVector
+import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.navi.viewmodel.entity.ModeCross
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo
 import org.kexie.android.dng.navi.widget.DensityUtils
 import org.kexie.android.dng.navi.widget.NaviCallback
 import org.kexie.android.dng.navi.widget.NaviUtil
+
 
 class NaviViewModel(application: Application,val navi:NaviController)
     : AndroidViewModel(application) {
@@ -35,6 +37,7 @@ class NaviViewModel(application: Application,val navi:NaviController)
         with(navi)
         {
             addAMapNaviListener(naviImpl)
+            setUseInnerVoice(true)
         }
     }
 
@@ -49,6 +52,8 @@ class NaviViewModel(application: Application,val navi:NaviController)
     val modeCross = MutableLiveData<ModeCross>()
 
     val isLockCamera = MutableLiveData<Boolean>()
+
+    val onInfo = PublishSubject.create<String>()
 
     private inner class NaviImpl : NaviCallback() {
         override fun onNaviInfoUpdate(naviInfo: NaviInfo?) {
@@ -142,6 +147,23 @@ class NaviViewModel(application: Application,val navi:NaviController)
             modeCross.value = null
         }
 
+        override fun notifyParallelRoad(i: Int) {
+            if (i == 0) {
+                onInfo.onNext("当前在主辅路过渡")
+                return
+            }
+            if (i == 1) {
+                onInfo.onNext("当前在主路");
+                return
+            }
+            if (i == 2) {
+                onInfo.onNext("当前在辅路");
+            }
+        }
+    }
+
+    override fun onCleared() {
+        navi.stopNavi()
     }
 
     fun start(id: Int) {

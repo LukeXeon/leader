@@ -14,6 +14,7 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.TextureSupportMapFragment;
+import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.CrossOverlay;
 import com.amap.api.maps.model.CrossOverlayOptions;
 import com.amap.api.maps.model.LatLng;
@@ -32,6 +33,7 @@ import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.ModeCross;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo;
+import org.kexie.android.dng.navi.widget.AMapCompat;
 
 import java.util.Collections;
 import java.util.List;
@@ -227,10 +229,11 @@ public final class NaviFragment extends Fragment
         });
         naviViewModel.isRunning().setValue(false);
 
-        TextureSupportMapFragment mapFragment = TextureSupportMapFragment
-                .class.cast(getChildFragmentManager()
-                .findFragmentById(R.id.map_view));
-        mapController = Objects.requireNonNull(mapFragment).getMap();
+        TextureSupportMapFragment mapFragment = Objects
+                .requireNonNull(TextureSupportMapFragment
+                        .class.cast(getChildFragmentManager()
+                        .findFragmentById(R.id.map_view)));
+        mapController = mapFragment.getMap();
         MyLocationStyle myLocationStyle = new MyLocationStyle().interval(1000);
         mapController.setMyLocationStyle(myLocationStyle);
         mapController.setOnMyLocationChangeListener(location -> {
@@ -240,8 +243,11 @@ public final class NaviFragment extends Fragment
             mapController.setOnMyLocationChangeListener(null);
         });
         mapController.setMyLocationEnabled(true);
-        mapController.getUiSettings().setMyLocationButtonEnabled(true);
+        UiSettings uiSettings = mapController.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(true);
+        AMapCompat.hideLogo(mapFragment);
     }
+
 
     @Override
     public void onDestroy()

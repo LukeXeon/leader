@@ -1,6 +1,7 @@
 package org.kexie.android.dng.host;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.bumptech.glide.Glide;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -20,5 +21,8 @@ public final class AppGlobal extends MultiDexApplication
             ARouter.openDebug();
         }
         ARouter.init(this);
+        Glide.with(this)
+                .load(R.mipmap.image_car_anim)
+                .preload();
     }
 }

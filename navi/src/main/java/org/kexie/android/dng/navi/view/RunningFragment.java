@@ -15,7 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
+import es.dmoral.toasty.Toasty;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = "navi/running")
 public final class RunningFragment extends Fragment
@@ -74,6 +80,9 @@ public final class RunningFragment extends Fragment
                 binding.myZoomInIntersectionView.setVisibility(View.GONE);
             }
         });
+        naviViewModel.getOnInfo().observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(x -> Toasty.info(requireContext(), x).show());
     }
 
     @Override

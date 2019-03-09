@@ -33,7 +33,8 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 类说明：自车位置管理Overlay类
  */
-public class CarOverlay {
+public class CarOverlay
+{
 
     protected static final int CAR_MOVE_ANIMATION_PERIOD = 50;
     protected int carMoveAnimationFrameNum = 2;
@@ -63,7 +64,8 @@ public class CarOverlay {
 
     private ScheduledExecutorService executorService;
 
-    public CarOverlay(Context context, TextureMapView mapView) {
+    public CarOverlay(Context context, TextureMapView mapView)
+    {
         this.mapView = mapView;
 
         fourCornersDescriptor = BitmapDescriptorFactory.fromBitmap(BitmapFactory
@@ -82,43 +84,54 @@ public class CarOverlay {
      *
      * @param lock true 锁车 false 非锁车
      */
-    public void setLock(boolean lock) {
+    public void setLock(boolean lock)
+    {
         mIsLock = lock;
-        if (carMarker == null) {
+        if (carMarker == null)
+        {
             return;
         }
-        if (mAmap == null) {
+        if (mAmap == null)
+        {
             return;
         }
-        if (directionMarker == null) {
+        if (directionMarker == null)
+        {
             return;
         }
         carMarker.setFlat(true);
         directionMarker.setGeoPoint(carMarker.getGeoPoint());
         carMarker.setGeoPoint(carMarker.getGeoPoint());
         carMarker.setRotateAngle(carMarker.getRotateAngle());
-        if (mIsLock) {
+        if (mIsLock)
+        {
             CameraPosition cameraPosition = new CameraPosition.Builder().target(carMarker.getPosition()).bearing(newAngle).tilt(0).zoom(16).build();
             mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
-    public void reset() {
-        if (carMarker != null) {
+    public void reset()
+    {
+        if (carMarker != null)
+        {
             carMarker.remove();
         }
-        if (directionMarker != null) {
+        if (directionMarker != null)
+        {
             directionMarker.remove();
         }
-        if (leaderLine != null) {
+        if (leaderLine != null)
+        {
             leaderLine.remove();
         }
         leaderLine = null;
         carMarker = null;
         directionMarker = null;
 
-        if (executorService != null) {
-            if (!executorService.isShutdown()) {
+        if (executorService != null)
+        {
+            if (!executorService.isShutdown())
+            {
                 executorService.shutdown();
             }
             isMoveStarted = false;
@@ -134,21 +147,28 @@ public class CarOverlay {
      * @param mLatLng
      * @param bearing
      */
-    public void draw(AMap aMap, LatLng mLatLng, float bearing) {
-        if (aMap == null || mLatLng == null || carDescriptor == null) {
+    public void draw(AMap aMap, LatLng mLatLng, float bearing)
+    {
+        if (aMap == null || mLatLng == null || carDescriptor == null)
+        {
             return;
         }
         mAmap = aMap;
-        try {
-            if (carMarker == null) {
+        try
+        {
+            if (carMarker == null)
+            {
                 carMarker = aMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).setFlat(true).icon(carDescriptor).position(mLatLng));
             }
 
-            if (directionMarker == null) {
+            if (directionMarker == null)
+            {
                 directionMarker = aMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).setFlat(true).icon(fourCornersDescriptor).position(mLatLng));
-                if (isDirectionVisible) {
+                if (isDirectionVisible)
+                {
                     directionMarker.setVisible(true);
-                } else {
+                } else
+                {
                     directionMarker.setVisible(false);
                 }
             }
@@ -157,64 +177,77 @@ public class CarOverlay {
             IPoint resultGeoPnt = IPoint.obtain();
             resultGeoPnt = NaviUtil.lonlat2Geo(mLatLng.latitude, mLatLng.longitude, 20);
 
-            if (carMarker != null && AMapUtils.calculateLineDistance(mLatLng, carMarker.getPosition()) > DISTANCE_OFFSET) {
-                if (executorService != null) {
-                     if (!executorService.isShutdown()) {
-                         executorService.shutdown();
-                     }
-                     isMoveStarted = false;
+            if (carMarker != null && AMapUtils.calculateLineDistance(mLatLng, carMarker.getPosition()) > DISTANCE_OFFSET)
+            {
+                if (executorService != null)
+                {
+                    if (!executorService.isShutdown())
+                    {
+                        executorService.shutdown();
+                    }
+                    isMoveStarted = false;
 
-                     executorService = null;
-                 }
+                    executorService = null;
+                }
                 newAngle = bearing;
                 updateCarPosition(resultGeoPnt);
-            } else {
+            } else
+            {
                 calculateCarSmoothMoveOffset(resultGeoPnt, bearing);
                 startSmoothMoveTimer();
             }
 
             resultGeoPnt.recycle();
 
-        } catch (Throwable e) {
+        } catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }
 
 
-    private void updateCarPosition(IPoint p) {
+    private void updateCarPosition(IPoint p)
+    {
         carMarker.setGeoPoint(p);
         carMarker.setFlat(true);
         carMarker.setRotateAngle(360 - newAngle);
-        if (directionMarker != null) {
+        if (directionMarker != null)
+        {
             directionMarker.setGeoPoint(p);
         }
 
-        if (mIsLock) {
+        if (mIsLock)
+        {
             CameraPosition cameraPosition = new CameraPosition.Builder().target(carMarker.getPosition()).bearing(newAngle).tilt(0).zoom(16).build();
             mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
 
-    public void setEndPoi(LatLng latlng) {
+    public void setEndPoi(LatLng latlng)
+    {
         endLatLng = latlng;
     }
 
     /**
      * 释放自车资源
      */
-    public void destroy() {
-        if (carMarker != null) {
+    public void destroy()
+    {
+        if (carMarker != null)
+        {
             carMarker.remove();
             carMarker = null;
         }
-        if (directionMarker != null) {
+        if (directionMarker != null)
+        {
             directionMarker.remove();
             directionMarker = null;
         }
         carDescriptor = null;
 
-        if (executorService != null && !executorService.isShutdown()) {
+        if (executorService != null && !executorService.isShutdown())
+        {
             executorService.shutdown();
             isMoveStarted = false;
 
@@ -222,12 +255,15 @@ public class CarOverlay {
         }
     }
 
-    private void calculateCarSmoothMoveOffset(IPoint newCenter, float newAngle) {
-        if (carMarker == null) {
+    private void calculateCarSmoothMoveOffset(IPoint newCenter, float newAngle)
+    {
+        if (carMarker == null)
+        {
             return;
         }
         IPoint currentAnchorGeoPoint = carMarker.getGeoPoint();
-        if (currentAnchorGeoPoint == null || currentAnchorGeoPoint.x == 0 || currentAnchorGeoPoint.y == 0) {
+        if (currentAnchorGeoPoint == null || currentAnchorGeoPoint.x == 0 || currentAnchorGeoPoint.y == 0)
+        {
             currentAnchorGeoPoint = newCenter;
         }
         currentFrameIndex = 0;
@@ -238,38 +274,49 @@ public class CarOverlay {
         angleStart = carMarker.getRotateAngle();
         boolean isFirst = false;
 
-        if (Float.compare(angleStart, newAngle) == 0) {
+        if (Float.compare(angleStart, newAngle) == 0)
+        {
             isFirst = true;
-        } else {
+        } else
+        {
             angleStart = 360 - angleStart;
         }
         // 校正旋转角度问题
         float dAngleDelta = newAngle - angleStart;
-        if (isFirst) {
+        if (isFirst)
+        {
             dAngleDelta = 0;
         }
-        if (dAngleDelta > 180) {
+        if (dAngleDelta > 180)
+        {
             dAngleDelta = dAngleDelta - 360;
-        }
-        else if (dAngleDelta < -180) {
+        } else if (dAngleDelta < -180)
+        {
             dAngleDelta = dAngleDelta + 360;
         }
         dAngleOffStep = dAngleDelta / carMoveAnimationFrameNum;
         isMoveStarted = true;
     }
 
-    protected void startSmoothMoveTimer() {
-        if (executorService == null) {
+    protected void startSmoothMoveTimer()
+    {
+        if (executorService == null)
+        {
             executorService = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().namingPattern("caroverlay-schedule-pool-%d").daemon(true).build());
 
-            executorService.scheduleAtFixedRate(new Runnable() {
+            executorService.scheduleAtFixedRate(new Runnable()
+            {
                 long currentSeconds;
+
                 @Override
-                public void run() {
-                    try{
+                public void run()
+                {
+                    try
+                    {
                         currentSeconds = System.currentTimeMillis();
                         mapSmoothMoveTimerTick();
-                    } catch(Throwable e){
+                    } catch (Throwable e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -277,32 +324,39 @@ public class CarOverlay {
         }
     }
 
-    private void mapSmoothMoveTimerTick() {
-        if (!isMoveStarted) {
+    private void mapSmoothMoveTimerTick()
+    {
+        if (!isMoveStarted)
+        {
             return;
         }
-        if (carMarker == null) {
+        if (carMarker == null)
+        {
             return;
         }
-        if (mAmap == null) {
+        if (mAmap == null)
+        {
             return;
         }
-        try {
+        try
+        {
             IPoint p = carMarker.getGeoPoint();
             double newX = 0, newY = 0;
-            if (currentFrameIndex++ < carMoveAnimationFrameNum) {
+            if (currentFrameIndex++ < carMoveAnimationFrameNum)
+            {
                 newX = mapAnchorBackup.x + dXOffStep * currentFrameIndex;
                 newY = mapAnchorBackup.y + dYOffStep * currentFrameIndex;
                 newAngle = angleStart + dAngleOffStep * currentFrameIndex;
                 newAngle %= angleModValue;
-                if (newX != 0 || newY != 0) {
-                    p = new IPoint((int)newX, (int)newY);
+                if (newX != 0 || newY != 0)
+                {
+                    p = new IPoint((int) newX, (int) newY);
                 }
                 updateCarPosition(p);
             }
-        } catch (Throwable e) {
+        } catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }
-
 }

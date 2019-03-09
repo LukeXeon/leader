@@ -25,8 +25,8 @@ import org.kexie.android.dng.navi.model.Query
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo
+import org.kexie.android.dng.navi.widget.AMapCompat
 import org.kexie.android.dng.navi.widget.NaviCallback
-import org.kexie.android.dng.navi.widget.NaviUtil
 import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -189,7 +189,7 @@ class QueryViewModel(application: Application,val navi:NaviController)
     }
 
     private fun getRouteInfo(id: Int): RouteInfo {
-        val path = NaviUtil.getNaviPath(navi)[id]!!
+        val path = AMapCompat.getAllNaviPath(navi)[id]!!
         return RouteInfo.Builder()
                 .length(getPathLength(path.allLength))
                 .time(getPathTime(path.allTime))
