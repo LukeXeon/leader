@@ -20,7 +20,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = "/navi/route")
+@Route(path = "/navi/query/select/route")
 public final class RouteFragment extends Fragment
 {
     private FragmentNaviRouteBinding binding;
@@ -51,7 +51,9 @@ public final class RouteFragment extends Fragment
 
         binding.setLifecycleOwner(this);
 
-        naviViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
+        naviViewModel = ViewModelProviders.of(requireParentFragment()
+                        .requireParentFragment()
+                        .requireParentFragment())
                 .get(NaviViewModel.class);
         Bundle bundle = getArguments();
         if (bundle != null)

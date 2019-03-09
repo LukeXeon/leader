@@ -32,6 +32,7 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.withLock
 typealias NaviController = com.amap.api.navi.AMapNavi;
 
@@ -50,9 +51,6 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
             }
 
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
-            .apply {
-                value = emptyMap()
-            }
 
     val naviInfo = MutableLiveData<NaviInfo>()
 
@@ -110,8 +108,6 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-
-
     private fun query0(query: Observable<Query>) {
 
         query.observeOn(AndroidSchedulers.from(worker.looper))
@@ -120,9 +116,9 @@ class NaviViewModel(application: Application) : AndroidViewModel(application) {
                     if (ids.isEmpty())
                         emptyMap()
                     else
-                        ids.map { x ->
+                        ids.asSequence().map { x ->
                             x to getRouteInfo(x)
-                        }.toMap()
+                        }.toMap(LinkedHashMap()) as Map<Int, RouteInfo>
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Map<Int, RouteInfo>> {
