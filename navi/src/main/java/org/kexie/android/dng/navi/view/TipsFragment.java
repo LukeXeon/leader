@@ -14,7 +14,7 @@ import org.kexie.android.dng.navi.BR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryTipsBinding;
 import org.kexie.android.dng.navi.viewmodel.InputTipViewModel;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 
 import java.util.Collections;
@@ -42,7 +42,7 @@ public final class TipsFragment extends Fragment
 
     private InputTipViewModel inputTipViewModel;
 
-    private NaviViewModel naviViewModel;
+    private QueryViewModel queryViewModel;
 
     private GenericQuickAdapter<InputTip> inputTipQuickAdapter;
 
@@ -80,15 +80,15 @@ public final class TipsFragment extends Fragment
             return false;
         });
 
-        naviViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
-                .get(NaviViewModel.class);
+        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
+                .get(QueryViewModel.class);
         inputTipViewModel = ViewModelProviders.of(this)
                 .get(InputTipViewModel.class);
 
         inputTipQuickAdapter = new GenericQuickAdapter<>(R.layout.item_tip, BR.inputTip);
         inputTipQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
             InputTip inputTip = Objects.requireNonNull(inputTipQuickAdapter.getItem(position));
-            naviViewModel.query(inputTip);
+            queryViewModel.query(inputTip);
         });
 
         binding.setIsShowTips(false);
@@ -111,11 +111,10 @@ public final class TipsFragment extends Fragment
                 });
 
 
-        naviViewModel.getRoutes().observe(this, data -> {
-            if (data != null
-                    && !data.isEmpty()
-                    && !StreamSupport.stream(requireFragmentManager().getFragments())
-                    .anyMatch(fragment -> "/navi/query/select".equals(fragment.getTag())))
+        queryViewModel.getRoutes().observe(this, data -> {
+            if (data != null && !data.isEmpty()
+                    && StreamSupport.stream(requireFragmentManager().getFragments())
+                    .noneMatch(fragment -> "/navi/query/select".equals(fragment.getTag())))
             {
                 Fragment fragment = (Fragment) ARouter
                         .getInstance()
@@ -130,11 +129,11 @@ public final class TipsFragment extends Fragment
                         .commit();
             }
         });
-        naviViewModel.getOnError().mergeWith(inputTipViewModel.getOnError())
+        queryViewModel.getOnError().mergeWith(inputTipViewModel.getOnError())
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe(data -> Toasty.error(requireContext(), data).show());
-        naviViewModel.getOnSuccess().mergeWith(inputTipViewModel.getOnSuccess())
+        queryViewModel.getOnSuccess().mergeWith(inputTipViewModel.getOnSuccess())
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe(data -> Toasty.success(requireContext(), data).show());

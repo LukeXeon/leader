@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.navi.R;
-import org.kexie.android.dng.navi.databinding.FragmentNaviRouteBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.databinding.FragmentNaviSelectRouteBinding;
+import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
 import java.util.Map;
@@ -23,9 +23,9 @@ import androidx.lifecycle.ViewModelProviders;
 @Route(path = "/navi/query/select/route")
 public final class RouteFragment extends Fragment
 {
-    private FragmentNaviRouteBinding binding;
+    private FragmentNaviSelectRouteBinding binding;
 
-    private NaviViewModel naviViewModel;
+    private QueryViewModel queryViewModel;
 
     @NonNull
     @Override
@@ -36,7 +36,7 @@ public final class RouteFragment extends Fragment
         if (binding == null)
         {
             binding = DataBindingUtil.inflate(inflater,
-                    R.layout.fragment_navi_route,
+                    R.layout.fragment_navi_select_route,
                     container,
                     false);
         }
@@ -51,24 +51,22 @@ public final class RouteFragment extends Fragment
 
         binding.setLifecycleOwner(this);
 
-        naviViewModel = ViewModelProviders.of(requireParentFragment()
+        queryViewModel = ViewModelProviders.of(requireParentFragment()
                         .requireParentFragment()
                         .requireParentFragment())
-                .get(NaviViewModel.class);
+                .get(QueryViewModel.class);
         Bundle bundle = getArguments();
         if (bundle != null)
         {
             int id = bundle.getInt("pathId");
-            Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
+            Map<Integer, RouteInfo> routeInfos = queryViewModel.getRoutes().getValue();
             if (routeInfos != null)
             {
                 RouteInfo routeInfo = routeInfos.get(id);
                 if (routeInfo != null)
                 {
                     binding.setRoute(routeInfo);
-                    binding.setOnJumpToNavi(v -> {
-
-                    });
+                    binding.setOnJumpToNavi(v -> queryViewModel.isRunning().setValue(true));
                 }
             }
         }

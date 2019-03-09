@@ -11,7 +11,7 @@ import com.bartoszlipinski.flippablestackview.StackPageTransformer;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQuerySelectBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
 import java.util.Collections;
@@ -34,7 +34,7 @@ public final class SelectFragment extends Fragment
 {
     private FragmentNaviQuerySelectBinding binding;
 
-    private NaviViewModel naviViewModel;
+    private QueryViewModel queryViewModel;
 
     private RouteAdapter routeAdapter;
 
@@ -58,17 +58,17 @@ public final class SelectFragment extends Fragment
         setRetainInstance(false);
 
         requireActivity().addOnBackPressedCallback(this, () -> {
-            Map<Integer, RouteInfo> routeInfos = naviViewModel.getRoutes().getValue();
+            Map<Integer, RouteInfo> routeInfos = queryViewModel.getRoutes().getValue();
             if (routeInfos != null && !routeInfos.isEmpty())
             {
-                naviViewModel.getCurrentSelect().setValue(NaviViewModel.NO_SELECT);
-                naviViewModel.getRoutes().setValue(Collections.emptyMap());
+                queryViewModel.getCurrentSelect().setValue(QueryViewModel.NO_SELECT);
+                queryViewModel.getRoutes().setValue(Collections.emptyMap());
             }
             return false;
         });
 
-        naviViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
-                .get(NaviViewModel.class);
+        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
+                .get(QueryViewModel.class);
 
         binding.setLifecycleOwner(this);
         binding.routePager.initStack(3, StackPageTransformer.Orientation.VERTICAL);
@@ -81,15 +81,15 @@ public final class SelectFragment extends Fragment
                 if (routeAdapter != null && !routeAdapter.fragments.isEmpty())
                 {
                     int index = routeAdapter.fragments.get(position).first;
-                    naviViewModel.getCurrentSelect().setValue(index);
+                    queryViewModel.getCurrentSelect().setValue(index);
                 } else
                 {
-                    naviViewModel.getCurrentSelect().setValue(NaviViewModel.NO_SELECT);
+                    queryViewModel.getCurrentSelect().setValue(QueryViewModel.NO_SELECT);
                 }
             }
         });
 
-        naviViewModel.getRoutes().observe(this, x -> {
+        queryViewModel.getRoutes().observe(this, x -> {
             List<Integer> ids;
             if (x != null)
             {

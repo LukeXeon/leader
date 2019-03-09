@@ -1,78 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
-            android:id="@+id/navi_sdk_autonavi_port_leftwidget"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#252831"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <!--剩余的公里数-->
-            <TextView
-                android:id="@+id/text_next_road_distance"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:textColor="@color/white"
-                android:textSize="20.0sp" />
-
-            <!--左右转向的图标-->
-            <com.amap.api.navi.view.NextTurnTipView
-                android:id="@+id/icon_next_turn_tip"
-                android:layout_width="50.0dip"
-                android:layout_height="40.0dip"
-                android:layout_gravity="center_vertical" />
-
-
-            <!--组件： 进入-->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dip"
-                android:gravity="left|center_vertical"
-                android:minHeight="46dp"
-                android:text="进入"
-                android:textColor="#676B70"
-                android:textSize="16.0sp" />
-
-            <!--组件： 下一路路名-->
-            <TextView
-                android:id="@+id/text_next_road_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dip"
-                android:singleLine="true"
-                android:textColor="@color/white"
-                android:textSize="20.0sp" />
+            android:layout_height="match_parent">
+            <androidx.cardview.widget.CardView
+                app:cardBackgroundColor="@color/colorBlackAlpha87"
+                android:layout_margin="10dp"
+                app:cardElevation="10dp"
+                app:cardCornerRadius="15dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false"
+                android:layout_width="350dp"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <!--剩余的公里数-->
+                    <TextView
+                        android:layout_margin="10dp"
+                        android:gravity="center"
+                        android:textColorHint="@android:color/white"
+                        android:hint="TEXT"
+                        android:id="@+id/text_next_road_distance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="50sp" />
+                    <!--左右转向的图标-->
+                    <com.amap.api.navi.view.NextTurnTipView
+                        android:id="@+id/icon_next_turn_tip"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"/>
+                    <TextView
+                        android:textColor="@color/greyAccent"
+                        android:gravity="center"
+                        android:text="进入"
+                        android:textSize="30sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                    <TextView
+                        android:gravity="center"
+                        android:textColorHint="@android:color/white"
+                        android:hint="TEXT"
+                        android:id="@+id/text_next_road_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="40sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <FrameLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+                <!-- 车道信息 -->
+                <org.kexie.android.dng.navi.widget.DriveWayView
+                    android:layout_gravity="center|top"
+                    android:id="@+id/myDriveWayView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"/>
+            </FrameLayout>
         </LinearLayout>
-
+        <!-- 交通状况条 -->
+        <com.amap.api.navi.view.TrafficProgressBar
+            android:layout_gravity="right"
+            android:layout_margin="10dp"
+            android:id="@+id/myTrafficBar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
         <!-- 路口放大图 -->
         <com.amap.api.navi.view.ZoomInIntersectionView
             android:id="@+id/myZoomInIntersectionView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="200dp"
-            android:layout_marginTop="50dp"
+            android:minHeight="250dp"
+            android:layout_marginTop="30dp"
             android:scaleType="fitXY"/>
-
-        <!-- 交通状况条 -->
-        <com.amap.api.navi.view.TrafficProgressBar
-            android:id="@+id/myTrafficBar"
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"/>
-
-        <!-- 车道信息 -->
-        <com.amap.api.navi.view.DriveWayView
-            android:id="@+id/myDriveWayView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"/>
-    </LinearLayout>
-
+    </FrameLayout>
 </layout>

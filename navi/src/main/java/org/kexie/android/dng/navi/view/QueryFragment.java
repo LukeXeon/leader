@@ -11,7 +11,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import org.kexie.android.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +25,7 @@ public final class QueryFragment extends Fragment
 {
     private FragmentNaviQueryBinding binding;
 
-    private NaviViewModel naviViewModel;
+    private QueryViewModel queryViewModel;
 
     @NonNull
     @Override
@@ -45,8 +45,8 @@ public final class QueryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        naviViewModel = ViewModelProviders.of(requireParentFragment())
-                .get(NaviViewModel.class);
+        queryViewModel = ViewModelProviders.of(requireParentFragment())
+                .get(QueryViewModel.class);
 
         Fragment fragment = (Fragment) ARouter
                 .getInstance()
@@ -59,7 +59,7 @@ public final class QueryFragment extends Fragment
                 .add(R.id.fragment_content, fragment)
                 .commit();
 
-        ProgressFragment.observeWith(naviViewModel.isLoading(), requireParentFragment());
+        ProgressFragment.observeWith(queryViewModel.isLoading(), requireParentFragment());
 
         requireActivity().addOnBackPressedCallback(this,
                 getChildFragmentManager()::popBackStackImmediate);
