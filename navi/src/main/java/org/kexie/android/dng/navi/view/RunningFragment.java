@@ -22,7 +22,7 @@ public final class RunningFragment extends Fragment
 {
     private FragmentNaviRunningBinding binding;
 
-    private NaviViewModel queryViewModel;
+    private NaviViewModel naviViewModel;
 
     @NonNull
     @Override
@@ -41,10 +41,10 @@ public final class RunningFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        queryViewModel = ViewModelProviders.of(requireParentFragment())
+        naviViewModel = ViewModelProviders.of(requireParentFragment())
                 .get(NaviViewModel.class);
 
-        queryViewModel.getRunningInfo().observe(this, naviInfo -> {
+        naviViewModel.getRunningInfo().observe(this, naviInfo -> {
             binding.myTrafficBar.update(
                     naviInfo.getAllLength(),
                     naviInfo.getPathRetainDistance(),
@@ -53,7 +53,7 @@ public final class RunningFragment extends Fragment
             binding.textNextRoadName.setText(naviInfo.getNextRoadName());
             binding.textNextRoadDistance.setText(naviInfo.getNextRoadDistance());
         });
-        queryViewModel.getLaneInfo().observe(this, aMapLaneInfo -> {
+        naviViewModel.getLaneInfo().observe(this, aMapLaneInfo -> {
             if (aMapLaneInfo != null)
             {
                 binding.myDriveWayView.setVisibility(View.VISIBLE);
@@ -64,7 +64,7 @@ public final class RunningFragment extends Fragment
                 binding.myDriveWayView.hide();
             }
         });
-        queryViewModel.getCrossImage().observe(this, data -> {
+        naviViewModel.getCrossImage().observe(this, data -> {
             if (data != null)
             {
                 binding.myZoomInIntersectionView.setIntersectionBitMap(data);
