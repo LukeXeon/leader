@@ -257,16 +257,24 @@ public final class NaviFragment extends Fragment
                             routeOverLay.setLightsVisible(true);
                             routeOverLay.setNaviArrowVisible(false);
                             Location location = mapController.getMyLocation();
-                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            LatLng latLng = new LatLng(location.getLatitude(),
+                                    location.getLongitude());
+                            android.graphics.Point point = mapController.getProjection()
+                                    .toScreenLocation(latLng);
+                            point.x -= 320;
+                            latLng = mapController.getProjection().fromScreenLocation(point);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                                    .target(latLng)
                                     .bearing(location.getBearing())
                                     .tilt(80)
                                     .zoom(20)
                                     .build();
+                            CameraUpdate cameraUpdate = CameraUpdateFactory
+                                    .newCameraPosition(cameraPosition);
+
                             carOverlay.setLock(false);
                             carOverlay.draw(mapController, latLng, location.getBearing());
-                            mapController.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                            mapController.animateCamera(cameraUpdate,
                                     1000, new AMap.CancelableCallback()
                                     {
                                         @Override

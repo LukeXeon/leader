@@ -2,9 +2,11 @@ package org.kexie.android.dng.navi.widget;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
@@ -55,6 +57,7 @@ public class CarOverlay
     protected LatLng endLatLng = null;
     protected Polyline leaderLine = null;
     protected final int DISTANCE_OFFSET = 150;// 默认 500 偏差
+    private Context context;
 
     public int zoom = 20;
 
@@ -68,13 +71,13 @@ public class CarOverlay
 
     public CarOverlay(Context context)
     {
-
+        this.context = context.getApplicationContext();
         fourCornersDescriptor = BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                .decodeResource(context.getResources(),
+                .decodeResource(this.context.getResources(),
                         R.drawable.navi_direction));
 
         carDescriptor = BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                .decodeResource(context.getResources(),
+                .decodeResource(this.context.getResources(),
                         R.drawable.caricon));
         angleModValue = 1800;
 
@@ -106,13 +109,18 @@ public class CarOverlay
         carMarker.setRotateAngle(carMarker.getRotateAngle());
         if (mIsLock)
         {
+            LatLng latLng = carMarker.getPosition();
+            Point point = mAmap.getProjection().toScreenLocation(latLng);
+            point.x -= 320;
+            latLng = mAmap.getProjection().fromScreenLocation(point);
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(carMarker.getPosition())
+                    .target(latLng)
                     .bearing(newAngle)
                     .tilt(tilt)
                     .zoom(zoom)
                     .build();
-            mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            mAmap.animateCamera(cameraUpdate);
         }
     }
 
@@ -234,13 +242,18 @@ public class CarOverlay
 
         if (mIsLock)
         {
+            LatLng latLng = carMarker.getPosition();
+            Point point = mAmap.getProjection().toScreenLocation(latLng);
+            point.x -= 320;
+            latLng = mAmap.getProjection().fromScreenLocation(point);
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(carMarker.getPosition())
+                    .target(latLng)
                     .bearing(newAngle)
                     .tilt(tilt)
                     .zoom(zoom)
                     .build();
-            mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            mAmap.moveCamera(cameraUpdate);
         }
     }
 
