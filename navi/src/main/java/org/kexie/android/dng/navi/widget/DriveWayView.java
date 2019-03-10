@@ -19,9 +19,9 @@ import org.kexie.android.dng.navi.R;
 public class DriveWayView extends LinearLayout
 {
 
-    public static final int IMG_WIDTH = 22;
+    public static final int IMG_WIDTH = 50;
 
-    public static final int IMG_HEIGHT = 39;
+    public static final int IMG_HEIGHT = 100;
 
     private final int[] driveWayGrayBgId = {
             R.drawable.landback_0,

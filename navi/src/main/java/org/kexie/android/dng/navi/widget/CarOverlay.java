@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.TextureMapView;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
@@ -52,11 +51,14 @@ public class CarOverlay
     protected Marker carMarker;
     protected Marker directionMarker;
     protected AMap mAmap = null;
-    protected TextureMapView mapView;
     protected boolean isDirectionVisible = true;
     protected LatLng endLatLng = null;
     protected Polyline leaderLine = null;
     protected final int DISTANCE_OFFSET = 150;// 默认 500 偏差
+
+    public int zoom = 20;
+
+    public int tilt = 80;
 
     // API 默认 1800  UI 默认  360
     protected int angleModValue = 1800;
@@ -64,9 +66,8 @@ public class CarOverlay
 
     private ScheduledExecutorService executorService;
 
-    public CarOverlay(Context context, TextureMapView mapView)
+    public CarOverlay(Context context)
     {
-        this.mapView = mapView;
 
         fourCornersDescriptor = BitmapDescriptorFactory.fromBitmap(BitmapFactory
                 .decodeResource(context.getResources(),
@@ -105,7 +106,12 @@ public class CarOverlay
         carMarker.setRotateAngle(carMarker.getRotateAngle());
         if (mIsLock)
         {
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(carMarker.getPosition()).bearing(newAngle).tilt(0).zoom(16).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(carMarker.getPosition())
+                    .bearing(newAngle)
+                    .tilt(tilt)
+                    .zoom(zoom)
+                    .build();
             mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
@@ -158,12 +164,20 @@ public class CarOverlay
         {
             if (carMarker == null)
             {
-                carMarker = aMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).setFlat(true).icon(carDescriptor).position(mLatLng));
+                carMarker = aMap.addMarker(new MarkerOptions()
+                        .anchor(0.5f, 0.5f)
+                        .setFlat(true)
+                        .icon(carDescriptor)
+                        .position(mLatLng));
             }
 
             if (directionMarker == null)
             {
-                directionMarker = aMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).setFlat(true).icon(fourCornersDescriptor).position(mLatLng));
+                directionMarker = aMap.addMarker(new MarkerOptions()
+                        .anchor(0.5f, 0.5f)
+                        .setFlat(true)
+                        .icon(fourCornersDescriptor)
+                        .position(mLatLng));
                 if (isDirectionVisible)
                 {
                     directionMarker.setVisible(true);
@@ -175,9 +189,11 @@ public class CarOverlay
             carMarker.setVisible(true);
 
             IPoint resultGeoPnt = IPoint.obtain();
-            resultGeoPnt = NaviUtil.lonlat2Geo(mLatLng.latitude, mLatLng.longitude, 20);
+            resultGeoPnt = NaviUtil.lonlat2Geo(mLatLng.latitude, mLatLng.longitude,
+                    20);
 
-            if (carMarker != null && AMapUtils.calculateLineDistance(mLatLng, carMarker.getPosition()) > DISTANCE_OFFSET)
+            if (carMarker != null && AMapUtils
+                    .calculateLineDistance(mLatLng, carMarker.getPosition()) > DISTANCE_OFFSET)
             {
                 if (executorService != null)
                 {
@@ -218,7 +234,12 @@ public class CarOverlay
 
         if (mIsLock)
         {
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(carMarker.getPosition()).bearing(newAngle).tilt(0).zoom(16).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(carMarker.getPosition())
+                    .bearing(newAngle)
+                    .tilt(tilt)
+                    .zoom(zoom)
+                    .build();
             mAmap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
@@ -246,7 +267,8 @@ public class CarOverlay
         }
         carDescriptor = null;
 
-        if (executorService != null && !executorService.isShutdown())
+        if (executorService != null
+                && !executorService.isShutdown())
         {
             executorService.shutdown();
             isMoveStarted = false;
@@ -302,7 +324,11 @@ public class CarOverlay
     {
         if (executorService == null)
         {
-            executorService = new ScheduledThreadPoolExecutor(1, new BasicThreadFactory.Builder().namingPattern("caroverlay-schedule-pool-%d").daemon(true).build());
+            executorService = new ScheduledThreadPoolExecutor(1,
+                    new BasicThreadFactory.Builder()
+                            .namingPattern("caroverlay-schedule-pool-%d")
+                            .daemon(true)
+                            .build());
 
             executorService.scheduleAtFixedRate(new Runnable()
             {

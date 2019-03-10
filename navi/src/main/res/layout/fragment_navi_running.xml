@@ -14,13 +14,13 @@
                 app:cardBackgroundColor="@color/colorBlackAlpha87"
                 android:layout_margin="10dp"
                 app:cardElevation="10dp"
-                app:cardCornerRadius="15dp"
+                app:cardCornerRadius="25dp"
                 app:cardUseCompatPadding="true"
                 app:cardPreventCornerOverlap="false"
-                android:layout_width="350dp"
+                android:layout_width="320dp"
                 android:layout_height="match_parent">
                 <LinearLayout
-                    android:gravity="center_horizontal"
+                    android:gravity="center"
                     android:layout_margin="10dp"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
@@ -35,20 +35,23 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:textSize="50sp" />
+                        android:textSize="60sp" />
                     <!--左右转向的图标-->
                     <com.amap.api.navi.view.NextTurnTipView
+                        android:layout_margin="20dp"
                         android:id="@+id/icon_next_turn_tip"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"/>
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"/>
                     <TextView
+                        android:layout_margin="5dp"
                         android:textColor="@color/greyAccent"
                         android:gravity="center"
                         android:text="进入"
-                        android:textSize="30sp"
+                        android:textSize="40sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                     <TextView
+                        android:layout_margin="5dp"
                         android:gravity="center"
                         android:textColorHint="@android:color/white"
                         android:hint="TEXT"
@@ -56,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:textSize="40sp" />
+                        android:textSize="50sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <FrameLayout
@@ -68,7 +71,7 @@
                     android:layout_gravity="center|top"
                     android:id="@+id/myDriveWayView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="100dp"
                     android:layout_marginTop="30dp"/>
             </FrameLayout>
         </LinearLayout>

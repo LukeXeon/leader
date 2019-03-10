@@ -9,10 +9,7 @@ import android.os.HandlerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.amap.api.navi.enums.NaviType
-import com.amap.api.navi.model.AMapLaneInfo
-import com.amap.api.navi.model.AMapModelCross
-import com.amap.api.navi.model.AMapNaviCross
-import com.amap.api.navi.model.NaviInfo
+import com.amap.api.navi.model.*
 import com.autonavi.ae.gmap.gloverlay.GLCrossVector
 import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.navi.viewmodel.entity.ModeCross
@@ -22,7 +19,7 @@ import org.kexie.android.dng.navi.widget.NaviCallback
 import org.kexie.android.dng.navi.widget.NaviUtil
 
 
-class NaviViewModel(application: Application,val navi:NaviController)
+class RunningViewModel(application: Application,private val navi:NaviController)
     : AndroidViewModel(application) {
 
     private val naviImpl = NaviImpl()
@@ -41,6 +38,8 @@ class NaviViewModel(application: Application,val navi:NaviController)
         }
     }
 
+    val location = MutableLiveData<AMapNaviLocation>()
+
     val runningInfo = MutableLiveData<RunningInfo>()
 
     val laneInfo = MutableLiveData<AMapLaneInfo>()
@@ -50,6 +49,8 @@ class NaviViewModel(application: Application,val navi:NaviController)
     val isRunning = MutableLiveData<Boolean>()
 
     val modeCross = MutableLiveData<ModeCross>()
+
+    val cameraInfo = MutableLiveData<Array<out AMapNaviCameraInfo>>()
 
     val isLockCamera = MutableLiveData<Boolean>()
 
@@ -160,14 +161,26 @@ class NaviViewModel(application: Application,val navi:NaviController)
                 onInfo.onNext("当前在辅路");
             }
         }
+
+        override fun onLocationChange(aMapNaviLocation: AMapNaviLocation?) {
+            if (aMapNaviLocation != null) {
+                location.value = aMapNaviLocation
+            }
+        }
+
+        override fun updateCameraInfo(aMapNaviCameraInfos: Array<out AMapNaviCameraInfo>?) {
+            if (aMapNaviCameraInfos != null) {
+                cameraInfo.value = aMapNaviCameraInfos;
+            }
+        }
     }
 
     override fun onCleared() {
         navi.stopNavi()
     }
 
-    fun start(id: Int) {
-        navi.selectRouteId(id)
+    fun start() {
+        navi.setEmulatorNaviSpeed(40)
         navi.startNavi(NaviType.EMULATOR)
     }
 }

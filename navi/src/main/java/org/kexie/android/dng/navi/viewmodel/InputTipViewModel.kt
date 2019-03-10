@@ -82,7 +82,6 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
                     .map { x -> InputTip(x.name, x.poiID) }
 
             this.inputTips.postValue(newTips)
-
         } catch (e: Exception) {
             e.printStackTrace()
             onError.onNext("输入提示查询失败,请检查网络连接")

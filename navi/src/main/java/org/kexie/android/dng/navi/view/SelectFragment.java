@@ -81,10 +81,10 @@ public final class SelectFragment extends Fragment
                 if (routeAdapter != null && !routeAdapter.fragments.isEmpty())
                 {
                     int index = routeAdapter.fragments.get(position).first;
-                    queryViewModel.getCurrentSelect().setValue(index);
+                    queryViewModel.select(index);
                 } else
                 {
-                    queryViewModel.getCurrentSelect().setValue(QueryViewModel.NO_SELECT);
+                    queryViewModel.select(QueryViewModel.NO_SELECT);
                 }
             }
         });

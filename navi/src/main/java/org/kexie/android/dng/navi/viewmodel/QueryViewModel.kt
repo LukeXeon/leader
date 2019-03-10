@@ -31,11 +31,10 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.LinkedHashMap
 import kotlin.concurrent.withLock
 typealias NaviController = com.amap.api.navi.AMapNavi;
 
-class QueryViewModel(application: Application,val navi:NaviController)
+class QueryViewModel(application: Application,private val navi:NaviController)
     : AndroidViewModel(application) {
 
     private val worker = HandlerThread(toString())
@@ -44,8 +43,6 @@ class QueryViewModel(application: Application,val navi:NaviController)
             }
 
     private val handler = Handler(worker.looper)
-
-    //plan
 
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
 
@@ -64,6 +61,13 @@ class QueryViewModel(application: Application,val navi:NaviController)
     fun query(query: Query) {
         isLoading.value = true
         query0(Observable.just(query))
+    }
+
+    fun select(id: Int) {
+        currentSelect.value = id;
+        if (id != NO_SELECT) {
+            navi.selectRouteId(id)
+        }
     }
 
     fun query(inputTip: InputTip) {
@@ -106,7 +110,7 @@ class QueryViewModel(application: Application,val navi:NaviController)
                     else
                         ids.asSequence().map { x ->
                             x to getRouteInfo(x)
-                        }.toMap(LinkedHashMap()) as Map<Int, RouteInfo>
+                        }.toMap()
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Map<Int, RouteInfo>> {
@@ -116,6 +120,7 @@ class QueryViewModel(application: Application,val navi:NaviController)
 
                     override fun onNext(t: Map<Int, RouteInfo>) {
                         routes.value = t
+
                         onSuccess.onNext("路径规划成功")
                     }
 

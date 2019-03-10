@@ -9,7 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviRunningBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,12 +23,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = "navi/running")
+@Route(path = "/navi/running")
 public final class RunningFragment extends Fragment
 {
     private FragmentNaviRunningBinding binding;
 
-    private NaviViewModel naviViewModel;
+    private RunningViewModel runningViewModel;
 
     @NonNull
     @Override
@@ -47,10 +47,10 @@ public final class RunningFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        naviViewModel = ViewModelProviders.of(requireParentFragment())
-                .get(NaviViewModel.class);
+        runningViewModel = ViewModelProviders.of(requireParentFragment())
+                .get(RunningViewModel.class);
 
-        naviViewModel.getRunningInfo().observe(this, naviInfo -> {
+        runningViewModel.getRunningInfo().observe(this, naviInfo -> {
             binding.myTrafficBar.update(
                     naviInfo.getAllLength(),
                     naviInfo.getPathRetainDistance(),
@@ -59,7 +59,7 @@ public final class RunningFragment extends Fragment
             binding.textNextRoadName.setText(naviInfo.getNextRoadName());
             binding.textNextRoadDistance.setText(naviInfo.getNextRoadDistance());
         });
-        naviViewModel.getLaneInfo().observe(this, aMapLaneInfo -> {
+        runningViewModel.getLaneInfo().observe(this, aMapLaneInfo -> {
             if (aMapLaneInfo != null)
             {
                 binding.myDriveWayView.setVisibility(View.VISIBLE);
@@ -70,7 +70,7 @@ public final class RunningFragment extends Fragment
                 binding.myDriveWayView.hide();
             }
         });
-        naviViewModel.getCrossImage().observe(this, data -> {
+        runningViewModel.getCrossImage().observe(this, data -> {
             if (data != null)
             {
                 binding.myZoomInIntersectionView.setIntersectionBitMap(data);
@@ -80,7 +80,7 @@ public final class RunningFragment extends Fragment
                 binding.myZoomInIntersectionView.setVisibility(View.GONE);
             }
         });
-        naviViewModel.getOnInfo().observeOn(AndroidSchedulers.mainThread())
+        runningViewModel.getOnInfo().observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(x -> Toasty.info(requireContext(), x).show());
     }

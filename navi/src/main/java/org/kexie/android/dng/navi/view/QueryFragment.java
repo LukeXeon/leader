@@ -59,7 +59,7 @@ public final class QueryFragment extends Fragment
                 .add(R.id.fragment_content, fragment)
                 .commit();
 
-        ProgressFragment.observeWith(queryViewModel.isLoading(), requireParentFragment());
+        ProgressFragment.observeWith(queryViewModel.isLoading(), this);
 
         requireActivity().addOnBackPressedCallback(this,
                 getChildFragmentManager()::popBackStackImmediate);

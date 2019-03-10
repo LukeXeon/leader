@@ -9,7 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviSelectRouteBinding;
-import org.kexie.android.dng.navi.viewmodel.NaviViewModel;
+import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
@@ -28,7 +28,7 @@ public final class RouteFragment extends Fragment
 
     private QueryViewModel queryViewModel;
 
-    private NaviViewModel naviViewModel;
+    private RunningViewModel runningViewModel;
 
     @NonNull
     @Override
@@ -60,8 +60,8 @@ public final class RouteFragment extends Fragment
 
         queryViewModel = ViewModelProviders.of(root)
                 .get(QueryViewModel.class);
-        naviViewModel = ViewModelProviders.of(root)
-                .get(NaviViewModel.class);
+        runningViewModel = ViewModelProviders.of(root)
+                .get(RunningViewModel.class);
         Bundle bundle = getArguments();
         if (bundle != null)
         {
@@ -73,7 +73,7 @@ public final class RouteFragment extends Fragment
                 if (routeInfo != null)
                 {
                     binding.setRoute(routeInfo);
-                    binding.setOnJumpToNavi(v -> naviViewModel.isRunning().setValue(true));
+                    binding.setOnJumpToNavi(v -> runningViewModel.isRunning().setValue(true));
                 }
             }
         }
