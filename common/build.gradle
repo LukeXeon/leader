@@ -72,7 +72,7 @@ dependencies {
     api 'com.uber.autodispose:autodispose-android-archcomponents:1.1.0'
     api 'com.github.bumptech.glide:glide:4.9.0'
     api 'com.neovisionaries:nv-websocket-client:2.6'
-    api 'com.squareup.okhttp3:okhttp:3.13.1'
+    api 'com.squareup.okhttp3:okhttp:3.12.0'
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.blankj:utilcode:1.23.4'
     api 'io.reactivex.rxjava2:rxjava:2.2.6'

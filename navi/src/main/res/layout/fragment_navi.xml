@@ -9,7 +9,7 @@
         android:layout_height="match_parent">
         <fragment
             android:id="@+id/map_view"
-            android:name="com.amap.api.maps.TextureSupportMapFragment"
+            android:name="org.kexie.android.dng.navi.widget.AMapCompatFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <FrameLayout

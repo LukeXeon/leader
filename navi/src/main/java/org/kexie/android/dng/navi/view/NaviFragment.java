@@ -1,6 +1,7 @@
 package org.kexie.android.dng.navi.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,7 +14,6 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.TextureSupportMapFragment;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.CrossOverlay;
@@ -34,7 +34,7 @@ import org.kexie.android.dng.navi.viewmodel.NaviViewModelFactory;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo;
-import org.kexie.android.dng.navi.widget.AMapCompat;
+import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarOverlay;
 
 import java.util.List;
@@ -99,11 +99,9 @@ public final class NaviFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
 
-        TextureSupportMapFragment mapFragment = Objects
-                .requireNonNull(TextureSupportMapFragment
-                        .class.cast(getChildFragmentManager()
-                        .findFragmentById(R.id.map_view)));
-        AMapCompat.hideLogo(mapFragment);
+        AMapCompatFragment mapFragment = (AMapCompatFragment)
+                Objects.requireNonNull(getChildFragmentManager()
+                        .findFragmentById(R.id.map_view));
         mapController = mapFragment.getMap();
         carOverlay = new CarOverlay(requireContext());
         cameraOverlay = new AmapCameraOverlay(requireContext());
@@ -119,6 +117,7 @@ public final class NaviFragment extends Fragment
             if (!routeInfos.isEmpty())
             {
                 Context context = requireContext().getApplicationContext();
+                Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
                 mapController.moveCamera(CameraUpdateFactory.changeTilt(0));
                 SparseArrayCompat<RouteOverLay> overLays = new SparseArrayCompat<>();
                 StreamSupport.stream(routeInfos.entrySet())
@@ -127,6 +126,7 @@ public final class NaviFragment extends Fragment
                                     mapController,
                                     entry.getValue().path,
                                     context);
+                            overLay.setStartPointBitmap(bitmap);
                             overLay.setTrafficLine(false);
                             overLay.addToMap();
                             overLays.put(entry.getKey(), overLay);
@@ -142,9 +142,13 @@ public final class NaviFragment extends Fragment
                         latLngBounds = bounds;
                     }
                 }
+                Logger.d(AutoSizeUtils.dp2px(requireContext(), 450));
                 CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(latLngBounds,
-                        200, AutoSizeUtils.dp2px(requireContext(), 450), 300, 300);
-                mapController.animateCamera(update,1000,null);
+                        AutoSizeUtils.dp2px(requireContext(), 100),
+                        AutoSizeUtils.dp2px(requireContext(), 450),
+                        AutoSizeUtils.dp2px(requireContext(), 50),
+                        AutoSizeUtils.dp2px(requireContext(), 50));
+                mapController.animateCamera(update, 1000, null);
                 routeOverLays = overLays;
                 //默认选择第一条路
                 queryViewModel.select(overLays.keyAt(0));
@@ -261,7 +265,7 @@ public final class NaviFragment extends Fragment
                                     location.getLongitude());
                             android.graphics.Point point = mapController.getProjection()
                                     .toScreenLocation(latLng);
-                            point.x -= 320;
+                            point.x -= AutoSizeUtils.dp2px(requireContext(), 140);
                             latLng = mapController.getProjection().fromScreenLocation(point);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(latLng)
@@ -271,7 +275,6 @@ public final class NaviFragment extends Fragment
                                     .build();
                             CameraUpdate cameraUpdate = CameraUpdateFactory
                                     .newCameraPosition(cameraPosition);
-
                             carOverlay.setLock(false);
                             carOverlay.draw(mapController, latLng, location.getBearing());
                             mapController.animateCamera(cameraUpdate,
@@ -287,7 +290,7 @@ public final class NaviFragment extends Fragment
                                         @Override
                                         public void onCancel()
                                         {
-
+                                            onFinish();
                                         }
                                     });
                         } else

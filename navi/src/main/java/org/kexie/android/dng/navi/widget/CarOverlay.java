@@ -23,6 +23,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import me.jessyan.autosize.utils.AutoSizeUtils;
+
 /**
  * 包名： com.amap.api.navi.core
  * <p>
@@ -111,7 +113,7 @@ public class CarOverlay
         {
             LatLng latLng = carMarker.getPosition();
             Point point = mAmap.getProjection().toScreenLocation(latLng);
-            point.x -= 320;
+            point.x -= AutoSizeUtils.dp2px(context,140);
             latLng = mAmap.getProjection().fromScreenLocation(point);
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(latLng)
@@ -244,7 +246,7 @@ public class CarOverlay
         {
             LatLng latLng = carMarker.getPosition();
             Point point = mAmap.getProjection().toScreenLocation(latLng);
-            point.x -= 320;
+            point.x -= AutoSizeUtils.dp2px(context,140);
             latLng = mAmap.getProjection().fromScreenLocation(point);
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(latLng)
