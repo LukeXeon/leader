@@ -49,8 +49,14 @@ public final class RunningFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         runningViewModel = ViewModelProviders.of(requireParentFragment())
                 .get(RunningViewModel.class);
-
+        binding.setIsLoading(true);
+        binding.progressBar.enableIndeterminateMode(true);
         runningViewModel.getRunningInfo().observe(this, naviInfo -> {
+            if (binding.getIsLoading())
+            {
+                binding.setIsLoading(false);
+                binding.progressBar.enableIndeterminateMode(false);
+            }
             binding.myTrafficBar.update(
                     naviInfo.getAllLength(),
                     naviInfo.getPathRetainDistance(),

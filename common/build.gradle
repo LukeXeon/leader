@@ -46,6 +46,7 @@ dependencies {
     //api 'com.google.guava:guava:27.0.1-android'
 
     //ui widget
+    api 'com.mikhaellopez:circularprogressbar:2.0.0'
     api 'com.bartoszlipinski.flippablestackview:library:1.2.1'
     api 'com.github.vipulasri:timelineview:1.1.0'
     api 'com.github.ishaan1995:ButtonProgressBar:1.0'

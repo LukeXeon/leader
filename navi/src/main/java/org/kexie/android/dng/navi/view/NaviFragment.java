@@ -259,6 +259,7 @@ public final class NaviFragment extends Fragment
                             LatLng latLng = new LatLng(location.getLatitude(),
                                     location.getLongitude());
                             carMarker.setLock(false);
+
                             carMarker.draw(Point.box(latLng), location.getBearing());
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(latLng)

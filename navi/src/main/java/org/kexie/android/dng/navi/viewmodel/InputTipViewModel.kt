@@ -9,10 +9,14 @@ import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.location.AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
 import com.amap.api.services.core.LatLonPoint
+import com.amap.api.services.geocoder.GeocodeSearch
+import com.amap.api.services.geocoder.RegeocodeQuery
 import com.amap.api.services.help.Inputtips
 import com.amap.api.services.help.InputtipsQuery
+import com.orhanobut.logger.Logger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
+import org.kexie.android.dng.navi.model.Point
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import java.util.concurrent.TimeUnit
 
@@ -59,12 +63,17 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
             this.inputTips.postValue(emptyList())
             return
         }
+        val location = locationSource.lastKnownLocation;
 
         try {
-            val location = locationSource.lastKnownLocation;
+            val search = GeocodeSearch(getApplication());
+            val query = RegeocodeQuery(Point.form(location.longitude, location.latitude)
+                    .unBox(LatLonPoint::class.java), 200f, GeocodeSearch.AMAP)
+            val city = search.getFromLocation(query).city
 
-            val inputTipsQuery = InputtipsQuery(text, "")
-            inputTipsQuery.location = LatLonPoint(location.latitude,location.longitude)
+            Logger.d("$text $city")
+
+            val inputTipsQuery = InputtipsQuery(text, city)
             val inputTips = Inputtips(getApplication(), inputTipsQuery)
             val newTips = inputTips.requestInputtips()
                     .filter { tip -> !TextUtils.isEmpty(tip.poiID) }
