@@ -1,15 +1,21 @@
 package org.kexie.android.dng.navi.view;
 
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -19,6 +25,8 @@ import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.Circle;
+import com.amap.api.maps.model.CircleOptions;
 import com.amap.api.maps.model.CrossOverlay;
 import com.amap.api.maps.model.CrossOverlayOptions;
 import com.amap.api.maps.model.LatLng;
@@ -59,6 +67,9 @@ import me.jessyan.autosize.utils.AutoSizeUtils;
 @Route(path = "/navi/navi")
 public final class NaviFragment extends Fragment
 {
+
+    private static final Interpolator interpolator = new LinearInterpolator();
+
     private FragmentNaviBinding binding;
 
     private AMap mapController;
@@ -76,6 +87,8 @@ public final class NaviFragment extends Fragment
     private CarMarker carMarker;
 
     private AmapCameraOverlay cameraOverlay;
+
+    private Circle[] circles;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -106,7 +119,6 @@ public final class NaviFragment extends Fragment
         setRetainInstance(false);
 
         binding.setLifecycleOwner(this);
-        binding.setIsLoaded(false);
         Glide.with(this)
                 .load(R.drawable.image_splash)
                 .into(binding.loading);
@@ -129,11 +141,11 @@ public final class NaviFragment extends Fragment
                 }
             });
             binding.loading.startAnimation(alphaAnimation);
-            binding.setIsLoaded(true);
-            carMarker = new CarMarker(requireContext(), mapController);
-            cameraOverlay = new AmapCameraOverlay(requireContext());
             mapController.setOnMapLoadedListener(null);
         });
+
+        carMarker = new CarMarker(requireContext(), mapController);
+        cameraOverlay = new AmapCameraOverlay(requireContext());
 
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
 
@@ -330,7 +342,28 @@ public final class NaviFragment extends Fragment
                     MyLocationStyle myLocationStyle1 = new MyLocationStyle()
                             .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
                     mapController.setMyLocationStyle(myLocationStyle1);
-                    mapController.setOnMyLocationChangeListener(null);
+                    AMap.OnMyLocationChangeListener listener = location1 -> {
+                        LatLng latLng = new LatLng(location1.getLatitude(), location1.getLongitude());
+                        if (circles == null)
+                        {
+                            circles = new Circle[3];
+                            Handler handler = new Handler();
+                            for (int i = 0; i < circles.length; i++)
+                            {
+                                Circle circle = addCircle(latLng);
+                                circles[i] = circle;
+                                handler.postDelayed(() -> {
+                                    startScaleCircleAnimation(circle);
+                                }, i * 800);
+                            }
+                        }
+                        for (Circle circle : circles)
+                        {
+                            circle.setCenter(latLng);
+                        }
+                    };
+                    listener.onMyLocationChange(location);
+                    mapController.setOnMyLocationChangeListener(listener);
                 });
                 mapController.setMyLocationEnabled(true);
                 UiSettings uiSettings = mapController.getUiSettings();
@@ -344,6 +377,42 @@ public final class NaviFragment extends Fragment
                     .commit();
         });
         runningViewModel.isRunning().setValue(false);
+    }
+
+    private Circle addCircle(LatLng latLng)
+    {
+        float accuracy = (float) ((latLng.longitude / latLng.latitude) * 20);
+        Logger.d(accuracy);
+        return mapController.addCircle(new CircleOptions()
+                .center(latLng)
+                .visible(true)
+                .fillColor(Color.argb(0, 98, 198, 255))
+                .radius(accuracy)
+                .strokeColor(Color.argb(0, 98, 198, 255))
+                .strokeWidth(0));
+    }
+
+    private static void startScaleCircleAnimation(Circle circle)
+    {
+        ValueAnimator vm = ValueAnimator.ofFloat(0, (float) circle.getRadius());
+        vm.addUpdateListener(animation -> {
+            float current = (float) animation.getAnimatedValue();
+            circle.setRadius(current);
+        });
+        ValueAnimator vm1 = ValueAnimator.ofInt(160, 0);
+        vm1.addUpdateListener(animation -> {
+            int color = (int) animation.getAnimatedValue();
+            circle.setFillColor(Color.argb(color, 98, 198, 255));
+        });
+        vm.setRepeatCount(Integer.MAX_VALUE);
+        vm.setRepeatMode(ValueAnimator.RESTART);
+        vm1.setRepeatCount(Integer.MAX_VALUE);
+        vm1.setRepeatMode(ValueAnimator.RESTART);
+        AnimatorSet set = new AnimatorSet();
+        set.play(vm).with(vm1);
+        set.setDuration(2500);
+        set.setInterpolator(interpolator);
+        set.start();
     }
 
     @Override
