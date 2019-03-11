@@ -6,6 +6,7 @@ import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
 import androidx.multidex.MultiDexApplication;
+import me.jessyan.autosize.AutoSizeConfig;
 
 
 public final class AppGlobal extends MultiDexApplication
@@ -20,6 +21,9 @@ public final class AppGlobal extends MultiDexApplication
             ARouter.openLog();     // Print log
             ARouter.openDebug();
         }
+        AutoSizeConfig.getInstance()
+                .setCustomFragment(true);
+
         ARouter.init(this);
         Glide.with(this)
                 .load(R.mipmap.image_car_anim)
