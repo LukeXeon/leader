@@ -26,9 +26,11 @@ import java.lang.reflect.Constructor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import me.jessyan.autosize.internal.CancelAdapt;
 
 public final class AMapCompatFragment extends Fragment
-        implements ViewTreeObserver.OnGlobalLayoutListener
+        implements ViewTreeObserver.OnGlobalLayoutListener,
+        CancelAdapt
 {
     private AMap map;
     private IMapFragmentDelegate mapFragmentDelegate;
@@ -84,7 +86,7 @@ public final class AMapCompatFragment extends Fragment
         return this.mapFragmentDelegate;
     }
 
-    private IMapFragmentDelegate a()
+    private IMapFragmentDelegate getMapFragmentDelegate()
     {
         return this.getMapFragmentDelegate(this.getActivity());
     }
@@ -92,7 +94,7 @@ public final class AMapCompatFragment extends Fragment
     public AMap getMap()
     {
         IMapFragmentDelegate var1;
-        if ((var1 = this.a()) == null)
+        if ((var1 = this.getMapFragmentDelegate()) == null)
         {
             return null;
         } else
@@ -151,7 +153,7 @@ public final class AMapCompatFragment extends Fragment
             {
                 var3 = this.getArguments();
             }
-            return this.a().onCreateView(var1, var2, var3);
+            return this.getMapFragmentDelegate().onCreateView(var1, var2, var3);
         } catch (Throwable var4)
         {
             var4.printStackTrace();
@@ -172,7 +174,7 @@ public final class AMapCompatFragment extends Fragment
         super.onResume();
         try
         {
-            this.a().onResume();
+            this.getMapFragmentDelegate().onResume();
         } catch (Throwable var1)
         {
             var1.printStackTrace();
@@ -185,7 +187,7 @@ public final class AMapCompatFragment extends Fragment
         super.onPause();
         try
         {
-            this.a().onPause();
+            this.getMapFragmentDelegate().onPause();
         } catch (Throwable var1)
         {
             var1.printStackTrace();
@@ -199,7 +201,7 @@ public final class AMapCompatFragment extends Fragment
         {
             this.requireView().getViewTreeObserver()
                     .removeOnGlobalLayoutListener(this);
-            this.a().onDestroyView();
+            this.getMapFragmentDelegate().onDestroyView();
         } catch (Throwable var1)
         {
             var1.printStackTrace();
@@ -213,7 +215,7 @@ public final class AMapCompatFragment extends Fragment
     {
         try
         {
-            this.a().onDestroy();
+            this.getMapFragmentDelegate().onDestroy();
             this.map = null;
         } catch (Throwable var1)
         {
@@ -228,7 +230,7 @@ public final class AMapCompatFragment extends Fragment
         super.onLowMemory();
         try
         {
-            this.a().onLowMemory();
+            this.getMapFragmentDelegate().onLowMemory();
         } catch (Throwable var1)
         {
             var1.printStackTrace();
@@ -240,7 +242,7 @@ public final class AMapCompatFragment extends Fragment
     {
         try
         {
-            this.a().onSaveInstanceState(var1);
+            this.getMapFragmentDelegate().onSaveInstanceState(var1);
         } catch (Throwable var2)
         {
             var2.printStackTrace();
@@ -267,10 +269,10 @@ public final class AMapCompatFragment extends Fragment
         super.setUserVisibleHint(var1);
         if (var1)
         {
-            this.a().setVisibility(0);
+            this.getMapFragmentDelegate().setVisibility(0);
         } else
         {
-            this.a().setVisibility(8);
+            this.getMapFragmentDelegate().setVisibility(8);
         }
     }
 

@@ -35,7 +35,7 @@ import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo;
 import org.kexie.android.dng.navi.widget.AMapCompatFragment;
-import org.kexie.android.dng.navi.widget.CarOverlay;
+import org.kexie.android.dng.navi.widget.CarMarker;
 
 import java.util.List;
 import java.util.Objects;
@@ -68,7 +68,7 @@ public final class NaviFragment extends Fragment
 
     private AMapNavi navi;
 
-    private CarOverlay carOverlay;
+    private CarMarker carMarker;
 
     private AmapCameraOverlay cameraOverlay;
 
@@ -103,7 +103,8 @@ public final class NaviFragment extends Fragment
                 Objects.requireNonNull(getChildFragmentManager()
                         .findFragmentById(R.id.map_view));
         mapController = mapFragment.getMap();
-        carOverlay = new CarOverlay(requireContext());
+        carMarker = new CarMarker(requireContext(), mapController);
+        carMarker.setOffsetX(140);
         cameraOverlay = new AmapCameraOverlay(requireContext());
 
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
@@ -151,7 +152,6 @@ public final class NaviFragment extends Fragment
                 mapController.animateCamera(update, 1000, null);
                 routeOverLays = overLays;
                 //默认选择第一条路
-                queryViewModel.select(overLays.keyAt(0));
             } else
             {
                 mapController.clear();
@@ -184,14 +184,10 @@ public final class NaviFragment extends Fragment
         });
 
         //running
-        runningViewModel.isLockCamera().observe(this, carOverlay::setLock);
-        runningViewModel.getLocation().observe(this,
-                location -> carOverlay.draw(mapController, new LatLng(
-                                location.getCoord()
-                                        .getLatitude(),
-                                location.getCoord()
-                                        .getLongitude()),
-                        location.getBearing()));
+        runningViewModel.isLockCamera().observe(this, carMarker::setLock);
+        runningViewModel.getLocation().observe(this, data -> {
+            carMarker.draw(Point.box(data.getCoord()), data.getBearing());
+        });
         runningViewModel.getCameraInfo().observe(this,
                 cameraInfos -> cameraOverlay.draw(mapController, cameraInfos));
         runningViewModel.getModeCross().observe(this, data -> {
@@ -245,7 +241,6 @@ public final class NaviFragment extends Fragment
                 postcard = ARouter.getInstance().build("/navi/running");
                 Logger.d("/navi/running");
 
-
                 Integer select = queryViewModel.getCurrentSelect().getValue();
                 if (select != null && select != QueryViewModel.NO_SELECT)
                 {
@@ -263,10 +258,8 @@ public final class NaviFragment extends Fragment
                             Location location = mapController.getMyLocation();
                             LatLng latLng = new LatLng(location.getLatitude(),
                                     location.getLongitude());
-                            android.graphics.Point point = mapController.getProjection()
-                                    .toScreenLocation(latLng);
-                            point.x -= AutoSizeUtils.dp2px(requireContext(), 140);
-                            latLng = mapController.getProjection().fromScreenLocation(point);
+                            carMarker.setLock(false);
+                            carMarker.draw(Point.box(latLng), location.getBearing());
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(latLng)
                                     .bearing(location.getBearing())
@@ -275,15 +268,13 @@ public final class NaviFragment extends Fragment
                                     .build();
                             CameraUpdate cameraUpdate = CameraUpdateFactory
                                     .newCameraPosition(cameraPosition);
-                            carOverlay.setLock(false);
-                            carOverlay.draw(mapController, latLng, location.getBearing());
                             mapController.animateCamera(cameraUpdate,
                                     1000, new AMap.CancelableCallback()
                                     {
                                         @Override
                                         public void onFinish()
                                         {
-                                            carOverlay.setLock(true);
+                                            carMarker.setLock(true);
                                             runningViewModel.start();
                                         }
 
@@ -293,12 +284,9 @@ public final class NaviFragment extends Fragment
                                             onFinish();
                                         }
                                     });
-                        } else
-                        {
-                            routeOverLay.removeFromMap();
+                            break;
                         }
                     }
-
                     mapController.setMyLocationEnabled(false);
                     UiSettings uiSettings = mapController.getUiSettings();
                     uiSettings.setMyLocationButtonEnabled(false);

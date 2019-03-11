@@ -20,7 +20,6 @@ import com.autonavi.amap.mapcore.MapProjection;
 public class NaviUtil
 {
 
-
     public static float calculateDistance(NaviLatLng start, NaviLatLng end)
     {
         double x1 = start.getLongitude();
@@ -132,5 +131,4 @@ public class NaviUtil
         }
         return (d / 1000) + "公里";
     }
-
 }

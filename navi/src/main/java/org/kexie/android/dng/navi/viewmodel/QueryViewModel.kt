@@ -120,8 +120,10 @@ class QueryViewModel(application: Application,private val navi:NaviController)
 
                     override fun onNext(t: Map<Int, RouteInfo>) {
                         routes.value = t
-
-                        onSuccess.onNext("路径规划成功")
+                        if (!t.isEmpty()) {
+                            select(t.keys.first())
+                            onSuccess.onNext("路径规划成功")
+                        }
                     }
 
                     override fun onError(e: Throwable) {

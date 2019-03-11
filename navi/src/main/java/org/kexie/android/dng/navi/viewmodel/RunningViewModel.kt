@@ -58,6 +58,10 @@ class RunningViewModel(application: Application,private val navi:NaviController)
 
     private inner class NaviImpl : NaviCallback() {
         override fun onNaviInfoUpdate(naviInfo: NaviInfo?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             if (naviInfo != null) {
                 val allLength = navi.naviPath.allLength
 
@@ -86,22 +90,42 @@ class RunningViewModel(application: Application,private val navi:NaviController)
         }
 
         override fun hideLaneInfo() {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             laneInfo.value = null
         }
 
         override fun showLaneInfo(aMapLaneInfo: AMapLaneInfo?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             laneInfo.value = aMapLaneInfo;
         }
 
         override fun showCross(aMapNaviCross: AMapNaviCross?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             crossImage.value = aMapNaviCross
         }
 
         override fun hideCross() {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             crossImage.value = null
         }
 
         override fun showModeCross(aMapModelCross: AMapModelCross?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             if (aMapModelCross == null) {
                 return
             }
@@ -145,10 +169,18 @@ class RunningViewModel(application: Application,private val navi:NaviController)
         }
 
         override fun hideModeCross() {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             modeCross.value = null
         }
 
         override fun notifyParallelRoad(i: Int) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             if (i == 0) {
                 onInfo.onNext("当前在主辅路过渡")
                 return
@@ -163,12 +195,20 @@ class RunningViewModel(application: Application,private val navi:NaviController)
         }
 
         override fun onLocationChange(aMapNaviLocation: AMapNaviLocation?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             if (aMapNaviLocation != null) {
                 location.value = aMapNaviLocation
             }
         }
 
         override fun updateCameraInfo(aMapNaviCameraInfos: Array<out AMapNaviCameraInfo>?) {
+            val isRun = isRunning.value;
+            if (isRun == null || !isRun) {
+                return
+            }
             if (aMapNaviCameraInfos != null) {
                 cameraInfo.value = aMapNaviCameraInfos;
             }

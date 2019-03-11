@@ -58,7 +58,7 @@ public class CarOverlay
     protected boolean isDirectionVisible = true;
     protected LatLng endLatLng = null;
     protected Polyline leaderLine = null;
-    protected final int DISTANCE_OFFSET = 150;// 默认 500 偏差
+    protected static final int DISTANCE_OFFSET = 500;// 默认 500 偏差
     private Context context;
 
     public int zoom = 20;
