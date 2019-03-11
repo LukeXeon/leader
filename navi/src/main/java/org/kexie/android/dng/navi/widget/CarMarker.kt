@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.widget
 
+import android.animation.PropertyValuesHolder
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -18,41 +19,43 @@ class CarMarker(context: Context, private val map: AMap) {
     private var directionMarker: Marker
     private var valueAnimator: ValueAnimator? = null
     private lateinit var last: Location
-    private var time = FIRST_TIME
+    private var time = BASE_TIME
     var isVisible: Boolean
         get() = carMarker.isVisible && directionMarker.isVisible
         set(value) {
             carMarker.isVisible = value;
             directionMarker.isVisible = value
+            directionMarker.setToTop()
+            carMarker.setToTop()
         }
     var zoom: Float = 20f
     var isLock: Boolean = false
-    var offsetX: Float = 0f
-    var offsetY: Float = 0f
 
-    private data class Location(val point: Point, val bearing: Float)
+    private data class Location(var point: Point, var bearing: Float)
 
     init {
         fun getMarker(res: Int): Marker {
-            val carBitmapDescriptor = BitmapDescriptorFactory
+            val descriptor = BitmapDescriptorFactory
                     .fromBitmap(BitmapFactory.decodeResource(this.context
                             .resources, res))
             return map.addMarker(MarkerOptions()
                     .anchor(0.5f, 0.5f)
+                    .position(LatLng(0.0, 0.0))
                     .setFlat(true)
-                    .icon(carBitmapDescriptor))
+                    .icon(descriptor))
         }
         carMarker = getMarker(R.drawable.caricon)
         directionMarker = getMarker(R.drawable.navi_direction)
         isVisible = false
     }
 
-    fun draw(location: Point,bearing:Float) {
+    fun draw(location: Point, bearing: Float) {
         fun apply(it: Location) {
             val point = it.point.unBox(LatLng::class.java)
             directionMarker.position = point
             carMarker.position = point
             carMarker.rotateAngle = 360 - it.bearing
+            isVisible = true
             if (!isLock) {
                 return
             }
@@ -63,26 +66,31 @@ class CarMarker(context: Context, private val map: AMap) {
                     .target(point)
                     .build()))
         }
-        isVisible = true
-        var animator = valueAnimator;
+        val animator = valueAnimator;
         if (animator == null) {
             last = Location(location, bearing)
-            valueAnimator = ValueAnimator()
-        } else {
-            if (animator.isRunning && time > FIRST_TIME) {
-                time /= 2
-            } else {
-                time *= 2
-            }
-            animator.pause()
-            animator.removeAllUpdateListeners()
-            animator = ValueAnimator.ofObject(evaluator,
-                    last, Location(location, bearing))
-            animator.addUpdateListener { animation ->
+            apply(last)
+            val newAnimator = ValueAnimator()
+            newAnimator.interpolator = interpolator
+            newAnimator.duration = time
+            newAnimator.addUpdateListener { animation ->
                 last = animation.animatedValue as Location
                 apply(last)
             }
-            animator.interpolator = interpolator
+            valueAnimator = newAnimator
+        } else {
+            if (animator.isRunning) {
+                animator.cancel()
+                if (time > BASE_TIME) {
+                    time /= 2
+                } else {
+                    time *= 2
+                }
+            }
+            animator.setValues(PropertyValuesHolder.ofObject("",
+                    evaluator,
+                    last,
+                    Location(location, bearing)))
             animator.duration = time
             animator.start()
             valueAnimator = animator
@@ -107,7 +115,7 @@ class CarMarker(context: Context, private val map: AMap) {
                 return Location(point, bearing)
             }
         }
-        private const val FIRST_TIME: Long = 50
+        private const val BASE_TIME: Long = 50
         private const val TILT = 80f
     }
 }

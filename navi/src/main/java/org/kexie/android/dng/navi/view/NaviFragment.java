@@ -102,10 +102,12 @@ public final class NaviFragment extends Fragment
         AMapCompatFragment mapFragment = (AMapCompatFragment)
                 Objects.requireNonNull(getChildFragmentManager()
                         .findFragmentById(R.id.map_view));
-        mapController = mapFragment.getMap();
-        carMarker = new CarMarker(requireContext(), mapController);
-        carMarker.setOffsetX(140);
-        cameraOverlay = new AmapCameraOverlay(requireContext());
+        mapController = Objects.requireNonNull(mapFragment.getMap());
+        mapController.setOnMapLoadedListener(() -> {
+            carMarker = new CarMarker(requireContext(), mapController);
+            cameraOverlay = new AmapCameraOverlay(requireContext());
+            mapController.setOnMapLoadedListener(null);
+        });
 
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
 
@@ -184,10 +186,10 @@ public final class NaviFragment extends Fragment
         });
 
         //running
-        runningViewModel.isLockCamera().observe(this, carMarker::setLock);
-        runningViewModel.getLocation().observe(this, data -> {
-            carMarker.draw(Point.box(data.getCoord()), data.getBearing());
-        });
+        runningViewModel.isLockCamera().observe(this,
+                data -> carMarker.setLock(data));
+        runningViewModel.getLocation().observe(this,
+                data -> carMarker.draw(Point.box(data.getCoord()), data.getBearing()));
         runningViewModel.getCameraInfo().observe(this,
                 cameraInfos -> cameraOverlay.draw(mapController, cameraInfos));
         runningViewModel.getModeCross().observe(this, data -> {
@@ -319,7 +321,6 @@ public final class NaviFragment extends Fragment
         });
         runningViewModel.isRunning().setValue(false);
     }
-
 
     @Override
     public void onDestroy()
