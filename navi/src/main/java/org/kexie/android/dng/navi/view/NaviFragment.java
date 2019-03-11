@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -7,6 +8,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -25,8 +28,10 @@ import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.navi.view.AmapCameraOverlay;
 import com.amap.api.navi.view.RouteOverLay;
+import com.bumptech.glide.Glide;
 import com.orhanobut.logger.Logger;
 
+import org.kexie.android.common.util.AnimationAdapter;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviBinding;
 import org.kexie.android.dng.navi.model.Point;
@@ -93,25 +98,44 @@ public final class NaviFragment extends Fragment
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
 
+        binding.setLifecycleOwner(this);
+        binding.setIsLoaded(false);
+        Glide.with(this)
+                .load(R.drawable.image_splash)
+                .into(binding.loading);
+        binding.loading.setOnTouchListener((x, y) -> true);
+
         AMapCompatFragment mapFragment = (AMapCompatFragment)
                 Objects.requireNonNull(getChildFragmentManager()
                         .findFragmentById(R.id.map_view));
         mapController = Objects.requireNonNull(mapFragment.getMap());
         mapController.setOnMapLoadedListener(() -> {
+            AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+            alphaAnimation.setDuration(1500);
+            alphaAnimation.setAnimationListener(new AnimationAdapter()
+            {
+                @Override
+                public void onAnimationEnd(Animation animation)
+                {
+                    binding.loading.setVisibility(View.GONE);
+                    binding.loading.setOnTouchListener(null);
+                }
+            });
+            binding.loading.startAnimation(alphaAnimation);
+            binding.setIsLoaded(true);
             carMarker = new CarMarker(requireContext(), mapController);
             cameraOverlay = new AmapCameraOverlay(requireContext());
             mapController.setOnMapLoadedListener(null);
         });
 
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
-
-        binding.setLifecycleOwner(this);
 
         runningViewModel = ViewModelProviders.of(this, factory).get(RunningViewModel.class);
         queryViewModel = ViewModelProviders.of(this, factory).get(QueryViewModel.class);
