@@ -21,7 +21,6 @@ public final class PermissionsInitializer
     @Override
     public boolean onCreate()
     {
-
         init(getContext());
         return true;
     }

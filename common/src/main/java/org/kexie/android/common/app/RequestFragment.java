@@ -1,6 +1,5 @@
 package org.kexie.android.common.app;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -66,7 +65,6 @@ public final class RequestFragment
                         .getApplicationInfo().uid);
     }
 
-    @SuppressLint("ObsoleteSdkInt")
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -77,11 +75,11 @@ public final class RequestFragment
                 permissions,
                 grantResults
         );
-        Context application = Objects.requireNonNull(getContext())
+        Context application = requireContext()
                 .getApplicationContext();
         if (requestCode == application.getApplicationInfo().uid)
         {
-            getFragmentManager()
+            requireFragmentManager()
                     .beginTransaction()
                     .remove(this)
                     .commit();

@@ -39,8 +39,7 @@ class QueryViewModel(application: Application,private val navi:NaviController)
                 start()
             }
 
-    var networkTest: Boolean = false
-        private set
+    val networkTest = MutableLiveData<Boolean>()
 
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
 
@@ -53,7 +52,7 @@ class QueryViewModel(application: Application,private val navi:NaviController)
     val onSuccess = PublishSubject.create<String>()
 
     init {
-        ping()
+        networkPingTest()
     }
 
     fun query(query: Query) {
@@ -205,13 +204,13 @@ class QueryViewModel(application: Application,private val navi:NaviController)
     }
 
     @Suppress("MissingPermission", "CheckResult")
-    private fun ping() {
+    private fun networkPingTest() {
         Observable.just(Unit)
                 .observeOn(Schedulers.io())
-                .map { NetworkUtils.isAvailableByPing() }
+                .map { NetworkUtils.isAvailableByPing("www.baidu.com") }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { isAvailable ->
-                    networkTest = isAvailable
+                    networkTest.value = isAvailable
                     if (!isAvailable) {
                         onError.onNext("无网络连接")
                     }

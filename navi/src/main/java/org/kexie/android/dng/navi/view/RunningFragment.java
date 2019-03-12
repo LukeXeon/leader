@@ -6,11 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviRunningBinding;
 import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -89,6 +91,26 @@ public final class RunningFragment extends Fragment
         runningViewModel.getOnInfo().observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(x -> Toasty.info(requireContext(), x).show());
+        requireActivity().addOnBackPressedCallback(this,
+                new OnBackPressedCallback()
+                {
+                    private long last = System.currentTimeMillis();
+
+                    @Override
+                    public boolean handleOnBackPressed()
+                    {
+                        long now = System.currentTimeMillis();
+                        Logger.d(now - last);
+                        if (now - last > 1000)
+                        {
+                            Toasty.warning(requireContext(), "再按一次退出导航")
+                                    .show();
+                            last = now;
+                            return true;
+                        }
+                        return false;
+                    }
+                });
     }
 
     @Override

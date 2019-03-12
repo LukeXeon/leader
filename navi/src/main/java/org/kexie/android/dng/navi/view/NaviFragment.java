@@ -5,7 +5,9 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.navi.model.RouteOverlayOptions;
 import com.amap.api.navi.view.AmapCameraOverlay;
 import com.amap.api.navi.view.RouteOverLay;
 import com.bumptech.glide.Glide;
@@ -45,6 +48,7 @@ import org.kexie.android.dng.navi.model.Point;
 import org.kexie.android.dng.navi.viewmodel.NaviViewModelFactory;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
+import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo;
 import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarMarker;
@@ -138,10 +142,18 @@ public final class NaviFragment extends Fragment
                 {
                     binding.loading.setVisibility(View.GONE);
                     binding.loading.setOnTouchListener(null);
-                    if (queryViewModel.getNetworkTest())
-                    {
-                        zoomMapToLocation();
-                    }
+                    queryViewModel.getNetworkTest()
+                            .observe(NaviFragment.this,
+                                    new Observer<Boolean>()
+                                    {
+                                        @Override
+                                        public void onChanged(Boolean aBoolean)
+                                        {
+                                            zoomMapToLocation();
+                                            queryViewModel.getNetworkTest()
+                                                    .removeObserver(this);
+                                        }
+                                    });
                 }
             });
             binding.loading.startAnimation(alphaAnimation);
@@ -159,60 +171,16 @@ public final class NaviFragment extends Fragment
         queryViewModel.getRoutes().observe(this, routeInfos -> {
             if (!routeInfos.isEmpty())
             {
-                Context context = requireContext().getApplicationContext();
-                Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-                mapController.moveCamera(CameraUpdateFactory.changeTilt(0));
-                SparseArrayCompat<RouteOverLay> overLays = new SparseArrayCompat<>();
-                StreamSupport.stream(routeInfos.entrySet())
-                        .forEach(entry -> {
-                            RouteOverLay overLay = new RouteOverLay(
-                                    mapController,
-                                    entry.getValue().path,
-                                    context);
-                            overLay.setStartPointBitmap(bitmap);
-                            overLay.setTrafficLine(false);
-                            overLay.addToMap();
-                            overLays.put(entry.getKey(), overLay);
-                        });
-                LatLngBounds latLngBounds = overLays.valueAt(0)
-                        .getAMapNaviPath()
-                        .getBoundsForPath();
-                for (int i = 1; i < overLays.size(); i++)
-                {
-                    LatLngBounds bounds = overLays
-                            .valueAt(i)
-                            .getAMapNaviPath()
-                            .getBoundsForPath();
-                    if (bounds.contains(latLngBounds))
-                    {
-                        latLngBounds = bounds;
-                    }
-                }
-                Logger.d(AutoSizeUtils.dp2px(requireContext(), 450));
-                CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(latLngBounds,
-                        AutoSizeUtils.dp2px(requireContext(), 100),
-                        AutoSizeUtils.dp2px(requireContext(), 450),
-                        AutoSizeUtils.dp2px(requireContext(), 50),
-                        AutoSizeUtils.dp2px(requireContext(), 50));
-                mapController.animateCamera(update, 1000, null);
-                routeOverLays = overLays;
+                drawRoutes(routeInfos);
                 //默认选择第一条路
             } else
             {
-                mapController.clear();
-                Location location = mapController.getMyLocation();
-                if (location != null)
-                {
-                    mapController.animateCamera(CameraUpdateFactory.newLatLngZoom(Point.form(
-                            location.getLongitude(),
-                            location.getLatitude())
-                            .unBox(LatLng.class), 10), 1000, null);
-                }
-                routeOverLays = new SparseArrayCompat<>();
+                clearRoutes();
             }
         });
         queryViewModel.getCurrentSelect().observe(this, select -> {
-            if (select != null && select != QueryViewModel.NO_SELECT)
+            if (select != null && select != QueryViewModel.NO_SELECT
+                    && routeOverLays.size() != 0)
             {
                 for (int i = 0; i < routeOverLays.size(); i++)
                 {
@@ -302,7 +270,60 @@ public final class NaviFragment extends Fragment
         runningViewModel.isRunning().setValue(false);
     }
 
-    @SuppressLint("MissingPermission")
+    private void clearRoutes()
+    {
+        zoomMapToLocation();
+        if (routeOverLays != null)
+        {
+            for (int i = 0; i < routeOverLays.size(); i++)
+            {
+                routeOverLays.valueAt(i).destroy();
+            }
+            routeOverLays.clear();
+        }
+    }
+
+    private void drawRoutes(Map<Integer, RouteInfo> routeInfos)
+    {
+        Context context = requireContext().getApplicationContext();
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        mapController.moveCamera(CameraUpdateFactory.changeTilt(0));
+        SparseArrayCompat<RouteOverLay> overLays = new SparseArrayCompat<>();
+        StreamSupport.stream(routeInfos.entrySet())
+                .forEach(entry -> {
+                    RouteOverLay overLay = new RouteOverLay(
+                            mapController,
+                            entry.getValue().path,
+                            context);
+                    overLay.setStartPointBitmap(bitmap);
+                    overLay.setTrafficLine(false);
+                    overLay.addToMap();
+                    overLays.put(entry.getKey(), overLay);
+                });
+        LatLngBounds latLngBounds = overLays.valueAt(0)
+                .getAMapNaviPath()
+                .getBoundsForPath();
+        for (int i = 1; i < overLays.size(); i++)
+        {
+            LatLngBounds bounds = overLays
+                    .valueAt(i)
+                    .getAMapNaviPath()
+                    .getBoundsForPath();
+            if (bounds.contains(latLngBounds))
+            {
+                latLngBounds = bounds;
+            }
+        }
+        Logger.d(AutoSizeUtils.dp2px(requireContext(), 450));
+        CameraUpdate update = CameraUpdateFactory.newLatLngBoundsRect(latLngBounds,
+                AutoSizeUtils.dp2px(requireContext(), 100),
+                AutoSizeUtils.dp2px(requireContext(), 450),
+                AutoSizeUtils.dp2px(requireContext(), 50),
+                AutoSizeUtils.dp2px(requireContext(), 50));
+        mapController.animateCamera(update, 1000, null);
+        routeOverLays = overLays;
+    }
+
     private void zoomMapToLocation()
     {
         Location location = mapController.getMyLocation();
@@ -335,46 +356,74 @@ public final class NaviFragment extends Fragment
             for (int i = 0; i < routeOverLays.size(); i++)
             {
                 RouteOverLay routeOverLay = routeOverLays.valueAt(i);
+
                 if (routeOverLays.keyAt(i) == select)
                 {
-                    routeOverLay.setTrafficLine(true);
-                    routeOverLay.setTrafficLightsVisible(true);
-                    routeOverLay.setLightsVisible(true);
-                    routeOverLay.setNaviArrowVisible(false);
-                    Location location = mapController.getMyLocation();
-                    LatLng latLng = new LatLng(location.getLatitude(),
-                            location.getLongitude());
-                    carMarker.setLock(false);
-                    carMarker.draw(Point.box(latLng), location.getBearing());
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(latLng)
-                            .bearing(location.getBearing())
-                            .tilt(80)
-                            .zoom(20)
-                            .build();
-                    CameraUpdate cameraUpdate = CameraUpdateFactory
-                            .newCameraPosition(cameraPosition);
-                    mapController.animateCamera(cameraUpdate,
-                            1000, new AMap.CancelableCallback()
-                            {
-                                @Override
-                                public void onFinish()
-                                {
-                                    carMarker.setLock(true);
-                                    runningViewModel.start();
-                                }
-
-                                @Override
-                                public void onCancel()
-                                {
-                                    onFinish();
-                                }
-                            });
+                    selectRoute(routeOverLay);
+                    startNavi();
                     break;
                 }
             }
             removeQueryMapState();
         }
+    }
+
+    private void startNavi()
+    {
+        Location location = mapController.getMyLocation();
+        LatLng latLng = new LatLng(location.getLatitude(),
+                location.getLongitude());
+        carMarker.setLock(false);
+        carMarker.draw(Point.box(latLng), location.getBearing());
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)
+                .bearing(location.getBearing())
+                .tilt(80)
+                .zoom(20)
+                .build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory
+                .newCameraPosition(cameraPosition);
+        mapController.animateCamera(cameraUpdate,
+                1000, new AMap.CancelableCallback()
+                {
+                    @Override
+                    public void onFinish()
+                    {
+                        carMarker.setLock(true);
+                        runningViewModel.start();
+                    }
+
+                    @Override
+                    public void onCancel()
+                    {
+                        onFinish();
+                    }
+                });
+    }
+
+    private void selectRoute(RouteOverLay routeOverLay)
+    {
+        Resources resources = getResources();
+
+        Bitmap smoothTraffic = BitmapFactory.decodeResource(resources, R.mipmap.map_1);
+        Bitmap unknownTraffic = BitmapFactory.decodeResource(resources, R.mipmap.map_2);
+        Bitmap slowTraffic = BitmapFactory.decodeResource(resources, R.mipmap.map_3);
+        Bitmap jamTraffic = BitmapFactory.decodeResource(resources, R.mipmap.map_4);
+        Bitmap veryJamTraffic = BitmapFactory.decodeResource(resources, R.mipmap.map_5);
+
+        RouteOverlayOptions routeOverlayOptions = new RouteOverlayOptions();
+
+        routeOverlayOptions.setSmoothTraffic(smoothTraffic);
+        routeOverlayOptions.setUnknownTraffic(unknownTraffic);
+        routeOverlayOptions.setSlowTraffic(slowTraffic);
+        routeOverlayOptions.setJamTraffic(jamTraffic);
+        routeOverlayOptions.setVeryJamTraffic(veryJamTraffic);
+
+        routeOverLay.setRouteOverlayOptions(routeOverlayOptions);
+        routeOverLay.setTrafficLine(true);
+        routeOverLay.setTrafficLightsVisible(true);
+        routeOverLay.setLightsVisible(true);
+        routeOverLay.setNaviArrowVisible(false);
     }
 
     private void removeQueryMapState()
