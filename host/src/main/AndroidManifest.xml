@@ -51,6 +51,7 @@
             android:name="design_height_in_dp"
             android:value="552"/>
         <activity
+            android:launchMode="singleInstance"
             android:name=".HostActivity"
             android:screenOrientation="landscape">
         </activity>

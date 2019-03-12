@@ -48,7 +48,7 @@ public final class SplashActivity extends AppCompatActivity
         binding.setIsFirst(isFirst || BuildConfig.DEBUG);
         if (isFirst || BuildConfig.DEBUG)
         {
-            Adapter adapter = new Adapter(R.mipmap.image_background, R.mipmap.image_background);
+            SplashAdapter adapter = new SplashAdapter(R.mipmap.image_background, R.mipmap.image_background);
             binding.setAdapter(adapter);
             binding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
             {
@@ -58,7 +58,8 @@ public final class SplashActivity extends AppCompatActivity
                     if (position == adapter.getCount() - 1)
                     {
                         jump.run();
-                        preferences.edit().putBoolean(IS_FIRST, false)
+                        preferences.edit()
+                                .putBoolean(IS_FIRST, false)
                                 .apply();
                     }
                 }
@@ -69,14 +70,14 @@ public final class SplashActivity extends AppCompatActivity
         }
     }
 
-    private static final class Adapter extends PagerAdapter
+    private static final class SplashAdapter extends PagerAdapter
     {
         private final int[] imageIds;
         private final AppCompatImageView[] imageViews;
         private AppCompatImageView last;
 
 
-        private Adapter(int... images)
+        private SplashAdapter(int... images)
         {
             this.imageIds = images;
             this.imageViews = new AppCompatImageView[images.length];
