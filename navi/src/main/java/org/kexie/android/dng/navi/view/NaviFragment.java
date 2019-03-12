@@ -62,6 +62,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
@@ -110,7 +111,7 @@ public final class NaviFragment extends Fragment
         return binding.getRoot();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "MissingPermission"})
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
@@ -137,15 +138,9 @@ public final class NaviFragment extends Fragment
                 {
                     binding.loading.setVisibility(View.GONE);
                     binding.loading.setOnTouchListener(null);
-
-                    Location location = mapController.getMyLocation();
-                    if (location != null)
+                    if (queryViewModel.getNetworkTest())
                     {
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        mapController.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,
-                                mapController.getMaxZoomLevel() - 2),
-                                1000,
-                                null);
+                        zoomMapToLocation();
                     }
                 }
             });
@@ -182,9 +177,12 @@ public final class NaviFragment extends Fragment
                 LatLngBounds latLngBounds = overLays.valueAt(0)
                         .getAMapNaviPath()
                         .getBoundsForPath();
-                for (int i = 0; i < overLays.size(); i++)
+                for (int i = 1; i < overLays.size(); i++)
                 {
-                    LatLngBounds bounds = overLays.valueAt(i).getAMapNaviPath().getBoundsForPath();
+                    LatLngBounds bounds = overLays
+                            .valueAt(i)
+                            .getAMapNaviPath()
+                            .getBoundsForPath();
                     if (bounds.contains(latLngBounds))
                     {
                         latLngBounds = bounds;
@@ -287,102 +285,12 @@ public final class NaviFragment extends Fragment
             {
                 postcard = ARouter.getInstance().build("/navi/running");
                 Logger.d("/navi/running");
-
-                Integer select = queryViewModel.getCurrentSelect().getValue();
-                if (select != null && select != QueryViewModel.NO_SELECT)
-                {
-                    Logger.d("select=" + select);
-                    for (int i = 0; i < routeOverLays.size(); i++)
-                    {
-                        RouteOverLay routeOverLay = routeOverLays.valueAt(i);
-                        if (routeOverLays.keyAt(i) == select)
-                        {
-                            Logger.d("index=" + i);
-                            routeOverLay.setTrafficLine(true);
-                            routeOverLay.setTrafficLightsVisible(true);
-                            routeOverLay.setLightsVisible(true);
-                            routeOverLay.setNaviArrowVisible(false);
-                            Location location = mapController.getMyLocation();
-                            LatLng latLng = new LatLng(location.getLatitude(),
-                                    location.getLongitude());
-                            carMarker.setLock(false);
-
-                            carMarker.draw(Point.box(latLng), location.getBearing());
-                            CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(latLng)
-                                    .bearing(location.getBearing())
-                                    .tilt(80)
-                                    .zoom(20)
-                                    .build();
-                            CameraUpdate cameraUpdate = CameraUpdateFactory
-                                    .newCameraPosition(cameraPosition);
-                            mapController.animateCamera(cameraUpdate,
-                                    1000, new AMap.CancelableCallback()
-                                    {
-                                        @Override
-                                        public void onFinish()
-                                        {
-                                            carMarker.setLock(true);
-                                            runningViewModel.start();
-                                        }
-
-                                        @Override
-                                        public void onCancel()
-                                        {
-                                            onFinish();
-                                        }
-                                    });
-                            break;
-                        }
-                    }
-                    mapController.setMyLocationEnabled(false);
-                    UiSettings uiSettings = mapController.getUiSettings();
-                    uiSettings.setMyLocationButtonEnabled(false);
-                    uiSettings.setZoomControlsEnabled(false);
-                    for (Map.Entry<Circle, Animator> entry : circles.entrySet())
-                    {
-                        entry.getValue().cancel();
-                        entry.getKey().remove();
-                    }
-                    circles.clear();
-                }
+                setRunningMapState();
             } else
             {
                 postcard = ARouter.getInstance().build("/navi/query");
                 Logger.d("/navi/query");
-                MyLocationStyle myLocationStyle = new MyLocationStyle()
-                        .radiusFillColor(Color.TRANSPARENT)
-                        .strokeColor(Color.TRANSPARENT)
-                        .interval(1000)
-                        .strokeWidth(0);
-                mapController.setMyLocationStyle(myLocationStyle);
-                mapController.setOnMyLocationChangeListener(location -> {
-                    MyLocationStyle myLocationStyle1 = mapController.getMyLocationStyle()
-                            .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-                    mapController.setMyLocationStyle(myLocationStyle1);
-                    AMap.OnMyLocationChangeListener listener = location1 -> {
-                        LatLng latLng1 = new LatLng(location1.getLatitude(), location1.getLongitude());
-                        if (circles == null)
-                        {
-                            circles = new ArrayMap<>();
-                            for (int i = 0; i < 3; i++)
-                            {
-                                Circle circle = addCircle(latLng1);
-                                Animator animator = startScaleCircleAnimation(circle, i * 800);
-                                circles.put(circle, animator);
-                            }
-                        }
-                        for (Circle circle : circles.keySet())
-                        {
-                            circle.setCenter(latLng1);
-                        }
-                    };
-                    listener.onMyLocationChange(location);
-                    mapController.setOnMyLocationChangeListener(listener);
-                });
-                mapController.setMyLocationEnabled(true);
-                UiSettings uiSettings = mapController.getUiSettings();
-                uiSettings.setMyLocationButtonEnabled(true);
+                setQueryMapState();
             }
             Fragment fragment = (Fragment) postcard.navigation();
             getChildFragmentManager()
@@ -392,6 +300,135 @@ public final class NaviFragment extends Fragment
                     .commit();
         });
         runningViewModel.isRunning().setValue(false);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void zoomMapToLocation()
+    {
+        Location location = mapController.getMyLocation();
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng,
+                mapController.getMaxZoomLevel() - 2);
+        mapController.animateCamera(cameraUpdate, 1000,
+                new AMap.CancelableCallback()
+                {
+                    @Override
+                    public void onFinish()
+                    {
+
+                    }
+
+                    @Override
+                    public void onCancel()
+                    {
+                        mapController.moveCamera(cameraUpdate);
+                    }
+                });
+    }
+
+    private void setRunningMapState()
+    {
+        Integer select = queryViewModel.getCurrentSelect().getValue();
+        if (select != null && select != QueryViewModel.NO_SELECT)
+        {
+            Logger.d("select=" + select);
+            for (int i = 0; i < routeOverLays.size(); i++)
+            {
+                RouteOverLay routeOverLay = routeOverLays.valueAt(i);
+                if (routeOverLays.keyAt(i) == select)
+                {
+                    routeOverLay.setTrafficLine(true);
+                    routeOverLay.setTrafficLightsVisible(true);
+                    routeOverLay.setLightsVisible(true);
+                    routeOverLay.setNaviArrowVisible(false);
+                    Location location = mapController.getMyLocation();
+                    LatLng latLng = new LatLng(location.getLatitude(),
+                            location.getLongitude());
+                    carMarker.setLock(false);
+                    carMarker.draw(Point.box(latLng), location.getBearing());
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(latLng)
+                            .bearing(location.getBearing())
+                            .tilt(80)
+                            .zoom(20)
+                            .build();
+                    CameraUpdate cameraUpdate = CameraUpdateFactory
+                            .newCameraPosition(cameraPosition);
+                    mapController.animateCamera(cameraUpdate,
+                            1000, new AMap.CancelableCallback()
+                            {
+                                @Override
+                                public void onFinish()
+                                {
+                                    carMarker.setLock(true);
+                                    runningViewModel.start();
+                                }
+
+                                @Override
+                                public void onCancel()
+                                {
+                                    onFinish();
+                                }
+                            });
+                    break;
+                }
+            }
+            removeQueryMapState();
+        }
+    }
+
+    private void removeQueryMapState()
+    {
+        mapController.setMyLocationEnabled(false);
+        UiSettings uiSettings = mapController.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(false);
+        uiSettings.setZoomControlsEnabled(false);
+        StreamSupport.stream(circles.entrySet())
+                .forEach(entry -> {
+                    entry.getValue().cancel();
+                    entry.getKey().remove();
+                });
+        circles.clear();
+    }
+
+    private void setQueryMapState()
+    {
+        MyLocationStyle myLocationStyle = new MyLocationStyle()
+                .radiusFillColor(Color.TRANSPARENT)
+                .strokeColor(Color.TRANSPARENT)
+                .interval(1000)
+                .strokeWidth(0);
+        mapController.setMyLocationStyle(myLocationStyle);
+        mapController.setOnMyLocationChangeListener(getLocationListener());
+        mapController.setMyLocationEnabled(true);
+        UiSettings uiSettings = mapController.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(true);
+    }
+
+    private AMap.OnMyLocationChangeListener getLocationListener()
+    {
+        AMap.OnMyLocationChangeListener normal = location -> {
+            LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
+            if (circles == null)
+            {
+                circles = new ArrayMap<>();
+                IntStreams.iterate(0, i -> i < 3, i -> i + 1)
+                        .forEach(i -> {
+                            Circle circle = addCircle(latLng1);
+                            Animator animator = startScaleCircleAnimation(circle, i * 800);
+                            circles.put(circle, animator);
+                        });
+            }
+            StreamSupport.stream(circles.keySet())
+                    .forEach(circle -> circle.setCenter(latLng1));
+        };
+        return location -> {
+            MyLocationStyle myLocationStyle1 = mapController.getMyLocationStyle()
+                    .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
+            mapController.setMyLocationStyle(myLocationStyle1);
+            normal.onMyLocationChange(location);
+            mapController.setOnMyLocationChangeListener(normal);
+        };
     }
 
     private Circle addCircle(LatLng latLng)

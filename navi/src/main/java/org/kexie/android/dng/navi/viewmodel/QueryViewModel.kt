@@ -1,7 +1,6 @@
 package org.kexie.android.dng.navi.viewmodel
 
 import android.app.Application
-import android.os.Handler
 import android.os.HandlerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +9,7 @@ import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
 import com.amap.api.services.core.PoiItem
 import com.amap.api.services.poisearch.PoiSearch
+import com.blankj.utilcode.util.NetworkUtils
 import com.orhanobut.logger.Logger
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -18,8 +18,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.Exceptions
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.kexie.android.dng.navi.model.Point
 import org.kexie.android.dng.navi.model.Query
 import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo
@@ -29,7 +27,6 @@ import org.kexie.android.dng.navi.widget.AMapCompat
 import org.kexie.android.dng.navi.widget.NaviCallback
 import java.text.DecimalFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 typealias NaviController = com.amap.api.navi.AMapNavi;
@@ -42,7 +39,8 @@ class QueryViewModel(application: Application,private val navi:NaviController)
                 start()
             }
 
-    private val handler = Handler(worker.looper)
+    var networkTest: Boolean = false
+        private set
 
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
 
@@ -206,22 +204,18 @@ class QueryViewModel(application: Application,private val navi:NaviController)
                 .build()
     }
 
+    @Suppress("MissingPermission", "CheckResult")
     private fun ping() {
-        handler.post {
-            val okHttpClient = OkHttpClient.Builder()
-                    .connectTimeout(3, TimeUnit.SECONDS)
-                    .build()
-            val request = Request.Builder()
-                    .get()
-                    .url("https://www.baidu.com")
-                    .build()
-            try {
-                okHttpClient.newCall(request).execute()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onError.onNext("网络异常,请检查网络连接")
-            }
-        }
+        Observable.just(Unit)
+                .observeOn(Schedulers.io())
+                .map { NetworkUtils.isAvailableByPing() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { isAvailable ->
+                    networkTest = isAvailable
+                    if (!isAvailable) {
+                        onError.onNext("无网络连接")
+                    }
+                }
     }
 
     companion object {
@@ -317,6 +311,5 @@ class QueryViewModel(application: Application,private val navi:NaviController)
             }
             return dis.toString() + "米"
         }
-
     }
 }
