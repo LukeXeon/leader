@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.view;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -8,13 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
 import com.alibaba.android.arouter.facade.Postcard;
@@ -51,10 +50,12 @@ import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarMarker;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
 import androidx.collection.SparseArrayCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -67,8 +68,6 @@ import me.jessyan.autosize.utils.AutoSizeUtils;
 @Route(path = "/navi/navi")
 public final class NaviFragment extends Fragment
 {
-
-    private static final Interpolator interpolator = new LinearInterpolator();
 
     private FragmentNaviBinding binding;
 
@@ -88,7 +87,7 @@ public final class NaviFragment extends Fragment
 
     private AmapCameraOverlay cameraOverlay;
 
-    private Circle[] circles;
+    private Map<Circle, Animator> circles;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -130,7 +129,7 @@ public final class NaviFragment extends Fragment
         mapController = Objects.requireNonNull(mapFragment.getMap());
         mapController.setOnMapLoadedListener(() -> {
             AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-            alphaAnimation.setDuration(1500);
+            alphaAnimation.setDuration(1000);
             alphaAnimation.setAnimationListener(new AnimationAdapter()
             {
                 @Override
@@ -138,6 +137,16 @@ public final class NaviFragment extends Fragment
                 {
                     binding.loading.setVisibility(View.GONE);
                     binding.loading.setOnTouchListener(null);
+
+                    Location location = mapController.getMyLocation();
+                    if (location != null)
+                    {
+                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        mapController.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,
+                                mapController.getMaxZoomLevel() - 2),
+                                1000,
+                                null);
+                    }
                 }
             });
             binding.loading.startAnimation(alphaAnimation);
@@ -330,36 +339,42 @@ public final class NaviFragment extends Fragment
                     UiSettings uiSettings = mapController.getUiSettings();
                     uiSettings.setMyLocationButtonEnabled(false);
                     uiSettings.setZoomControlsEnabled(false);
+                    for (Map.Entry<Circle, Animator> entry : circles.entrySet())
+                    {
+                        entry.getValue().cancel();
+                        entry.getKey().remove();
+                    }
+                    circles.clear();
                 }
             } else
             {
                 postcard = ARouter.getInstance().build("/navi/query");
                 Logger.d("/navi/query");
-
-                MyLocationStyle myLocationStyle = new MyLocationStyle().interval(1000);
+                MyLocationStyle myLocationStyle = new MyLocationStyle()
+                        .radiusFillColor(Color.TRANSPARENT)
+                        .strokeColor(Color.TRANSPARENT)
+                        .interval(1000)
+                        .strokeWidth(0);
                 mapController.setMyLocationStyle(myLocationStyle);
                 mapController.setOnMyLocationChangeListener(location -> {
-                    MyLocationStyle myLocationStyle1 = new MyLocationStyle()
+                    MyLocationStyle myLocationStyle1 = mapController.getMyLocationStyle()
                             .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
                     mapController.setMyLocationStyle(myLocationStyle1);
                     AMap.OnMyLocationChangeListener listener = location1 -> {
-                        LatLng latLng = new LatLng(location1.getLatitude(), location1.getLongitude());
+                        LatLng latLng1 = new LatLng(location1.getLatitude(), location1.getLongitude());
                         if (circles == null)
                         {
-                            circles = new Circle[3];
-                            Handler handler = new Handler();
-                            for (int i = 0; i < circles.length; i++)
+                            circles = new ArrayMap<>();
+                            for (int i = 0; i < 3; i++)
                             {
-                                Circle circle = addCircle(latLng);
-                                circles[i] = circle;
-                                handler.postDelayed(() -> {
-                                    startScaleCircleAnimation(circle);
-                                }, i * 800);
+                                Circle circle = addCircle(latLng1);
+                                Animator animator = startScaleCircleAnimation(circle, i * 800);
+                                circles.put(circle, animator);
                             }
                         }
-                        for (Circle circle : circles)
+                        for (Circle circle : circles.keySet())
                         {
-                            circle.setCenter(latLng);
+                            circle.setCenter(latLng1);
                         }
                     };
                     listener.onMyLocationChange(location);
@@ -382,37 +397,35 @@ public final class NaviFragment extends Fragment
     private Circle addCircle(LatLng latLng)
     {
         float accuracy = (float) ((latLng.longitude / latLng.latitude) * 20);
-        Logger.d(accuracy);
         return mapController.addCircle(new CircleOptions()
                 .center(latLng)
-                .visible(true)
                 .fillColor(Color.argb(0, 98, 198, 255))
                 .radius(accuracy)
                 .strokeColor(Color.argb(0, 98, 198, 255))
                 .strokeWidth(0));
     }
 
-    private static void startScaleCircleAnimation(Circle circle)
+    private static Animator startScaleCircleAnimation(Circle circle, long startDelay)
     {
         ValueAnimator vm = ValueAnimator.ofFloat(0, (float) circle.getRadius());
-        vm.addUpdateListener(animation -> {
-            float current = (float) animation.getAnimatedValue();
-            circle.setRadius(current);
-        });
+        vm.addUpdateListener(animation -> circle.setRadius((float) animation.getAnimatedValue()));
         ValueAnimator vm1 = ValueAnimator.ofInt(160, 0);
-        vm1.addUpdateListener(animation -> {
-            int color = (int) animation.getAnimatedValue();
-            circle.setFillColor(Color.argb(color, 98, 198, 255));
-        });
-        vm.setRepeatCount(Integer.MAX_VALUE);
+        vm1.addUpdateListener(animation -> circle
+                .setFillColor(Color.argb((int) animation.getAnimatedValue(),
+                        98,
+                        198,
+                        255)));
+        vm.setRepeatCount(ValueAnimator.INFINITE);
         vm.setRepeatMode(ValueAnimator.RESTART);
-        vm1.setRepeatCount(Integer.MAX_VALUE);
+        vm1.setRepeatCount(ValueAnimator.INFINITE);
         vm1.setRepeatMode(ValueAnimator.RESTART);
         AnimatorSet set = new AnimatorSet();
-        set.play(vm).with(vm1);
+        set.setStartDelay(startDelay);
+        set.playTogether(vm, vm1);
         set.setDuration(2500);
-        set.setInterpolator(interpolator);
+        set.setInterpolator(new LinearInterpolator());
         set.start();
+        return set;
     }
 
     @Override

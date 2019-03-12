@@ -71,7 +71,7 @@ class CarMarker(context: Context, private val map: AMap) {
             last = Location(location, bearing)
             apply(last)
             val newAnimator = ValueAnimator()
-            newAnimator.interpolator = interpolator
+            newAnimator.interpolator = LinearInterpolator()
             newAnimator.duration = time
             newAnimator.addUpdateListener { animation ->
                 last = animation.animatedValue as Location
@@ -98,13 +98,12 @@ class CarMarker(context: Context, private val map: AMap) {
     }
 
     companion object {
-        private val interpolator = LinearInterpolator()
         private val evaluator = object : TypeEvaluator<Location> {
             override fun evaluate(fraction: Float, startValue: Location, endValue: Location): Location {
                 val x = endValue.point.longitude - startValue.point.longitude
                 val y = endValue.point.latitude - startValue.point.latitude
                 val point = Point.form(startValue.point.longitude + x * fraction,
-                        startValue.point.latitude + y * fraction);
+                        startValue.point.latitude + y * fraction)
                 var r = endValue.bearing - startValue.bearing
                 if (r > 180) {
                     r -= 360

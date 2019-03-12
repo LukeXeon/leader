@@ -24,7 +24,6 @@ public final class HostActivity extends AppCompatActivity
         DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
 
-
         Fragment fragment = (Fragment) ARouter.getInstance()
                 .build("/ux/main")
                 .navigation();

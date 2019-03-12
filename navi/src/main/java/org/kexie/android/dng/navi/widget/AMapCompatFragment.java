@@ -15,7 +15,6 @@ import com.amap.api.col.n3.ht;
 import com.amap.api.col.n3.on;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
-import com.amap.api.maps.TextureSupportMapFragment;
 import com.autonavi.amap.mapcore.interfaces.IAMap;
 import com.autonavi.amap.mapcore.interfaces.IMapFragmentDelegate;
 
@@ -39,15 +38,15 @@ public final class AMapCompatFragment extends Fragment
     {
     }
 
-    public static TextureSupportMapFragment newInstance()
+    public static AMapCompatFragment newInstance()
     {
         return newInstance(new AMapOptions());
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static TextureSupportMapFragment newInstance(AMapOptions var0)
+    public static AMapCompatFragment newInstance(AMapOptions var0)
     {
-        TextureSupportMapFragment var1 = new TextureSupportMapFragment();
+        AMapCompatFragment var1 = new AMapCompatFragment();
         Bundle var2 = new Bundle();
 
         Parcel var3;
