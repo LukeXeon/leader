@@ -102,7 +102,8 @@ public final class SplashActivity extends AppCompatActivity
             {
                 last = new AppCompatImageView(context);
                 last.setScaleType(AppCompatImageView.ScaleType.CENTER_CROP);
-                Glide.with(last).load(R.mipmap.image_background)
+                Glide.with(last)
+                        .load(R.mipmap.image_background)
                         .into(last);
             }
             if (imageIds.length == position)

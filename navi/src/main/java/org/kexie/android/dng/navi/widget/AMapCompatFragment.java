@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.amap.api.col.n3.ck;
 import com.amap.api.col.n3.ht;
@@ -28,8 +27,7 @@ import androidx.fragment.app.Fragment;
 import me.jessyan.autosize.internal.CancelAdapt;
 
 public final class AMapCompatFragment extends Fragment
-        implements ViewTreeObserver.OnGlobalLayoutListener,
-        CancelAdapt
+        implements CancelAdapt
 {
     private AMap map;
     private IMapFragmentDelegate mapFragmentDelegate;
@@ -164,7 +162,8 @@ public final class AMapCompatFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        view.getViewTreeObserver().addOnGlobalLayoutListener(this);
+        ViewGroup viewGroup = (ViewGroup) view;
+        viewGroup.removeView(viewGroup.getChildAt(2));
     }
 
     @Override
@@ -198,8 +197,6 @@ public final class AMapCompatFragment extends Fragment
     {
         try
         {
-            this.requireView().getViewTreeObserver()
-                    .removeOnGlobalLayoutListener(this);
             this.getMapFragmentDelegate().onDestroyView();
         } catch (Throwable var1)
         {
@@ -272,20 +269,6 @@ public final class AMapCompatFragment extends Fragment
         } else
         {
             this.getMapFragmentDelegate().setVisibility(8);
-        }
-    }
-
-    @Override
-    public void onGlobalLayout()
-    {
-        View view = getView();
-        if (view instanceof ViewGroup)
-        {
-            View logo = ((ViewGroup) view).getChildAt(2);
-            if (logo != null)
-            {
-                logo.setVisibility(View.GONE);
-            }
         }
     }
 }

@@ -19,7 +19,6 @@ import org.kexie.android.dng.navi.viewmodel.InputTipViewModel;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -75,8 +74,7 @@ public final class TipsFragment extends Fragment
             List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
             if (inputTips != null && !inputTips.isEmpty())
             {
-                inputTipViewModel.getQueryText().setValue("");
-                inputTipViewModel.getInputTips().setValue(Collections.emptyList());
+                inputTipViewModel.clear();
                 return true;
             }
             return false;
@@ -93,8 +91,7 @@ public final class TipsFragment extends Fragment
             InputTip inputTip = Objects.requireNonNull(adapter.getItem(position));
             queryViewModel.query(inputTip);
         }));
-
-        binding.setIsShowTips(false);
+        
         binding.setIsShowQuery(false);
         binding.setStartQuery(new RxOnClick(this, v -> binding.setIsShowQuery(true)));
         binding.setLifecycleOwner(this);
@@ -140,5 +137,14 @@ public final class TipsFragment extends Fragment
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe(data -> Toasty.success(requireContext(), data).show());
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden)
+    {
+        if (!hidden)
+        {
+            inputTipViewModel.clear();
+        }
     }
 }

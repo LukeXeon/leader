@@ -86,6 +86,11 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun clear() {
+        queryText.value = ""
+        inputTips.value = emptyList()
+    }
+
     override fun onCleared() {
         locationSource.stopLocation()
         worker.quitSafely()

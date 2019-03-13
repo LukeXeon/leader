@@ -1,6 +1,5 @@
 package org.kexie.android.dng.navi.widget;
 
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
@@ -16,11 +15,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.LifecycleOwner;
 
 public final class AMapCompat
 {
@@ -98,43 +93,17 @@ public final class AMapCompat
     {
         Fragment fragment = Objects.requireNonNull(Fragment.class.cast(mapFragment));
         ViewGroup mapLayout = Objects.requireNonNull((ViewGroup) fragment.getView());
-        HideLogoObserver hideLogoObserver = new HideLogoObserver(mapLayout);
-        fragment.getLifecycle().addObserver(hideLogoObserver);
-        mapLayout.getViewTreeObserver().addOnGlobalLayoutListener(hideLogoObserver);
-    }
-
-    private static final class HideLogoObserver
-            implements ViewTreeObserver.OnGlobalLayoutListener,
-            LifecycleEventObserver
-    {
-
-        private final ViewGroup mapLayout;
-
-        private HideLogoObserver(ViewGroup mapLayout)
+        mapLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
         {
-            this.mapLayout = mapLayout;
-        }
-
-        @Override
-        public void onGlobalLayout()
-        {
-            View logo = mapLayout.getChildAt(2);
-            if (logo != null)
+            @Override
+            public void onGlobalLayout()
             {
-                logo.setVisibility(View.GONE);
-            }
-        }
-
-        @Override
-        public void onStateChanged(@NonNull LifecycleOwner source,
-                                   @NonNull Lifecycle.Event event)
-        {
-            if (Lifecycle.Event.ON_DESTROY.equals(event))
-            {
+                mapLayout.removeView(mapLayout.getChildAt(2));
                 mapLayout.getViewTreeObserver()
                         .removeOnGlobalLayoutListener(this);
             }
-        }
+        });
     }
+
 }
 
