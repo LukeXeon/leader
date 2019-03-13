@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.databinding.RxOnClick;
 import org.kexie.android.dng.navi.BR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryTipsBinding;
@@ -35,7 +37,7 @@ import static androidx.lifecycle.Lifecycle.Event.ON_DESTROY;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = "/navi/query/tips")
+@Route(path = PR.navi.query_tips)
 public final class TipsFragment extends Fragment
 {
     private FragmentNaviQueryTipsBinding binding;
@@ -86,14 +88,15 @@ public final class TipsFragment extends Fragment
                 .get(InputTipViewModel.class);
 
         inputTipQuickAdapter = new GenericQuickAdapter<>(R.layout.item_tip, BR.inputTip);
-        inputTipQuickAdapter.setOnItemClickListener((adapter, view1, position) -> {
-            InputTip inputTip = Objects.requireNonNull(inputTipQuickAdapter.getItem(position));
+        inputTipQuickAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<InputTip>(
+                this, (adapter, view1, position) -> {
+            InputTip inputTip = Objects.requireNonNull(adapter.getItem(position));
             queryViewModel.query(inputTip);
-        });
+        }));
 
         binding.setIsShowTips(false);
         binding.setIsShowQuery(false);
-        binding.setStartQuery(v -> binding.setIsShowQuery(true));
+        binding.setStartQuery(new RxOnClick(this, v -> binding.setIsShowQuery(true)));
         binding.setLifecycleOwner(this);
         binding.setQueryText(inputTipViewModel.getQueryText());
         binding.setTipsAdapter(inputTipQuickAdapter);
@@ -114,18 +117,18 @@ public final class TipsFragment extends Fragment
         queryViewModel.getRoutes().observe(this, data -> {
             if (data != null && !data.isEmpty()
                     && StreamSupport.stream(requireFragmentManager().getFragments())
-                    .noneMatch(fragment -> "/navi/query/select".equals(fragment.getTag())))
+                    .noneMatch(fragment -> PR.navi.query_select.equals(fragment.getTag())))
             {
                 Fragment fragment = (Fragment) ARouter
                         .getInstance()
-                        .build("/navi/query/select")
+                        .build(PR.navi.query_select)
                         .navigation();
                 requireFragmentManager()
                         .beginTransaction()
                         .hide(this)
                         .addToBackStack(null)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .add(getId(), fragment, "/navi/query/select")
+                        .add(getId(), fragment, PR.navi.query_select)
                         .commit();
             }
         });

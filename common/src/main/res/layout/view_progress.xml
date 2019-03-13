@@ -70,7 +70,7 @@
                                     android:layout_height="match_parent"
                                     android:src="@drawable/shape_round_corner_bottom"/>
 
-                                <org.kexie.android.common.widget.RoundCornerImageView
+                                <org.kexie.android.dng.common.widget.RoundCornerImageView
                                     android:id="@+id/p_cover_iv"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"

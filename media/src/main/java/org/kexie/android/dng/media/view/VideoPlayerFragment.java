@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dl7.player.media.IjkPlayerView;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
@@ -22,7 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-@Route(path = "/media/video")
+@Route(path = PR.media.video)
 public class VideoPlayerFragment
         extends Fragment
         implements OnBackPressedCallback

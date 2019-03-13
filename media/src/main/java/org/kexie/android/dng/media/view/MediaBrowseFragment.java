@@ -12,8 +12,10 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
-import org.kexie.android.common.widget.ProgressFragment;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.databinding.RxOnClick;
+import org.kexie.android.dng.common.widget.ProgressFragment;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
@@ -32,7 +34,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = "/media/browse")
+@Route(path = PR.media.browse)
 public class MediaBrowseFragment
         extends Fragment
 {
@@ -68,34 +70,36 @@ public class MediaBrowseFragment
         setRetainInstance(false);
 
         mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
-        mediasAdapter.setOnItemClickListener((adapter, view1, position) -> {
-            Media info = mediasAdapter.getData().get(position);
-            switch (info.type)
-            {
-                case MediaType.TYPE_PHOTO:
-                {
-                    Postcard postcard = ARouter.getInstance()
-                            .build("/media/photo");
-                    Bundle bundle = postcard.getExtras();
-                    bundle.putParcelable("media", info);
-                    Fragment fragment = (Fragment) postcard.navigation();
-                    fragment.setTargetFragment(this, REQUEST_TO_PHOTO);
-                    jumpTo(fragment);
-                }
-                break;
-                case MediaType.TYPE_VIDEO:
-                {
-                    Postcard postcard = ARouter.getInstance()
-                            .build("/media/video");
-                    Bundle bundle = postcard.getExtras();
-                    bundle.putParcelable("media", info);
-                    Fragment fragment = (Fragment) postcard.navigation();
-                    fragment.setTargetFragment(this, REQUEST_TO_VIDEO);
-                    jumpTo(fragment);
-                }
-                break;
-            }
-        });
+        mediasAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<Media>(
+                this,
+                (adapter, view1, position) -> {
+                    Media info = adapter.getData().get(position);
+                    switch (info.type)
+                    {
+                        case MediaType.TYPE_PHOTO:
+                        {
+                            Postcard postcard = ARouter.getInstance()
+                                    .build(PR.media.photo);
+                            Bundle bundle = postcard.getExtras();
+                            bundle.putParcelable("media", info);
+                            Fragment fragment = (Fragment) postcard.navigation();
+                            fragment.setTargetFragment(this, REQUEST_TO_PHOTO);
+                            jumpTo(fragment);
+                        }
+                        break;
+                        case MediaType.TYPE_VIDEO:
+                        {
+                            Postcard postcard = ARouter.getInstance()
+                                    .build(PR.media.video);
+                            Bundle bundle = postcard.getExtras();
+                            bundle.putParcelable("media", info);
+                            Fragment fragment = (Fragment) postcard.navigation();
+                            fragment.setTargetFragment(this, REQUEST_TO_VIDEO);
+                            jumpTo(fragment);
+                        }
+                        break;
+                    }
+                }));
         mediasAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
         mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
 
@@ -109,16 +113,20 @@ public class MediaBrowseFragment
                 = new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("相册", v ->{
-                    viewModel.loadPhoto();
-                    binding.dataContent.stopScroll();
-                    binding.dataContent.stopNestedScroll();
-                });
-                put("视频",v ->{
-                    viewModel.loadVideo();
-                    binding.dataContent.stopScroll();
-                    binding.dataContent.stopNestedScroll();
-                });
+                put("相册", new RxOnClick(
+                        MediaBrowseFragment.this,
+                        v -> {
+                            viewModel.loadPhoto();
+                            binding.dataContent.stopScroll();
+                            binding.dataContent.stopNestedScroll();
+                        }));
+                put("视频", new RxOnClick(
+                        MediaBrowseFragment.this,
+                        v -> {
+                            viewModel.loadVideo();
+                            binding.dataContent.stopScroll();
+                            binding.dataContent.stopNestedScroll();
+                        }));
             }
         };
         binding.setLifecycleOwner(this);

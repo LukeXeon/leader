@@ -7,7 +7,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.common.util.ZoomTransformation;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.ZoomTransformation;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.model.entity.FunctionInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
@@ -92,9 +93,9 @@ public class DesktopViewModel
         loadFunction(new LinkedList<FunctionInfo>()
         {
             {
-                add(FunctionInfo.from("天气", R.mipmap.image_weather, "/ux/weather"));
-                add(FunctionInfo.from("多媒体", R.mipmap.image_media, "/media/browse"));
-                add(FunctionInfo.from("APPS", R.mipmap.image_apps, "/ux/apps"));
+                add(FunctionInfo.from("天气", R.mipmap.image_weather, PR.ux.weather));
+                add(FunctionInfo.from("多媒体", R.mipmap.image_media, PR.media.browse));
+                add(FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps));
             }
         }).subscribe(new Observer<List<Function>>()
         {

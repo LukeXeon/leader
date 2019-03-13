@@ -15,6 +15,11 @@ import android.widget.ImageView;
 
 import com.dl7.player.R;
 
+import org.kexie.android.dng.common.widget.SystemUtil;
+
+import java.util.Objects;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
@@ -35,13 +40,16 @@ public class ImageDialogFragment extends DialogFragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState)
     {
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-        Window window = getDialog().getWindow();
+        Window window = Objects.requireNonNull(requireDialog().getWindow());
+        window.requestFeature(Window.FEATURE_NO_TITLE);
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         window.setWindowAnimations(R.style.AnimateDialog);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        SystemUtil.hideSystemUi(window);
 
         View view = inflater.inflate(R.layout.dialog_share, container);
         final ImageView photo = view.findViewById(R.id.iv_screenshot_photo);
@@ -59,7 +67,7 @@ public class ImageDialogFragment extends DialogFragment
 
 
     @Override
-    public void onCancel(DialogInterface dialog)
+    public void onCancel(@NonNull DialogInterface dialog)
     {
         super.onCancel(dialog);
         listener.onDismiss(dialog);

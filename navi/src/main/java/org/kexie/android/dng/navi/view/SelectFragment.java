@@ -9,6 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.bartoszlipinski.flippablestackview.StackPageTransformer;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQuerySelectBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -29,7 +30,7 @@ import androidx.viewpager.widget.ViewPager;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
-@Route(path = "/navi/query/select")
+@Route(path = PR.navi.query_select)
 public final class SelectFragment extends Fragment
 {
     private FragmentNaviQuerySelectBinding binding;
@@ -118,7 +119,7 @@ public final class SelectFragment extends Fragment
                     .map(id -> {
                         Fragment fragment = (Fragment) ARouter
                                 .getInstance()
-                                .build("/navi/query/select/route")
+                                .build(PR.navi.query_select_route)
                                 .withInt("pathId", id)
                                 .navigation();
                         return Pair.create(id, fragment);

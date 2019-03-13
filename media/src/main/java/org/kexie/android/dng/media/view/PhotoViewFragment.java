@@ -12,7 +12,9 @@ import android.view.animation.Animation;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import org.kexie.android.common.util.AnimationAdapter;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.databinding.RxOnClick;
+import org.kexie.android.dng.common.widget.AnimationAdapter;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
@@ -28,7 +30,7 @@ import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
 
-@Route(path = "/media/photo")
+@Route(path = PR.media.photo)
 public class PhotoViewFragment extends Fragment
 {
 
@@ -81,25 +83,27 @@ public class PhotoViewFragment extends Fragment
                     = new ArrayMap<String, View.OnClickListener>()
             {
                 {
-                    View.OnClickListener a1 = v -> requireActivity().onBackPressed();
-                    put("back", a1);
-                    put("delete", v -> {
-                        if (viewModel.delete(binding.getInfo()))
-                        {
-                            Fragment fragment = getTargetFragment();
-                            if (fragment != null)
-                            {
-                                fragment.onActivityResult(getTargetRequestCode(),
-                                        Activity.RESULT_FIRST_USER, new Intent().putExtras(requireArguments()));
-                            }
-                            Toasty.success(requireContext(), "删除成功").show();
-                            requireActivity().onBackPressed();
-                        } else
-                        {
-                            Toasty.error(requireContext(), "删除失败").show();
-                        }
-                    });
-                    put("hide", v -> doHideAnimation());
+                    put("back", new RxOnClick(PhotoViewFragment.this,
+                            v -> requireActivity().onBackPressed()));
+                    put("delete", new RxOnClick(PhotoViewFragment.this,
+                            v -> {
+                                if (viewModel.delete(binding.getInfo()))
+                                {
+                                    Fragment fragment = getTargetFragment();
+                                    if (fragment != null)
+                                    {
+                                        fragment.onActivityResult(getTargetRequestCode(),
+                                                Activity.RESULT_FIRST_USER, new Intent().putExtras(requireArguments()));
+                                    }
+                                    Toasty.success(requireContext(), "删除成功").show();
+                                    requireActivity().onBackPressed();
+                                } else
+                                {
+                                    Toasty.error(requireContext(), "删除失败").show();
+                                }
+                            }));
+                    put("hide", new RxOnClick(PhotoViewFragment.this,
+                            v -> doHideAnimation()));
                 }
             };
 

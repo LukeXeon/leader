@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentInfoBinding;
 import org.kexie.android.dng.ux.viewmodel.InfoViewModel;
@@ -17,7 +18,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = "/ux/info")
+@Route(path = PR.ux.content_info)
 public class InfoFragment extends Fragment
 {
     private FragmentInfoBinding binding;

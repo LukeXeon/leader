@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.orhanobut.logger.Logger;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviRunningBinding;
 import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
@@ -25,7 +26,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = "/navi/running")
+@Route(path = PR.navi.running)
 public final class RunningFragment extends Fragment
 {
     private FragmentNaviRunningBinding binding;

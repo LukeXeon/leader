@@ -9,7 +9,9 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.databinding.RxOnClick;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
@@ -28,16 +30,16 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
+import static androidx.lifecycle.Lifecycle.Event;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = "/ux/main")
+@Route(path = PR.ux.desktop)
 public class DesktopFragment extends Fragment
 {
     private FragmentDesktopBinding binding;
@@ -70,27 +72,29 @@ public class DesktopFragment extends Fragment
 
         GenericQuickAdapter<Function> functionsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_desktop_function, BR.function);
-        functionsAdapter.setOnItemClickListener((adapter, view1, position) -> {
-            String uri = Objects.requireNonNull(functionsAdapter.getItem(position)).uri;
-            Postcard postcard = ARouter.getInstance().build(uri);
-            if ("/ux/apps".equals(uri))
-            {
-                jumpToNoHide(postcard);
-            } else
-            {
-                jumpTo(postcard);
-            }
-        });
+        functionsAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<Function>(
+                this,
+                (adapter, view1, position) -> {
+                    String uri = Objects.requireNonNull(adapter.getItem(position)).uri;
+                    Postcard postcard = ARouter.getInstance().build(uri);
+                    if (PR.ux.apps.equals(uri))
+                    {
+                        jumpToNoHide(postcard);
+                    } else
+                    {
+                        jumpTo(postcard);
+                    }
+                }));
 
         desktopViewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
         desktopViewModel.functions.observe(this, functionsAdapter::setNewData);
         desktopViewModel.time.observe(this, binding::setTime);
         desktopViewModel.onError.observeOn(AndroidSchedulers.mainThread())
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(requireContext(), s).show());
         desktopViewModel.onSuccess.observeOn(AndroidSchedulers.mainThread())
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.success(requireContext(), s).show());
         getLifecycle().addObserver(desktopViewModel);
 
@@ -107,8 +111,10 @@ public class DesktopFragment extends Fragment
                 = new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("个人信息", v -> jumpToNoHide(ARouter.getInstance().build("/ux/content")));
-                put("导航", v -> jumpTo(ARouter.getInstance().build("/navi/navi")));
+                put("个人信息", new RxOnClick(DesktopFragment.this,
+                        v -> jumpToNoHide(ARouter.getInstance().build(PR.ux.content))));
+                put("导航", new RxOnClick(DesktopFragment.this,
+                        v -> jumpTo(ARouter.getInstance().build(PR.navi.navi))));
             }
         };
         binding.setActions(actions);

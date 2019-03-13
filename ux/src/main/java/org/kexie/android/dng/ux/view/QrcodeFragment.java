@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentQrcodeBinding;
 import org.kexie.android.dng.ux.viewmodel.LoginViewModel;
@@ -23,7 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = "/ux/login")
+@Route(path = PR.ux.content_login)
 public class QrcodeFragment extends Fragment
 {
     private FragmentQrcodeBinding binding;
@@ -51,7 +52,7 @@ public class QrcodeFragment extends Fragment
         setRetainInstance(false);
 
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-        viewModel.qrcode.observe(this,binding::setQrCode);
+        viewModel.qrcode.observe(this, binding::setQrCode);
         viewModel.onError.observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> Toasty.error(requireContext(), s).show());

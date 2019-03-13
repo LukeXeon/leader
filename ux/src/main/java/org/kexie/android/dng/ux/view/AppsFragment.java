@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import org.kexie.android.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
@@ -25,7 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
-@Route(path = "/ux/apps")
+@Route(path = PR.ux.apps)
 public class AppsFragment extends Fragment
 {
 
@@ -57,17 +58,19 @@ public class AppsFragment extends Fragment
 
         GenericQuickAdapter<App> adapter
                 = new GenericQuickAdapter<>(R.layout.item_app, BR.app);
-        adapter.setOnItemClickListener((adapter1, view1, position) -> {
-            String packName = Objects.requireNonNull(adapter.getItem(position))
-                    .packageName;
-            Intent intent = requireContext()
-                    .getPackageManager()
-                    .getLaunchIntentForPackage(packName);
-            if (intent != null)
-            {
-                startActivity(intent);
-            }
-        });
+        adapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<App>(
+                this,
+                (adapter1, view1, position) -> {
+                    String packName = Objects.requireNonNull(adapter1.getItem(position))
+                            .packageName;
+                    Intent intent = requireContext()
+                            .getPackageManager()
+                            .getLaunchIntentForPackage(packName);
+                    if (intent != null)
+                    {
+                        startActivity(intent);
+                    }
+                }));
 
         appsViewModel = ViewModelProviders.of(requireActivity())
                 .get(AppsViewModel.class);

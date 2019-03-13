@@ -41,7 +41,8 @@ import com.amap.api.navi.view.RouteOverLay;
 import com.bumptech.glide.Glide;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.common.util.AnimationAdapter;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.AnimationAdapter;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviBinding;
 import org.kexie.android.dng.navi.model.Point;
@@ -70,7 +71,7 @@ import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
-@Route(path = "/navi/navi")
+@Route(path = PR.navi.navi)
 public final class NaviFragment extends Fragment
 {
 
@@ -251,13 +252,13 @@ public final class NaviFragment extends Fragment
             Postcard postcard;
             if (isRun != null && isRun)
             {
-                postcard = ARouter.getInstance().build("/navi/running");
-                Logger.d("/navi/running");
+                postcard = ARouter.getInstance().build(PR.navi.running);
+                Logger.d(PR.navi.running);
                 setRunningMapState();
             } else
             {
-                postcard = ARouter.getInstance().build("/navi/query");
-                Logger.d("/navi/query");
+                postcard = ARouter.getInstance().build(PR.navi.query);
+                Logger.d(PR.navi.query);
                 setQueryMapState();
             }
             Fragment fragment = (Fragment) postcard.navigation();

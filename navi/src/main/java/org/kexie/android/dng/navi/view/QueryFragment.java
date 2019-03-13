@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.common.widget.ProgressFragment;
+import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.ProgressFragment;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -20,7 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = "/navi/query")
+@Route(path = PR.navi.query)
 public final class QueryFragment extends Fragment
 {
     private FragmentNaviQueryBinding binding;
@@ -50,7 +51,7 @@ public final class QueryFragment extends Fragment
 
         Fragment fragment = (Fragment) ARouter
                 .getInstance()
-                .build("/navi/query/tips")
+                .build(PR.navi.query_select_route)
                 .navigation();
 
         getChildFragmentManager()

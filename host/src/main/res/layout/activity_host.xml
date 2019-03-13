@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="onBack"
+            type="View.OnClickListener"/>
+        <variable
+            name="onHome"
+            type="View.OnClickListener"/>
+        <variable
+            name="onSpeak"
+            type="View.OnClickListener"/>
+    </data>
     <LinearLayout
+        android:id="@+id/background"
         android:orientation="vertical"
         async_background='@{"image_background"}'
         android:layout_width="match_parent"
@@ -12,9 +26,35 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
         <LinearLayout
+            android:padding="5dp"
+            android:orientation="horizontal"
             android:background="@android:color/white"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="50dp">
+            <ImageButton
+                android:background="@null"
+                android:onClick="@{onBack}"
+                android:src="@drawable/back"
+                android:layout_weight="1"
+                android:scaleType="centerInside"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+            <ImageButton
+                android:background="@null"
+                android:onClick="@{onHome}"
+                android:src="@drawable/home"
+                android:layout_weight="1"
+                android:scaleType="centerInside"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+            <ImageButton
+                android:background="@null"
+                android:onClick="@{onSpeak}"
+                android:src="@drawable/speak"
+                android:layout_weight="1"
+                android:scaleType="centerInside"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
         </LinearLayout>
     </LinearLayout>
 </layout>

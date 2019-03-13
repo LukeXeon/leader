@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentContentBinding;
 
@@ -17,7 +18,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
-@Route(path = "/ux/content")
+@Route(path = PR.ux.content)
 public class ContentFragment extends Fragment
 {
     private FragmentContentBinding binding;
@@ -53,7 +54,7 @@ public class ContentFragment extends Fragment
                 .setHasFixedTransformationMatrix(true);
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build("/ux/info")
+                .build(PR.ux.content_login)
                 .navigation();
 
         getChildFragmentManager()
