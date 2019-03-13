@@ -40,9 +40,13 @@ public final class HostActivity extends AppCompatActivity
         }));
         binding.setOnHome(new RxOnClick(this, v -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            int size = fragmentManager.getFragments().size() - 1;
-            IntStreams.iterate(1, i -> i < size, i -> i + 1)
-                    .forEach(i -> onBackPressed());
+            int size = fragmentManager.getFragments().size();
+            if (size == 1)
+            {
+                return;
+            }
+            IntStreams.iterate(1, i -> i < size - 1, i -> i + 1)
+                    .forEach(i -> fragmentManager.popBackStackImmediate());
         }));
         binding.setOnSpeak(new RxOnClick(this, v -> {
             FragmentManager fragmentManager = getSupportFragmentManager();

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import androidx.lifecycle.Observer;
 public final class ProgressFragment
         extends Fragment
 {
+    private final static int UPDATE = 1;
+    private final static int REMOVE = 2;
     private ViewProgressBinding binding;
     private RoundCornerImageView mProgressIv;
     private ImageView mBotIv;
@@ -60,7 +63,9 @@ public final class ProgressFragment
         //新增进度条
         mProgressIv = view.findViewById(R.id.p_cover_iv);
         mBotIv = view.findViewById(R.id.p_bot_iv);
-        mHandler.post(new Runnable()
+        Message message = mHandler.obtainMessage();
+        message.what = UPDATE;
+        message.obj = new Runnable()
         {
             private int value = 0;
 
@@ -75,9 +80,13 @@ public final class ProgressFragment
                 {
                     value = 0;
                 }
-                mHandler.postDelayed(this, 50);
+                Message newMessage = mHandler.obtainMessage();
+                newMessage.what = UPDATE;
+                newMessage.obj = this;
+                mHandler.sendMessageDelayed(newMessage, 50);
             }
-        });
+        };
+        message.sendToTarget();
     }
 
 
@@ -97,6 +106,7 @@ public final class ProgressFragment
     public void onDestroyView()
     {
         super.onDestroyView();
+        mHandler.removeMessages(UPDATE);
         binding = null;
         mBotIv = null;
         mProgressIv = null;
@@ -118,8 +128,7 @@ public final class ProgressFragment
     private static final class ObserverImpl
             extends Handler
             implements Observer<Boolean>,
-            OnBackPressedCallback,
-            Runnable
+            OnBackPressedCallback
     {
         private final ProgressFragment progressFragment = new ProgressFragment();
 
@@ -150,7 +159,32 @@ public final class ProgressFragment
                 }
             } else
             {
-                postDelayed(this, 200);
+                Message message = Message.obtain();
+                message.obj = (Runnable) () -> {
+                    this.removeMessages(REMOVE);
+                    if (progressFragment.isAdded())
+                    {
+                        progressFragment.requireFragmentManager()
+                                .beginTransaction()
+                                .remove(progressFragment)
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                                .commit();
+                        progressFragment.requireActivity()
+                                .removeOnBackPressedCallback(this);
+                    }
+                };
+                message.what = REMOVE;
+                sendMessageDelayed(message, 200);
+            }
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            Object run = msg.obj;
+            if (run instanceof Runnable)
+            {
+                ((Runnable) run).run();
             }
         }
 
@@ -160,20 +194,5 @@ public final class ProgressFragment
             return true;
         }
 
-        @Override
-        public void run()
-        {
-            this.removeCallbacksAndMessages(null);
-            if (progressFragment.isAdded())
-            {
-                progressFragment.requireFragmentManager()
-                        .beginTransaction()
-                        .remove(progressFragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                        .commit();
-                progressFragment.requireActivity()
-                        .removeOnBackPressedCallback(this);
-            }
-        }
     }
 }
