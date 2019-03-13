@@ -21,6 +21,4 @@ public class SpeakerViewModel extends AndroidViewModel
         super(application);
         ARouter.getInstance().inject(this);
     }
-
-
 }
