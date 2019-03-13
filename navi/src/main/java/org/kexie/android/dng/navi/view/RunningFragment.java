@@ -101,9 +101,9 @@ public final class RunningFragment extends Fragment
                     public boolean handleOnBackPressed()
                     {
                         long now = System.currentTimeMillis();
-                        Logger.d(now - last);
                         if (now - last > 1000)
                         {
+                            Logger.d(now - last);
                             Toasty.warning(requireContext(), "再按一次退出导航")
                                     .show();
                             last = now;
