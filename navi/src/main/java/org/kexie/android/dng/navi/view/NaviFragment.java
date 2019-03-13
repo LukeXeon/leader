@@ -67,9 +67,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import io.reactivex.Observable;
+import io.reactivex.subjects.ReplaySubject;
 import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 import me.jessyan.autosize.utils.AutoSizeUtils;
+
+import static androidx.lifecycle.Lifecycle.Event;
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = PR.navi.navi)
 public final class NaviFragment extends Fragment
@@ -94,6 +100,8 @@ public final class NaviFragment extends Fragment
     private AmapCameraOverlay cameraOverlay;
 
     private Map<Circle, Animator> circles;
+
+    private Observable<Location> uiLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -143,18 +151,9 @@ public final class NaviFragment extends Fragment
                 {
                     binding.loading.setVisibility(View.GONE);
                     binding.loading.setOnTouchListener(null);
-                    queryViewModel.getNetworkTest()
-                            .observe(NaviFragment.this,
-                                    new Observer<Boolean>()
-                                    {
-                                        @Override
-                                        public void onChanged(Boolean aBoolean)
-                                        {
-                                            zoomMapToLocation();
-                                            queryViewModel.getNetworkTest()
-                                                    .removeObserver(this);
-                                        }
-                                    });
+                    uiLocation.firstElement()
+                            .as(autoDisposable(from(getLifecycle(), Event.ON_DESTROY)))
+                            .subscribe(location -> zoomMapToLocation());
                 }
             });
             binding.loading.startAnimation(alphaAnimation);
@@ -163,6 +162,10 @@ public final class NaviFragment extends Fragment
 
         carMarker = new CarMarker(requireContext(), mapController);
         cameraOverlay = new AmapCameraOverlay(requireContext());
+
+        ReplaySubject<Location> subject = ReplaySubject.createWithSize(5);
+        mapController.setOnMyLocationChangeListener(subject::onNext);
+        uiLocation = subject;
 
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
 
@@ -449,38 +452,35 @@ public final class NaviFragment extends Fragment
                 .interval(1000)
                 .strokeWidth(0);
         mapController.setMyLocationStyle(myLocationStyle);
-        mapController.setOnMyLocationChangeListener(getLocationListener());
+        uiLocation.map(location -> new LatLng(location.getLatitude(), location.getLongitude()))
+                .as(autoDisposable(from(this, Event.ON_DESTROY)))
+                .subscribe(location -> {
+                    if (circles == null)
+                    {
+                        MyLocationStyle myLocationStyle1 = mapController
+                                .getMyLocationStyle()
+                                .myLocationType(MyLocationStyle
+                                        .LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
+                        mapController.setMyLocationStyle(myLocationStyle1);
+                        circles = new ArrayMap<>();
+                        IntStreams.iterate(0, i -> i < 3, i -> i + 1)
+                                .forEach(i -> {
+                                    Circle circle = addCircle(location);
+                                    Animator animator = startScaleCircleAnimation(circle,
+                                            i * 800);
+                                    circles.put(circle, animator);
+                                });
+                    } else
+                    {
+                        StreamSupport.stream(circles.keySet())
+                                .forEach(circle -> circle.setCenter(location));
+                    }
+                });
         mapController.setMyLocationEnabled(true);
         UiSettings uiSettings = mapController.getUiSettings();
         uiSettings.setMyLocationButtonEnabled(true);
     }
-
-    private AMap.OnMyLocationChangeListener getLocationListener()
-    {
-        AMap.OnMyLocationChangeListener normal = location -> {
-            LatLng latLng1 = new LatLng(location.getLatitude(), location.getLongitude());
-            if (circles == null)
-            {
-                circles = new ArrayMap<>();
-                IntStreams.iterate(0, i -> i < 3, i -> i + 1)
-                        .forEach(i -> {
-                            Circle circle = addCircle(latLng1);
-                            Animator animator = startScaleCircleAnimation(circle, i * 800);
-                            circles.put(circle, animator);
-                        });
-            }
-            StreamSupport.stream(circles.keySet())
-                    .forEach(circle -> circle.setCenter(latLng1));
-        };
-        return location -> {
-            MyLocationStyle myLocationStyle1 = mapController.getMyLocationStyle()
-                    .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-            mapController.setMyLocationStyle(myLocationStyle1);
-            normal.onMyLocationChange(location);
-            mapController.setOnMyLocationChangeListener(normal);
-        };
-    }
-
+    
     private Circle addCircle(LatLng latLng)
     {
         float accuracy = (float) ((latLng.longitude / latLng.latitude) * 20);

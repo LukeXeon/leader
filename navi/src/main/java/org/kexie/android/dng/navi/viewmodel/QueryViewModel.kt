@@ -9,7 +9,6 @@ import com.amap.api.navi.model.NaviLatLng
 import com.amap.api.navi.model.NaviPath
 import com.amap.api.services.core.PoiItem
 import com.amap.api.services.poisearch.PoiSearch
-import com.blankj.utilcode.util.NetworkUtils
 import com.orhanobut.logger.Logger
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -39,8 +38,6 @@ class QueryViewModel(application: Application,private val navi:NaviController)
                 start()
             }
 
-    val networkTest = MutableLiveData<Boolean>()
-
     val routes = MutableLiveData<Map<Int, RouteInfo>>()
 
     val currentSelect = MutableLiveData<Int>()
@@ -51,9 +48,6 @@ class QueryViewModel(application: Application,private val navi:NaviController)
 
     val onSuccess = PublishSubject.create<String>()
 
-    init {
-        networkPingTest()
-    }
 
     fun query(query: Query) {
         isLoading.value = true
@@ -203,19 +197,6 @@ class QueryViewModel(application: Application,private val navi:NaviController)
                 .build()
     }
 
-    @Suppress("MissingPermission", "CheckResult")
-    private fun networkPingTest() {
-        Observable.just(Unit)
-                .observeOn(Schedulers.io())
-                .map { NetworkUtils.isAvailableByPing("www.baidu.com") }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { isAvailable ->
-                    networkTest.value = isAvailable
-                    if (!isAvailable) {
-                        onError.onNext("无网络连接")
-                    }
-                }
-    }
 
     companion object {
 

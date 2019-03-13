@@ -51,7 +51,7 @@ public final class QueryFragment extends Fragment
 
         Fragment fragment = (Fragment) ARouter
                 .getInstance()
-                .build(PR.navi.query_select_route)
+                .build(PR.navi.query_tips)
                 .navigation();
 
         getChildFragmentManager()
