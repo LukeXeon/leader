@@ -10,32 +10,30 @@ public interface SpeakerService extends IProvider
 {
     enum Status
     {
-        NONE,//无状态
-        READY,//准备好
-        SPEAKING,//用户说话中
-        RECOGNITION,//识别中
-        FINISHED,//完成
-        LONG_SPEECH_FINISHED,//长语音完成
-        STOPPED,//停止
+        //Initialization-->Idle-->Prepare-->Speaking-->Recognition-->Idle
+        Initialization,//初始化中
+        Idle,//空闲中
+        Prepare,//准备中
+        Speaking,//正在听
+        Recognition;//识别中
     }
 
-    interface OnAwakeCallback
+    interface OnWakeUpCallback
     {
-        boolean OnHandleAwake(String text);
+        boolean handleWeakUp(String text);
     }
 
-    void addOnAwakeCallback(LifecycleOwner owner, OnAwakeCallback listener);
+    void addOnWeakUpCallback(LifecycleOwner owner, OnWakeUpCallback listener);
 
-    void removeOnAwakeCallback(OnAwakeCallback listener);
+    void removeOnWeakUpCallback(OnWakeUpCallback listener);
 
-    void start();
+    LiveData<Status> getStatus();
 
-    Observable<String> partialResult();
+    LiveData<Integer> getCurrentVolume();
 
-    Observable<String> finalResult();
+    Observable<String> getPartialResult();
 
-    Observable<Integer> currentVolume();
+    Observable<String> getFinalResult();
 
-    LiveData<Status> currentStatus();
-
+    boolean start();
 }

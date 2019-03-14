@@ -1,6 +1,7 @@
 package org.kexie.android.dng.asr.model;
 
 import android.content.Context;
+import android.os.Looper;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.baidu.speech.EventListener;
@@ -32,147 +33,148 @@ import io.reactivex.subjects.PublishSubject;
 public class SpeakerServiceImpl implements SpeakerService
 {
 
-    private final static int ERROR_NONE = 0;
-    private static final int backTrackInMs = 1500;
+    private static final int sErrorNone = 0;
+    //private static final int sBackTrackInMs = 1500;
+    private static final int sNormalVID = 1536;
+    private static final String sWeakUpBin = "assets:///WakeUp.bin";
 
-    private EventManager weakUp;
-    private EventManager asr;
-
-    private MutableLiveData<Status> currentStatus = new MutableLiveData<>(Status.NONE);
-    private PublishSubject<Integer> currentVolume = PublishSubject.create();
-    private PublishSubject<String> finalResult = PublishSubject.create();
-    private PublishSubject<String> partialResult = PublishSubject.create();
-
-    private Gson gson = new Gson();
-
-    private final CopyOnWriteArrayList<LifecycleOnAwakeCallbackWrapper> onAwakeListeners =
-            new CopyOnWriteArrayList<>();
+    private EventManager mAsrManager;
+    private EventManager mWeakUpManager;
+    private Gson mGson = new Gson();
+    private final CopyOnWriteArrayList<LifecycleOnWakeUpCallbackWrapper>
+            mOnWeakUpListeners = new CopyOnWriteArrayList<>();
+    private MutableLiveData<Status> mStatus = new MutableLiveData<>(Status.Initialization);
+    private MutableLiveData<Integer> mCurrentVolume = new MutableLiveData<>(0);
+    private PublishSubject<String> mPartialResult = PublishSubject.create();
+    private PublishSubject<String> mFinalResult = PublishSubject.create();
 
     @Override
     public void init(Context context)
     {
-        asr = EventManagerFactory.create(context, "asr");
-        weakUp = EventManagerFactory.create(context, "weakUp");
-        initAwake();
-        initAsr();
-    }
-
-    private void initAwake()
-    {
-        weakUp.send(SpeechConstant.WAKEUP_START,
-                gson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE,
-                        "assets:///WakeUp.bin")),
-                null, 0, 0);
-        Map<String, EventListener> actions = new ArrayMap<String, EventListener>()
+        mAsrManager = EventManagerFactory.create(context, "asr");
+        mWeakUpManager = EventManagerFactory.create(context, "weakUp");
+        Map<String, EventListener> eventHandlers = new ArrayMap<String, EventListener>()
         {
             {
-                put(SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS,
-                        (name, params, data, offset, length) -> {
-                            AwakeResult awakeResult = gson.fromJson(params, AwakeResult.class);
-                            for (OnAwakeCallback callback : onAwakeListeners)
-                            {
-                                if (callback.OnHandleAwake(awakeResult.hasError() ? null
-                                        : awakeResult.word))
-                                {
-                                    return;
-                                }
-                            }
-                        });
-                put(SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS,
-                        (name, params, data, offset, length) -> {
-                            AwakeResult awakeResult = gson.fromJson(params, AwakeResult.class);
-
-                        });
-            }
-        };
-        weakUp.registerListener((name, params, data, offset, length) -> {
-            EventListener eventListener = actions.get(name);
-            if (eventListener != null)
-            {
-                eventListener.onEvent(name, params, data, offset, length);
-            }
-        });
-    }
-
-    private void initAsr()
-    {
-        Map<String, EventListener> actions = new ArrayMap<String, EventListener>()
-        {
-            {
+                // 引擎准备就绪，可以开始说话
                 put(SpeechConstant.CALLBACK_EVENT_ASR_READY,
-                        (name, params, data, offset, length) -> {
-                            // 引擎准备就绪，可以开始说话
-                            currentStatus.setValue(Status.READY);
-                        });
-
-                put(SpeechConstant.CALLBACK_EVENT_ASR_BEGIN,
-                        (name, params, data, offset, length) -> {
-                            // 检测到用户的已经开始说话
-
-                        });
-
+                        (name, params, data, offset, length)
+                                -> mStatus.setValue(Status.Speaking));
+                // 检测到用户的已经停止说话
                 put(SpeechConstant.CALLBACK_EVENT_ASR_END,
                         (name, params, data, offset, length) -> {
-                            // 检测到用户的已经停止说话
-
+                            mStatus.setValue(Status.Recognition);
+                            mCurrentVolume.setValue(0);
                         });
-
-                put(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL,
-                        (name, params, data, offset, length) -> {
-                            // 临时识别结果, 长语音模式需要从此消息中取出结果
-                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
-                            if (speakerResult.isFinalResult())
-                            {
-
-                            }else if (speakerResult.isPartialResult())
-                            {
-
-                            }else if (speakerResult.isNluResult())
-                            {
-
-                            }
-                        });
-
+                // 最终结果
                 put(SpeechConstant.CALLBACK_EVENT_ASR_FINISH,
                         (name, params, data, offset, length) -> {
-                            // 识别结束， 最终识别结果或可能的错误
-                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
-
+                            SpeakerResult speakerResult
+                                    = mGson.fromJson(params, SpeakerResult.class);
+                            if (speakerResult.results != null
+                                    && speakerResult.results.length != 0
+                                    && speakerResult.isFinalResult())
+                            {
+                                mFinalResult.onNext(speakerResult.results[0]);
+                            }
+                            mStatus.setValue(Status.Idle);
                         });
-
+                // 临时识别结果, 长语音模式需要从此消息中取出结果
+                put(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL,
+                        (name, params, data, offset, length) -> {
+                            SpeakerResult speakerResult
+                                    = mGson.fromJson(params, SpeakerResult.class);
+                            if (speakerResult.results != null
+                                    && speakerResult.results.length != 0
+                                    && speakerResult.isPartialResult())
+                            {
+                                mPartialResult.onNext(speakerResult.results[0]);
+                            }
+                        });
+                // 实时音量
                 put(SpeechConstant.CALLBACK_EVENT_ASR_VOLUME,
                         (name, params, data, offset, length) -> {
-                            // 实时音量
-                            VolumeResult volumeResult = gson.fromJson(params, VolumeResult.class);
-                            currentVolume.onNext(volumeResult.volumePercent);
-                        });
-
-                put(SpeechConstant.CALLBACK_EVENT_ASR_LONG_SPEECH,
-                        (name, params, data, offset, length) -> {
-                            // 长语音识别结束
-                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
+                            VolumeResult volumeResult
+                                    = mGson.fromJson(params, VolumeResult.class);
+                            mCurrentVolume.setValue(volumeResult.volumePercent);
                         });
             }
         };
-        asr.registerListener((name, params, data, offset, length) -> {
-            EventListener eventListener = actions.get(name);
+        mAsrManager.registerListener((name, params, data, offset, length) -> {
+            EventListener eventListener = eventHandlers.get(name);
             if (eventListener != null)
             {
                 eventListener.onEvent(name, params, data, offset, length);
             }
         });
+        mWeakUpManager.registerListener((name, params, data, offset, length) -> {
+            if (SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS.equals(name))
+            {
+                AwakeResult awakeResult = mGson.fromJson(params, AwakeResult.class);
+                for (OnWakeUpCallback callback : mOnWeakUpListeners)
+                {
+                    if (callback.handleWeakUp(awakeResult.hasError() ? null
+                            : awakeResult.word))
+                    {
+                        return;
+                    }
+                }
+            }
+        });
+        mWeakUpManager.registerListener(new EventListener()
+        {
+            @Override
+            public void onEvent(String name, String params, byte[] data, int offset, int length)
+            {
+                if (SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name))
+                {
+                    mStatus.setValue(Status.Idle);
+                    mWeakUpManager.unregisterListener(this);
+                }
+            }
+        });
+        mWeakUpManager.send(SpeechConstant.WAKEUP_START,
+                mGson.toJson(Collections
+                        .singletonMap(SpeechConstant.WP_WORDS_FILE, sWeakUpBin)),
+                null, 0, 0);
+
     }
 
     @Override
-    public void removeOnAwakeCallback(OnAwakeCallback listener)
+    public boolean start()
     {
-        Iterator<LifecycleOnAwakeCallbackWrapper> iterator =
-                onAwakeListeners.iterator();
-        LifecycleOnAwakeCallbackWrapper callbackToRemove = null;
+        if (!Looper.getMainLooper().equals(Looper.myLooper()))
+        {
+            throw new AssertionError("must run at main thread");
+        }
+        if (!Status.Idle.equals(mStatus.getValue()))
+        {
+            return false;
+        }
+        mAsrManager.send(SpeechConstant.ASR_START, mGson.toJson(
+                new ArrayMap<String, Object>(4)
+                {
+                    {
+                        put(SpeechConstant.ACCEPT_AUDIO_VOLUME, true);
+                        put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
+                        put(SpeechConstant.PID, sNormalVID);
+                        //put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - sBackTrackInMs);
+                    }
+                }), null, 0, 0);
+        mStatus.setValue(Status.Prepare);
+        return true;
+    }
+
+    @Override
+    public void removeOnWeakUpCallback(OnWakeUpCallback listener)
+    {
+        Iterator<LifecycleOnWakeUpCallbackWrapper> iterator =
+                mOnWeakUpListeners.iterator();
+        LifecycleOnWakeUpCallbackWrapper callbackToRemove = null;
         while (iterator.hasNext())
         {
-            LifecycleOnAwakeCallbackWrapper callback = iterator.next();
-            if (callback.onAwakeCallback.equals(listener))
+            LifecycleOnWakeUpCallbackWrapper callback = iterator.next();
+            if (callback.onWakeUpCallback.equals(listener))
             {
                 callbackToRemove = callback;
                 break;
@@ -181,89 +183,69 @@ public class SpeakerServiceImpl implements SpeakerService
         if (callbackToRemove != null)
         {
             callbackToRemove.lifecycle.removeObserver(callbackToRemove);
-            onAwakeListeners.remove(callbackToRemove);
+            mOnWeakUpListeners.remove(callbackToRemove);
         }
     }
 
     @Override
-    public void start()
+    public LiveData<Status> getStatus()
     {
-        cancel();
-        asr.send(SpeechConstant.ASR_START, gson.toJson(new ArrayMap<String, Object>()
-        {
-            {
-                put(SpeechConstant.ACCEPT_AUDIO_VOLUME, false);
-                put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
-                put(SpeechConstant.PID, 1536);
-                put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - backTrackInMs);
-            }
-        }), null, 0, 0);
+        return mStatus;
     }
 
     @Override
-    public Observable<String> partialResult()
+    public LiveData<Integer> getCurrentVolume()
     {
-        return partialResult;
+        return mCurrentVolume;
     }
 
     @Override
-    public Observable<String> finalResult()
+    public Observable<String> getPartialResult()
     {
-        return finalResult;
+        return mPartialResult;
     }
 
     @Override
-    public Observable<Integer> currentVolume()
+    public Observable<String> getFinalResult()
     {
-        return currentVolume;
+        return mFinalResult;
     }
 
     @Override
-    public LiveData<Status> currentStatus()
-    {
-        return currentStatus;
-    }
-
-    private void cancel()
-    {
-        asr.send(SpeechConstant.ASR_CANCEL,
-                "{}", null, 0, 0);
-    }
-
-    @Override
-    public void addOnAwakeCallback(LifecycleOwner owner, OnAwakeCallback listener)
+    public void addOnWeakUpCallback(LifecycleOwner owner, OnWakeUpCallback listener)
     {
         Lifecycle lifecycle = owner.getLifecycle();
         if (lifecycle.getCurrentState() == Lifecycle.State.DESTROYED)
         {
             return;
         }
-        LifecycleOnAwakeCallbackWrapper wrapper = new LifecycleOnAwakeCallbackWrapper(lifecycle, listener);
+        LifecycleOnWakeUpCallbackWrapper wrapper
+                = new LifecycleOnWakeUpCallbackWrapper(lifecycle, listener);
         lifecycle.addObserver(wrapper);
-        onAwakeListeners.add(0, wrapper);
+        mOnWeakUpListeners.add(0, wrapper);
     }
 
-    private final class LifecycleOnAwakeCallbackWrapper
-            implements OnAwakeCallback,
+    private final class LifecycleOnWakeUpCallbackWrapper
+            implements OnWakeUpCallback,
             LifecycleEventObserver
     {
         private final Lifecycle lifecycle;
-        private final OnAwakeCallback onAwakeCallback;
+        private final OnWakeUpCallback onWakeUpCallback;
 
-        private LifecycleOnAwakeCallbackWrapper(Lifecycle lifecycle,
-                                                OnAwakeCallback onAwakeCallback)
+        private LifecycleOnWakeUpCallbackWrapper(Lifecycle lifecycle,
+                                                 OnWakeUpCallback onWakeUpCallback)
         {
             this.lifecycle = lifecycle;
-            this.onAwakeCallback = onAwakeCallback;
+            this.onWakeUpCallback = onWakeUpCallback;
             lifecycle.addObserver(this);
         }
 
         @Override
-        public boolean OnHandleAwake(String text)
+        public boolean handleWeakUp(String text)
         {
             if (lifecycle.getCurrentState().isAtLeast(Lifecycle.State.STARTED))
             {
-                return onAwakeCallback.OnHandleAwake(text);
+                return onWakeUpCallback.handleWeakUp(text);
             }
             return false;
         }
@@ -274,15 +256,15 @@ public class SpeakerServiceImpl implements SpeakerService
         {
             if (event == Lifecycle.Event.ON_DESTROY)
             {
-                synchronized (onAwakeListeners)
+                synchronized (mOnWeakUpListeners)
                 {
                     lifecycle.removeObserver(this);
-                    onAwakeListeners.remove(this);
+                    mOnWeakUpListeners.remove(this);
                 }
             }
         }
     }
-
+    
     private static final class AwakeResult
     {
 
@@ -295,15 +277,15 @@ public class SpeakerServiceImpl implements SpeakerService
 
         private boolean hasError()
         {
-            return errorCode != ERROR_NONE;
+            return errorCode != sErrorNone;
         }
     }
 
     private static final class VolumeResult
     {
-        @SerializedName("currentVolume-percent")
+        @SerializedName("volume-percent")
         private int volumePercent = -1;
-        @SerializedName("currentVolume")
+        @SerializedName("volume")
         private int volume = -1;
     }
 
