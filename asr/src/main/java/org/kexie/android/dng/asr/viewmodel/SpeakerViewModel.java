@@ -14,11 +14,14 @@ import androidx.lifecycle.AndroidViewModel;
 public class SpeakerViewModel extends AndroidViewModel
 {
     @Autowired(name = PR.asr.service)
-    private SpeakerService speakerService;
+    SpeakerService speakerService;
 
     public SpeakerViewModel(@NonNull Application application)
     {
         super(application);
         ARouter.getInstance().inject(this);
+        speakerService.getWeakUp().subscribe(s -> {
+
+        });
     }
 }

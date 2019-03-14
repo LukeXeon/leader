@@ -4,9 +4,11 @@ import android.os.Bundle;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.RxOnClick;
+import org.kexie.android.dng.common.model.SpeakerService;
 import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.host.R;
 import org.kexie.android.dng.host.databinding.ActivityHostBinding;
@@ -17,13 +19,20 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import java8.util.stream.IntStreams;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = PR.host.host)
 public final class HostActivity extends AppCompatActivity
 {
 
     private ActivityHostBinding binding;
+
+    //@Autowired(name = PR.asr.service)
+    SpeakerService speakerService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -69,14 +78,24 @@ public final class HostActivity extends AppCompatActivity
             }
         }));
 
-        Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(PR.ux.desktop)
+        speakerService = (SpeakerService) ARouter.getInstance()
+                .build(PR.asr.service)
                 .navigation();
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, fragment, PR.ux.desktop)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+
+
+        speakerService.getWeakUp()
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(Logger::d);
+
+//        Fragment fragment = (Fragment) ARouter.getInstance()
+//                .build(PR.ux.desktop)
+//                .navigation();
+//
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .add(R.id.fragment_container, fragment, PR.ux.desktop)
+//                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                .commit();
     }
 }

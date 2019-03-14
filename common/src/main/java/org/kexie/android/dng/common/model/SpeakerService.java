@@ -2,7 +2,6 @@ package org.kexie.android.dng.common.model;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
 
@@ -18,14 +17,7 @@ public interface SpeakerService extends IProvider
         Recognition;//识别中
     }
 
-    interface OnWakeUpCallback
-    {
-        boolean handleWeakUp(String text);
-    }
-
-    void addOnWeakUpCallback(LifecycleOwner owner, OnWakeUpCallback listener);
-
-    void removeOnWeakUpCallback(OnWakeUpCallback listener);
+    Observable<String> getWeakUp();
 
     LiveData<Status> getStatus();
 
