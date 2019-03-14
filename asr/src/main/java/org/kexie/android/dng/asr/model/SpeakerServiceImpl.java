@@ -23,25 +23,27 @@ import androidx.collection.ArrayMap;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 @Route(path = PR.asr.service)
 public class SpeakerServiceImpl implements SpeakerService
 {
 
     private final static int ERROR_NONE = 0;
-    private static final int STATUS_NONE = 2;
-    private static final int STATUS_READY = 3;
-    private static final int STATUS_SPEAKING = 4;
-    private static final int STATUS_RECOGNITION = 5;
-    private static final int STATUS_FINISHED = 6;
-    private static final int STATUS_LONG_SPEECH_FINISHED = 7;
-    private static final int STATUS_STOPPED = 10;
     private static final int backTrackInMs = 1500;
 
     private EventManager weakUp;
     private EventManager asr;
 
-    private final Gson gson = new Gson();
+    private MutableLiveData<Status> currentStatus = new MutableLiveData<>(Status.NONE);
+    private PublishSubject<Integer> currentVolume = PublishSubject.create();
+    private PublishSubject<String> finalResult = PublishSubject.create();
+    private PublishSubject<String> partialResult = PublishSubject.create();
+
+    private Gson gson = new Gson();
 
     private final CopyOnWriteArrayList<LifecycleOnAwakeCallbackWrapper> onAwakeListeners =
             new CopyOnWriteArrayList<>();
@@ -100,34 +102,55 @@ public class SpeakerServiceImpl implements SpeakerService
                 put(SpeechConstant.CALLBACK_EVENT_ASR_READY,
                         (name, params, data, offset, length) -> {
                             // 引擎准备就绪，可以开始说话
+                            currentStatus.setValue(Status.READY);
                         });
 
                 put(SpeechConstant.CALLBACK_EVENT_ASR_BEGIN,
                         (name, params, data, offset, length) -> {
                             // 检测到用户的已经开始说话
+
+                        });
+
+                put(SpeechConstant.CALLBACK_EVENT_ASR_END,
+                        (name, params, data, offset, length) -> {
+                            // 检测到用户的已经停止说话
+
                         });
 
                 put(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL,
                         (name, params, data, offset, length) -> {
                             // 临时识别结果, 长语音模式需要从此消息中取出结果
-                            SpeakerResult speakerResult = gson.fromJson(params,SpeakerResult.class);
+                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
+                            if (speakerResult.isFinalResult())
+                            {
+
+                            }else if (speakerResult.isPartialResult())
+                            {
+
+                            }else if (speakerResult.isNluResult())
+                            {
+
+                            }
                         });
 
                 put(SpeechConstant.CALLBACK_EVENT_ASR_FINISH,
                         (name, params, data, offset, length) -> {
                             // 识别结束， 最终识别结果或可能的错误
+                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
+
                         });
 
                 put(SpeechConstant.CALLBACK_EVENT_ASR_VOLUME,
                         (name, params, data, offset, length) -> {
                             // 实时音量
                             VolumeResult volumeResult = gson.fromJson(params, VolumeResult.class);
-
+                            currentVolume.onNext(volumeResult.volumePercent);
                         });
 
                 put(SpeechConstant.CALLBACK_EVENT_ASR_LONG_SPEECH,
                         (name, params, data, offset, length) -> {
                             // 长语音识别结束
+                            SpeakerResult speakerResult = gson.fromJson(params, SpeakerResult.class);
                         });
             }
         };
@@ -163,7 +186,7 @@ public class SpeakerServiceImpl implements SpeakerService
     }
 
     @Override
-    public void listening()
+    public void start()
     {
         cancel();
         asr.send(SpeechConstant.ASR_START, gson.toJson(new ArrayMap<String, Object>()
@@ -175,6 +198,30 @@ public class SpeakerServiceImpl implements SpeakerService
                 put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - backTrackInMs);
             }
         }), null, 0, 0);
+    }
+
+    @Override
+    public Observable<String> partialResult()
+    {
+        return partialResult;
+    }
+
+    @Override
+    public Observable<String> finalResult()
+    {
+        return finalResult;
+    }
+
+    @Override
+    public Observable<Integer> currentVolume()
+    {
+        return currentVolume;
+    }
+
+    @Override
+    public LiveData<Status> currentStatus()
+    {
+        return currentStatus;
     }
 
     private void cancel()
@@ -254,14 +301,18 @@ public class SpeakerServiceImpl implements SpeakerService
 
     private static final class VolumeResult
     {
-        @SerializedName("volume-percent")
+        @SerializedName("currentVolume-percent")
         private int volumePercent = -1;
-        @SerializedName("volume")
+        @SerializedName("currentVolume")
         private int volume = -1;
     }
 
     private static final class SpeakerResult
     {
+        private static final String FINAL_TAG = "final_result";
+        private static final String PARTIAL_TAG = "partial_result";
+        private static final String NLU_TAG = "nlu_result";
+
         @SerializedName("desc")
         private String desc;
         @SerializedName("result_type")
@@ -270,5 +321,22 @@ public class SpeakerServiceImpl implements SpeakerService
         private int error = -1;
         @SerializedName("sub_error")
         private int subError = -1;
+        @SerializedName("results_recognition")
+        private String[] results;
+
+        private boolean isFinalResult()
+        {
+            return FINAL_TAG.equals(resultType);
+        }
+
+        private boolean isPartialResult()
+        {
+            return PARTIAL_TAG.equals(resultType);
+        }
+
+        private boolean isNluResult()
+        {
+            return NLU_TAG.equals(resultType);
+        }
     }
 }

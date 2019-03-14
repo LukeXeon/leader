@@ -1865,7 +1865,7 @@ public class IjkPlayerView extends FrameLayout
      */
     private void _switchStatus(int status)
     {
-        Log.i("IjkPlayerView", "status " + status);
+        Log.i("IjkPlayerView", "currentStatus " + status);
         switch (status)
         {
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
@@ -3059,7 +3059,7 @@ public class IjkPlayerView extends FrameLayout
                 int scale = intent.getIntExtra("scale", 100);
                 // 电量百分比
                 int curPower = level * 100 / scale;
-                int status = intent.getIntExtra("status", BatteryManager.BATTERY_HEALTH_UNKNOWN);
+                int status = intent.getIntExtra("currentStatus", BatteryManager.BATTERY_HEALTH_UNKNOWN);
                 // SecondaryProgress 用来展示低电量，Progress 用来展示正常电量
                 if (status == BatteryManager.BATTERY_STATUS_CHARGING)
                 {
