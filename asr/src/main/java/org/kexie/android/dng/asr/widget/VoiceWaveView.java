@@ -14,14 +14,12 @@ import android.view.View;
 
 import org.kexie.android.dng.asr.R;
 
-import java.util.Random;
-
 /**
  * 音量反馈动画类，动画分为三个步骤(preparing, recording, recognizing)
  *
  * @author luke
  */
-public class AnimationView extends View
+public final class VoiceWaveView extends View
 {
     public static final int SAMPE_RATE_VOLUME = 50;
 
@@ -47,10 +45,10 @@ public class AnimationView extends View
 
 
     /* INITIALIZING状态数据 */
-    private static byte[] INIT_VOLUME_ARRAY = new byte[RECT_IN_ROW];
+    private final static byte[] INIT_VOLUME_ARRAY = new byte[RECT_IN_ROW];
 
     /* PREPARING状态数据 */
-    private static byte[] PREPARING_VOLUME_ARRAY = new byte[]{
+    private final static byte[] PREPARING_VOLUME_ARRAY = new byte[]{
             11, 11, 11, 11, 11, 11, 11, 11, 11,
             11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
             11,
@@ -175,19 +173,19 @@ public class AnimationView extends View
             14, 14, 14
     };
 
-    private static byte[][] VOLUMES_GROUP1 = new byte[][]{
+    private final static byte[][] VOLUMES_GROUP1 = new byte[][]{
             GROUP1_VOLUME_ARRAY1, GROUP1_VOLUME_ARRAY2,
             GROUP1_VOLUME_ARRAY3, GROUP1_VOLUME_ARRAY4, GROUP1_VOLUME_ARRAY5, GROUP1_VOLUME_ARRAY6,
             GROUP1_VOLUME_ARRAY7
     };
 
-    private static byte[][] VOLUMES_GROUP2 = new byte[][]{
+    private final static byte[][] VOLUMES_GROUP2 = new byte[][]{
             GROUP2_VOLUME_ARRAY1, GROUP2_VOLUME_ARRAY2,
             GROUP2_VOLUME_ARRAY3, GROUP2_VOLUME_ARRAY4, GROUP2_VOLUME_ARRAY5, GROUP2_VOLUME_ARRAY6,
             GROUP2_VOLUME_ARRAY7
     };
 
-    private static byte[][] VOLUMES_GROUP3 = new byte[][]{
+    private final static byte[][] VOLUMES_GROUP3 = new byte[][]{
             GROUP3_VOLUME_ARRAY1, GROUP3_VOLUME_ARRAY2,
             GROUP3_VOLUME_ARRAY3, GROUP3_VOLUME_ARRAY4, GROUP3_VOLUME_ARRAY5, GROUP3_VOLUME_ARRAY6,
             GROUP3_VOLUME_ARRAY7
@@ -260,17 +258,17 @@ public class AnimationView extends View
     private ColorFilter mHsvFilter;
     private float mCurrentDBLevelMeter;
 
-    public AnimationView(Context context)
+    public VoiceWaveView(Context context)
     {
         this(context, null);
     }
 
-    public AnimationView(Context context, AttributeSet attrs)
+    public VoiceWaveView(Context context, AttributeSet attrs)
     {
         this(context, attrs, 0);
     }
 
-    public AnimationView(Context context, AttributeSet attrs, int defStyleAttr)
+    public VoiceWaveView(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
         // TODO Auto-generated constructor stub
@@ -286,32 +284,6 @@ public class AnimationView extends View
         targetVolumeArray = volumes[0];
 
         setThemeStyle(0x01000000 | 0x00000001);
-        startRecordingAnimation();
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                while (true)
-                {
-                    try
-                    {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            setVolumeLevel(new Random().nextInt() % 5);
-                        }
-                    });
-                }
-            }
-        }.start();
     }
 
 
@@ -442,7 +414,6 @@ public class AnimationView extends View
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
-        // TODO Auto-generated method stub
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         // 用控件宽度值计算高度值，从而保持采样格为方形。
@@ -814,7 +785,6 @@ public class AnimationView extends View
         @Override
         public void run()
         {
-            // TODO Auto-generated method stub
             invalidate();
             post(this);
         }

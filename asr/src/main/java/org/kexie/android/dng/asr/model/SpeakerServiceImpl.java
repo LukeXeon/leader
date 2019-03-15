@@ -22,11 +22,12 @@ import androidx.collection.ArrayMap;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 @Route(path = PR.asr.service,name = "语音识别服务")
 public class SpeakerServiceImpl implements SpeakerService
 {
-    //private static final int sBackTrackInMs = 1500;
+    private static final int sBackTrackInMs = 1500;
     private static final int sErrorNone = 0;
     private static final int sNormalVID = 1536;
     private static final String sWeakUpBin = "assets:///WakeUp.bin";
@@ -37,7 +38,7 @@ public class SpeakerServiceImpl implements SpeakerService
     private Gson mGson = new Gson();
     private MutableLiveData<Status> mStatus = new MutableLiveData<>(Status.Initialization);
     private MutableLiveData<Integer> mCurrentVolume = new MutableLiveData<>(0);
-    private Observable<String> mWeakUp;
+    private Observable<String> mWeakUpResult;
     private Observable<String> mPartialResult;
     private Observable<String> mFinalResult;
 
@@ -59,44 +60,44 @@ public class SpeakerServiceImpl implements SpeakerService
                     mStatus.setValue(Status.Recognition);
                     mCurrentVolume.setValue(0);
                 });
+        // 取消
+        eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_CANCEL,
+                (name, params, data, offset, length) -> {
+                    mStatus.setValue(Status.Idle);
+                    mCurrentVolume.setValue(0);
+                });
         // 实时音量
         eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_VOLUME,
                 (name, params, data, offset, length) -> {
                     VolumeResult volumeResult
                             = mGson.fromJson(params, VolumeResult.class);
+                    if (!Status.Speaking.equals(mStatus.getValue()))
+                    {
+                        return;
+                    }
                     mCurrentVolume.setValue(volumeResult.volumePercent);
                 });
+        // 引擎完成
+        eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_FINISH,
+                (name, params, data, offset, length) -> mStatus.setValue(Status.Idle));
+        // 结果处理
+        PublishSubject<String> push = PublishSubject.create();
+        eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL,
+                (name, params, data, offset, length) -> push.onNext(params));
+        Observable<SpeakerResult> result = push
+                .doOnNext(Logger::d)
+                .map(params -> mGson.fromJson(params, SpeakerResult.class))
+                .filter(speakerResult -> !speakerResult.hasError())
+                .filter(speakerResult -> speakerResult.results != null)
+                .filter(speakerResult -> speakerResult.results.length != 0);
         // 临时识别结果, 长语音模式需要从此消息中取出结果
-        mPartialResult = Observable.create(emitter ->
-                eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL,
-                        (name, params, data, offset, length) -> {
-                            SpeakerResult speakerResult
-                                    = mGson.fromJson(params, SpeakerResult.class);
-                            if (!speakerResult.hasError()
-                                    && speakerResult.results != null
-                                    && speakerResult.results.length != 0
-                                    && speakerResult.isPartialResult())
-                            {
-                                emitter.onNext(speakerResult.results[0]);
-                            }
-                        }));
+        mPartialResult = result.filter(SpeakerResult::isPartialResult)
+                .map(speakerResult -> speakerResult.results[0]);
         // 最终结果
-        mFinalResult = Observable.create(emitter ->
-                eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_FINISH,
-                        (name, params, data, offset, length) -> {
-                            SpeakerResult speakerResult
-                                    = mGson.fromJson(params, SpeakerResult.class);
-                            if (!speakerResult.hasError()
-                                    && speakerResult.results != null
-                                    && speakerResult.results.length != 0
-                                    && speakerResult.isFinalResult())
-                            {
-                                emitter.onNext(speakerResult.results[0]);
-                            }
-                            mStatus.setValue(Status.Idle);
-                        }));
-
+        mFinalResult = result.filter(SpeakerResult::isFinalResult)
+                .map(speakerResult -> speakerResult.results[0]);
         mAsrManager.registerListener((name, params, data, offset, length) -> {
+            Logger.d(name);
             EventListener eventListener = eventHandlers.get(name);
             if (eventListener != null)
             {
@@ -108,17 +109,18 @@ public class SpeakerServiceImpl implements SpeakerService
         Map<String, EventListener> eventHandlers2 = new ArrayMap<>();
         eventHandlers2.put(SpeechConstant.CALLBACK_EVENT_WAKEUP_ERROR,
                 (name, params, data, offset, length) -> Logger.d(params));
-        mWeakUp = Observable.create(emitter ->
-                eventHandlers2.put(SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS,
-                        (name, params, data, offset, length) -> {
-                            WeakUpResult weakUpResult
-                                    = mGson.fromJson(params, WeakUpResult.class);
-                            if (!weakUpResult.hasError() && sWeakUpText.equals(weakUpResult.word))
-                            {
-                                emitter.onNext(weakUpResult.word);
-                            }
-                        }));
+        PublishSubject<String> push2 = PublishSubject.create();
+        eventHandlers2.put(SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS,
+                (name, params, data, offset, length) -> push2.onNext(params));
+        mWeakUpResult = push2
+                .doOnNext(Logger::d)
+                .map(params -> mGson.fromJson(params, WeakUpResult.class))
+                .filter(weakUpResult -> !weakUpResult.hasError())
+                .filter(weakUpResult -> sWeakUpText.equals(weakUpResult.word))
+                .map(weakUpResult -> weakUpResult.word);
+
         mWeakUpManager.registerListener((name, params, data, offset, length) -> {
+            Logger.d(name);
             EventListener eventListener = eventHandlers2.get(name);
             if (eventListener != null)
             {
@@ -132,7 +134,6 @@ public class SpeakerServiceImpl implements SpeakerService
             @Override
             public void onEvent(String name, String params, byte[] data, int offset, int length)
             {
-
                 if (SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name))
                 {
                     mStatus.setValue(Status.Idle);
@@ -146,13 +147,10 @@ public class SpeakerServiceImpl implements SpeakerService
     }
 
     @Override
-    public boolean start()
+    public boolean beginTransaction()
     {
         // 必须主线程
-        if (!Looper.getMainLooper().equals(Looper.myLooper()))
-        {
-            throw new AssertionError("must run at main thread");
-        }
+        assertMainThread();
         // 必须待机态
         if (!Status.Idle.equals(mStatus.getValue()))
         {
@@ -165,7 +163,7 @@ public class SpeakerServiceImpl implements SpeakerService
                         put(SpeechConstant.ACCEPT_AUDIO_VOLUME, true);
                         put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
                         put(SpeechConstant.PID, sNormalVID);
-                        //put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - sBackTrackInMs);
+                        put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - sBackTrackInMs);
                     }
                 }), null, 0, 0);
         mStatus.setValue(Status.Prepare);
@@ -173,7 +171,21 @@ public class SpeakerServiceImpl implements SpeakerService
     }
 
     @Override
-    public LiveData<Status> getStatus()
+    public void endTransaction()
+    {
+        mAsrManager.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0);
+    }
+
+    private static void assertMainThread()
+    {
+        if (!Looper.getMainLooper().equals(Looper.myLooper()))
+        {
+            throw new AssertionError("must run at main thread");
+        }
+    }
+
+    @Override
+    public LiveData<Status> getCurrentStatus()
     {
         return mStatus;
     }
@@ -185,9 +197,9 @@ public class SpeakerServiceImpl implements SpeakerService
     }
 
     @Override
-    public Observable<String> getWeakUp()
+    public Observable<String> getWeakUpResult()
     {
-        return mWeakUp;
+        return mWeakUpResult;
     }
 
     @Override

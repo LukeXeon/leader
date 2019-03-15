@@ -17,15 +17,17 @@ public interface SpeakerService extends IProvider
         Recognition;//识别中
     }
 
-    Observable<String> getWeakUp();
-
-    LiveData<Status> getStatus();
+    LiveData<Status> getCurrentStatus();
 
     LiveData<Integer> getCurrentVolume();
+
+    Observable<String> getWeakUpResult();
 
     Observable<String> getPartialResult();
 
     Observable<String> getFinalResult();
 
-    boolean start();
+    boolean beginTransaction();
+
+    void endTransaction();
 }

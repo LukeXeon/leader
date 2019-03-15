@@ -2,6 +2,7 @@ package org.kexie.android.dng.host.view;
 
 import android.os.Bundle;
 
+import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.Logger;
@@ -31,7 +32,7 @@ public final class HostActivity extends AppCompatActivity
 
     private ActivityHostBinding binding;
 
-    //@Autowired(name = PR.asr.service)
+    @Autowired(name = PR.asr.service)
     SpeakerService speakerService;
 
     @Override
@@ -42,24 +43,25 @@ public final class HostActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
         binding.setOnBack(new RxOnClick(this, v -> {
-            if (getSupportFragmentManager().getFragments().size() > 1)
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0)
             {
                 onBackPressed();
             }
         }));
         binding.setOnHome(new RxOnClick(this, v -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            int size = fragmentManager.getFragments().size();
-            if (size == 1)
+            int size = getSupportFragmentManager().getBackStackEntryCount();
+            if (size == 0)
             {
                 return;
             }
-            IntStreams.iterate(1, i -> i < size - 1, i -> i + 1)
+            IntStreams.iterate(0, i -> i < size, i -> i + 1)
                     .forEach(i -> fragmentManager.popBackStackImmediate());
         }));
-        binding.setOnSpeak(new RxOnClick(this, v -> {
+        Runnable runnable = ()->{
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentByTag(PR.asr.speaker);
+            Logger.d(fragment);
             if (fragment == null)
             {
                 fragment = (Fragment) ARouter.getInstance()
@@ -67,35 +69,32 @@ public final class HostActivity extends AppCompatActivity
                         .navigation();
                 fragmentManager.beginTransaction()
                         .add(R.id.fragment_container, fragment, PR.asr.speaker)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit();
-            } else
-            {
-                fragmentManager.beginTransaction()
-                        .show(fragment)
+                        .addToBackStack(null)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
             }
-        }));
+        };
+        binding.setOnSpeak(new RxOnClick(this, v -> runnable.run()));
+        addOnBackPressedCallback(() -> getSupportFragmentManager().getBackStackEntryCount() == 0);
 
-        speakerService = (SpeakerService) ARouter.getInstance()
-                .build(PR.asr.service)
+        ARouter.getInstance().inject(this);
+
+        speakerService.getWeakUpResult()
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(s -> {
+                    runnable.run();
+                    speakerService.beginTransaction();
+                });
+
+
+        Fragment fragment = (Fragment) ARouter.getInstance()
+                .build(PR.ux.desktop)
                 .navigation();
 
-
-
-        speakerService.getWeakUp()
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(Logger::d);
-
-//        Fragment fragment = (Fragment) ARouter.getInstance()
-//                .build(PR.ux.desktop)
-//                .navigation();
-//
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.fragment_container, fragment, PR.ux.desktop)
-//                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                .commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, fragment, PR.ux.desktop)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 }

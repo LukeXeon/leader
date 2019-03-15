@@ -22,8 +22,6 @@ import org.kexie.android.dng.navi.widget.NaviUtil
 class RunningViewModel(application: Application,private val navi:NaviController)
     : AndroidViewModel(application) {
 
-    private val naviImpl = NaviImpl()
-
     private val worker = HandlerThread(toString()).apply {
         start()
     }
@@ -33,7 +31,164 @@ class RunningViewModel(application: Application,private val navi:NaviController)
     init {
         with(navi)
         {
-            addAMapNaviListener(naviImpl)
+            addAMapNaviListener(object : NaviCallback() {
+                override fun onNaviInfoUpdate(naviInfo: NaviInfo?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    if (naviInfo != null) {
+                        val allLength = navi.naviPath.allLength
+
+                        val trafficStatuses = navi.getTrafficStatuses(0, 0)
+
+                        val pathRetainDistance = naviInfo.pathRetainDistance
+
+                        val iconType = naviInfo.iconType
+
+                        val nextRoadName = naviInfo.nextRoadName
+
+                        val nextRoadDistance = NaviUtil.formatKM(naviInfo.curStepRetainDistance)
+
+                        val curStep = naviInfo.curStep
+
+                        runningInfo.value = RunningInfo(
+                                allLength = allLength,
+                                trafficStatuses = trafficStatuses,
+                                pathRetainDistance = pathRetainDistance,
+                                iconType = iconType,
+                                nextRoadName = nextRoadName,
+                                nextRoadDistance = nextRoadDistance,
+                                curStep = curStep)
+
+                    }
+                }
+
+                override fun hideLaneInfo() {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    laneInfo.value = null
+                }
+
+                override fun showLaneInfo(aMapLaneInfo: AMapLaneInfo?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    laneInfo.value = aMapLaneInfo;
+                }
+
+                override fun showCross(aMapNaviCross: AMapNaviCross?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    crossImage.value = aMapNaviCross
+                }
+
+                override fun hideCross() {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    crossImage.value = null
+                }
+
+                override fun showModeCross(aMapModelCross: AMapModelCross?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    if (aMapModelCross == null) {
+                        return
+                    }
+                    handler.post {
+                        try {
+                            val context = getApplication<Application>()
+                            val attr = GLCrossVector.AVectorCrossAttr()
+                            // 设置显示区域
+                            attr.stAreaRect = Rect(0, DensityUtils.dp2px(context, 50f),
+                                    DensityUtils.getScreenWidth(getApplication()),
+                                    DensityUtils.dp2px(context,
+                                            300f))
+
+                            //        attr.stAreaRect = new Rect(0, dp2px(48), nWidth, dp2px(290));
+                            attr.stAreaColor = Color.argb(217, 95, 95, 95)/* 背景颜色 */
+                            attr.fArrowBorderWidth = DensityUtils.dp2px(context, 22f)/* 箭头边线宽度 */
+                            attr.stArrowBorderColor = Color.argb(0, 0, 50, 20)/* 箭头边线颜色 */
+                            attr.fArrowLineWidth = DensityUtils.dp2px(context, 18f)/* 箭头内部宽度 */
+                            attr.stArrowLineColor = Color.argb(255, 255, 253, 65)/* 箭头内部颜色 */
+                            attr.dayMode = false
+                            attr.fArrowLineWidth = 18/* 箭头内部宽度 */
+                            attr.stArrowLineColor = Color.argb(255, 255, 253, 65)/* 箭头内部颜色 */
+                            attr.dayMode = true
+                            val inputStream = context
+                                    .resources
+                                    .assets
+                                    .open("vector3d_arrow_in.png")
+                            val bitmap = BitmapFactory.decodeStream(inputStream)
+                            inputStream.close()
+
+                            val newModelCross = ModeCross(
+                                    buffer = aMapModelCross.picBuf1,
+                                    attr = attr,
+                                    res = bitmap)
+
+                            modeCross.postValue(newModelCross)
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
+                override fun hideModeCross() {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    modeCross.value = null
+                }
+
+                override fun notifyParallelRoad(i: Int) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    if (i == 0) {
+                        onInfo.onNext("当前在主辅路过渡")
+                        return
+                    }
+                    if (i == 1) {
+                        onInfo.onNext("当前在主路");
+                        return
+                    }
+                    if (i == 2) {
+                        onInfo.onNext("当前在辅路");
+                    }
+                }
+
+                override fun onLocationChange(aMapNaviLocation: AMapNaviLocation?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    if (aMapNaviLocation != null) {
+                        location.value = aMapNaviLocation
+                    }
+                }
+
+                override fun updateCameraInfo(aMapNaviCameraInfos: Array<out AMapNaviCameraInfo>?) {
+                    val isRun = isRunning.value;
+                    if (isRun == null || !isRun) {
+                        return
+                    }
+                    if (aMapNaviCameraInfos != null) {
+                        cameraInfo.value = aMapNaviCameraInfos;
+                    }
+                }
+            })
             setUseInnerVoice(true)
         }
     }
@@ -55,165 +210,6 @@ class RunningViewModel(application: Application,private val navi:NaviController)
     val isLockCamera = MutableLiveData<Boolean>()
 
     val onInfo = PublishSubject.create<String>()
-
-    private inner class NaviImpl : NaviCallback() {
-        override fun onNaviInfoUpdate(naviInfo: NaviInfo?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            if (naviInfo != null) {
-                val allLength = navi.naviPath.allLength
-
-                val trafficStatuses = navi.getTrafficStatuses(0, 0)
-
-                val pathRetainDistance = naviInfo.pathRetainDistance
-
-                val iconType = naviInfo.iconType
-
-                val nextRoadName = naviInfo.nextRoadName
-
-                val nextRoadDistance = NaviUtil.formatKM(naviInfo.curStepRetainDistance)
-
-                val curStep = naviInfo.curStep
-
-                runningInfo.value = RunningInfo(
-                        allLength = allLength,
-                        trafficStatuses = trafficStatuses,
-                        pathRetainDistance = pathRetainDistance,
-                        iconType = iconType,
-                        nextRoadName = nextRoadName,
-                        nextRoadDistance = nextRoadDistance,
-                        curStep = curStep)
-
-            }
-        }
-
-        override fun hideLaneInfo() {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            laneInfo.value = null
-        }
-
-        override fun showLaneInfo(aMapLaneInfo: AMapLaneInfo?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            laneInfo.value = aMapLaneInfo;
-        }
-
-        override fun showCross(aMapNaviCross: AMapNaviCross?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            crossImage.value = aMapNaviCross
-        }
-
-        override fun hideCross() {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            crossImage.value = null
-        }
-
-        override fun showModeCross(aMapModelCross: AMapModelCross?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            if (aMapModelCross == null) {
-                return
-            }
-            handler.post {
-                try {
-                    val context = getApplication<Application>()
-                    val attr = GLCrossVector.AVectorCrossAttr()
-                    // 设置显示区域
-                    attr.stAreaRect = Rect(0, DensityUtils.dp2px(context, 50f),
-                            DensityUtils.getScreenWidth(getApplication()),
-                            DensityUtils.dp2px(context,
-                                    300f))
-
-                    //        attr.stAreaRect = new Rect(0, dp2px(48), nWidth, dp2px(290));
-                    attr.stAreaColor = Color.argb(217, 95, 95, 95)/* 背景颜色 */
-                    attr.fArrowBorderWidth = DensityUtils.dp2px(context, 22f)/* 箭头边线宽度 */
-                    attr.stArrowBorderColor = Color.argb(0, 0, 50, 20)/* 箭头边线颜色 */
-                    attr.fArrowLineWidth = DensityUtils.dp2px(context, 18f)/* 箭头内部宽度 */
-                    attr.stArrowLineColor = Color.argb(255, 255, 253, 65)/* 箭头内部颜色 */
-                    attr.dayMode = false
-                    attr.fArrowLineWidth = 18/* 箭头内部宽度 */
-                    attr.stArrowLineColor = Color.argb(255, 255, 253, 65)/* 箭头内部颜色 */
-                    attr.dayMode = true
-                    val inputStream = context
-                            .resources
-                            .assets
-                            .open("vector3d_arrow_in.png")
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream.close()
-
-                    val newModelCross = ModeCross(
-                            buffer = aMapModelCross.picBuf1,
-                            attr = attr,
-                            res = bitmap)
-
-                    modeCross.postValue(newModelCross)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        override fun hideModeCross() {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            modeCross.value = null
-        }
-
-        override fun notifyParallelRoad(i: Int) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            if (i == 0) {
-                onInfo.onNext("当前在主辅路过渡")
-                return
-            }
-            if (i == 1) {
-                onInfo.onNext("当前在主路");
-                return
-            }
-            if (i == 2) {
-                onInfo.onNext("当前在辅路");
-            }
-        }
-
-        override fun onLocationChange(aMapNaviLocation: AMapNaviLocation?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            if (aMapNaviLocation != null) {
-                location.value = aMapNaviLocation
-            }
-        }
-
-        override fun updateCameraInfo(aMapNaviCameraInfos: Array<out AMapNaviCameraInfo>?) {
-            val isRun = isRunning.value;
-            if (isRun == null || !isRun) {
-                return
-            }
-            if (aMapNaviCameraInfos != null) {
-                cameraInfo.value = aMapNaviCameraInfos;
-            }
-        }
-    }
 
     override fun onCleared() {
         navi.stopNavi()

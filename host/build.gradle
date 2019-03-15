@@ -11,6 +11,10 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        renderscriptTargetApi 19
+        renderscriptSupportModeEnabled  true
+
         ndk {
             abiFilters "armeabi-v7a"
         }
