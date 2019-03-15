@@ -19,7 +19,7 @@ import org.kexie.android.dng.asr.R;
  *
  * @author luke
  */
-public final class VoiceWaveView extends View
+public final class WaveformView1 extends View
 {
     public static final int SAMPE_RATE_VOLUME = 50;
 
@@ -258,17 +258,17 @@ public final class VoiceWaveView extends View
     private ColorFilter mHsvFilter;
     private float mCurrentDBLevelMeter;
 
-    public VoiceWaveView(Context context)
+    public WaveformView1(Context context)
     {
         this(context, null);
     }
 
-    public VoiceWaveView(Context context, AttributeSet attrs)
+    public WaveformView1(Context context, AttributeSet attrs)
     {
         this(context, attrs, 0);
     }
 
-    public VoiceWaveView(Context context, AttributeSet attrs, int defStyleAttr)
+    public WaveformView1(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
         // TODO Auto-generated constructor stub

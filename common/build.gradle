@@ -60,6 +60,7 @@ dependencies {
     api 'com.github.GrenderG:Toasty:1.4.0'
     api 'com.makeramen:roundedimageview:2.3.0'
     api 'de.hdodenhof:circleimageview:3.0.0'
+    api 'com.dnkilic.waveform:waveform:0.9.3'
     //api 'com.flipboard:bottomsheet-core:1.5.3'
 
     //util framework

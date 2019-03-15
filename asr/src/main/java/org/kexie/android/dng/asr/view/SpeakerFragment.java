@@ -4,14 +4,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.asr.BR;
 import org.kexie.android.dng.asr.R;
 import org.kexie.android.dng.asr.databinding.FragmentSpeakerBinding;
 import org.kexie.android.dng.asr.viewmodel.SpeakerViewModel;
 import org.kexie.android.dng.asr.viewmodel.entity.Message;
+import org.kexie.android.dng.asr.widget.WaveformView2;
+import org.kexie.android.dng.asr.widget.WaveformView2PreLoader;
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
 
@@ -53,7 +57,6 @@ public class SpeakerFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
-
         messageGenericQuickAdapter = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
 
         binding.setLifecycleOwner(this);
@@ -66,37 +69,40 @@ public class SpeakerFragment extends Fragment
                 .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
 
+        WaveformView2 waveformView2 = WaveformView2PreLoader.getView();
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        waveformView2.setLayoutParams(params);
+        binding.animation.addView(waveformView2);
+
         viewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
         viewModel.getNextMessage()
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
-                .subscribe(messageGenericQuickAdapter::addData);
-        viewModel.getVolume().observe(this, binding.animation::setCurrentDBLevelMeter);
+                .subscribe(data -> messageGenericQuickAdapter.addData(0, data));
         viewModel.getStatus().observe(this, status -> {
+            Logger.d(status);
             switch (status)
             {
                 case Initialization:
-                {
-                    binding.animation.startInitializingAnimation();
-                }
-                break;
                 case Idle:
                 {
-                    binding.animation.startInitializingAnimation();
+                    waveformView2.stop();
                 }
                 break;
                 case Prepare:
                 {
-                    binding.animation.startInitializingAnimation();
+                    waveformView2.initialize();
                 }
                 break;
                 case Speaking:
                 {
-                    binding.animation.startRecordingAnimation();
+                    waveformView2.speechStarted();
                 }
                 break;
                 case Recognition:
                 {
-                    binding.animation.startRecognizingAnimation();
+                    waveformView2.speechEnded();
                 }
                 break;
             }
@@ -109,6 +115,24 @@ public class SpeakerFragment extends Fragment
             viewModel.endTransaction();
             return false;
         });
+
+        Bundle bundle = getArguments();
+        Logger.d(bundle != null && bundle.getBoolean("weakUp"));
+        if (bundle != null)
+        {
+            if (bundle.getBoolean("weakUp"))
+            {
+                viewModel.beginTransaction();
+            }
+        }
     }
 
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        binding.animation.removeAllViews();
+        binding.unbind();
+        binding = null;
+    }
 }

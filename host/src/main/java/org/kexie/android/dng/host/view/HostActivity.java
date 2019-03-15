@@ -5,7 +5,6 @@ import android.os.Bundle;
 import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.RxOnClick;
@@ -58,10 +57,9 @@ public final class HostActivity extends AppCompatActivity
             IntStreams.iterate(0, i -> i < size, i -> i + 1)
                     .forEach(i -> fragmentManager.popBackStackImmediate());
         }));
-        Runnable runnable = ()->{
+        binding.setOnSpeak(new RxOnClick(this, v -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             Fragment fragment = fragmentManager.findFragmentByTag(PR.asr.speaker);
-            Logger.d(fragment);
             if (fragment == null)
             {
                 fragment = (Fragment) ARouter.getInstance()
@@ -73,8 +71,7 @@ public final class HostActivity extends AppCompatActivity
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
             }
-        };
-        binding.setOnSpeak(new RxOnClick(this, v -> runnable.run()));
+        }));
         addOnBackPressedCallback(() -> getSupportFragmentManager().getBackStackEntryCount() == 0);
 
         ARouter.getInstance().inject(this);
@@ -82,8 +79,20 @@ public final class HostActivity extends AppCompatActivity
         speakerService.getWeakUpResult()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> {
-                    runnable.run();
-                    speakerService.beginTransaction();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    Fragment fragment = fragmentManager.findFragmentByTag(PR.asr.speaker);
+                    if (fragment == null)
+                    {
+                        fragment = (Fragment) ARouter.getInstance()
+                                .build(PR.asr.speaker)
+                                .withBoolean("weakUp", true)
+                                .navigation();
+                        fragmentManager.beginTransaction()
+                                .add(R.id.fragment_container, fragment, PR.asr.speaker)
+                                .addToBackStack(null)
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                .commit();
+                    }
                 });
 
 

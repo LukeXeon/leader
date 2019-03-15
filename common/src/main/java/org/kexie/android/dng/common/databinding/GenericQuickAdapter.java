@@ -12,6 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import static com.uber.autodispose.AutoDispose.autoDisposable;
@@ -54,6 +55,7 @@ public class GenericQuickAdapter<X>
         public RxOnItemClick(LifecycleOwner lifecycleOwner, OnItemClickListener<X> listener)
         {
             subject.throttleFirst(500, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .as(autoDisposable(from(lifecycleOwner, Lifecycle.Event.ON_DESTROY)))
                     .subscribe((pack) -> listener.onItemClick(
                             (GenericQuickAdapter<X>) pack[0],
