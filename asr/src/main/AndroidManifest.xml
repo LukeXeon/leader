@@ -3,7 +3,7 @@
 
     <application>
         <provider
-            android:authorities="{applicationId}.waveformview2-initializer"
+            android:authorities="${applicationId}.waveformview2-initializer"
             android:name=".widget.WaveformView2$Initializer"
             android:exported="false"/>
     </application>

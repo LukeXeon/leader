@@ -121,10 +121,7 @@ public class SpeakerFragment extends Fragment
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> speakerViewModel.beginTransaction());
 
-        requireActivity().addOnBackPressedCallback(this, () -> {
-            speakerViewModel.endTransaction();
-            return false;
-        });
+        requireActivity().addOnBackPressedCallback(this, requireFragmentManager()::popBackStackImmediate);
 
         Bundle bundle = getArguments();
         if (bundle != null)
@@ -140,8 +137,7 @@ public class SpeakerFragment extends Fragment
     public void onDestroyView()
     {
         super.onDestroyView();
+        speakerViewModel.endTransaction();
         WaveformView2.Provider.INSTANCE.release();
-        waveformView2 = null;
     }
-
 }
