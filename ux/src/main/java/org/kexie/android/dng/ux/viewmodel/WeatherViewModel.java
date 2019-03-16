@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import java8.util.Objects;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class WeatherViewModel extends AndroidViewModel
@@ -32,7 +32,7 @@ public class WeatherViewModel extends AndroidViewModel
     private void loadWallpaper()
     {
         Retrofit retrofit = new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("http://cn.bing.com")
                 .client(new OkHttpClient())

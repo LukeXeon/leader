@@ -5,14 +5,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.alibaba.android.arouter.launcher.ARouter
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
+import org.kexie.android.dng.asr.R
 import org.kexie.android.dng.asr.model.AIService
 import org.kexie.android.dng.asr.model.entity.AIRequest
 import org.kexie.android.dng.asr.viewmodel.entity.Message
 import org.kexie.android.dng.common.app.PR
 import org.kexie.android.dng.common.model.SpeakerService
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class SpeakerViewModel(application: Application) : AndroidViewModel(application) {
@@ -20,7 +23,6 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
     private var speakerService: SpeakerService = ARouter.getInstance()
             .build(PR.asr.service)
             .navigation() as SpeakerService
-
     private val aiService: AIService
     val status: LiveData<SpeakerService.Status>
     val volume: LiveData<Int>
@@ -29,18 +31,20 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         val retrofit = Retrofit.Builder()
-                .baseUrl("http://openapi.tuling123.com")
+                .baseUrl(getApplication<Application>().getString(R.string.ai_open_api_url))
                 .client(OkHttpClient())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         aiService = retrofit.create(AIService::class.java)
 
-        nextMessage = speakerService.finalResult.map {
-            Message(Message.TYPE_USER, it)
-        }.flatMap {
-            Observable.just(it).mergeWith(post(it.text))
-        }
+        nextMessage = speakerService.finalResult
+                .map {
+                    Message(Message.TYPE_USER, it)
+                }.observeOn(Schedulers.io())
+                .flatMap {
+                    Observable.just(it).mergeWith(post(it.text))
+                }.observeOn(AndroidSchedulers.mainThread())
 
         volume = speakerService.currentVolume
         status = speakerService.currentStatus
@@ -48,7 +52,15 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun post(text: String): Observable<Message> {
+        val context = getApplication<Application>()
         val request = AIRequest()
+        request.reqType = 0
+        request.perception = AIRequest.Perception()
+        request.perception.inputText = AIRequest.Perception.InputText()
+        request.perception.inputText.text = text
+        request.userInfo = AIRequest.UserInfo()
+        request.userInfo.apiKey = context.getString(R.string.ai_api_key)
+        request.userInfo.userId = context.getString(R.string.ai_user_id)
         return aiService.post(request)
                 .flatMap {
                     Observable.fromArray(*it.results.toTypedArray())

@@ -57,7 +57,7 @@ public final class SystemUtil
     private static UUID uuid;
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
-    public synchronized UUID getUuid(Context context)
+    public static synchronized UUID getUuid(Context context)
     {
         context = context.getApplicationContext();
         if (uuid == null)

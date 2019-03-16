@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">asr</string>
+    <string name="ai_api_key">b44a2e5106704588ba9874e29af4d106</string>
+    <string name="ai_open_api_url">http://openapi.tuling123.com</string>
+    <string name="ai_user_id">415822</string>
 </resources>
