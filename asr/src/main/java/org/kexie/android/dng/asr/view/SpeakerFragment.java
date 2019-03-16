@@ -1,13 +1,14 @@
 package org.kexie.android.dng.asr.view;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.asr.BR;
 import org.kexie.android.dng.asr.R;
@@ -15,9 +16,10 @@ import org.kexie.android.dng.asr.databinding.FragmentSpeakerBinding;
 import org.kexie.android.dng.asr.viewmodel.SpeakerViewModel;
 import org.kexie.android.dng.asr.viewmodel.entity.Message;
 import org.kexie.android.dng.asr.widget.WaveformView2;
-import org.kexie.android.dng.asr.widget.WaveformView2PreLoader;
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
+
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,6 +54,7 @@ public class SpeakerFragment extends Fragment
         return binding.getRoot();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
@@ -69,19 +72,16 @@ public class SpeakerFragment extends Fragment
                 .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
 
-        WaveformView2 waveformView2 = WaveformView2PreLoader.getView();
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        waveformView2.setLayoutParams(params);
-        binding.animation.addView(waveformView2);
+        WaveformView2 waveformView2 = WaveformView2.Provider.INSTANCE.setTo(binding.animation);
 
         viewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
         viewModel.getNextMessage()
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
-                .subscribe(data -> messageGenericQuickAdapter.addData(0, data));
+                .subscribe(data -> {
+                    binding.dataContent.scrollToPosition(messageGenericQuickAdapter.getHeaderLayoutCount());
+                    messageGenericQuickAdapter.addData(0, data);
+                });
         viewModel.getStatus().observe(this, status -> {
-            Logger.d(status);
             switch (status)
             {
                 case Initialization:
@@ -92,11 +92,14 @@ public class SpeakerFragment extends Fragment
                 break;
                 case Prepare:
                 {
-                    waveformView2.initialize();
+                    waveformView2.speechPrepare();
                 }
                 break;
                 case Speaking:
                 {
+                    Vibrator vibrator = (Vibrator) Objects.requireNonNull(requireContext()
+                                    .getSystemService(Context.VIBRATOR_SERVICE));
+                    vibrator.vibrate(100);
                     waveformView2.speechStarted();
                 }
                 break;
@@ -117,7 +120,6 @@ public class SpeakerFragment extends Fragment
         });
 
         Bundle bundle = getArguments();
-        Logger.d(bundle != null && bundle.getBoolean("weakUp"));
         if (bundle != null)
         {
             if (bundle.getBoolean("weakUp"))
@@ -131,8 +133,6 @@ public class SpeakerFragment extends Fragment
     public void onDestroyView()
     {
         super.onDestroyView();
-        binding.animation.removeAllViews();
-        binding.unbind();
-        binding = null;
+        WaveformView2.Provider.INSTANCE.release();
     }
 }
