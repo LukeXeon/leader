@@ -14,7 +14,6 @@ import android.webkit.WebSettings;
 import android.widget.FrameLayout;
 
 import com.dnkilic.waveform.WaveView;
-import com.orhanobut.logger.Logger;
 
 import java.util.Objects;
 
@@ -29,9 +28,11 @@ public final class WaveformView2
         implements LifecycleEventObserver
 {
 
-    //Jvm级别单例
     public enum Provider
     {
+        /**
+         * Jvm级别单例
+         */
         INSTANCE;
 
         private final WaveformView2 mView;
@@ -72,7 +73,8 @@ public final class WaveformView2
         WebSettings settings = getSettings();
         settings.setAppCacheEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setDomStorageEnabled(true);//开启DOM缓存，关闭的话H5自身的一些操作是无效的
+        //开启DOM缓存，关闭的话H5自身的一些操作是无效的
+        settings.setDomStorageEnabled(true);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         settings.setBlockNetworkImage(true);
@@ -96,7 +98,6 @@ public final class WaveformView2
     @Override
     public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event)
     {
-        Logger.d(event);
         switch (event)
         {
             case ON_PAUSE:

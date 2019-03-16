@@ -27,11 +27,11 @@ import io.reactivex.subjects.PublishSubject;
 @Route(path = PR.asr.service,name = "语音识别服务")
 public class SpeakerServiceImpl implements SpeakerService
 {
-    private static final int sBackTrackInMs = 1500;
-    private static final int sErrorNone = 0;
-    private static final int sNormalVID = 1536;
-    private static final String sWeakUpBin = "assets:///WakeUp.bin";
-    private static final String sWeakUpText = "嘿领航员";
+    private static final int BACK_TRACK_IN_MS = 1500;
+    private static final int ERROR_NONE = 0;
+    private static final int NORMAL_VID = 1536;
+    private static final String WEAK_UP_BIN = "assets:///WakeUp.bin";
+    private static final String WEAK_UP_TEXT = "嘿领航员";
 
     private EventManager mAsrManager;
     private EventManager mWeakUpManager;
@@ -116,7 +116,7 @@ public class SpeakerServiceImpl implements SpeakerService
                 .doOnNext(Logger::d)
                 .map(params -> mGson.fromJson(params, WeakUpResult.class))
                 .filter(weakUpResult -> !weakUpResult.hasError())
-                .filter(weakUpResult -> sWeakUpText.equals(weakUpResult.word))
+                .filter(weakUpResult -> WEAK_UP_TEXT.equals(weakUpResult.word))
                 .map(weakUpResult -> weakUpResult.word);
 
         mWeakUpManager.registerListener((name, params, data, offset, length) -> {
@@ -142,7 +142,7 @@ public class SpeakerServiceImpl implements SpeakerService
             }
         });
         mWeakUpManager.send(SpeechConstant.WAKEUP_START,
-                mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, sWeakUpBin)),
+                mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, WEAK_UP_BIN)),
                 null, 0, 0);
     }
 
@@ -162,8 +162,8 @@ public class SpeakerServiceImpl implements SpeakerService
                     {
                         put(SpeechConstant.ACCEPT_AUDIO_VOLUME, true);
                         put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
-                        put(SpeechConstant.PID, sNormalVID);
-                        put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - sBackTrackInMs);
+                        put(SpeechConstant.PID, NORMAL_VID);
+                        put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - BACK_TRACK_IN_MS);
                     }
                 }), null, 0, 0);
         mStatus.setValue(Status.Prepare);
@@ -225,7 +225,7 @@ public class SpeakerServiceImpl implements SpeakerService
 
         private boolean hasError()
         {
-            return errorCode != sErrorNone;
+            return errorCode != ERROR_NONE;
         }
     }
 
@@ -257,7 +257,7 @@ public class SpeakerServiceImpl implements SpeakerService
         @SuppressWarnings("All")
         private boolean hasError()
         {
-            return error != sErrorNone;
+            return error != ERROR_NONE;
         }
 
         private boolean isFinalResult()

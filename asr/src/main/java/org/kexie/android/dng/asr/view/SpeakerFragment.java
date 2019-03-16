@@ -27,6 +27,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static androidx.lifecycle.Lifecycle.Event;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
@@ -35,7 +36,9 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 @Route(path = PR.asr.speaker)
 public class SpeakerFragment extends Fragment
 {
-    private SpeakerViewModel viewModel;
+    private SpeakerViewModel speakerViewModel;
+
+    private WaveformView2 waveformView2;
 
     private FragmentSpeakerBinding binding;
 
@@ -51,6 +54,7 @@ public class SpeakerFragment extends Fragment
                 R.layout.fragment_speaker,
                 container,
                 false);
+        waveformView2 = WaveformView2.Provider.INSTANCE.setTo(binding.animation);
         return binding.getRoot();
     }
 
@@ -72,16 +76,17 @@ public class SpeakerFragment extends Fragment
                 .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
 
-        WaveformView2 waveformView2 = WaveformView2.Provider.INSTANCE.setTo(binding.animation);
+        speakerViewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
 
-        viewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
-        viewModel.getNextMessage()
+        speakerViewModel.getNextMessage()
+                .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(data -> {
-                    binding.dataContent.scrollToPosition(messageGenericQuickAdapter.getHeaderLayoutCount());
+                    binding.dataContent.scrollToPosition(messageGenericQuickAdapter
+                            .getHeaderLayoutCount());
                     messageGenericQuickAdapter.addData(0, data);
                 });
-        viewModel.getStatus().observe(this, status -> {
+        speakerViewModel.getStatus().observe(this, status -> {
             switch (status)
             {
                 case Initialization:
@@ -98,7 +103,7 @@ public class SpeakerFragment extends Fragment
                 case Speaking:
                 {
                     Vibrator vibrator = (Vibrator) Objects.requireNonNull(requireContext()
-                                    .getSystemService(Context.VIBRATOR_SERVICE));
+                            .getSystemService(Context.VIBRATOR_SERVICE));
                     vibrator.vibrate(100);
                     waveformView2.speechStarted();
                 }
@@ -108,14 +113,16 @@ public class SpeakerFragment extends Fragment
                     waveformView2.speechEnded();
                 }
                 break;
+                default:
+                    break;
             }
         });
-        viewModel.getWeakUp()
+        speakerViewModel.getWeakUp()
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
-                .subscribe(s -> viewModel.beginTransaction());
+                .subscribe(s -> speakerViewModel.beginTransaction());
 
         requireActivity().addOnBackPressedCallback(this, () -> {
-            viewModel.endTransaction();
+            speakerViewModel.endTransaction();
             return false;
         });
 
@@ -124,7 +131,7 @@ public class SpeakerFragment extends Fragment
         {
             if (bundle.getBoolean("weakUp"))
             {
-                viewModel.beginTransaction();
+                speakerViewModel.beginTransaction();
             }
         }
     }
@@ -134,5 +141,7 @@ public class SpeakerFragment extends Fragment
     {
         super.onDestroyView();
         WaveformView2.Provider.INSTANCE.release();
+        waveformView2 = null;
     }
+
 }

@@ -72,7 +72,6 @@ public final class HostActivity extends AppCompatActivity
                         .commit();
             }
         }));
-        addOnBackPressedCallback(() -> getSupportFragmentManager().getBackStackEntryCount() == 0);
 
         ARouter.getInstance().inject(this);
 
@@ -105,5 +104,14 @@ public final class HostActivity extends AppCompatActivity
                 .add(R.id.fragment_container, fragment, PR.ux.desktop)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+        {
+            super.onBackPressed();
+        }
     }
 }
