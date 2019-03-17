@@ -75,7 +75,7 @@ public final class WaveformView2
     @SuppressLint("SetJavaScriptEnabled")
     private WaveformView2(Context context)
     {
-        super(context, null);
+        super(context);
         WebSettings settings = getSettings();
         //开启DOM缓存，关闭的话H5自身的一些操作是无效的
         settings.setDomStorageEnabled(true);

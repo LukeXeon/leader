@@ -50,6 +50,7 @@
             android:value="552"/>
 
         <activity
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:launchMode="singleInstance"
             android:name=".view.HostActivity"
             android:screenOrientation="landscape">

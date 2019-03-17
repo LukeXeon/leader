@@ -107,6 +107,14 @@ public final class HostActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+        SystemUtil.hideSystemUi(getWindow());
+    }
+
+
+    @Override
     public void onBackPressed()
     {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0)

@@ -1,8 +1,9 @@
 package org.kexie.android.dng.ai.model;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -57,8 +58,19 @@ public class TTSServiceImpl implements TTSService
 
     private static String getMetadata(Context context, int id)
     {
-        Bundle bundle = context.getApplicationInfo().metaData;
-        return bundle.getString(context.getString(id));
+        try
+        {
+            ApplicationInfo applicationInfo = context
+                    .getPackageManager()
+                    .getApplicationInfo(context.getPackageName(),
+                            PackageManager.GET_META_DATA);
+            Object object = applicationInfo.metaData.get(context.getString(id));
+            Logger.d(object);
+            return String.valueOf(object);
+        } catch (PackageManager.NameNotFoundException e)
+        {
+            throw new AssertionError(e);
+        }
     }
 
     @Override
