@@ -71,6 +71,7 @@ public final class WaveformView2
         }
     }
 
+    @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private WaveformView2(Context context)
     {

@@ -29,14 +29,15 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
     private val aiService: AIService
     val status: LiveData<SpeakerService.Status>
     val volume: LiveData<Int>
-    val nextMessage: Observable<Message>
     val weakUp: Observable<String>
+    val nextMessage: Observable<Message>
+
 
     init {
         val retrofit = Retrofit.Builder()
                 .baseUrl(getApplication<Application>().getString(R.string.ai_open_api_url))
                 .client(OkHttpClient.Builder()
-                        .callTimeout(3,TimeUnit.SECONDS)
+                        .callTimeout(3, TimeUnit.SECONDS)
                         .cookieJar(CookieCache())
                         .build())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -49,7 +50,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
                     Message(Message.TYPE_USER, it)
                 }.observeOn(Schedulers.io())
                 .flatMap {
-                    Observable.just(it).mergeWith(post(it.text))
+                    Observable.just(it).mergeWith(sendToAI(it.text))
                 }.observeOn(AndroidSchedulers.mainThread())
 
         volume = speakerService.currentVolume
@@ -57,7 +58,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
         weakUp = speakerService.weakUpResult
     }
 
-    private fun post(text: String): Observable<Message> {
+    private fun sendToAI(text: String): Observable<Message> {
         val context = getApplication<Application>()
         val request = AIRequest()
         request.reqType = 0
