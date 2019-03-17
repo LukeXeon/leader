@@ -8,7 +8,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.RxOnClick;
-import org.kexie.android.dng.common.model.SpeakerService;
+import org.kexie.android.dng.common.model.ASRService;
 import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.host.R;
 import org.kexie.android.dng.host.databinding.ActivityHostBinding;
@@ -31,8 +31,8 @@ public final class HostActivity extends AppCompatActivity
 
     private ActivityHostBinding binding;
 
-    @Autowired(name = PR.asr.service)
-    SpeakerService speakerService;
+    @Autowired(name = PR.ai.asr_service)
+    ASRService ASRService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -59,14 +59,14 @@ public final class HostActivity extends AppCompatActivity
         }));
         binding.setOnSpeak(new RxOnClick(this, v -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment fragment = fragmentManager.findFragmentByTag(PR.asr.speaker);
+            Fragment fragment = fragmentManager.findFragmentByTag(PR.ai.speaker);
             if (fragment == null)
             {
                 fragment = (Fragment) ARouter.getInstance()
-                        .build(PR.asr.speaker)
+                        .build(PR.ai.speaker)
                         .navigation();
                 fragmentManager.beginTransaction()
-                        .add(R.id.fragment_container, fragment, PR.asr.speaker)
+                        .add(R.id.fragment_container, fragment, PR.ai.speaker)
                         .addToBackStack(null)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit();
@@ -75,19 +75,19 @@ public final class HostActivity extends AppCompatActivity
 
         ARouter.getInstance().inject(this);
 
-        speakerService.getWeakUpResult()
+        ASRService.getWeakUpResult()
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> {
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    Fragment fragment = fragmentManager.findFragmentByTag(PR.asr.speaker);
+                    Fragment fragment = fragmentManager.findFragmentByTag(PR.ai.speaker);
                     if (fragment == null)
                     {
                         fragment = (Fragment) ARouter.getInstance()
-                                .build(PR.asr.speaker)
+                                .build(PR.ai.speaker)
                                 .withBoolean("weakUp", true)
                                 .navigation();
                         fragmentManager.beginTransaction()
-                                .add(R.id.fragment_container, fragment, PR.asr.speaker)
+                                .add(R.id.fragment_container, fragment, PR.ai.speaker)
                                 .addToBackStack(null)
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .commit();

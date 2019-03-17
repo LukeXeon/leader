@@ -50,7 +50,7 @@ dependencies {
     implementation project(':ux')
     implementation project(':navi')
     implementation project(':media')
-    implementation project(':asr')
+    implementation project(':ai')
 
     annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
 

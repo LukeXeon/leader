@@ -10,6 +10,9 @@
             android:name=".NetworkMonitoringService"
             android:enabled="true"
             android:exported="false"/>
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="a48efbfd70e2cd776f87922bf0d0ce14"/>
     </application>
 
 </manifest>

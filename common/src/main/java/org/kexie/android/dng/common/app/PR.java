@@ -35,9 +35,10 @@ public final class PR
         public final static String host = "/host/host";
     }
 
-    public static final class asr
+    public static final class ai
     {
-        public final static String service = "/asr/service";
-        public final static String speaker = "/asr/speaker";
+        public final static String tts_service = "/ai/tts";
+        public final static String asr_service = "/ai/asr";
+        public final static String speaker = "/ai/speaker";
     }
 }

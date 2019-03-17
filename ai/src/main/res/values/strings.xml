@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">asr</string>
+    <string name="ai_api_key">b44a2e5106704588ba9874e29af4d106</string>
+    <string name="ai_open_api_url">http://openapi.tuling123.com</string>
+    <string name="ai_user_id">415822</string>
+
+    <string name="bd_app_id">com.baidu.speech.APP_ID</string>
+    <string name="bd_api_key">com.baidu.speech.API_KEY</string>
+    <string name="bd_secret_key">com.baidu.speech.SECRET_KEY</string>
+</resources>
