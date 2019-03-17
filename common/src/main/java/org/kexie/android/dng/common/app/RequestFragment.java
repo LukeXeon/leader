@@ -5,8 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
-import org.kexie.android.dng.common.model.SpeakerService;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -72,7 +70,6 @@ public final class RequestFragment
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults)
     {
-        SpeakerService speakerService;
         super.onRequestPermissionsResult(
                 requestCode,
                 permissions,

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.asr.BR;
 import org.kexie.android.dng.asr.R;
@@ -25,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 import eightbitlab.com.blurview.RenderScriptBlur;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,7 +56,7 @@ public class SpeakerFragment extends Fragment
                 R.layout.fragment_speaker,
                 container,
                 false);
-        waveformView2 = WaveformView2.Provider.INSTANCE.setTo(binding.animation);
+        waveformView2 = WaveformView2.Provider.INSTANCE.attachTo(binding.animation);
         return binding.getRoot();
     }
 
@@ -86,6 +88,10 @@ public class SpeakerFragment extends Fragment
                             .getHeaderLayoutCount());
                     messageGenericQuickAdapter.addData(0, data);
                 });
+        speakerViewModel.getVolume().observe(this, Logger::d);
+        Transformations.map(speakerViewModel.getVolume(),
+                input -> input.floatValue() / 10f)
+                .observe(this, v -> waveformView2.setAmplitude(v));
         speakerViewModel.getStatus().observe(this, status -> {
             switch (status)
             {
@@ -97,7 +103,7 @@ public class SpeakerFragment extends Fragment
                 break;
                 case Prepare:
                 {
-                    waveformView2.speechPrepare();
+                    waveformView2.prepare();
                 }
                 break;
                 case Speaking:
@@ -105,16 +111,13 @@ public class SpeakerFragment extends Fragment
                     Vibrator vibrator = (Vibrator) Objects.requireNonNull(requireContext()
                             .getSystemService(Context.VIBRATOR_SERVICE));
                     vibrator.vibrate(100);
-                    waveformView2.speechStarted();
                 }
                 break;
                 case Recognition:
                 {
-                    waveformView2.speechEnded();
+                    waveformView2.setAmplitude(0.1f);
                 }
                 break;
-                default:
-                    break;
             }
         });
         speakerViewModel.getWeakUp()
@@ -138,6 +141,6 @@ public class SpeakerFragment extends Fragment
     {
         super.onDestroyView();
         speakerViewModel.endTransaction();
-        WaveformView2.Provider.INSTANCE.release();
+        WaveformView2.Provider.INSTANCE.detach();
     }
 }

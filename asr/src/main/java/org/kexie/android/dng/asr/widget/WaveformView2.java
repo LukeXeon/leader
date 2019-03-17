@@ -1,22 +1,26 @@
 package org.kexie.android.dng.asr.widget;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
-
-import com.dnkilic.waveform.WaveView;
 
 import java.util.Objects;
 
+import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
@@ -24,7 +28,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 public final class WaveformView2
-        extends WaveView
+        extends WebView
         implements LifecycleEventObserver
 {
 
@@ -43,7 +47,7 @@ public final class WaveformView2
             mView = Initializer.createView();
         }
 
-        public WaveformView2 setTo(FrameLayout viewGroup)
+        public WaveformView2 attachTo(FrameLayout viewGroup)
         {
             viewGroup.addView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
@@ -58,7 +62,7 @@ public final class WaveformView2
             return mView;
         }
 
-        public void release()
+        public void detach()
         {
             FrameLayout parent = (FrameLayout) mView.getParent();
             parent.removeView(mView);
@@ -67,18 +71,21 @@ public final class WaveformView2
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private WaveformView2(Context context)
     {
         super(context, null);
         WebSettings settings = getSettings();
-        settings.setAppCacheEnabled(true);
-        settings.setDatabaseEnabled(true);
         //开启DOM缓存，关闭的话H5自身的一些操作是无效的
         settings.setDomStorageEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setAppCacheEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ONLY);
         settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         settings.setBlockNetworkImage(true);
-        //这个是国外网站Stack Overflow推荐提升加载速度的方式
+        settings.setJavaScriptEnabled(true);
+        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {
             // chromium, enable hardware acceleration
@@ -88,11 +95,49 @@ public final class WaveformView2
             // older android version, disable hardware acceleration
             setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
+        setWebChromeClient(new WebChromeClient());
+        setBackgroundColor(Color.TRANSPARENT);
+        setVerticalScrollBarEnabled(false);
+        setHorizontalScrollBarEnabled(false);
+        loadUrl("file:///android_asset/voicewave.html");
     }
 
-    public void speechPrepare()
+    @SuppressWarnings("deprecation")
+    @SuppressLint("ObsoleteSdkInt")
+    public void stop()
     {
-        initialize(getContext().getResources().getDisplayMetrics());
+        evaluateJavascript("javascript:SW9.stop(\"\")", null);
+        removeAllViews();
+        //clearHistory();
+        //clearCache(true);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            clearView();
+        } else {
+            loadUrl("about:blank");
+        }
+        freeMemory();
+        pauseTimers();
+        loadUrl("file:///android_asset/voicewave.html");
+    }
+
+    public void prepare()
+    {
+        DisplayMetrics displayMetrics = getContext()
+                .getResources()
+                .getDisplayMetrics();
+        evaluateJavascript("javascript:SW9.setWidth(\""
+                        + displayMetrics.widthPixels * 92 / 100
+                        + "\");"
+                        + "javascript:SW9.start(\"\");",
+                null);
+    }
+
+    public void setAmplitude(@FloatRange(from = 0.1f, to = 1f) float value)
+    {
+        evaluateJavascript("javascript:SW9.setAmplitude(\""
+                        + Math.min(Math.max(value, 0.1f), 1f)
+                        + "\")",
+                null);
     }
 
     @Override
