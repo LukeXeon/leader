@@ -37,6 +37,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
     val volume: LiveData<Int>
     val weakUp: Observable<String>
     val nextMessage: Observable<Message>
+    val partialResult:Observable<String>
 
 
     init {
@@ -61,6 +62,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
         volume = asrService.currentVolume
         status = asrService.currentStatus
         weakUp = asrService.weakUpResult
+        partialResult = asrService.partialResult
     }
 
     private fun sendToAI(text: String): Observable<Message> {

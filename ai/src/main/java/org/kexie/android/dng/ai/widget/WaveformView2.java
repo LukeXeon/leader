@@ -109,7 +109,7 @@ public final class WaveformView2
     {
         evaluateJavascript("javascript:SW9.stop(\"\")", null);
         removeAllViews();
-        //clearHistory();
+        clearHistory();
         //clearCache(true);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
             clearView();

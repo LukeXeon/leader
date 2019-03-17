@@ -3,12 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="adapter"
             type="androidx.recyclerview.widget.RecyclerView.Adapter"/>
+        <variable
+            name="speechText"
+            type="String"/>
+        <variable
+            name="isShow"
+            type="Boolean"/>
     </data>
     <eightbitlab.com.blurview.BlurView
-        app:blurOverlayColor="@color/colorBlackAlpha26"
+        app:blurOverlayColor="@color/colorBlackAlpha54"
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,19 +24,44 @@
             android:gravity="center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <androidx.recyclerview.widget.RecyclerView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_alignParentTop="true"
-                android:id="@+id/data_content"
+                android:layout_above="@+id/animation"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:adapter="@{adapter}"
                 android:layout_width="match_parent"
-                android:layout_above="@+id/animation"
                 android:layout_height="400dp">
-            </androidx.recyclerview.widget.RecyclerView>
+                <androidx.cardview.widget.CardView
+                    android:layout_gravity="right"
+                    android:visibility="@{safeUnbox(isShow)?View.VISIBLE:View.GONE}"
+                    android:layout_margin="5dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_margin="15dp"
+                        android:textSize="40dp"
+                        android:text='@{speechText}'
+                        android:textColor="@color/colorBlackAlpha54"
+                        android:hint="TEXT"
+                        android:textColorHint="@android:color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </androidx.cardview.widget.CardView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/data_content"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:adapter="@{adapter}"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+                </androidx.recyclerview.widget.RecyclerView>
+            </LinearLayout>
             <FrameLayout
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"

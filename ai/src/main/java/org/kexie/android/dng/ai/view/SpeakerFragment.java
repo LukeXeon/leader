@@ -4,12 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.ai.BR;
 import org.kexie.android.dng.ai.R;
@@ -46,6 +46,7 @@ public class SpeakerFragment extends Fragment
 
     private GenericQuickAdapter<Message> messageGenericQuickAdapter;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -66,6 +67,7 @@ public class SpeakerFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
+
         messageGenericQuickAdapter = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
 
         binding.setLifecycleOwner(this);
@@ -88,7 +90,13 @@ public class SpeakerFragment extends Fragment
                             .getHeaderLayoutCount());
                     messageGenericQuickAdapter.addData(0, data);
                 });
-        speakerViewModel.getVolume().observe(this, Logger::d);
+        speakerViewModel.getPartialResult()
+                .observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(this, Event.ON_DESTROY)))
+                .subscribe(s -> {
+                    binding.setIsShow(!TextUtils.isEmpty(s));
+                    binding.setSpeechText(s);
+                });
         Transformations.map(speakerViewModel.getVolume(),
                 input -> input.floatValue() / 10f)
                 .observe(this, v -> waveformView2.setAmplitude(v));
@@ -99,6 +107,7 @@ public class SpeakerFragment extends Fragment
                 case Idle:
                 {
                     waveformView2.stop();
+                    binding.setIsShow(false);
                 }
                 break;
                 case Prepare:
@@ -121,6 +130,7 @@ public class SpeakerFragment extends Fragment
             }
         });
         speakerViewModel.getWeakUp()
+                .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> speakerViewModel.beginTransaction());
 
