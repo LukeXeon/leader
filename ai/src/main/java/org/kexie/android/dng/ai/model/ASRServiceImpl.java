@@ -1,6 +1,8 @@
 package org.kexie.android.dng.ai.model;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -33,6 +35,8 @@ public class ASRServiceImpl implements ASRService
     private static final String WEAK_UP_BIN = "assets:///WakeUp.bin";
     private static final String WEAK_UP_TEXT = "嘿领航员";
 
+    private HandlerThread worker = new HandlerThread(toString());
+    private Handler handler;
     private EventManager mAsrManager;
     private EventManager mWeakUpManager;
     private Gson mGson = new Gson();
@@ -45,9 +49,6 @@ public class ASRServiceImpl implements ASRService
     @Override
     public void init(Context context)
     {
-
-        mAsrManager = EventManagerFactory.create(context, "asr");
-        mWeakUpManager = EventManagerFactory.create(context, "wp");
 
         Map<String, EventListener> eventHandlers = new ArrayMap<>();
         // 引擎准备就绪，可以开始说话
@@ -95,14 +96,6 @@ public class ASRServiceImpl implements ASRService
         // 最终结果
         mFinalResult = result.filter(SpeakerResult::isFinalResult)
                 .map(speakerResult -> speakerResult.results[0]);
-        mAsrManager.registerListener((name, params, data, offset, length) -> {
-            Logger.d(name);
-            EventListener eventListener = eventHandlers.get(name);
-            if (eventListener != null)
-            {
-                eventListener.onEvent(name, params, data, offset, length);
-            }
-        });
 
         // WeakUp事件
         Map<String, EventListener> eventHandlers2 = new ArrayMap<>();
@@ -118,32 +111,48 @@ public class ASRServiceImpl implements ASRService
                 .filter(weakUpResult -> WEAK_UP_TEXT.equals(weakUpResult.word))
                 .map(weakUpResult -> weakUpResult.word);
 
-        mWeakUpManager.registerListener((name, params, data, offset, length) -> {
-            Logger.d(name);
-            EventListener eventListener = eventHandlers2.get(name);
-            if (eventListener != null)
-            {
-                eventListener.onEvent(name, params, data, offset, length);
-            }
-        });
+        // 异步初始化
+        worker.start();
+        handler = new Handler(worker.getLooper());
+        handler.post(() -> {
+            mAsrManager = EventManagerFactory.create(context, "asr");
+            mWeakUpManager = EventManagerFactory.create(context, "wp");
 
-        // 初始化WeakUp
-        mWeakUpManager.registerListener(new EventListener()
-        {
-            @Override
-            public void onEvent(String name, String params, byte[] data, int offset, int length)
-            {
-                if (SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name))
+            mWeakUpManager.registerListener((name, params, data, offset, length) -> {
+                Logger.d(name);
+                EventListener eventListener = eventHandlers2.get(name);
+                if (eventListener != null)
                 {
-                    mStatus.setValue(Status.Idle);
-                    mWeakUpManager.unregisterListener(this);
+                    eventListener.onEvent(name, params, data, offset, length);
                 }
-            }
+            });
+
+            mAsrManager.registerListener((name, params, data, offset, length) -> {
+                Logger.d(name);
+                EventListener eventListener = eventHandlers.get(name);
+                if (eventListener != null)
+                {
+                    eventListener.onEvent(name, params, data, offset, length);
+                }
+            });
+
+            mWeakUpManager.registerListener(new EventListener()
+            {
+                @Override
+                public void onEvent(String name, String params, byte[] data, int offset, int length)
+                {
+                    if (SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name))
+                    {
+                        mStatus.setValue(Status.Idle);
+                        mWeakUpManager.unregisterListener(this);
+                    }
+                }
+            });
+            mWeakUpManager.send(SpeechConstant.WAKEUP_START,
+                    mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, WEAK_UP_BIN)),
+                    null, 0, 0);
+            Logger.d(getClass().getName() + " start");
         });
-        mWeakUpManager.send(SpeechConstant.WAKEUP_START,
-                mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, WEAK_UP_BIN)),
-                null, 0, 0);
-        Logger.d(getClass().getName() + " start");
     }
 
     @Override
@@ -156,7 +165,7 @@ public class ASRServiceImpl implements ASRService
         {
             return false;
         }
-        mAsrManager.send(SpeechConstant.ASR_START, mGson.toJson(
+        handler.post(()-> mAsrManager.send(SpeechConstant.ASR_START, mGson.toJson(
                 new ArrayMap<String, Object>(4)
                 {
                     {
@@ -165,7 +174,7 @@ public class ASRServiceImpl implements ASRService
                         put(SpeechConstant.PID, NORMAL_VID);
                         put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - BACK_TRACK_IN_MS);
                     }
-                }), null, 0, 0);
+                }), null, 0, 0));
         mStatus.setValue(Status.Prepare);
         return true;
     }
@@ -173,7 +182,8 @@ public class ASRServiceImpl implements ASRService
     @Override
     public void endTransaction()
     {
-        mAsrManager.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0);
+        handler.post(() -> mAsrManager.send(SpeechConstant.ASR_CANCEL,
+                "{}", null, 0, 0));
     }
 
     private static void assertMainThread()
