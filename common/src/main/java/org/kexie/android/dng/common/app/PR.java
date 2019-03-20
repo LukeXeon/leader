@@ -21,6 +21,7 @@ public final class PR
         public static final String running = "/navi/running";
         public static final String query_select = "/navi/select";
         public static final String query_tips = "/navi/tips";
+        public static final String location_service = "/navi/location";
     }
 
     public static final class media

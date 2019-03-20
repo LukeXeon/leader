@@ -1,9 +1,9 @@
 package org.kexie.android.dng.ai.viewmodel
 
 import android.app.Application
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.alibaba.android.arouter.launcher.ARouter
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -15,6 +15,7 @@ import org.kexie.android.dng.ai.model.entity.AIResponse
 import org.kexie.android.dng.ai.viewmodel.entity.Message
 import org.kexie.android.dng.ai.widget.CookieCache
 import org.kexie.android.dng.common.app.PR
+import org.kexie.android.dng.common.app.navigationAs
 import org.kexie.android.dng.common.model.ASRService
 import org.kexie.android.dng.common.model.TTSService
 import retrofit2.Retrofit
@@ -24,12 +25,8 @@ import java.util.concurrent.TimeUnit
 
 class SpeakerViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val asrService = ARouter.getInstance()
-            .build(PR.ai.asr_service)
-            .navigation() as ASRService
-    private val ttsService = ARouter.getInstance()
-            .build(PR.ai.tts_service)
-            .navigation() as TTSService
+    private val asrService = navigationAs<ASRService>(PR.ai.asr_service)
+    private val ttsService = navigationAs<TTSService>(PR.ai.tts_service)
 
     private val aiService: AIService
 
@@ -37,8 +34,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
     val volume: LiveData<Int>
     val weakUp: Observable<String>
     val nextMessage: Observable<Message>
-    val partialResult:Observable<String>
-
+    val partialResult: Observable<String>
 
     init {
         val retrofit = Retrofit.Builder()
@@ -65,6 +61,7 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
         partialResult = asrService.partialResult
     }
 
+    @WorkerThread
     private fun sendToAI(text: String): Observable<Message> {
         val context = getApplication<Application>()
         val request = AIRequest()

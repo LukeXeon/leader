@@ -68,7 +68,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.Observable;
-import io.reactivex.subjects.ReplaySubject;
+import io.reactivex.subjects.PublishSubject;
 import java8.util.stream.IntStreams;
 import java8.util.stream.StreamSupport;
 import me.jessyan.autosize.utils.AutoSizeUtils;
@@ -163,7 +163,7 @@ public final class NaviFragment extends Fragment
         carMarker = new CarMarker(requireContext(), mapController);
         cameraOverlay = new AmapCameraOverlay(requireContext());
 
-        ReplaySubject<Location> subject = ReplaySubject.createWithSize(5);
+        PublishSubject<Location> subject = PublishSubject.create();
         mapController.setOnMyLocationChangeListener(subject::onNext);
         uiLocation = subject;
 

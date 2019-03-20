@@ -79,6 +79,7 @@ public class SpeakerFragment extends Fragment
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
+        binding.setIsShow(false);
 
         speakerViewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
 
