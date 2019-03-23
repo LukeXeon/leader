@@ -7,29 +7,40 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+
+import org.kexie.android.dng.ai.R;
+
 import java.util.Objects;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 public final class WaveformView2
-        extends WebView
-        implements LifecycleEventObserver
+        extends FrameLayout
 {
 
     public enum Provider
@@ -43,7 +54,6 @@ public final class WaveformView2
 
         Provider()
         {
-            Log.d(WaveformView2.class.getSimpleName(), "Provider: init");
             mView = Initializer.createView();
         }
 
@@ -53,7 +63,7 @@ public final class WaveformView2
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
             Context context = viewGroup.getContext();
             LifecycleOwner owner = (LifecycleOwner) context;
-            owner.getLifecycle().addObserver(mView);
+            owner.getLifecycle().addObserver(mView.mObserver);
             contextWrapper.setBaseContext(context);
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -71,12 +81,17 @@ public final class WaveformView2
         }
     }
 
+    private final WebView mWebView;
+    private final AppCompatImageView mImageView;
+    private final LifecycleObserver mObserver;
+
     @SuppressWarnings("deprecation")
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled"})
     private WaveformView2(Context context)
     {
         super(context);
-        WebSettings settings = getSettings();
+        mWebView = new WebView(context);
+        WebSettings settings = mWebView.getSettings();
         //开启DOM缓存，关闭的话H5自身的一些操作是无效的
         settings.setDomStorageEnabled(true);
         settings.setAppCacheEnabled(true);
@@ -90,35 +105,104 @@ public final class WaveformView2
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {
             // chromium, enable hardware acceleration
-            setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else
         {
             // older android version, disable hardware acceleration
-            setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
-        setWebChromeClient(new WebChromeClient());
+        mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setHorizontalScrollBarEnabled(false);
+        mWebView.loadUrl("file:///android_asset/voicewave.html");
+        LayoutParams layoutParams1 = new LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
+        layoutParams1.gravity = Gravity.CENTER;
+        mWebView.setLayoutParams(layoutParams1);
+        mImageView = new AppCompatImageView(context);
+        LayoutParams layoutParams2 = new LayoutParams(0, 0);
+        layoutParams2.gravity = Gravity.CENTER;
+        mImageView.setLayoutParams(layoutParams2);
+        mImageView.setScaleType(AppCompatImageView.ScaleType.CENTER_INSIDE);
+        Glide.with(this)
+                .load(R.drawable.yy)
+                .listener(new RequestListener<Drawable>()
+                {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e,
+                                                Object model,
+                                                Target<Drawable> target,
+                                                boolean isFirstResource)
+                    {
+                        Bitmap bitmap = BitmapFactory
+                                .decodeResource(getResources(), R.drawable.yy);
+                        post(() -> mImageView.setImageBitmap(bitmap));
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource,
+                                                   Object model,
+                                                   Target<Drawable> target,
+                                                   DataSource dataSource,
+                                                   boolean isFirstResource)
+                    {
+                        post(() -> mImageView.setImageDrawable(resource));
+                        return true;
+                    }
+                })
+                .submit();
+        addView(mImageView);
+        addView(mWebView);
+        mObserver = (LifecycleEventObserver) (source, event) -> {
+            switch (event)
+            {
+                case ON_PAUSE:
+                {
+                    mWebView.onPause();
+                }
+                break;
+                case ON_RESUME:
+                {
+                    mWebView.onResume();
+                }
+                break;
+            }
+        };
         setBackgroundColor(Color.TRANSPARENT);
-        setVerticalScrollBarEnabled(false);
-        setHorizontalScrollBarEnabled(false);
-        loadUrl("file:///android_asset/voicewave.html");
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        LayoutParams layoutParams = (LayoutParams) mImageView
+                .getLayoutParams();
+        layoutParams.width = getMeasuredHeight();
+        layoutParams.height = getMeasuredHeight();
     }
 
     @SuppressWarnings("deprecation")
     @SuppressLint("ObsoleteSdkInt")
     public void stop()
     {
-        evaluateJavascript("javascript:SW9.stop(\"\")", null);
-        removeAllViews();
-        clearHistory();
+        mWebView.evaluateJavascript("javascript:SW9.stop(\"\")",
+                value -> mImageView.setVisibility(VISIBLE));
+        mWebView.removeAllViews();
+        mWebView.clearHistory();
         //clearCache(true);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            clearView();
-        } else {
-            loadUrl("about:blank");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            mWebView.clearView();
+        } else
+        {
+            mWebView.loadUrl("about:blank");
         }
-        freeMemory();
-        pauseTimers();
-        loadUrl("file:///android_asset/voicewave.html");
+        mWebView.freeMemory();
+        mWebView.pauseTimers();
+        mWebView.loadUrl("file:///android_asset/voicewave.html");
     }
 
     public void prepare()
@@ -126,7 +210,7 @@ public final class WaveformView2
         DisplayMetrics displayMetrics = getContext()
                 .getResources()
                 .getDisplayMetrics();
-        evaluateJavascript("javascript:SW9.setWidth(\""
+        mWebView.evaluateJavascript("javascript:SW9.setWidth(\""
                         + displayMetrics.widthPixels * 92 / 100
                         + "\");"
                         + "javascript:SW9.start(\"\");",
@@ -135,28 +219,11 @@ public final class WaveformView2
 
     public void setAmplitude(@FloatRange(from = 0.1f, to = 1f) float value)
     {
-        evaluateJavascript("javascript:SW9.setAmplitude(\""
+        mImageView.setVisibility(INVISIBLE);
+        mWebView.evaluateJavascript("javascript:SW9.setAmplitude(\""
                         + Math.min(Math.max(value, 0.1f), 1f)
                         + "\")",
                 null);
-    }
-
-    @Override
-    public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event)
-    {
-        switch (event)
-        {
-            case ON_PAUSE:
-            {
-                onPause();
-            }
-            break;
-            case ON_RESUME:
-            {
-                onResume();
-            }
-            break;
-        }
     }
 
     public static final class Initializer extends ContentProvider

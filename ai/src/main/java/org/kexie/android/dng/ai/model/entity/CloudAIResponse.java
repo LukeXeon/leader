@@ -2,7 +2,7 @@ package org.kexie.android.dng.ai.model.entity;
 
 import java.util.List;
 
-public class AIResponse
+public class CloudAIResponse
 {
     /**
      * intent : {"code":10005,"intentName":"","actionName":"","parameters":{"nearby_place":"酒店"}}

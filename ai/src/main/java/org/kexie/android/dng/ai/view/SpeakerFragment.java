@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Transformations;
@@ -45,6 +46,8 @@ public class SpeakerFragment extends Fragment
     private FragmentSpeakerBinding binding;
 
     private GenericQuickAdapter<Message> messageGenericQuickAdapter;
+
+    private AppCompatImageView imageView;
 
 
     @Nullable
@@ -79,9 +82,10 @@ public class SpeakerFragment extends Fragment
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
-        binding.setIsShow(false);
+        binding.setIsShowPartial(false);
 
-        speakerViewModel = ViewModelProviders.of(this).get(SpeakerViewModel.class);
+        speakerViewModel = ViewModelProviders.of(this)
+                .get(SpeakerViewModel.class);
 
         speakerViewModel.getNextMessage()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,7 +99,7 @@ public class SpeakerFragment extends Fragment
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> {
-                    binding.setIsShow(!TextUtils.isEmpty(s));
+                    binding.setIsShowPartial(!TextUtils.isEmpty(s));
                     binding.setSpeechText(s);
                 });
         Transformations.map(speakerViewModel.getVolume(),
@@ -108,7 +112,7 @@ public class SpeakerFragment extends Fragment
                 case Idle:
                 {
                     waveformView2.stop();
-                    binding.setIsShow(false);
+                    binding.setIsShowPartial(false);
                 }
                 break;
                 case Prepare:
@@ -135,7 +139,8 @@ public class SpeakerFragment extends Fragment
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
                 .subscribe(s -> speakerViewModel.beginTransaction());
 
-        requireActivity().addOnBackPressedCallback(this, requireFragmentManager()::popBackStackImmediate);
+        requireActivity().addOnBackPressedCallback(this,
+                requireFragmentManager()::popBackStackImmediate);
 
         Bundle bundle = getArguments();
         if (bundle != null)
@@ -145,7 +150,9 @@ public class SpeakerFragment extends Fragment
                 speakerViewModel.beginTransaction();
             }
         }
+
     }
+
 
     @Override
     public void onDestroyView()

@@ -36,7 +36,7 @@ public class TTSServiceImpl implements TTSService
             speechSynthesizer.setApiKey(getMetadata(context, R.string.bd_api_key),
                     getMetadata(context, R.string.bd_secret_key));
             // 设置在线发声音人： 0 普通女声（默认） 1 普通男声 2 特别男声 3 情感男声<度逍遥> 4 情感儿童声<度丫丫>
-            speechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "2");
+            speechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0");
             // 设置合成的音量，0-9 ，默认 5
             speechSynthesizer.setParam(SpeechSynthesizer.PARAM_VOLUME, "9");
             // 设置合成的语速，0-9 ，默认 5

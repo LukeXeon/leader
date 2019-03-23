@@ -1,6 +1,6 @@
 package org.kexie.android.dng.ai.model.entity;
 
-public class AIRequest
+public class CloudAIRequest
 {
     /**
      * reqType : 0

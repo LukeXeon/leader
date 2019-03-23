@@ -11,8 +11,11 @@
             name="speechText"
             type="String"/>
         <variable
-            name="isShow"
+            name="isShowPartial"
             type="Boolean"/>
+        <variable
+            name="onStart"
+            type="View.OnClickListener"/>
     </data>
     <eightbitlab.com.blurview.BlurView
         app:blurOverlayColor="@color/colorBlackAlpha54"
@@ -35,7 +38,7 @@
                 android:layout_height="400dp">
                 <androidx.cardview.widget.CardView
                     android:layout_gravity="right"
-                    android:visibility="@{safeUnbox(isShow)?View.VISIBLE:View.GONE}"
+                    android:visibility="@{safeUnbox(isShowPartial)?View.VISIBLE:View.GONE}"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
                     app:cardUseCompatPadding="true"

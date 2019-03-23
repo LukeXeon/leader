@@ -12,6 +12,9 @@ import com.amap.api.navi.enums.NaviType
 import com.amap.api.navi.model.*
 import com.autonavi.ae.gmap.gloverlay.GLCrossVector
 import io.reactivex.subjects.PublishSubject
+import org.kexie.android.dng.common.app.PR
+import org.kexie.android.dng.common.app.navigationAs
+import org.kexie.android.dng.common.model.TTSService
 import org.kexie.android.dng.navi.viewmodel.entity.ModeCross
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo
 import org.kexie.android.dng.navi.widget.DensityUtils
@@ -19,12 +22,17 @@ import org.kexie.android.dng.navi.widget.NaviCallback
 import org.kexie.android.dng.navi.widget.NaviUtil
 
 
-class RunningViewModel(application: Application,private val navi:NaviController)
-    : AndroidViewModel(application) {
+class RunningViewModel(
+        application: Application,
+        private val navi: NaviController
+) : AndroidViewModel(application) {
 
-    private val worker = HandlerThread(toString()).apply {
-        start()
-    }
+    private val ttsService = navigationAs<TTSService>(PR.ai.tts_service)
+
+    private val worker = HandlerThread(toString())
+            .apply {
+                start()
+            }
 
     private val handler = Handler(worker.looper)
 
@@ -188,8 +196,15 @@ class RunningViewModel(application: Application,private val navi:NaviController)
                         cameraInfo.value = aMapNaviCameraInfos;
                     }
                 }
+
+                override fun onGetNavigationText(playText: String?) {
+                    if (!playText.isNullOrEmpty()) {
+                        ttsService.send(playText)
+                    }
+                }
+
             })
-            setUseInnerVoice(true)
+            setUseInnerVoice(false)
         }
     }
 
@@ -212,6 +227,7 @@ class RunningViewModel(application: Application,private val navi:NaviController)
     val onInfo = PublishSubject.create<String>()
 
     override fun onCleared() {
+        ttsService.stop()
         navi.stopNavi()
     }
 

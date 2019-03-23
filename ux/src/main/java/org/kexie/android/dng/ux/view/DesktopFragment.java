@@ -129,7 +129,7 @@ public class DesktopFragment extends Fragment
         Fragment fragment = (Fragment) postcard.navigation();
         return requireFragmentManager()
                 .beginTransaction()
-                .add(getId(), fragment)
+                .add(getId(), fragment, postcard.getPath())
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
     }
