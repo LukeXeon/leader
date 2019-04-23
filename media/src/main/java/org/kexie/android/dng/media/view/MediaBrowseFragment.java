@@ -47,6 +47,14 @@ public class MediaBrowseFragment
     private static final int REQUEST_TO_PHOTO = 1000;
     private static final int REQUEST_TO_VIDEO = 1001;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        viewModel = ViewModelProviders.of(this)
+                .get(MediaBrowseViewModel.class);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,8 +75,6 @@ public class MediaBrowseFragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
         mediasAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<Media>(
                 this,
@@ -103,8 +109,6 @@ public class MediaBrowseFragment
         mediasAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
         mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
 
-        viewModel = ViewModelProviders.of(this)
-                .get(MediaBrowseViewModel.class);
         viewModel.medias.observe(this, mediasAdapter::setNewData);
         viewModel.title.observe(this, binding::setTitle);
         viewModel.loadPhoto();

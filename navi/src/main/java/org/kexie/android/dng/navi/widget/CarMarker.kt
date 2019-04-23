@@ -31,7 +31,7 @@ class CarMarker(context: Context, private val map: AMap) {
     var zoom: Float = 20f
     var isLock: Boolean = false
 
-    private data class Location(var point: Point, var bearing: Float)
+    class Location(var point: Point, var bearing: Float)
 
     init {
         fun getMarker(res: Int): Marker {
@@ -66,6 +66,7 @@ class CarMarker(context: Context, private val map: AMap) {
                     .target(point)
                     .build()))
         }
+
         val animator = valueAnimator;
         if (animator == null) {
             last = Location(location, bearing)
@@ -88,7 +89,7 @@ class CarMarker(context: Context, private val map: AMap) {
                 }
             }
             animator.setValues(PropertyValuesHolder.ofObject("",
-                    evaluator,
+                    Companion,
                     last,
                     Location(location, bearing)))
             animator.duration = time
@@ -97,23 +98,22 @@ class CarMarker(context: Context, private val map: AMap) {
         }
     }
 
-    companion object {
-        private val evaluator = object : TypeEvaluator<Location> {
-            override fun evaluate(fraction: Float, startValue: Location, endValue: Location): Location {
-                val x = endValue.point.longitude - startValue.point.longitude
-                val y = endValue.point.latitude - startValue.point.latitude
-                val point = Point.form(startValue.point.longitude + x * fraction,
-                        startValue.point.latitude + y * fraction)
-                var r = endValue.bearing - startValue.bearing
-                if (r > 180) {
-                    r -= 360
-                } else if (r < -180) {
-                    r += 360
-                }
-                val bearing = (startValue.bearing + r * fraction)
-                return Location(point, bearing)
+    companion object : TypeEvaluator<Location> {
+        override fun evaluate(fraction: Float, startValue: Location, endValue: Location): Location {
+            val x = endValue.point.longitude - startValue.point.longitude
+            val y = endValue.point.latitude - startValue.point.latitude
+            val point = Point.form(startValue.point.longitude + x * fraction,
+                    startValue.point.latitude + y * fraction)
+            var r = endValue.bearing - startValue.bearing
+            if (r > 180) {
+                r -= 360
+            } else if (r < -180) {
+                r += 360
             }
+            val bearing = (startValue.bearing + r * fraction)
+            return Location(point, bearing)
         }
+
         private const val BASE_TIME: Long = 50
         private const val TILT = 80f
     }

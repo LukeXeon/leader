@@ -1,10 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.kexie.android.dng.common">
-    <application>
-        <provider
-            android:authorities="${applicationId}.permissions-initializer"
-            android:name=".app.PermissionsInitializer"
-            android:exported="false"
-            android:multiprocess="false"/>
-    </application>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.kexie.android.dng.common">
 </manifest>

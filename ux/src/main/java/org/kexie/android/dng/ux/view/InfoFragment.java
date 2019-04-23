@@ -24,6 +24,14 @@ public class InfoFragment extends Fragment
     private FragmentInfoBinding binding;
     private InfoViewModel viewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        viewModel = ViewModelProviders.of(requireActivity())
+                .get(InfoViewModel.class);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -42,12 +50,7 @@ public class InfoFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         binding.setLifecycleOwner(this);
-
-        viewModel = ViewModelProviders.of(requireActivity())
-                .get(InfoViewModel.class);
         viewModel.user.observe(this, binding::setUser);
     }
 }

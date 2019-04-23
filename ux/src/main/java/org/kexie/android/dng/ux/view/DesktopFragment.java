@@ -50,6 +50,18 @@ public class DesktopFragment extends Fragment
 
     private AppsViewModel appsViewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        appsViewModel = ViewModelProviders.of(requireActivity())
+                .get(AppsViewModel.class);
+        infoViewModel = ViewModelProviders.of(requireActivity())
+                .get(InfoViewModel.class);
+        desktopViewModel = ViewModelProviders.of(this)
+                .get(DesktopViewModel.class);
+    }
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -68,8 +80,6 @@ public class DesktopFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         GenericQuickAdapter<Function> functionsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_desktop_function, BR.function);
         functionsAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<Function>(
@@ -86,8 +96,6 @@ public class DesktopFragment extends Fragment
                     }
                 }));
 
-        desktopViewModel = ViewModelProviders.of(this)
-                .get(DesktopViewModel.class);
         desktopViewModel.functions.observe(this, functionsAdapter::setNewData);
         desktopViewModel.time.observe(this, binding::setTime);
         desktopViewModel.onError.observeOn(AndroidSchedulers.mainThread())
@@ -98,11 +106,7 @@ public class DesktopFragment extends Fragment
                 .subscribe(s -> Toasty.success(requireContext(), s).show());
         getLifecycle().addObserver(desktopViewModel);
 
-        appsViewModel = ViewModelProviders.of(requireActivity())
-                .get(AppsViewModel.class);
 
-        infoViewModel = ViewModelProviders.of(requireActivity())
-                .get(InfoViewModel.class);
         Transformations.map(infoViewModel.user,
                 input -> new LiteUser(input.headImage, input.username, input.carNumber))
                 .observe(this, binding::setUser);

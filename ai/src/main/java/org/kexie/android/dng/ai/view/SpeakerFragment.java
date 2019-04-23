@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Transformations;
@@ -47,8 +46,13 @@ public class SpeakerFragment extends Fragment
 
     private GenericQuickAdapter<Message> messageGenericQuickAdapter;
 
-    private AppCompatImageView imageView;
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        speakerViewModel = ViewModelProviders.of(this)
+                .get(SpeakerViewModel.class);
+    }
 
     @Nullable
     @Override
@@ -84,8 +88,7 @@ public class SpeakerFragment extends Fragment
         binding.setAdapter(messageGenericQuickAdapter);
         binding.setIsShowPartial(false);
 
-        speakerViewModel = ViewModelProviders.of(this)
-                .get(SpeakerViewModel.class);
+
 
         speakerViewModel.getNextMessage()
                 .observeOn(AndroidSchedulers.mainThread())

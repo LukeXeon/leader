@@ -35,5 +35,11 @@ public final class AppGlobal extends MultiDexApplication
 
         Logger.d(SHA1Util.getSHA1(this));
 
+
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
     }
 }

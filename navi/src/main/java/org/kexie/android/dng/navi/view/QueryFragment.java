@@ -28,6 +28,14 @@ public final class QueryFragment extends Fragment
 
     private QueryViewModel queryViewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        queryViewModel = ViewModelProviders.of(requireParentFragment())
+                .get(QueryViewModel.class);
+    }
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -45,10 +53,6 @@ public final class QueryFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
-        queryViewModel = ViewModelProviders.of(requireParentFragment())
-                .get(QueryViewModel.class);
-
         Fragment fragment = (Fragment) ARouter
                 .getInstance()
                 .build(PR.navi.query_tips)

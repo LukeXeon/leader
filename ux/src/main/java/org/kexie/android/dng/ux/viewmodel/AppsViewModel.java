@@ -24,6 +24,8 @@ public class AppsViewModel extends AndroidViewModel
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
+
+
     public AppsViewModel(@NonNull Application application)
     {
         super(application);

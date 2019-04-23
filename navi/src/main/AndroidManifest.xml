@@ -7,7 +7,7 @@
             android:name="com.amap.api.location.APSService"
             android:exported="false"/>
         <service
-            android:name=".NetworkMonitoringService"
+            android:name=".model.NetworkMonitoringService"
             android:enabled="true"
             android:exported="false"/>
         <meta-data

@@ -34,6 +34,14 @@ public class AppsFragment extends Fragment
 
     private AppsViewModel appsViewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        appsViewModel = ViewModelProviders.of(requireActivity())
+                .get(AppsViewModel.class);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -54,8 +62,6 @@ public class AppsFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         view.setOnTouchListener((x, y) -> true);
-        setRetainInstance(false);
-
         GenericQuickAdapter<App> adapter
                 = new GenericQuickAdapter<>(R.layout.item_app, BR.app);
         adapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<App>(
@@ -72,8 +78,7 @@ public class AppsFragment extends Fragment
                     }
                 }));
 
-        appsViewModel = ViewModelProviders.of(requireActivity())
-                .get(AppsViewModel.class);
+
         appsViewModel.apps.observe(this, adapter::setNewData);
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
 

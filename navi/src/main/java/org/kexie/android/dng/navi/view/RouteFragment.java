@@ -11,8 +11,8 @@ import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.databinding.RxOnClick;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviSelectRouteBinding;
-import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
+import org.kexie.android.dng.navi.viewmodel.RunningViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.RouteInfo;
 
 import java.util.Map;
@@ -31,6 +31,19 @@ public final class RouteFragment extends Fragment
     private QueryViewModel queryViewModel;
 
     private RunningViewModel runningViewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        Fragment root = requireParentFragment()
+                .requireParentFragment()
+                .requireParentFragment();
+        queryViewModel = ViewModelProviders.of(root)
+                .get(QueryViewModel.class);
+        runningViewModel = ViewModelProviders.of(root)
+                .get(RunningViewModel.class);
+    }
 
     @NonNull
     @Override
@@ -52,18 +65,7 @@ public final class RouteFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         binding.setLifecycleOwner(this);
-
-        Fragment root = requireParentFragment()
-                .requireParentFragment()
-                .requireParentFragment();
-
-        queryViewModel = ViewModelProviders.of(root)
-                .get(QueryViewModel.class);
-        runningViewModel = ViewModelProviders.of(root)
-                .get(RunningViewModel.class);
         Bundle bundle = getArguments();
         if (bundle != null)
         {

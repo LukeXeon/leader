@@ -39,6 +39,14 @@ public final class SelectFragment extends Fragment
 
     private RouteAdapter routeAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
+                .get(QueryViewModel.class);
+    }
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -56,7 +64,7 @@ public final class SelectFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
+
 
         requireActivity().addOnBackPressedCallback(this, () -> {
             Map<Integer, RouteInfo> routeInfos = queryViewModel.getRoutes().getValue();
@@ -68,8 +76,7 @@ public final class SelectFragment extends Fragment
             return false;
         });
 
-        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
-                .get(QueryViewModel.class);
+
 
         binding.setLifecycleOwner(this);
         binding.routePager.initStack(3, StackPageTransformer.Orientation.VERTICAL);

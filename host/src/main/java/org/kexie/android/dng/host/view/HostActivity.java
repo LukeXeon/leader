@@ -113,7 +113,6 @@ public final class HostActivity extends AppCompatActivity
         SystemUtil.hideSystemUi(getWindow());
     }
 
-
     @Override
     public void onBackPressed()
     {

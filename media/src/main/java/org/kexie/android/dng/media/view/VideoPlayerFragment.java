@@ -26,20 +26,17 @@ import androidx.fragment.app.Fragment;
 @Route(path = PR.media.video)
 public class VideoPlayerFragment
         extends Fragment
-        implements OnBackPressedCallback
-{
+        implements OnBackPressedCallback {
 
     private IjkPlayerView player;
 
     private FragmentVideoPlayerBinding binding;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
-    {
+                             @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_video_player,
@@ -50,13 +47,11 @@ public class VideoPlayerFragment
 
     @Override
     public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState)
-    {
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Media info = requireArguments().getParcelable("media");
         requireActivity().addOnBackPressedCallback(this, this);
-        if (info != null)
-        {
+        if (info != null) {
             player = binding.playerView;
             Glide.with(this)
                     .load(info.uri)
@@ -67,6 +62,7 @@ public class VideoPlayerFragment
                     .setSaveDir(Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                             .getAbsolutePath() + "/dng")
+                    .setOnClickBackListener(requireActivity()::onBackPressed)
                     .setTitle(info.title)    // set title
                     .setVideoPath(info.uri)
                     .alwaysFullScreen()
@@ -76,52 +72,42 @@ public class VideoPlayerFragment
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
-        if (player != null)
-        {
+        if (player != null) {
             player.onPause();
         }
     }
 
     @Override
-    public void onDestroyView()
-    {
+    public void onDestroyView() {
         super.onDestroyView();
-        if (player != null)
-        {
+        if (player != null) {
             player.onDestroy();
             player = null;
         }
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
-        if (player != null)
-        {
+        if (player != null) {
             player.onResume();
         }
     }
 
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig)
-    {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (player != null)
-        {
+        if (player != null) {
             player.configurationChanged(newConfig);
         }
     }
 
     @Override
-    public boolean handleOnBackPressed()
-    {
-        if (player != null)
-        {
+    public boolean handleOnBackPressed() {
+        if (player != null) {
             return player.onBackPressed();
         }
         return false;

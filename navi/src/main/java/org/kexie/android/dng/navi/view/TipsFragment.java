@@ -47,6 +47,16 @@ public final class TipsFragment extends Fragment
 
     private GenericQuickAdapter<InputTip> inputTipQuickAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(false);
+        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
+                .get(QueryViewModel.class);
+        inputTipViewModel = ViewModelProviders.of(this)
+                .get(InputTipViewModel.class);
+    }
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,7 +75,7 @@ public final class TipsFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
+
         requireActivity().addOnBackPressedCallback(this, () -> {
             if (isHidden())
             {
@@ -80,10 +90,7 @@ public final class TipsFragment extends Fragment
             return false;
         });
 
-        queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
-                .get(QueryViewModel.class);
-        inputTipViewModel = ViewModelProviders.of(this)
-                .get(InputTipViewModel.class);
+
 
         inputTipQuickAdapter = new GenericQuickAdapter<>(R.layout.item_tip, BR.inputTip);
         inputTipQuickAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<InputTip>(

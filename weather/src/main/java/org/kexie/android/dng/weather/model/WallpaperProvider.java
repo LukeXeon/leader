@@ -1,6 +1,6 @@
-package org.kexie.android.dng.ux.model;
+package org.kexie.android.dng.weather.model;
 
-import org.kexie.android.dng.ux.model.entity.JsonWallpapers;
+import org.kexie.android.dng.weather.model.entity.JsonWallpapers;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;

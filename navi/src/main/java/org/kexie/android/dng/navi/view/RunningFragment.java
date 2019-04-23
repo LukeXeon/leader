@@ -33,6 +33,14 @@ public final class RunningFragment extends Fragment
 
     private RunningViewModel runningViewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        runningViewModel = ViewModelProviders.of(requireParentFragment())
+                .get(RunningViewModel.class);
+    }
+
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -50,8 +58,6 @@ public final class RunningFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        runningViewModel = ViewModelProviders.of(requireParentFragment())
-                .get(RunningViewModel.class);
         binding.setIsLoading(true);
         binding.progressBar.enableIndeterminateMode(true);
         runningViewModel.getRunningInfo().observe(this, naviInfo -> {

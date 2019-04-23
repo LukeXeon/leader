@@ -154,7 +154,8 @@ public final class LoadAsyncBindingAdapter
 
     private static void loadAsync(RequestBuilder<Drawable> builder, ImageView view)
     {
-        builder.error(Glide.with(view).load(R.mipmap.image_loading))
+        builder.error(Glide.with(view)
+                .load(R.mipmap.image_loading))
                 .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
                 .into(view);
     }

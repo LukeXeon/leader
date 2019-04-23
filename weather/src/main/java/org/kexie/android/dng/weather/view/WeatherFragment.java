@@ -1,4 +1,4 @@
-package org.kexie.android.dng.ux.view;
+package org.kexie.android.dng.weather.view;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 

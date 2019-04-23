@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi
+package org.kexie.android.dng.navi.model
 
 import android.app.Service
 import android.content.Intent

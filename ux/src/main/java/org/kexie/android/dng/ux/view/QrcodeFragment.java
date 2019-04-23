@@ -31,6 +31,13 @@ public class QrcodeFragment extends Fragment
 
     private LoginViewModel viewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -49,9 +56,6 @@ public class QrcodeFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         viewModel.qrcode.observe(this, binding::setQrCode);
         viewModel.onError.observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))

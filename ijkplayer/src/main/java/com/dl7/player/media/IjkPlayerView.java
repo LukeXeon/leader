@@ -48,7 +48,7 @@ import android.widget.Toast;
 
 import com.dl7.player.R;
 import com.dl7.player.danmaku.BaseDanmakuConverter;
-import com.dl7.player.danmaku.BiliDanmukuParser;
+import com.dl7.player.danmaku.BiliDanmakuParser;
 import com.dl7.player.danmaku.OnDanmakuListener;
 import com.dl7.player.utils.AnimHelper;
 import com.dl7.player.utils.MotionEventUtils;
@@ -60,6 +60,7 @@ import com.dl7.player.utils.StringUtils;
 import com.dl7.player.utils.WindowUtils;
 import com.dl7.player.widgets.MarqueeTextView;
 import com.dl7.player.widgets.ImageDialogFragment;
+import com.orhanobut.logger.Logger;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -264,7 +265,7 @@ public class IjkPlayerView extends FrameLayout
 
     private OnBackListener onBackListener;
 
-    public IjkPlayerView setOnBackListener(OnBackListener listener)
+    public IjkPlayerView setOnClickBackListener(OnBackListener listener)
     {
         onBackListener = listener;
         return this;
@@ -531,20 +532,17 @@ public class IjkPlayerView extends FrameLayout
      *
      * @return
      */
-    public boolean onBackPressed()
-    {
-        if (recoverFromEditVideo())
-        {
+    public boolean onBackPressed() {
+        if (recoverFromEditVideo()) {
             return true;
         }
         if (mIsAlwaysFullScreen)
         {
-            return _exit();
-        } else if (mIsFullscreen)
-        {
+            return false;
+        }
+        else if (mIsFullscreen) {
             mAttachActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            if (mIsForbidTouch)
-            {
+            if (mIsForbidTouch) {
                 // 锁住状态则解锁
                 mIsForbidTouch = false;
                 mIvPlayerLock.setSelected(false);
@@ -1361,20 +1359,12 @@ public class IjkPlayerView extends FrameLayout
      */
     private boolean _exit()
     {
-        if (System.currentTimeMillis() - mExitTime > 2000)
+        Logger.d(this);
+        if (onBackListener != null)
         {
-            Toasty.warning(mAttachActivity, "再按一次退出", Toast.LENGTH_SHORT).show();
-            mExitTime = System.currentTimeMillis();
-            return true;
-        } else
-        {
-            //mAttachActivity.finish();
-            if (onBackListener != null)
-            {
-                onBackListener.onBack();
-            }
-            return false;
+            onBackListener.onBack();
         }
+        return true;
     }
 
     /**============================ 触屏操作处理 ============================*/
@@ -2479,7 +2469,6 @@ public class IjkPlayerView extends FrameLayout
             // 设置弹幕
             mDanmakuContext = DanmakuContext.create();
             //同步弹幕和video，貌似没法保持同步，可能我用的有问题，先注释掉- -
-//            mDanmakuContext.setDanmakuSync(new VideoDanmakuSync(this));
             if (mDanmakuParser == null)
             {
                 mDanmakuParser = new BaseDanmakuParser()
@@ -2590,7 +2579,7 @@ public class IjkPlayerView extends FrameLayout
         IDataSource<?> dataSource = mDanmakuLoader.getDataSource();
         if (mDanmakuParser == null)
         {
-            mDanmakuParser = new BiliDanmukuParser();
+            mDanmakuParser = new BiliDanmakuParser();
         }
         mDanmakuParser.load(dataSource);
         return this;
@@ -2627,7 +2616,7 @@ public class IjkPlayerView extends FrameLayout
         IDataSource<?> dataSource = mDanmakuLoader.getDataSource();
         if (mDanmakuParser == null)
         {
-            mDanmakuParser = new BiliDanmukuParser();
+            mDanmakuParser = new BiliDanmakuParser();
         }
         mDanmakuParser.load(dataSource);
         return this;

@@ -104,10 +104,13 @@ public final class NaviFragment extends Fragment
     private Observable<Location> uiLocation;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         navi = AMapNavi.getInstance(requireContext().getApplicationContext());
+        NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
+        runningViewModel = ViewModelProviders.of(this, factory).get(RunningViewModel.class);
+        queryViewModel = ViewModelProviders.of(this, factory).get(QueryViewModel.class);
     }
 
     @NonNull
@@ -129,8 +132,6 @@ public final class NaviFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         binding.setLifecycleOwner(this);
         Glide.with(this)
                 .load(R.drawable.image_splash)
@@ -166,11 +167,6 @@ public final class NaviFragment extends Fragment
         PublishSubject<Location> subject = PublishSubject.create();
         mapController.setOnMyLocationChangeListener(subject::onNext);
         uiLocation = subject;
-
-        NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
-
-        runningViewModel = ViewModelProviders.of(this, factory).get(RunningViewModel.class);
-        queryViewModel = ViewModelProviders.of(this, factory).get(QueryViewModel.class);
         //no run
         queryViewModel.getRoutes().observe(this, routeInfos -> {
             if (!routeInfos.isEmpty())
