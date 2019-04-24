@@ -50,7 +50,6 @@ public class VideoPlayerProxyActivity
         Bundle extra = postcard.getExtras();
         extra.putAll(bundle);
         Fragment fragment = (Fragment) postcard.navigation();
-        Logger.d(getSupportFragmentManager().getFragments());
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)

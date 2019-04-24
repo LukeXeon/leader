@@ -1,6 +1,5 @@
 package org.kexie.android.dng.media.view;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -16,7 +15,7 @@ import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
-import org.kexie.android.dng.media.widget.FloatPlayerManager;
+import org.kexie.android.dng.media.widget.FloatPlayerWindow;
 import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -39,10 +38,9 @@ public class VideoPlayerFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Context context = inflater.getContext();
         this.thisContainer = (FrameLayout) inflater
                 .inflate(R.layout.fragment_player_container, container, false);
-        player = new IjkPlayerView(context);
+        player = new IjkPlayerView(inflater.getContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
@@ -80,7 +78,7 @@ public class VideoPlayerFragment
                         player.mFloatWindow.setVisibility(View.GONE);
                         player.setOnClickBackListener(null);
                         player.mFloatWindow.setOnClickListener(null);
-                        FloatPlayerManager.transform(player);
+                        FloatPlayerWindow.transform(player);
                         player = null;
                         requireActivity().onBackPressed();
                     })

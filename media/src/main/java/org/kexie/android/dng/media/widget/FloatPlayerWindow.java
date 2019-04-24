@@ -1,6 +1,8 @@
 package org.kexie.android.dng.media.widget;
 
 import android.content.Context;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.Screen;
@@ -8,7 +10,7 @@ import com.yhao.floatwindow.Screen;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.player.media.IjkPlayerView;
 
-public final class FloatPlayerManager
+public final class FloatPlayerWindow
         extends ViewStateAdapter
         implements IjkPlayerView.OnBackListener {
 
@@ -16,20 +18,27 @@ public final class FloatPlayerManager
     private Context context;
 
     public static void transform(IjkPlayerView player) {
-        new FloatPlayerManager(player);
+        new FloatPlayerWindow(player);
     }
 
-    private FloatPlayerManager(IjkPlayerView player) {
+    private FloatPlayerWindow(IjkPlayerView player) {
         this.player = player;
         player.setOnClickBackListener(this);
-        context = player.getContext().getApplicationContext();
+        View root = View.inflate(
+                player.getContext(),
+                R.layout.window_float_player,
+                null);
+        context = player.getContext()
+                .getApplicationContext();
+        FrameLayout container = root.findViewById(R.id.container);
+        container.addView(player);
         FloatWindow.with(context)
                 .setWidth(Screen.width, 0.6f)
-                .setHeight(Screen.height, 0.6f)
-                .setX(100)
+                .setHeight(Screen.height, 0.7f)
                 .setTag(context.getString(R.string.window_key))
+                .setX(Screen.width, 0.6f)
                 .setY(Screen.height, 0.3f)
-                .setView(player)
+                .setView(root)
                 .setViewStateListener(this)
                 .build();
         FloatWindow.get(context.getString(R.string.window_key)).show();
