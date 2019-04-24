@@ -1583,19 +1583,20 @@ public class IjkPlayerView extends FrameLayout
         int position = Math.max(mVideoView.getCurrentPosition(), mInterruptPosition);
         // 视频总的时长
         int duration = mVideoView.getDuration();
-        if (duration > 0)
-        {
+        if (duration > 0) {
             // 转换为 Seek 显示的进度值
-            long pos = (long) MAX_VIDEO_SEEK * position / duration;
-            mPlayerSeek.setProgress((int) pos);
-            if (mIsEnableDanmaku)
-            {
-                mDanmakuPlayerSeek.setProgress((int) pos);
+            int pos = position + INTERVAL_TIME > duration
+                    ? MAX_VIDEO_SEEK
+                    : (int) (Math.min(MAX_VIDEO_SEEK,
+                    Math.round((double) MAX_VIDEO_SEEK * (double) position / (double) duration)));
+            mPlayerSeek.setProgress(pos);
+            if (mIsEnableDanmaku) {
+                mDanmakuPlayerSeek.setProgress(pos);
             }
         }
         // 获取缓冲的进度百分比，并显示在 Seek 的次进度
         int percent = mVideoView.getBufferPercentage();
-        mPlayerSeek.setSecondaryProgress(percent * 10);
+        mPlayerSeek.setSecondaryProgress(0);
         if (mIsEnableDanmaku)
         {
             mDanmakuPlayerSeek.setSecondaryProgress(percent * 10);

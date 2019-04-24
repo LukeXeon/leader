@@ -22,7 +22,9 @@ public class GenericQuickAdapter<X>
 
     @Override
     protected void convert(GenericViewHolder helper, X item) {
-        helper.getBinding().setVariable(mName, item);
+        if (item != null) {
+            helper.getBinding().setVariable(mName, item);
+        }
     }
 
     public static class GenericViewHolder extends BaseViewHolder {

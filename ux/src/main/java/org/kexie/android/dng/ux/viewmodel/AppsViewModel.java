@@ -47,6 +47,7 @@ public class AppsViewModel extends AndroidViewModel {
 
     public AppsViewModel(@NonNull Application application) {
         super(application);
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);

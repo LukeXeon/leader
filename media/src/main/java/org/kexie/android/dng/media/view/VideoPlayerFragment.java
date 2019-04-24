@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
@@ -23,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+
+//需要实现浮窗
 @Route(path = PR.media.video)
 public class VideoPlayerFragment
         extends Fragment
@@ -42,6 +45,12 @@ public class VideoPlayerFragment
                 R.layout.fragment_video_player,
                 container,
                 false);
+        player = new IjkPlayerView(inflater.getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
+        player.setLayoutParams(params);
+        binding.container.addView(player);
         return binding.getRoot();
     }
 
@@ -52,16 +61,14 @@ public class VideoPlayerFragment
         Media info = requireArguments().getParcelable("media");
         requireActivity().addOnBackPressedCallback(this, this);
         if (info != null) {
-            player = binding.playerView;
             Glide.with(this)
                     .load(info.uri)
                     .apply(RequestOptions.fitCenterTransform())
                     .into(player.mPlayerThumb);
 
-            binding.playerView.init()
-                    .setSaveDir(Environment
-                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                            .getAbsolutePath() + "/dng")
+            player.init().setSaveDir(Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                    .getAbsolutePath() + "/dng")
                     .setOnClickBackListener(requireActivity()::onBackPressed)
                     .setTitle(info.title)    // set title
                     .setVideoPath(info.uri)
