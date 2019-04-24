@@ -13,7 +13,7 @@ import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.model.entity.FunctionInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.Function;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,7 +25,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -36,8 +36,7 @@ import java8.util.stream.StreamSupport;
 
 public class DesktopViewModel
         extends AndroidViewModel
-        implements LifecycleObserver
-{
+        implements LifecycleObserver {
 
     private static final int BORDER_SIZE = 250;
 
@@ -49,17 +48,17 @@ public class DesktopViewModel
 
     public final PublishSubject<String> onSuccess = PublishSubject.create();
 
+    private Disposable disposable;
+
     private Timer updateTimer;
 
-    public DesktopViewModel(Application application)
-    {
+    public DesktopViewModel(Application application) {
         super(application);
         loadDefaultFunctions();
     }
 
     private Observable<List<Function>>
-    loadFunction(List<FunctionInfo> functionRes)
-    {
+    loadFunction(List<FunctionInfo> functionRes) {
         return Observable.just(functionRes)
                 .observeOn(Schedulers.io())
                 .map(raw -> {
@@ -72,77 +71,49 @@ public class DesktopViewModel
                                             .apply(RequestOptions.bitmapTransform(zoomTransformation))
                                             .submit()))
                             .map(x -> {
-                                try
-                                {
+                                try {
                                     assert x.first != null;
                                     assert x.second != null;
                                     Logger.d(x.first.name);
                                     return new Function(x.first.name, x.second.get(), x.first.uri);
-                                } catch (Exception e)
-                                {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                     return null;
                                 }
                             }).filter(Objects::nonNull)
                             .collect(Collectors.toList());
-                });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private void loadDefaultFunctions()
-    {
-        loadFunction(new LinkedList<FunctionInfo>()
-        {
-            {
-                add(FunctionInfo.from("天气", R.mipmap.image_weather, PR.ux.weather));
-                add(FunctionInfo.from("多媒体", R.mipmap.image_media, PR.media.browse));
-                add(FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps));
-            }
-        }).subscribe(new Observer<List<Function>>()
-        {
-            @Override
-            public void onSubscribe(Disposable d)
-            {
-
-            }
-
-            @Override
-            public void onNext(List<Function> functions)
-            {
-                DesktopViewModel.this.functions.postValue(functions);
-            }
-
-            @Override
-            public void onError(Throwable e)
-            {
-
-            }
-
-            @Override
-            public void onComplete()
-            {
-
-            }
-        });
+    private void loadDefaultFunctions() {
+        disposable = loadFunction(Arrays.asList(
+                FunctionInfo.from("天气", R.mipmap.image_weather, PR.ux.weather),
+                FunctionInfo.from("多媒体", R.mipmap.image_media, PR.media.browse),
+                FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps)))
+                .subscribe(functions::setValue);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void startTimer()
-    {
+    void startTimer() {
         updateTimer = new Timer();
-        updateTimer.schedule(new TimerTask()
-        {
+        updateTimer.schedule(new TimerTask() {
             @Override
-            public void run()
-            {
+            public void run() {
                 time.postValue(TimeUtils.getNowString());
             }
         }, 0, 1000);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    void endTimer()
-    {
+    void endTimer() {
         updateTimer.cancel();
     }
 
+    @Override
+    protected void onCleared() {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+    }
 }

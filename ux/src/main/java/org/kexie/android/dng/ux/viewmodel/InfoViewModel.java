@@ -14,30 +14,28 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.exceptions.Exceptions;
 import io.reactivex.schedulers.Schedulers;
-import java8.util.Objects;
 
-public class InfoViewModel extends AndroidViewModel
-{
+public class InfoViewModel extends AndroidViewModel {
     private Gson gson = new Gson();
 
     public final MutableLiveData<User> user = new MutableLiveData<>();
 
-    public InfoViewModel(@NonNull Application application)
-    {
+    private Disposable disposable;
+
+    public InfoViewModel(@NonNull Application application) {
         super(application);
         loadDefault();
     }
 
-    private void loadDefault()
-    {
-        Observable.<Context>just(getApplication())
+    private void loadDefault() {
+        disposable = Observable.<Context>just(getApplication())
                 .observeOn(Schedulers.io())
                 .map(context -> {
-                    try
-                    {
+                    try {
                         Drawable drawable = Glide.with(context)
                                 .load(R.mipmap.image_head_man)
                                 .submit()
@@ -51,37 +49,18 @@ public class InfoViewModel extends AndroidViewModel
                                 .headImage(drawable)
                                 .verified(false)
                                 .build();
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        return null;
+                    } catch (Exception e) {
+                        throw Exceptions.propagate(e);
                     }
-                }).filter(Objects::nonNull)
-                .subscribe(new Observer<User>()
-                {
-                    @Override
-                    public void onSubscribe(Disposable d)
-                    {
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(user::setValue);
+    }
 
-                    }
-
-                    @Override
-                    public void onNext(User user)
-                    {
-                        InfoViewModel.this.user.postValue(user);
-                    }
-
-                    @Override
-                    public void onError(Throwable e)
-                    {
-
-                    }
-
-                    @Override
-                    public void onComplete()
-                    {
-
-                    }
-                });
+    @Override
+    protected void onCleared() {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 }

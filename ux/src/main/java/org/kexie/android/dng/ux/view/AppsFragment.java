@@ -13,7 +13,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.common.widget.RxOnClickWrapper;
-import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
@@ -59,8 +58,8 @@ public class AppsFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.setOnTouchListener((x, y) -> true);
-        GenericQuickAdapter<App> adapter
-                = new GenericQuickAdapter<>(R.layout.item_app, BR.app);
+
+        GenericQuickAdapter<App> adapter = appsViewModel.appAdapter;
         adapter.setOnItemClickListener(RxOnClickWrapper
                 .create(BaseQuickAdapter.OnItemClickListener.class)
                 .owner(this)
@@ -79,9 +78,7 @@ public class AppsFragment extends Fragment {
                 })
                 .build());
 
-        appsViewModel.apps.observe(this, adapter::setNewData);
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
-
         binding.setAdapter(adapter);
         binding.setLifecycleOwner(this);
         binding.rootView.setupWith((ViewGroup) view.getParent())
@@ -91,5 +88,11 @@ public class AppsFragment extends Fragment {
                 .setBlurAlgorithm(new RenderScriptBlur(getContext()))
                 .setBlurRadius(20f)
                 .setHasFixedTransformationMatrix(true);
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding.setAdapter(null);
+        super.onDestroyView();
     }
 }
