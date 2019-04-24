@@ -7,6 +7,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.Logger;
+import com.yhao.floatwindow.FloatWindow;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;
@@ -34,6 +35,7 @@ public class VideoPlayerProxyActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        FloatWindow.destroy(getString(R.string.window_key));
         startNewPlayer();
     }
 
