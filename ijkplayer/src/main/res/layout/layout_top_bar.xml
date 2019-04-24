@@ -14,10 +14,13 @@
 
         <ImageView
             android:id="@+id/iv_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
             android:background="@drawable/sel_item_background"
-            android:padding="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
             android:src="@mipmap/ic_return_back"/>
 
         <org.kexie.android.dng.player.widgets.MarqueeTextView
@@ -34,7 +37,7 @@
             android:singleLine="true"
             android:text="标题"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
+            android:textSize="30dp" />
 
         <ProgressBar
             android:id="@+id/pb_battery"
@@ -48,15 +51,22 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
+            android:textSize="25dp"/>
 
         <ImageView
             android:id="@+id/iv_screenshot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@drawable/sel_item_background"
-            android:padding="10dp"
+            android:padding="7dp"
             android:src="@mipmap/ic_video_screenshot"/>
+
+        <Button
+            android:id="@+id/float_window"
+            android:text="浮窗显示"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:textSize="20dp"/>
 
         <TextView
             android:id="@+id/tv_settings"
@@ -69,7 +79,7 @@
             android:layout_marginRight="10dp"
             android:gravity="center"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
+            android:textSize="25dp"/>
     </LinearLayout>
 
     <FrameLayout

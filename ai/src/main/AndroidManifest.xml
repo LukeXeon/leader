@@ -16,7 +16,7 @@
     <application>
         <provider
             android:authorities="${applicationId}.waveformview2-initializer"
-            android:multiprocess="true"
+            android:multiprocess="false"
             android:name=".widget.WaveformView2$Initializer"
             android:exported="false"/>
         <meta-data android:name="com.baidu.speech.APP_ID"

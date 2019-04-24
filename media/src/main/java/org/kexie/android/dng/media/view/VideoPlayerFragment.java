@@ -1,6 +1,6 @@
 package org.kexie.android.dng.media.view;
 
-import android.content.res.Configuration;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -11,21 +11,20 @@ import android.widget.FrameLayout;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.databinding.FragmentVideoPlayerBinding;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
+import org.kexie.android.dng.media.widget.FloatPlayerManager;
+import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 
-//需要实现浮窗
 @Route(path = PR.media.video)
 public class VideoPlayerFragment
         extends Fragment
@@ -33,25 +32,23 @@ public class VideoPlayerFragment
 
     private IjkPlayerView player;
 
-    private FragmentVideoPlayerBinding binding;
+    private FrameLayout thisContainer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_video_player,
-                container,
-                false);
-        player = new IjkPlayerView(inflater.getContext());
+        Context context = inflater.getContext();
+        this.thisContainer = (FrameLayout) inflater
+                .inflate(R.layout.fragment_player_container, container, false);
+        player = new IjkPlayerView(context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
         player.setLayoutParams(params);
-        binding.container.addView(player);
-        return binding.getRoot();
+        this.thisContainer.addView(player);
+        return this.thisContainer;
     }
 
     @Override
@@ -65,7 +62,6 @@ public class VideoPlayerFragment
                     .load(info.uri)
                     .apply(RequestOptions.fitCenterTransform())
                     .into(player.mPlayerThumb);
-
             player.init().setSaveDir(Environment
                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
                     .getAbsolutePath() + "/dng")
@@ -75,6 +71,20 @@ public class VideoPlayerFragment
                     .alwaysFullScreen()
                     .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
                     .start();   // Start playing
+
+            player.mFloatWindow.setOnClickListener(RxOnClickWrapper
+                    .create(View.OnClickListener.class)
+                    .owner(this)
+                    .inner(v -> {
+                        thisContainer.removeView(player);
+                        player.mFloatWindow.setVisibility(View.GONE);
+                        player.setOnClickBackListener(null);
+                        player.mFloatWindow.setOnClickListener(null);
+                        FloatPlayerManager.transform(player);
+                        player = null;
+                        requireActivity().onBackPressed();
+                    })
+                    .build());
         }
     }
 
@@ -103,19 +113,10 @@ public class VideoPlayerFragment
         }
     }
 
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (player != null) {
-            player.configurationChanged(newConfig);
-        }
-    }
-
     @Override
     public boolean handleOnBackPressed() {
         if (player != null) {
-            return player.onBackPressed();
+            player.onBackPressed();
         }
         return false;
     }

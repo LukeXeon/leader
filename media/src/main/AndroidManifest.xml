@@ -1,3 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.kexie.android.dng.media">
+    <application>
+        <activity
+            android:theme="@style/VideoTheme"
+            android:process=":videoplayer"
+            android:launchMode="singleInstance"
+            android:screenOrientation="landscape"
+            android:name=".view.VideoPlayerProxyActivity">
+        </activity>
+    </application>
 </manifest>
