@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.dl7.player.media.IjkPlayerView;
+import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;

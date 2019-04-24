@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.dl7.player">
+          package="org.kexie.android.dng.player">
 
     <uses-permission android:name="android.permission.BATTERY_STATS"
                      tools:ignore="ProtectedPermissions"/>
