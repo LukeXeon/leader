@@ -41,7 +41,7 @@ dependencies {
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     api 'me.jessyan:autosize:1.1.2'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    //api "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     //api 'androidx.percentlayout:percentlayout:1.0.0'
     //api 'com.google.guava:guava:27.0.1-android'
     //ui widget
@@ -84,7 +84,6 @@ dependencies {
     api files('libs/AMap3DMap_6.6.0_AMapNavi_6.5.0_20181221.jar')
     api files('libs/AMap_Location_V4.4.0_20181122.jar')
     api files('libs/AMap_Search_V6.5.0_20180930.jar')
-    api files('libs/Msc.jar')
 
 
     testImplementation 'junit:junit:4.12'

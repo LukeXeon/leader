@@ -13,8 +13,8 @@ import android.view.animation.Animation;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.databinding.RxOnClick;
 import org.kexie.android.dng.common.widget.AnimationAdapter;
+import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
@@ -53,8 +53,7 @@ public class PhotoViewFragment extends Fragment
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState)
-    {
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
 
@@ -74,36 +73,40 @@ public class PhotoViewFragment extends Fragment
 
         Fragment target = getTargetFragment();
 
-        if (target != null)
-        {
+        if (target != null) {
             MediaBrowseViewModel viewModel = ViewModelProviders.of(target)
                     .get(MediaBrowseViewModel.class);
 
             Map<String, View.OnClickListener> actions
-                    = new ArrayMap<String, View.OnClickListener>()
-            {
+                    = new ArrayMap<String, View.OnClickListener>() {
                 {
-                    put("back", new RxOnClick(PhotoViewFragment.this,
-                            v -> requireActivity().onBackPressed()));
-                    put("delete", new RxOnClick(PhotoViewFragment.this,
-                            v -> {
-                                if (viewModel.delete(binding.getInfo()))
-                                {
+                    put("back", RxOnClickWrapper
+                            .create(View.OnClickListener.class)
+                            .lifecycle(getLifecycle())
+                            .inner(v -> requireActivity().onBackPressed())
+                            .build());
+                    put("delete", RxOnClickWrapper
+                            .create(View.OnClickListener.class)
+                            .lifecycle(getLifecycle())
+                            .inner(v -> {
+                                if (viewModel.delete(binding.getInfo())) {
                                     Fragment fragment = getTargetFragment();
-                                    if (fragment != null)
-                                    {
+                                    if (fragment != null) {
                                         fragment.onActivityResult(getTargetRequestCode(),
                                                 Activity.RESULT_FIRST_USER, new Intent().putExtras(requireArguments()));
                                     }
                                     Toasty.success(requireContext(), "删除成功").show();
                                     requireActivity().onBackPressed();
-                                } else
-                                {
+                                } else {
                                     Toasty.error(requireContext(), "删除失败").show();
                                 }
-                            }));
-                    put("hide", new RxOnClick(PhotoViewFragment.this,
-                            v -> doHideAnimation()));
+                            })
+                            .build());
+                    put("hide", RxOnClickWrapper
+                            .create(View.OnClickListener.class)
+                            .lifecycle(getLifecycle())
+                            .inner(v -> doHideAnimation())
+                            .build());
                 }
             };
 

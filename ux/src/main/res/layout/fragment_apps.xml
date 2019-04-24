@@ -7,7 +7,7 @@
         <import type="org.kexie.android.dng.ux.R"/>
         <variable
             name="adapter"
-            type="org.kexie.android.dng.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.App&gt;"/>
+            type="org.kexie.android.dng.common.widget.GenericQuickAdapter"/>
         <variable
             name="isLoading"
             type="Boolean"/>

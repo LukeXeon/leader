@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
-import org.kexie.android.dng.common.databinding.RxOnClick;
+import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.common.widget.ProgressFragment;
+import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
@@ -76,14 +77,16 @@ public class MediaBrowseFragment
     {
         super.onViewCreated(view, savedInstanceState);
         mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
-        mediasAdapter.setOnItemClickListener(new GenericQuickAdapter.RxOnItemClick<Media>(
-                this,
-                (adapter, view1, position) -> {
-                    Media info = adapter.getData().get(position);
-                    switch (info.type)
-                    {
-                        case MediaType.TYPE_PHOTO:
-                        {
+        mediasAdapter.setOnItemClickListener(RxOnClickWrapper
+                .create(BaseQuickAdapter.OnItemClickListener.class)
+                .owner(this)
+                .inner((adapter, view1, position) -> {
+                    Media info = (Media) adapter.getItem(position);
+                    if (info == null) {
+                        return;
+                    }
+                    switch (info.type) {
+                        case MediaType.TYPE_PHOTO: {
                             Postcard postcard = ARouter.getInstance()
                                     .build(PR.media.photo);
                             Bundle bundle = postcard.getExtras();
@@ -93,8 +96,7 @@ public class MediaBrowseFragment
                             jumpTo(fragment);
                         }
                         break;
-                        case MediaType.TYPE_VIDEO:
-                        {
+                        case MediaType.TYPE_VIDEO: {
                             Postcard postcard = ARouter.getInstance()
                                     .build(PR.media.video);
                             Bundle bundle = postcard.getExtras();
@@ -105,7 +107,8 @@ public class MediaBrowseFragment
                         }
                         break;
                     }
-                }));
+                })
+                .build());
         mediasAdapter.openLoadAnimation(GenericQuickAdapter.ALPHAIN);
         mediasAdapter.setEmptyView(R.layout.view_empty, (ViewGroup) view);
 
@@ -117,20 +120,24 @@ public class MediaBrowseFragment
                 = new ArrayMap<String, View.OnClickListener>()
         {
             {
-                put("相册", new RxOnClick(
-                        MediaBrowseFragment.this,
-                        v -> {
+                put("相册", RxOnClickWrapper
+                        .create(View.OnClickListener.class)
+                        .lifecycle(getLifecycle())
+                        .inner(v -> {
                             viewModel.loadPhoto();
                             binding.dataContent.stopScroll();
                             binding.dataContent.stopNestedScroll();
-                        }));
-                put("视频", new RxOnClick(
-                        MediaBrowseFragment.this,
-                        v -> {
+                        })
+                        .build());
+                put("视频", RxOnClickWrapper
+                        .create(View.OnClickListener.class)
+                        .lifecycle(getLifecycle())
+                        .inner(v -> {
                             viewModel.loadVideo();
                             binding.dataContent.stopScroll();
                             binding.dataContent.stopNestedScroll();
-                        }));
+                        })
+                        .build());
             }
         };
         binding.setLifecycleOwner(this);

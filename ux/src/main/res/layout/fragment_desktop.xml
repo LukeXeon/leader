@@ -23,7 +23,7 @@
 
         <variable
             name="functions"
-            type="org.kexie.android.dng.common.databinding.GenericQuickAdapter&lt;org.kexie.android.dng.ux.viewmodel.entity.Function&gt;"/>
+            type="org.kexie.android.dng.common.widget.GenericQuickAdapter"/>
     </data>
 
     <LinearLayout

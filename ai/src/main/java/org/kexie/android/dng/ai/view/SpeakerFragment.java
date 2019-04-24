@@ -18,7 +18,7 @@ import org.kexie.android.dng.ai.viewmodel.SpeakerViewModel;
 import org.kexie.android.dng.ai.viewmodel.entity.Message;
 import org.kexie.android.dng.ai.widget.WaveformView2;
 import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.databinding.GenericQuickAdapter;
+import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 
 import java.util.Objects;
 

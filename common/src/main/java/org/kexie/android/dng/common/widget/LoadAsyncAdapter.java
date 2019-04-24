@@ -1,4 +1,4 @@
-package org.kexie.android.dng.common.databinding;
+package org.kexie.android.dng.common.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -30,9 +30,9 @@ import java.util.WeakHashMap;
 import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 
-public final class LoadAsyncBindingAdapter
+public final class LoadAsyncAdapter
 {
-    private LoadAsyncBindingAdapter()
+    private LoadAsyncAdapter()
     {
         throw new AssertionError();
     }
