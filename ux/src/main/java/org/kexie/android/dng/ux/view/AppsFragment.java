@@ -77,6 +77,12 @@ public class AppsFragment extends Fragment {
                     }
                 })
                 .build());
+        adapter.setOnItemLongClickListener((adapter12, view12, position) -> {
+
+
+
+            return true;
+        });
 
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
         binding.setAdapter(adapter);

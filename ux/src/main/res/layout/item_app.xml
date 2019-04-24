@@ -9,17 +9,17 @@
     </data>
 
     <LinearLayout
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_width="140dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <FrameLayout
             android:layout_marginTop="15dp"
-            android:layout_width="90dp"
-            android:layout_height="90dp">
+            android:layout_width="100dp"
+            android:layout_height="100dp">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:src="@android:color/white"
                 android:layout_width="match_parent"
@@ -27,20 +27,21 @@
             <ImageView
                 android:layout_gravity="center"
                 android:id="@+id/iv_image"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@{app.icon}"/>
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                async_src="@{app.icon}"/>
         </FrameLayout>
         <TextView
             android:id="@+id/tv_text"
-            android:singleLine="true"
-            android:textSize="15dp"
+            android:maxLines="2"
+            android:minLines="1"
+            android:textSize="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center"
             android:layout_margin="10dp"
             android:text="@{app.name}"
             android:textColor="#FFF"/>
-
     </LinearLayout>
 </layout>

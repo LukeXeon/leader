@@ -1,28 +1,45 @@
 package org.kexie.android.dng.ux.viewmodel;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.model.AppInfoProvider;
+import org.kexie.android.dng.ux.model.entity.AppInfo;
 import org.kexie.android.dng.ux.viewmodel.entity.App;
+
+import java.util.List;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import java8.util.Objects;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
 public class AppsViewModel extends AndroidViewModel {
 
-    private Disposable disposable;
+    private BroadcastReceiver broadcastReceiver;
+
+    private HandlerThread workerThread = new HandlerThread(toString());
+
+    private Handler mainWorker = new Handler(Looper.getMainLooper());
+
+    private Handler worker = ((Function<HandlerThread, Handler>) input -> {
+        input.start();
+        return new Handler(input.getLooper());
+    }).apply(workerThread);
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
@@ -30,33 +47,75 @@ public class AppsViewModel extends AndroidViewModel {
 
     public AppsViewModel(@NonNull Application application) {
         super(application);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Uri uri = intent.getData();
+                if (uri == null) {
+                    return;
+                }
+                String packageName = uri.getSchemeSpecificPart();
+                if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
+                    AppInfo appInfo = AppInfoProvider.getLaunchApp(getApplication(), packageName);
+                    if (appInfo != null) {
+                        App app = new App(
+                                appInfo.getName(),
+                                appInfo.getIcon(),
+                                appInfo.getPackageName(),
+                                appInfo.isSysApp());
+                        List<App> apps = appAdapter.getData();
+                        apps.add(app);
+                        appAdapter.setNewData(StreamSupport.stream(apps)
+                                .sorted()
+                                .collect(Collectors.toList()));
+                    }
+                }
+                if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction())) {
+                    int index = -1;
+                    List<App> apps = appAdapter.getData();
+                    for (int i = 0; i < apps.size(); i++) {
+                        App app = apps.get(i);
+                        if (Objects.equals(packageName, app.packageName)) {
+                            index = i;
+                        }
+                    }
+                    if (index > 0) {
+                        appAdapter.remove(index);
+                    }
+                }
+            }
+        };
+        getApplication().registerReceiver(broadcastReceiver, filter);
         load();
     }
 
     @MainThread
     private void load() {
         isLoading.setValue(true);
-        disposable = Observable.<Context>just(this.getApplication())
-                .observeOn(Schedulers.io())
-                .map(context -> {
-                    return StreamSupport.stream(AppInfoProvider.getLaunchApps(context))
-                            .map(info -> new App(
-                                    info.getName(),
-                                    info.getIcon(),
-                                    info.getPackageName()))
-                            .collect(Collectors.toList());
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(apps -> {
-                    appAdapter.setNewData(apps);
-                    isLoading.setValue(false);
-                });
+        worker.post(() -> {
+            List<App> list = StreamSupport.stream(AppInfoProvider
+                    .getLaunchApps(getApplication()))
+                    .map(info -> new App(
+                            info.getName(),
+                            info.getIcon(),
+                            info.getPackageName(),
+                            info.isSysApp()))
+                    .sorted()
+                    .collect(Collectors.toList());
+            mainWorker.post(() -> {
+                appAdapter.setNewData(list);
+                isLoading.setValue(false);
+            });
+        });
     }
 
     @Override
     protected void onCleared() {
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
+        getApplication().unregisterReceiver(broadcastReceiver);
+        workerThread.quit();
     }
 }

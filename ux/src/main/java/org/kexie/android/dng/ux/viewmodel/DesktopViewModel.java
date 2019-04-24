@@ -24,7 +24,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -57,9 +57,9 @@ public class DesktopViewModel
         loadDefaultFunctions();
     }
 
-    private Observable<List<Function>>
+    private Single<List<Function>>
     loadFunction(List<FunctionInfo> functionRes) {
-        return Observable.just(functionRes)
+        return Single.just(functionRes)
                 .observeOn(Schedulers.io())
                 .map(raw -> {
                     ZoomTransformation zoomTransformation

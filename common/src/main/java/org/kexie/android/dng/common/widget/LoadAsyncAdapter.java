@@ -114,6 +114,11 @@ public final class LoadAsyncAdapter
         loadAsync(Glide.with(view).load(id), view);
     }
 
+    @BindingAdapter({"async_src"})
+    public static void loadAsyncToSrc(ImageView view, Drawable drawable) {
+        Glide.with(view).load(drawable).into(view);
+    }
+
     @BindingAdapter({"async_background"})
     public static void loadAsyncToBackground(final View view, String name)
     {

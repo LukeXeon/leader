@@ -25,10 +25,10 @@ public class MediaBrowseViewModel extends AndroidViewModel {
 
     private final HandlerThread workerThread = new HandlerThread(toString());
 
-    private final Handler singleTask = ((Function<Void, Handler>) input -> {
-        workerThread.start();
+    private final Handler singleTask = ((Function<HandlerThread, Handler>) input -> {
+        input.start();
         return new Handler(workerThread.getLooper());
-    }).apply(null);
+    }).apply(workerThread);
 
     public final MutableLiveData<String> title = new MutableLiveData<>();
 

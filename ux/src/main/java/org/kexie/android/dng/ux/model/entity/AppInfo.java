@@ -2,6 +2,8 @@ package org.kexie.android.dng.ux.model.entity;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
+
 public class AppInfo
 {
   private String dataDir;
@@ -10,8 +12,6 @@ public class AppInfo
   private String name;
   private String launcherName;
   private String packageName;
-  private int pageIndex;
-  private int position;
   private boolean sysApp = false;
 
   public String getDataDir()
@@ -39,16 +39,6 @@ public class AppInfo
     return this.packageName;
   }
 
-  public int getPageIndex()
-  {
-    return this.pageIndex;
-  }
-
-  public int getPosition()
-  {
-    return this.position;
-  }
-
   public void setDataDir(String paramString)
   {
     this.dataDir = paramString;
@@ -74,16 +64,7 @@ public class AppInfo
     this.packageName = paramString;
   }
 
-  public void setPageIndex(int paramInt)
-  {
-    this.pageIndex = paramInt;
-  }
-
-  public void setPosition(int paramInt)
-  {
-    this.position = paramInt;
-  }
-
+  @NonNull
   public String toString()
   {
     return "AppInfo [packageName=" + this.packageName + ", name=" + this.name + ", dataDir=" + this.dataDir + "]";
