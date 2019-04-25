@@ -335,6 +335,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 setRenderView(null);
                 break;
             case RENDER_TEXTURE_VIEW: {
+
                 TextureRenderView renderView = new TextureRenderView(getContext());
                 if (mMediaPlayer != null) {
                     renderView.getSurfaceHolder().bindToMediaPlayer(mMediaPlayer);
@@ -1087,12 +1088,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      * 初始化渲染器
      */
     private void initRenders() {
-        setRender(RENDER_SURFACE_VIEW);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//            setRender(RENDER_TEXTURE_VIEW);
-//        } else {
-//
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setRender(RENDER_TEXTURE_VIEW);
+        } else {
+            setRender(RENDER_SURFACE_VIEW);
+        }
     }
 
     public IMediaPlayer createPlayer(int playerType) {

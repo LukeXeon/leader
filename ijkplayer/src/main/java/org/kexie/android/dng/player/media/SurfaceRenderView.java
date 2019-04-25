@@ -22,8 +22,6 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -37,6 +35,8 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ISurfaceTextureHolder;
 
@@ -196,8 +196,10 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
 
     @Override
     public Bitmap getVideoScreenshot() {
+        getHolder();
         return null;
     }
+
 
     private SurfaceCallback mSurfaceCallback;
 
@@ -212,7 +214,7 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         private Map<IRenderCallback, Object> mRenderCallbackMap = new ConcurrentHashMap<IRenderCallback, Object>();
 
         public SurfaceCallback(@NonNull SurfaceRenderView surfaceView) {
-            mWeakSurfaceView = new WeakReference<SurfaceRenderView>(surfaceView);
+            mWeakSurfaceView = new WeakReference<>(surfaceView);
         }
 
         public void addRenderCallback(@NonNull IRenderCallback callback) {
@@ -220,8 +222,7 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
 
             ISurfaceHolder surfaceHolder = null;
             if (mSurfaceHolder != null) {
-                if (surfaceHolder == null)
-                    surfaceHolder = new InternalSurfaceHolder(mWeakSurfaceView.get(), mSurfaceHolder);
+                surfaceHolder = new InternalSurfaceHolder(mWeakSurfaceView.get(), mSurfaceHolder);
                 callback.onSurfaceCreated(surfaceHolder, mWidth, mHeight);
             }
 

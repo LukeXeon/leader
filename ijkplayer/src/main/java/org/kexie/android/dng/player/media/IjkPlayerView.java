@@ -4,19 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
@@ -57,17 +54,11 @@ import org.kexie.android.dng.player.utils.AnimHelper;
 import org.kexie.android.dng.player.utils.MotionEventUtils;
 import org.kexie.android.dng.player.utils.NavBarUtils;
 import org.kexie.android.dng.player.utils.NetWorkUtils;
-import org.kexie.android.dng.player.utils.SDCardUtils;
 import org.kexie.android.dng.player.utils.SoftInputUtils;
 import org.kexie.android.dng.player.utils.StringUtils;
 import org.kexie.android.dng.player.utils.WindowUtils;
-import org.kexie.android.dng.player.widgets.ImageDialogFragment;
 import org.kexie.android.dng.player.widgets.MarqueeTextView;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -128,7 +119,8 @@ public class IjkPlayerView extends FrameLayout
 
     // 原生的IjkPlayer
     private IjkVideoView mVideoView;
-    public Button mFloatWindow;
+    //切换到小屏
+    private Button mFloatWindow;
     // 视频开始前的缩略图，根据需要外部进行加载
     public ImageView mPlayerThumb;
     // 加载
@@ -259,6 +251,16 @@ public class IjkPlayerView extends FrameLayout
     private boolean mIsReady = false;
 
     private OnBackListener onBackListener;
+
+    public IjkPlayerView setFloatClickListener(OnClickListener listener) {
+        mFloatWindow.setOnClickListener(listener);
+        mFloatWindow.setVisibility(listener != null ? VISIBLE : GONE);
+        mIvBack.setVisibility(listener != null ? VISIBLE : GONE);
+        if (listener == null) {
+            setOnClickBackListener(null);
+        }
+        return this;
+    }
 
     public IjkPlayerView setOnClickBackListener(OnBackListener listener) {
         onBackListener = listener;
@@ -454,10 +456,6 @@ public class IjkPlayerView extends FrameLayout
             // don't forget release!
             mDanmakuView.release();
             mDanmakuView = null;
-        }
-        if (mShareDialog != null) {
-            mShareDialog.dismiss();
-            mShareDialog = null;
         }
         mHandler.removeMessages(MSG_TRY_RELOAD);
         mHandler.removeMessages(MSG_UPDATE_SEEK);
@@ -987,8 +985,6 @@ public class IjkPlayerView extends FrameLayout
             mEtDanmakuContent.setText("");
         } else if (id == R.id.input_options_more) {
             _toggleMoreColorOptions();
-        } else if (id == R.id.iv_screenshot) {
-            _doScreenshot();
         } else if (id == R.id.tv_recover_screen) {
             mVideoView.resetVideoView(true);
             mIsNeedRecoverScreen = false;
@@ -1693,6 +1689,8 @@ public class IjkPlayerView extends FrameLayout
     }
 
     /**============================ Listener ============================*/
+
+
 
     /**
      * Register a callback to be invoked when the media file
@@ -2506,8 +2504,6 @@ public class IjkPlayerView extends FrameLayout
     private ProgressBar mPbBatteryLevel;
     // 系统时间显示
     private TextView mTvSystemTime;
-    // 截图按钮
-    private ImageView mIvScreenshot;
     // 电量变化广播接收器
     private BatteryBroadcastReceiver mBatteryReceiver;
     // 锁屏状态广播接收器
@@ -2516,11 +2512,7 @@ public class IjkPlayerView extends FrameLayout
     private NetBroadcastReceiver mNetReceiver;
     // 判断是否出现锁屏,有则需要重新设置渲染器，不然视频会没有动画只有声音
     private boolean mIsScreenLocked = false;
-    // 截图分享弹框
-    private ImageDialogFragment mShareDialog;
     // 对话框点击监听，内部和外部
-    // 截图保存路径
-    private File mSaveDir;
 
     /**
      * 初始化电量、锁屏、时间处理
@@ -2536,111 +2528,9 @@ public class IjkPlayerView extends FrameLayout
         mAttachActivity.registerReceiver(mBatteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         mAttachActivity.registerReceiver(mScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         mAttachActivity.registerReceiver(mNetReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        mIvScreenshot = findViewById(R.id.iv_screenshot);
-        mIvScreenshot.setOnClickListener(this);
-        if (SDCardUtils.isAvailable()) {
-            _createSaveDir(SDCardUtils.getRootPath() + File.separator + "IjkPlayView");
-        }
     }
 
-    /**
-     * 截图
-     */
-    private void _doScreenshot() {
-        editVideo();
-        _showShareDialog(mVideoView.getScreenshot());
-    }
 
-    /**
-     * 显示对话框
-     *
-     * @param bitmap
-     */
-    private void _showShareDialog(final Bitmap bitmap) {
-        if (mShareDialog == null) {
-            mShareDialog = new ImageDialogFragment();
-            mShareDialog.setListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    recoverFromEditVideo();
-                }
-            });
-        }
-
-        new SaveImageTask(mAttachActivity, mSaveDir, bitmap).execute();
-
-        mShareDialog.setScreenshotPhoto(bitmap);
-        mShareDialog.show(mAttachActivity.getSupportFragmentManager(), "share");
-    }
-
-    private static final class SaveImageTask
-            extends AsyncTask<Void, Void, Boolean> {
-        @SuppressLint("StaticFieldLeak")
-        private final Context context;
-        private final File file;
-        private final Bitmap bitmap;
-
-        private SaveImageTask(Context context, File file, Bitmap bitmap) {
-            super();
-            this.context = context.getApplicationContext();
-            this.file = new File(file,
-                    System.currentTimeMillis() + ".jpg");
-            this.bitmap = bitmap;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                BufferedOutputStream bos
-                        = new BufferedOutputStream(new FileOutputStream(file));
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                bos.flush();
-                bos.close();
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            if (aBoolean) {
-                Toasty.success(context,
-                        "保存成功，路径为:" + file.getAbsolutePath(),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                Toasty.error(context,
-                        "保存本地失败",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    /**
-     * 创建目录
-     *
-     * @param path
-     */
-    private void _createSaveDir(String path) {
-        mSaveDir = new File(path);
-        if (!mSaveDir.exists()) {
-            mSaveDir.mkdirs();
-        } else if (!mSaveDir.isDirectory()) {
-            mSaveDir.delete();
-            mSaveDir.mkdirs();
-        }
-    }
-
-    /**
-     * 设置截图保存路径
-     *
-     * @param path
-     */
-    public IjkPlayerView setSaveDir(String path) {
-        _createSaveDir(path);
-        return this;
-    }
 
     /**
      * 接受电量改变广播

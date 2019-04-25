@@ -53,14 +53,6 @@
             android:textColor="@android:color/white"
             android:textSize="25dp"/>
 
-        <ImageView
-            android:id="@+id/iv_screenshot"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/sel_item_background"
-            android:padding="7dp"
-            android:src="@mipmap/ic_video_screenshot"/>
-
         <Button
             android:id="@+id/float_window"
             android:text="浮窗显示"

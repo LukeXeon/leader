@@ -1,7 +1,6 @@
 package org.kexie.android.dng.media.view;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,10 +70,8 @@ public class VideoPlayerFragment
                         .apply(RequestOptions.fitCenterTransform())
                         .into(player.mPlayerThumb);
 
-                player.init().setSaveDir(Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-                        .getAbsolutePath() + "/dng")
-                        .setTitle(info.title)    // set title
+                // set title
+                player.init().setTitle(info.title)
                         .setVideoPath(info.uri)
                         .alwaysFullScreen()
                         .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
@@ -83,19 +80,16 @@ public class VideoPlayerFragment
         }
         requireActivity().addOnBackPressedCallback(this, this);
         player.setOnClickBackListener(requireActivity()::onBackPressed);
-        player.mFloatWindow.setOnClickListener(RxOnClickWrapper
+        player.setFloatClickListener(RxOnClickWrapper
                 .create(View.OnClickListener.class)
                 .owner(this)
                 .inner(v -> transformToWindow())
                 .build());
     }
 
-    private void transformToWindow()
-    {
+    private void transformToWindow() {
         playerContainer.removeView(player);
-        player.mFloatWindow.setVisibility(View.GONE);
-        player.setOnClickBackListener(null);
-        player.mFloatWindow.setOnClickListener(null);
+        player.setFloatClickListener(null);
         VideoPlayerHolderActivity holderActivity
                 = (VideoPlayerHolderActivity) requireActivity();
         holderActivity.holdByWindow(player);
