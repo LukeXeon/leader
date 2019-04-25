@@ -13,12 +13,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
                 android:background="@android:color/white"
                 android:layout_marginRight="1dp"
                 android:layout_marginTop="1dp"
                 android:layout_marginLeft="1dp"
                 android:layout_width="match_parent"
                 android:layout_height="?android:actionBarSize">
+                <TextView
+                    android:background="@color/lightblue400"
+                    android:id="@+id/transform"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="还原"
+                    android:textStyle="bold"
+                    android:textSize="30dp"
+                    android:layout_width="90dp"
+                    android:layout_height="match_parent" />
+                <TextView
+                    android:background="@color/reda400"
+                    android:id="@+id/close"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:text="关闭"
+                    android:textStyle="bold"
+                    android:textSize="30dp"
+                    android:layout_width="90dp"
+                    android:layout_height="match_parent" />
             </LinearLayout>
         </FrameLayout>
         <FrameLayout

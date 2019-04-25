@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.orhanobut.logger.Logger;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.Screen;
 
@@ -29,9 +30,11 @@ public final class WindowPlayer
                 player.getContext(),
                 R.layout.window_float_player,
                 null);
-        Context context = player.getContext();
+        root.findViewById(R.id.transform).setOnClickListener(this);
+        root.findViewById(R.id.close).setOnClickListener(v -> onBack());
         FrameLayout container = root.findViewById(R.id.container);
         container.addView(player);
+        Context context = player.getContext();
         FloatWindow.with(context.getApplicationContext())
                 .setWidth(Screen.width, 0.6f)
                 .setHeight(Screen.height, 0.7f)
@@ -49,14 +52,17 @@ public final class WindowPlayer
         Context context = player.getContext().getApplicationContext();
         ARouter.getInstance()
                 .build(PR.media.video)
-                .withBoolean(context.getString(R.string.is_restart), true)
+                .withBoolean(context.getString(R.string.is_form_window), true)
                 .navigation(context);
+        Logger.d(context);
     }
 
     public Fragment transformToFragment() {
         player.mFloatWindow.setVisibility(View.VISIBLE);
         player.setOnClickBackListener(null);
-        Fragment fragment = VideoPlayerFragment.restart(player);
+        FrameLayout container = (FrameLayout) player.getParent();
+        container.removeView(player);
+        Fragment fragment = VideoPlayerFragment.formWindow(player);
         player = null;
         return fragment;
     }

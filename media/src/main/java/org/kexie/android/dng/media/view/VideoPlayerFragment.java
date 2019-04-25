@@ -27,7 +27,7 @@ public class VideoPlayerFragment
 
     private IjkPlayerView player;
 
-    private boolean restart = false;
+    private boolean isFormWindow = false;
 
     private FrameLayout playerContainer;
 
@@ -40,7 +40,7 @@ public class VideoPlayerFragment
                 .inflate(R.layout.fragment_player_container,
                         container,
                         false);
-        if (!restart) {
+        if (!isFormWindow) {
             player = new IjkPlayerView(inflater.getContext());
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -51,9 +51,9 @@ public class VideoPlayerFragment
         return playerContainer;
     }
 
-    public static Fragment restart(IjkPlayerView player) {
+    public static Fragment formWindow(IjkPlayerView player) {
         VideoPlayerFragment fragment = new VideoPlayerFragment();
-        fragment.restart = true;
+        fragment.isFormWindow = true;
         fragment.player = player;
         return fragment;
     }
@@ -63,7 +63,7 @@ public class VideoPlayerFragment
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (!restart) {
+        if (!isFormWindow) {
             Media info = requireArguments().getParcelable("media");
             if (info != null) {
                 Glide.with(this)
@@ -86,18 +86,21 @@ public class VideoPlayerFragment
         player.mFloatWindow.setOnClickListener(RxOnClickWrapper
                 .create(View.OnClickListener.class)
                 .owner(this)
-                .inner(v -> {
-                    playerContainer.removeView(player);
-                    player.mFloatWindow.setVisibility(View.GONE);
-                    player.setOnClickBackListener(null);
-                    player.mFloatWindow.setOnClickListener(null);
-                    VideoPlayerHolderActivity holderActivity
-                            = (VideoPlayerHolderActivity) requireActivity();
-                    holderActivity.transformToWindow(player);
-                    player = null;
-                    holderActivity.onBackPressed();
-                })
+                .inner(v -> transformToWindow())
                 .build());
+    }
+
+    private void transformToWindow()
+    {
+        playerContainer.removeView(player);
+        player.mFloatWindow.setVisibility(View.GONE);
+        player.setOnClickBackListener(null);
+        player.mFloatWindow.setOnClickListener(null);
+        VideoPlayerHolderActivity holderActivity
+                = (VideoPlayerHolderActivity) requireActivity();
+        holderActivity.holdByWindow(player);
+        player = null;
+        holderActivity.onBackPressed();
     }
 
     @Override

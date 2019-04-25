@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">media</string>
     <string name="window_key">window_key</string>
-    <string name="is_restart">isRestart</string>
+    <string name="is_form_window">is_form_window</string>
 </resources>

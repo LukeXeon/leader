@@ -44,12 +44,12 @@ public class VideoPlayerHolderActivity
             return;
         }
         Fragment fragment = null;
-        boolean isRestart = bundle.getBoolean(getString(R.string.is_restart), false);
+        boolean isFormWindow = bundle.getBoolean(getString(R.string.is_form_window), false);
         if (FloatWindow.get(getString(R.string.window_key)) != null) {
-            if (isRestart && windowPlayer != null) {
+            if (isFormWindow && windowPlayer != null) {
                 fragment = windowPlayer.transformToFragment();
-                windowPlayer = null;
             }
+            windowPlayer = null;
             FloatWindow.destroy(getString(R.string.window_key));
         }
         if (fragment == null) {
@@ -64,7 +64,7 @@ public class VideoPlayerHolderActivity
                 .commit();
     }
 
-    public void transformToWindow(IjkPlayerView player) {
+    public void holdByWindow(IjkPlayerView player) {
         windowPlayer = new WindowPlayer(player);
     }
 
