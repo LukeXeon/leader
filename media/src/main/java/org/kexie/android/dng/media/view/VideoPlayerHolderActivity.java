@@ -8,6 +8,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.yhao.floatwindow.FloatWindow;
 
 import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.widget.WindowPlayer;
 import org.kexie.android.dng.player.media.IjkPlayerView;
@@ -39,6 +40,7 @@ public class VideoPlayerHolderActivity
     }
 
     private void doTransform() {
+        SystemUtil.hideSystemUi(getWindow());
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
             return;

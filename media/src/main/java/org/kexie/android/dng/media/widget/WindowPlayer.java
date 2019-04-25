@@ -1,11 +1,11 @@
 package org.kexie.android.dng.media.widget;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.orhanobut.logger.Logger;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.Screen;
 
@@ -52,9 +52,9 @@ public final class WindowPlayer
         Context context = player.getContext().getApplicationContext();
         ARouter.getInstance()
                 .build(PR.media.video)
+                .withFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .withBoolean(context.getString(R.string.is_form_window), true)
                 .navigation(context);
-        Logger.d(context);
     }
 
     public Fragment transformToFragment() {
