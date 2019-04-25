@@ -1,7 +1,6 @@
 package org.kexie.android.dng.host.app;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.didichuxing.doraemonkit.DoraemonKit;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -29,7 +28,7 @@ public final class AppGlobal extends MultiDexApplication
 
         ARouter.init(this);
 
-        DoraemonKit.install(this);
+        //DoraemonKit.install(this);
 
         AutoSizeConfig.getInstance()
                 .setCustomFragment(true);

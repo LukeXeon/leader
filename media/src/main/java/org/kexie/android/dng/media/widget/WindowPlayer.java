@@ -4,35 +4,35 @@ import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.Screen;
 
+import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;
+import org.kexie.android.dng.media.view.VideoPlayerFragment;
 import org.kexie.android.dng.player.media.IjkPlayerView;
 
-public final class FloatPlayerWindow
+import androidx.fragment.app.Fragment;
+
+public final class WindowPlayer
         extends ViewStateAdapter
-        implements IjkPlayerView.OnBackListener {
+        implements View.OnClickListener,
+        IjkPlayerView.OnBackListener {
 
     private IjkPlayerView player;
-    private Context context;
 
-    public static void transform(IjkPlayerView player) {
-        new FloatPlayerWindow(player);
-    }
-
-    private FloatPlayerWindow(IjkPlayerView player) {
+    public WindowPlayer(IjkPlayerView player) {
         this.player = player;
         player.setOnClickBackListener(this);
         View root = View.inflate(
                 player.getContext(),
                 R.layout.window_float_player,
                 null);
-        context = player.getContext()
-                .getApplicationContext();
+        Context context = player.getContext();
         FrameLayout container = root.findViewById(R.id.container);
         container.addView(player);
-        FloatWindow.with(context)
+        FloatWindow.with(context.getApplicationContext())
                 .setWidth(Screen.width, 0.6f)
                 .setHeight(Screen.height, 0.7f)
                 .setTag(context.getString(R.string.window_key))
@@ -42,6 +42,23 @@ public final class FloatPlayerWindow
                 .setViewStateListener(this)
                 .build();
         FloatWindow.get(context.getString(R.string.window_key)).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Context context = player.getContext().getApplicationContext();
+        ARouter.getInstance()
+                .build(PR.media.video)
+                .withBoolean(context.getString(R.string.is_restart), true)
+                .navigation(context);
+    }
+
+    public Fragment transformToFragment() {
+        player.mFloatWindow.setVisibility(View.VISIBLE);
+        player.setOnClickBackListener(null);
+        Fragment fragment = VideoPlayerFragment.restart(player);
+        player = null;
+        return fragment;
     }
 
     @Override
@@ -69,7 +86,7 @@ public final class FloatPlayerWindow
     @Override
     public void onBack() {
         if (player != null) {
-            FloatWindow.destroy(context.getString(R.string.window_key));
+            FloatWindow.destroy(player.getResources().getString(R.string.window_key));
         }
     }
 }

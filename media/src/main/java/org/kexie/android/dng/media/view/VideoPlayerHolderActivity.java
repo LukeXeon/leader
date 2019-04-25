@@ -3,14 +3,14 @@ package org.kexie.android.dng.media.view;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.orhanobut.logger.Logger;
 import com.yhao.floatwindow.FloatWindow;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;
+import org.kexie.android.dng.media.widget.WindowPlayer;
+import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,43 +19,53 @@ import androidx.fragment.app.FragmentTransaction;
 
 //需要实现浮窗
 //多进程,单进程是在是顶不住了
-@Route(path = PR.media.video_proxy)
-public class VideoPlayerProxyActivity
+@Route(path = PR.media.video)
+public class VideoPlayerHolderActivity
         extends AppCompatActivity {
+
+    private WindowPlayer windowPlayer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.d("video proxy start");
-        setContentView(R.layout.fragment_player_container);
-        startNewPlayer();
+        doTransform();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        FloatWindow.destroy(getString(R.string.window_key));
-        startNewPlayer();
+        doTransform();
     }
 
-    private void startNewPlayer() {
+    private void doTransform() {
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
             return;
         }
-        Postcard postcard = ARouter
-                .getInstance()
-                .build(PR.media.video);
-        Bundle extra = postcard.getExtras();
-        extra.putAll(bundle);
-        Fragment fragment = (Fragment) postcard.navigation();
+        Fragment fragment = null;
+        boolean isRestart = bundle.getBoolean(getString(R.string.is_restart), false);
+        if (FloatWindow.get(getString(R.string.window_key)) != null) {
+            if (isRestart && windowPlayer != null) {
+                fragment = windowPlayer.transformToFragment();
+                windowPlayer = null;
+            }
+            FloatWindow.destroy(getString(R.string.window_key));
+        }
+        if (fragment == null) {
+            fragment = new VideoPlayerFragment();
+            fragment.setArguments(bundle);
+        }
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .add(R.id.container, fragment)
+                .add(android.R.id.content, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    public void transformToWindow(IjkPlayerView player) {
+        windowPlayer = new WindowPlayer(player);
     }
 
     @Override

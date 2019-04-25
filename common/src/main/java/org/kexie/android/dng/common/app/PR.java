@@ -29,7 +29,6 @@ public final class PR
         public static final String browse = "/media/browse";
         public static final String photo = "/media/photo";
         public static final String video = "/media/video";
-        public static final String video_proxy = "/media/video/proxy";
 
     }
 

@@ -6,7 +6,7 @@
             android:process=":videoplayer"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape"
-            android:name=".view.VideoPlayerProxyActivity">
+            android:name=".view.VideoPlayerHolderActivity">
         </activity>
     </application>
 </manifest>
