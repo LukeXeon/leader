@@ -61,15 +61,15 @@ public final class WindowPlayer
         int height = root.getMeasuredHeight();
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         IFloatWindow floatWindow = FloatWindow.get(resources.getString(R.string.window_key));
-        if (x < 0) {
-            floatWindow.updateX(0);
-        } else if (x + width > displayMetrics.widthPixels) {
-            floatWindow.updateX(displayMetrics.widthPixels - width);
+        if (x < -width / 2) {
+            floatWindow.updateX(-width / 2);
+        } else if (x + width / 2 > displayMetrics.widthPixels) {
+            floatWindow.updateX(displayMetrics.widthPixels - width / 2);
         }
         if (y < 0) {
             floatWindow.updateY(0);
-        } else if (y + height > displayMetrics.heightPixels) {
-            floatWindow.updateY(displayMetrics.heightPixels - height);
+        } else if (y + height / 2 > displayMetrics.heightPixels) {
+            floatWindow.updateY(displayMetrics.heightPixels - height / 2);
         }
     }
 
