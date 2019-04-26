@@ -1,12 +1,8 @@
-package org.kexie.android.dng.player.widget;
+package org.kexie.android.dng.player.subtitle.reader;
 
 import android.text.TextUtils;
 
-
-import org.kexie.android.dng.player.subtitle.reader.AssSubtitleFileReader;
-import org.kexie.android.dng.player.subtitle.reader.SrtSubtitleFileReader;
-import org.kexie.android.dng.player.subtitle.reader.SubtitleFileReader;
-import org.kexie.android.dng.player.subtitle.reader.SubtitleLineInfo;
+import com.blankj.utilcode.util.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,9 +15,9 @@ import java.util.regex.Pattern;
  * @author: zhangliangming
  * @date: 2019-01-12 15:57
  **/
-public class SubtitleUtils {
+public class SubtitleReader {
 
-    private static ArrayList<SubtitleFileReader> readers;
+    private static List<SubtitleFileReader> readers;
 
     static {
         readers = new ArrayList<>();
@@ -59,7 +55,7 @@ public class SubtitleUtils {
      * @return
      */
     public static SubtitleFileReader getSubtitleFileReader(String fileName) {
-        String ext = FileUtils.getFileExt(fileName);
+        String ext = FileUtils.getFileExtension(fileName);
         for (SubtitleFileReader subtitleFileReader : readers) {
             if (subtitleFileReader.isFileSupported(ext)) {
                 return subtitleFileReader;

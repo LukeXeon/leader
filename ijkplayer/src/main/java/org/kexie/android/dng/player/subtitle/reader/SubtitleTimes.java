@@ -1,11 +1,13 @@
-package org.kexie.android.dng.player.widget;
+package org.kexie.android.dng.player.subtitle.reader;
+
+import java.util.Locale;
 
 /**
  * @Description: 时间处理类
  * @author: zhangliangming
  * @date: 2019-01-12 21:37
  **/
-public class TimeUtils {
+public class SubtitleTimes {
     /**
      * 解析字幕时间
      *
@@ -43,7 +45,9 @@ public class TimeUtils {
         int hour = minute / 60;
         int second = msecTotal % 60;
         minute %= 60;
-        return String.format("%02d:%02d:%02d,%03d", hour, minute, second, msec);
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d,%03d",
+                hour, minute, second, msec);
     }
 
     /**
@@ -59,7 +63,9 @@ public class TimeUtils {
         int hour = minute / 60;
         int second = msecTotal % 60;
         minute %= 60;
-        return String.format("%02d:%02d:%02d.%02d", hour, minute, second, msec / 10);
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d.%02d",
+                hour, minute, second, msec / 10);
     }
 
     /**
@@ -74,6 +80,8 @@ public class TimeUtils {
         int hour = minute / 60;
         int second = msecTotal % 60;
         minute %= 60;
-        return String.format("%02d:%02d:%02d", hour, minute, second);
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d",
+                hour, minute, second);
     }
 }

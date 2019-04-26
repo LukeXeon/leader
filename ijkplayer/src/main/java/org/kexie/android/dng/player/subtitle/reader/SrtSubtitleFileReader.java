@@ -1,9 +1,6 @@
 package org.kexie.android.dng.player.subtitle.reader;
 
 
-import org.kexie.android.dng.player.widget.SubtitleUtils;
-import org.kexie.android.dng.player.widget.TimeUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -87,7 +84,7 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
             String subtitleHtmlString = "";
             String subtitleTextString = "";
             for (int i = 2; i < subtitleLines.length; i++) {
-                String[] result = SubtitleUtils.parseSubtitleText(subtitleLines[i]);
+                String[] result = SubtitleReader.parseSubtitleText(subtitleLines[i]);
                 subtitleTextString += result[0];
                 subtitleHtmlString += result[1];
                 if (i != subtitleLines.length - 1) {
@@ -112,10 +109,10 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(timeString);
         if (matcher.find()) {
-            int startTime = TimeUtils.parseSubtitleTime(matcher.group());
+            int startTime = SubtitleTimes.parseSubtitleTime(matcher.group());
             subtitleLineInfo.setStartTime(startTime);
             if (matcher.find()) {
-                int endTime = TimeUtils.parseSubtitleTime(matcher.group());
+                int endTime = SubtitleTimes.parseSubtitleTime(matcher.group());
                 subtitleLineInfo.setEndTime(endTime);
                 return true;
             }

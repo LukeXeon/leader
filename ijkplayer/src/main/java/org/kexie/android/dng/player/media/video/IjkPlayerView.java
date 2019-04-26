@@ -44,6 +44,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.NetworkUtils;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.player.R;
@@ -54,8 +56,6 @@ import org.kexie.android.dng.player.widget.AnimHelper;
 import org.kexie.android.dng.player.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
 import org.kexie.android.dng.player.widget.NavBarUtils;
-import org.kexie.android.dng.player.widget.NetWorkUtils;
-import org.kexie.android.dng.player.widget.SoftInputUtils;
 import org.kexie.android.dng.player.widget.StringUtils;
 import org.kexie.android.dng.player.widget.WindowUtils;
 
@@ -638,7 +638,7 @@ public class IjkPlayerView extends FrameLayout
         mLoadingView.setVisibility(VISIBLE);
         if (mIsReady) {
             // 确保网络正常时
-            if (NetWorkUtils.isNetworkAvailable(mAttachActivity)) {
+            if (NetworkUtils.isConnected()) {
                 mVideoView.reload();
                 mVideoView.start();
 //                start();
@@ -975,7 +975,7 @@ public class IjkPlayerView extends FrameLayout
             if (mDanmakuListener == null || mDanmakuListener.isValid()) {
                 editVideo();
                 mEditDanmakuLayout.setVisibility(VISIBLE);
-                SoftInputUtils.setEditFocusable(mAttachActivity, mEtDanmakuContent);
+                KeyboardUtils.showSoftInput(mEtDanmakuContent);
             }
         } else if (id == R.id.iv_cancel_send) {
             recoverFromEditVideo();
@@ -2469,7 +2469,7 @@ public class IjkPlayerView extends FrameLayout
             mEditDanmakuLayout.setVisibility(GONE);
         }
         // 关闭软键盘
-        SoftInputUtils.closeSoftInput(mAttachActivity);
+        KeyboardUtils.hideSoftInput(mAttachActivity);
         // 重新设置全屏界面UI标志位
         _setUiLayoutFullscreen();
         if (mDanmakuColorOptions != null
@@ -2588,7 +2588,7 @@ public class IjkPlayerView extends FrameLayout
         public void onReceive(Context context, Intent intent) {
             // 如果相等的话就说明网络状态发生了变化
             if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                mIsNetConnected = NetWorkUtils.isNetworkAvailable(mAttachActivity);
+                mIsNetConnected = NetworkUtils.isConnected();
             }
         }
     }

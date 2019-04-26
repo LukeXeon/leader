@@ -2,6 +2,7 @@ package org.kexie.android.dng.player.widget;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by long on 2016/10/18.
@@ -23,7 +24,8 @@ public final class StringUtils {
         int minutes = totalSeconds / 60;
 //        int minutes = (totalSeconds / 60) % 60;
 //        int hours = totalSeconds / 3600;
-        return minutes > 99 ? String.format("%d:%02d", minutes, seconds) : String.format("%02d:%02d", minutes, seconds);
+        return minutes > 99 ? String.format(Locale.CHINA, "%d:%02d", minutes, seconds)
+                : String.format(Locale.CHINA, "%02d:%02d", minutes, seconds);
     }
 
     /**
@@ -44,10 +46,11 @@ public final class StringUtils {
 
     /**
      * 获取格式化当前时间
+     *
      * @return
      */
     public static String getCurFormatTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.CHINA);
         return sdf.format(new Date(System.currentTimeMillis()));
     }
 }
