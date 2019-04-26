@@ -28,7 +28,14 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="tjwfviK6NWsEcIbuIgMMwVRMfV96dLLx" />
         <service
-            android:name="com.baidu.speech.aidl.EventRecognitionService"
-            android:process=":speech"/>
+            android:exported="false"
+            android:enabled="true"
+            android:process=":speech"
+            android:name="com.baidu.speech.aidl.EventRecognitionService" />
+        <service
+            android:exported="false"
+            android:enabled="true"
+            android:process=":speech"
+            android:name=".model.SpeechService"/>
     </application>
 </manifest>

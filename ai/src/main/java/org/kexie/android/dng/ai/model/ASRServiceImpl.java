@@ -44,7 +44,7 @@ public class ASRServiceImpl implements ASRService
 
     @Override
     public void init(Context context) {
-
+        context = context.getApplicationContext();
         Map<String, EventListener> eventHandlers = new ArrayMap<>();
         // 引擎准备就绪，可以开始说话
         eventHandlers.put(SpeechConstant.CALLBACK_EVENT_ASR_READY,
