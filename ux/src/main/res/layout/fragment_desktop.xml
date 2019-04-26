@@ -61,7 +61,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    async_font='@{"PingFang Regular.ttf"}'
+                     
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
@@ -71,7 +71,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
-                    async_font='@{"PingFang Regular.ttf"}'
+                     
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
@@ -171,7 +171,7 @@
                                 android:background="@color/colorBlackAlpha26"/>
 
                             <TextView
-                                async_font='@{"PingFang Regular.ttf"}'
+                                 
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
@@ -206,7 +206,7 @@
                                 android:background="@color/colorBlackAlpha26"/>
 
                             <TextView
-                                async_font='@{"PingFang Regular.ttf"}'
+                                 
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
@@ -228,7 +228,7 @@
                 android:layout_margin="30dp">
 
                 <TextView
-                    async_font='@{"PingFang Regular.ttf"}'
+                     
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/draw_text_background"

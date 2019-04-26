@@ -1,16 +1,12 @@
 package org.kexie.android.dng.common.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -23,10 +19,6 @@ import com.bumptech.glide.request.target.Target;
 
 import org.kexie.android.dng.common.R;
 
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 
@@ -36,51 +28,6 @@ public final class LoadAsyncAdapter
     {
         throw new AssertionError();
     }
-
-    private final static Map<String, Typeface> sTypefaceCache
-            = new WeakHashMap<>();
-
-    private static final class TypefaceLoadTask
-            extends AsyncTask<Void, Void, Typeface>
-    {
-        private final String name;
-
-        private final WeakReference<TextView> textView;
-
-        @SuppressLint("StaticFieldLeak")
-        private final Context context;
-
-        private TypefaceLoadTask(TextView textView, String name)
-        {
-            super();
-            this.name = name;
-            this.textView = new WeakReference<>(textView);
-            this.context = textView.getContext().getApplicationContext();
-        }
-
-        @Override
-        protected Typeface doInBackground(Void... voids)
-        {
-            TextView target = textView.get();
-            if (target == null)
-            {
-                return null;
-            }
-            return Typeface.createFromAsset(context.getAssets(), name);
-        }
-
-        @Override
-        protected void onPostExecute(Typeface typeface)
-        {
-            TextView target = textView.get();
-            if (target != null && typeface != null)
-            {
-                target.setTypeface(typeface);
-                sTypefaceCache.put(name, typeface);
-            }
-        }
-    }
-
 
     @BindingAdapter({"async_src"})
     public static void loadAsyncToSrc(ImageView view, String name)
@@ -163,19 +110,5 @@ public final class LoadAsyncAdapter
                 .load(R.mipmap.image_loading))
                 .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
                 .into(view);
-    }
-
-    @BindingAdapter({"async_font"})
-    public static void loadAsyncToFont(TextView view, String name)
-    {
-        String path = "font/" + name;
-        Typeface typeface = sTypefaceCache.get(path);
-        if (typeface != null)
-        {
-            view.setTypeface(typeface);
-        } else
-        {
-            new TypefaceLoadTask(view, path);
-        }
     }
 }

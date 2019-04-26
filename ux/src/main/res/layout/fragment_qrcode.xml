@@ -24,7 +24,7 @@
                 android:scaleType="centerCrop"
                 app:riv_corner_radius="20dp"/>
             <TextView
-                async_font='@{"PingFang Regular.ttf"}'
+                 
                 android:textColor="@android:color/white"
                 android:gravity="center"
                 android:textSize="40dp"

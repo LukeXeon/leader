@@ -15,7 +15,7 @@ import org.kexie.android.dng.ai.model.entity.CloudAIResponse
 import org.kexie.android.dng.ai.viewmodel.entity.Message
 import org.kexie.android.dng.ai.widget.CookieCache
 import org.kexie.android.dng.common.app.PR
-import org.kexie.android.dng.common.app.navigationAs
+import org.kexie.android.dng.common.widget.navigationAs
 import org.kexie.android.dng.common.model.ASRService
 import org.kexie.android.dng.common.model.TTSService
 import retrofit2.Retrofit

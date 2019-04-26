@@ -55,7 +55,7 @@
                         <TextView
                             android:singleLine="true"
                             android:id="@+id/tv_title"
-                            async_font='@{"PingFang Regular.ttf"}'
+                             
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="20dp"
@@ -74,7 +74,7 @@
                     <TextView
                         android:singleLine="true"
                         android:id="@+id/tv_info"
-                        async_font='@{"PingFang Regular.ttf"}'
+                         
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical|right"

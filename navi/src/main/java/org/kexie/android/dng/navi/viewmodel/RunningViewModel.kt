@@ -13,7 +13,7 @@ import com.amap.api.navi.model.*
 import com.autonavi.ae.gmap.gloverlay.GLCrossVector
 import io.reactivex.subjects.PublishSubject
 import org.kexie.android.dng.common.app.PR
-import org.kexie.android.dng.common.app.navigationAs
+import org.kexie.android.dng.common.widget.navigationAs
 import org.kexie.android.dng.common.model.TTSService
 import org.kexie.android.dng.navi.viewmodel.entity.ModeCross
 import org.kexie.android.dng.navi.viewmodel.entity.RunningInfo
