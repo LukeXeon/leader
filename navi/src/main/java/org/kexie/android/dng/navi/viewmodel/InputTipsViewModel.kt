@@ -21,7 +21,7 @@ import org.kexie.android.dng.navi.viewmodel.entity.InputTip
 import java.util.concurrent.TimeUnit
 
 
-class InputTipViewModel(application: Application) : AndroidViewModel(application) {
+class InputTipsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val locationSource = AMapLocationClient(application)
             .apply {
@@ -40,7 +40,7 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
             .apply {
                 debounce(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.from(worker.looper))
-                        .subscribe(this@InputTipViewModel::query0)
+                        .subscribe(this@InputTipsViewModel::query0)
             }
 
     val inputTips = MutableLiveData<List<InputTip>>()
@@ -48,7 +48,7 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
                 value = emptyList()
             }
 
-    val queryText = MutableLiveData<String>()
+    val query = MutableLiveData<String>()
 
     val onError = PublishSubject.create<String>()
 
@@ -87,7 +87,7 @@ class InputTipViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun clear() {
-        queryText.value = ""
+        query.value = ""
         inputTips.value = emptyList()
     }
 

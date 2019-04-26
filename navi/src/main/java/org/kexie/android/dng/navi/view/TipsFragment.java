@@ -16,7 +16,7 @@ import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.navi.BR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryTipsBinding;
-import org.kexie.android.dng.navi.viewmodel.InputTipViewModel;
+import org.kexie.android.dng.navi.viewmodel.InputTipsViewModel;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
 import org.kexie.android.dng.navi.viewmodel.entity.InputTip;
 
@@ -40,7 +40,7 @@ import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvid
 public final class TipsFragment extends Fragment {
     private FragmentNaviQueryTipsBinding binding;
 
-    private InputTipViewModel inputTipViewModel;
+    private InputTipsViewModel inputTipsViewModel;
 
     private QueryViewModel queryViewModel;
 
@@ -50,10 +50,10 @@ public final class TipsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(false);
+        inputTipsViewModel = ViewModelProviders.of(this)
+                .get(InputTipsViewModel.class);
         queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
                 .get(QueryViewModel.class);
-        inputTipViewModel = ViewModelProviders.of(this)
-                .get(InputTipViewModel.class);
     }
 
     @NonNull
@@ -77,9 +77,9 @@ public final class TipsFragment extends Fragment {
             if (isHidden()) {
                 return false;
             }
-            List<InputTip> inputTips = inputTipViewModel.getInputTips().getValue();
+            List<InputTip> inputTips = inputTipsViewModel.getInputTips().getValue();
             if (inputTips != null && !inputTips.isEmpty()) {
-                inputTipViewModel.clear();
+                inputTipsViewModel.clear();
                 return true;
             }
             return false;
@@ -105,19 +105,19 @@ public final class TipsFragment extends Fragment {
                 .inner(v -> binding.setIsShowQuery(true))
                 .build());
         binding.setLifecycleOwner(this);
-        binding.setQueryText(inputTipViewModel.getQueryText());
+        binding.setQueryText(inputTipsViewModel.getQuery());
         binding.setTipsAdapter(inputTipQuickAdapter);
 
-        inputTipViewModel.getInputTips()
+        inputTipsViewModel.getInputTips()
                 .observe(this, data -> {
                     boolean isShow = data != null && !data.isEmpty();
                     binding.setIsShowTips(isShow);
                     inputTipQuickAdapter.setNewData(data);
                 });
-        inputTipViewModel.getQueryText()
+        inputTipsViewModel.getQuery()
                 .observe(this, data -> {
                     binding.setIsShowQuery(!TextUtils.isEmpty(data));
-                    inputTipViewModel.query(data);
+                    inputTipsViewModel.query(data);
                 });
 
 
@@ -138,11 +138,11 @@ public final class TipsFragment extends Fragment {
                         .commit();
             }
         });
-        queryViewModel.getOnError().mergeWith(inputTipViewModel.getOnError())
+        queryViewModel.getOnError().mergeWith(inputTipsViewModel.getOnError())
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe(data -> Toasty.error(requireContext(), data).show());
-        queryViewModel.getOnSuccess().mergeWith(inputTipViewModel.getOnSuccess())
+        queryViewModel.getOnSuccess().mergeWith(inputTipsViewModel.getOnSuccess())
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, ON_DESTROY)))
                 .subscribe(data -> Toasty.success(requireContext(), data).show());
@@ -151,7 +151,7 @@ public final class TipsFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (!hidden) {
-            inputTipViewModel.clear();
+            inputTipsViewModel.clear();
         }
     }
 }
