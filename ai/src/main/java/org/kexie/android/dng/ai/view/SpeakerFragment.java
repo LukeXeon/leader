@@ -88,8 +88,6 @@ public class SpeakerFragment extends Fragment
         binding.setAdapter(messageGenericQuickAdapter);
         binding.setIsShowPartial(false);
 
-
-
         speakerViewModel.getNextMessage()
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
@@ -105,6 +103,10 @@ public class SpeakerFragment extends Fragment
                     binding.setIsShowPartial(!TextUtils.isEmpty(s));
                     binding.setSpeechText(s);
                 });
+        waveformView2.setMicrophoneClickListener(v -> {
+            speakerViewModel.stopSpeak();
+            speakerViewModel.beginSpeechTransaction();
+        });
         Transformations.map(speakerViewModel.getVolume(),
                 input -> input.floatValue() / 10f)
                 .observe(this, v -> waveformView2.setAmplitude(v));
@@ -140,7 +142,7 @@ public class SpeakerFragment extends Fragment
         speakerViewModel.getWeakUp()
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(this, Event.ON_DESTROY)))
-                .subscribe(s -> speakerViewModel.beginTransaction());
+                .subscribe(s -> speakerViewModel.beginSpeechTransaction());
 
         requireActivity().addOnBackPressedCallback(this,
                 requireFragmentManager()::popBackStackImmediate);
@@ -150,7 +152,7 @@ public class SpeakerFragment extends Fragment
         {
             if (bundle.getBoolean("weakUp"))
             {
-                speakerViewModel.beginTransaction();
+                speakerViewModel.beginSpeechTransaction();
             }
         }
 
@@ -161,7 +163,7 @@ public class SpeakerFragment extends Fragment
     public void onDestroyView()
     {
         super.onDestroyView();
-        speakerViewModel.endTransaction();
+        speakerViewModel.endSpeechTransaction();
         WaveformView2.Provider.INSTANCE.detach();
     }
 }

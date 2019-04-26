@@ -15,9 +15,9 @@ import org.kexie.android.dng.ai.model.entity.CloudAIResponse
 import org.kexie.android.dng.ai.viewmodel.entity.Message
 import org.kexie.android.dng.ai.widget.CookieCache
 import org.kexie.android.dng.common.app.PR
-import org.kexie.android.dng.common.widget.navigationAs
 import org.kexie.android.dng.common.model.ASRService
 import org.kexie.android.dng.common.model.TTSService
+import org.kexie.android.dng.common.widget.navigationAs
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -92,12 +92,16 @@ class SpeakerViewModel(application: Application) : AndroidViewModel(application)
                 }
     }
 
-    fun beginTransaction() {
+    fun beginSpeechTransaction() {
         asrService.beginTransaction()
     }
 
-    fun endTransaction() {
+    fun endSpeechTransaction() {
         asrService.endTransaction()
+    }
+
+    fun stopSpeak() {
+        ttsService.stop()
     }
 
     override fun onCleared() {

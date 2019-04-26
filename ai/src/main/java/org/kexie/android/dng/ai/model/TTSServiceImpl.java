@@ -24,7 +24,7 @@ public class TTSServiceImpl implements TTSService {
     @Override
     public void init(Context context) {
         context = context.getApplicationContext();
-        Intent intent = new Intent(context, SpeechService.class);
+        Intent intent = new Intent(context, SpeakService.class);
         context.bindService(intent, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -46,9 +46,9 @@ public class TTSServiceImpl implements TTSService {
         if (remote == null) {
             return;
         }
-        Message message = obtainMessage(SpeechService.ACTION_SEND);
+        Message message = obtainMessage(SpeakService.ACTION_SEND);
         Bundle bundle = new Bundle();
-        bundle.putString(SpeechService.SEND_KEY, text);
+        bundle.putString(SpeakService.SEND_KEY, text);
         message.setData(bundle);
         try {
             remote.send(message);
@@ -62,7 +62,7 @@ public class TTSServiceImpl implements TTSService {
         if (remote == null) {
             return;
         }
-        Message message = obtainMessage(SpeechService.ACTION_STOP);
+        Message message = obtainMessage(SpeakService.ACTION_STOP);
         try {
             remote.send(message);
         } catch (RemoteException e) {

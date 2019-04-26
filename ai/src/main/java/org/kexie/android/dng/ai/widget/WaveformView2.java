@@ -25,6 +25,7 @@ import org.kexie.android.dng.ai.databinding.ViewWaveform2Binding;
 import java.util.Objects;
 
 import androidx.annotation.FloatRange;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -49,6 +50,7 @@ public final class WaveformView2
             mView = new WaveformView2(Initializer.createInner());
         }
 
+        @MainThread
         public WaveformView2 attachTo(FrameLayout viewGroup) {
             viewGroup.addView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
@@ -61,12 +63,14 @@ public final class WaveformView2
             return mView;
         }
 
+        @MainThread
         public void detach() {
             FrameLayout parent = (FrameLayout) mView.getParent();
             parent.removeView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
             contextWrapper.setBaseContext(Initializer.mApplication);
             mView.mBinding.icon.setImageDrawable(null);
+            mView.setMicrophoneClickListener(null);
         }
     }
 
@@ -119,6 +123,10 @@ public final class WaveformView2
             }
         };
         addView(mBinding.getRoot());
+    }
+
+    public void setMicrophoneClickListener(View.OnClickListener listener) {
+        mBinding.icon.setOnClickListener(listener);
     }
 
     @SuppressWarnings("deprecation")

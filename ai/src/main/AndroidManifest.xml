@@ -36,6 +36,6 @@
             android:exported="false"
             android:enabled="true"
             android:process=":speech"
-            android:name=".model.SpeechService"/>
+            android:name=".model.SpeakService"/>
     </application>
 </manifest>
