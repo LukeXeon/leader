@@ -65,6 +65,7 @@ public final class WaveformView2
 
         @MainThread
         public void detach() {
+            mView.stop();
             FrameLayout parent = (FrameLayout) mView.getParent();
             parent.removeView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();

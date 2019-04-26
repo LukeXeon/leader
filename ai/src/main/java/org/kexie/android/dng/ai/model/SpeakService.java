@@ -82,10 +82,8 @@ public class SpeakService extends Service {
         return messenger.getBinder();
     }
 
-    private static String getMetadata(Context context, int id)
-    {
-        try
-        {
+    private static String getMetadata(Context context, int id) {
+        try {
             ApplicationInfo applicationInfo = context
                     .getPackageManager()
                     .getApplicationInfo(context.getPackageName(),
@@ -93,8 +91,7 @@ public class SpeakService extends Service {
             Object object = applicationInfo.metaData.get(context.getString(id));
             Logger.d(object);
             return String.valueOf(object);
-        } catch (PackageManager.NameNotFoundException e)
-        {
+        } catch (PackageManager.NameNotFoundException e) {
             throw new AssertionError(e);
         }
     }

@@ -23,7 +23,6 @@ public class TTSServiceImpl implements TTSService {
 
     @Override
     public void init(Context context) {
-        context = context.getApplicationContext();
         Intent intent = new Intent(context, SpeakService.class);
         context.bindService(intent, new ServiceConnection() {
             @Override
@@ -37,6 +36,7 @@ public class TTSServiceImpl implements TTSService {
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 Logger.d("tts unlink");
+                context.bindService(intent, this, Context.BIND_AUTO_CREATE);
             }
         }, Context.BIND_AUTO_CREATE);
     }
