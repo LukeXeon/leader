@@ -52,7 +52,7 @@ import org.kexie.android.dng.player.R;
 import org.kexie.android.dng.player.subtitle.danmaku.BaseDanmakuConverter;
 import org.kexie.android.dng.player.subtitle.danmaku.BiliDanmakuParser;
 import org.kexie.android.dng.player.subtitle.danmaku.OnDanmakuListener;
-import org.kexie.android.dng.player.widget.AnimHelper;
+import org.kexie.android.dng.player.widget.AnimUtils;
 import org.kexie.android.dng.player.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
 import org.kexie.android.dng.player.widget.NavBarUtils;
@@ -328,7 +328,7 @@ public class IjkPlayerView extends FrameLayout
                 } else if (checkedId == R.id.aspect_4_and_3) {
                     mVideoView.setAspectRatio(IRenderView.AR_4_3_FIT_PARENT);
                 }
-                AnimHelper.doClipViewHeight(mAspectRatioOptions, mAspectOptionsHeight, 0, 150);
+                AnimUtils.doClipViewHeight(mAspectRatioOptions, mAspectOptionsHeight, 0, 150);
             }
         });
         _initMediaQuality();
@@ -927,7 +927,7 @@ public class IjkPlayerView extends FrameLayout
      */
     private void _showAspectRatioOptions(boolean isShow) {
         if (isShow) {
-            AnimHelper.doClipViewHeight(mAspectRatioOptions, 0, mAspectOptionsHeight, 150);
+            AnimUtils.doClipViewHeight(mAspectRatioOptions, 0, mAspectOptionsHeight, 150);
         } else {
             ViewGroup.LayoutParams layoutParams = mAspectRatioOptions.getLayoutParams();
             layoutParams.height = 0;
@@ -1967,7 +1967,7 @@ public class IjkPlayerView extends FrameLayout
         if (mSkipPosition != INVALID_VALUE && mLlSkipLayout.getVisibility() == GONE) {
             mLlSkipLayout.setVisibility(VISIBLE);
             mTvSkipTime.setText(generateTime(mSkipPosition));
-            AnimHelper.doSlideRightIn(mLlSkipLayout, mWidthPixels, 0, 800);
+            AnimUtils.doSlideRightIn(mLlSkipLayout, mWidthPixels, 0, 800);
             mHandler.postDelayed(mHideSkipTipRunnable, DEFAULT_HIDE_TIMEOUT * 3);
         }
     }
@@ -2486,12 +2486,12 @@ public class IjkPlayerView extends FrameLayout
             mBasicOptionsWidth = mDanmakuOptionsBasic.getWidth();
         }
         if (mDanmakuColorOptions.getWidth() == 0) {
-            AnimHelper.doClipViewWidth(mDanmakuOptionsBasic, mBasicOptionsWidth, 0, 300);
-            AnimHelper.doClipViewWidth(mDanmakuColorOptions, 0, mMoreOptionsWidth, 300);
+            AnimUtils.doClipViewWidth(mDanmakuOptionsBasic, mBasicOptionsWidth, 0, 300);
+            AnimUtils.doClipViewWidth(mDanmakuColorOptions, 0, mMoreOptionsWidth, 300);
             ViewCompat.animate(mDanmakuMoreColorIcon).rotation(180).setDuration(150).setStartDelay(250).start();
         } else {
-            AnimHelper.doClipViewWidth(mDanmakuOptionsBasic, 0, mBasicOptionsWidth, 300);
-            AnimHelper.doClipViewWidth(mDanmakuColorOptions, mMoreOptionsWidth, 0, 300);
+            AnimUtils.doClipViewWidth(mDanmakuOptionsBasic, 0, mBasicOptionsWidth, 300);
+            AnimUtils.doClipViewWidth(mDanmakuColorOptions, mMoreOptionsWidth, 0, 300);
             ViewCompat.animate(mDanmakuMoreColorIcon).rotation(0).setDuration(150).setStartDelay(250).start();
         }
     }

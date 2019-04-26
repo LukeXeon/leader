@@ -5,8 +5,12 @@ import android.text.TextUtils;
 import com.blankj.utilcode.util.FileUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,14 +19,14 @@ import java.util.regex.Pattern;
  * @author: zhangliangming
  * @date: 2019-01-12 15:57
  **/
-public class SubtitleReader {
+public class SubtitleHelper {
 
-    private static List<SubtitleFileReader> readers;
+    private final static Map<String, Class<? extends SubtitleFileReader>> sReaderTypes;
 
     static {
-        readers = new ArrayList<>();
-        readers.add(new SrtSubtitleFileReader());
-        readers.add(new AssSubtitleFileReader());
+        sReaderTypes = new HashMap<>();
+        sReaderTypes.put("ass", AssSubtitleFileReader.class);
+        sReaderTypes.put("srt", SrtSubtitleFileReader.class);
     }
 
     /**
@@ -30,12 +34,8 @@ public class SubtitleReader {
      *
      * @return
      */
-    public static List<String> getSupportSubtitleExts() {
-        List<String> lrcExts = new ArrayList<String>();
-        for (SubtitleFileReader subtitleFileReader : readers) {
-            lrcExts.add(subtitleFileReader.getSupportFileExt());
-        }
-        return lrcExts;
+    public static Set<String> getSupportSubtitleExt() {
+        return Collections.unmodifiableSet(sReaderTypes.keySet());
     }
 
     /**
@@ -56,12 +56,16 @@ public class SubtitleReader {
      */
     public static SubtitleFileReader getSubtitleFileReader(String fileName) {
         String ext = FileUtils.getFileExtension(fileName);
-        for (SubtitleFileReader subtitleFileReader : readers) {
-            if (subtitleFileReader.isFileSupported(ext)) {
-                return subtitleFileReader;
+        Class<? extends SubtitleFileReader> type = sReaderTypes.get(ext);
+        SubtitleFileReader reader = null;
+        if (type != null) {
+            try {
+                reader = type.newInstance();
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
-        return null;
+        return reader;
     }
 
     /**
@@ -70,9 +74,9 @@ public class SubtitleReader {
      * @param subtitleLine
      * @return html格式对应的字幕文本
      */
-    public static String[] parseSubtitleText(String subtitleLine) {
+    static String[] parseSubtitleText(String subtitleLine) {
         String[] result = {"", ""};
-        String regex = "\\{[^\\{]+\\}";
+        String regex = "\\{[^{]+}";
         //去掉样式
         result[0] = subtitleLine.replaceAll(regex, "");
         //加载样式
@@ -136,16 +140,19 @@ public class SubtitleReader {
         if (styleString.contains("$")) {
             result.append("<font");
             String[] styles = styleString.split("\\$");
-            for (int i = 0; i < styles.length; i++) {
-                String style = styles[i];
+            StringBuilder splitSubtitleBuilder = new StringBuilder(splitSubtitle);
+            for (String style1 : styles) {
+                String style = style1;
                 if (style.startsWith("fn")) {
                     String face = style.substring("fn".length()).trim();
-                    result.append(" face=\"" + face + "\"");
-
+                    result.append(" face=\"")
+                            .append(face)
+                            .append("\"");
                 } else if (style.startsWith("fs")) {
                     String size = style.substring("fs".length()).trim();
-                    result.append(" size=\"" + size + "\"");
-
+                    result.append(" size=\"")
+                            .append(size)
+                            .append("\"");
                 } else if (style.startsWith("b1")
                         || style.startsWith("i1")
                         || style.startsWith("u1")
@@ -155,13 +162,13 @@ public class SubtitleReader {
                     // s<0/1>  删除线（0=关闭，1=开启）
 
                     if (style.startsWith("b1")) {
-                        splitSubtitle = "<b>" + splitSubtitle + "</b>";
+                        splitSubtitleBuilder = new StringBuilder("<b>" + splitSubtitleBuilder + "</b>");
                     } else if (style.startsWith("i1")) {
-                        splitSubtitle = "<i>" + splitSubtitle + "</i>";
+                        splitSubtitleBuilder = new StringBuilder("<i>" + splitSubtitleBuilder + "</i>");
                     } else if (style.startsWith("u1")) {
-                        splitSubtitle = "<u>" + splitSubtitle + "</u>";
+                        splitSubtitleBuilder = new StringBuilder("<u>" + splitSubtitleBuilder + "</u>");
                     } else if (style.startsWith("s1")) {
-                        splitSubtitle = "<s>" + splitSubtitle + "</s>";
+                        splitSubtitleBuilder = new StringBuilder("<s>" + splitSubtitleBuilder + "</s>");
                     }
 
                 } else if (style.startsWith("c&H") || style.startsWith("1c&H")) {
@@ -175,10 +182,13 @@ public class SubtitleReader {
                     } else {
                         color = convertRgbColor(style.substring("1c&H".length()).trim());
                     }
-                    result.append(" color=\"#" + color + "\"");
+                    result.append(" color=\"#")
+                            .append(color)
+                            .append("\"");
 
                 }
             }
+            splitSubtitle = splitSubtitleBuilder.toString();
             result.append(">");
         }
         //修改成html标签
@@ -191,21 +201,7 @@ public class SubtitleReader {
         return result.toString();
     }
 
-    /**
-     * 获取rgb颜色字符串
-     * 版权归作者所有，任何形式转载请联系作者。
-     * 作者：无条件积极关注（来自豆瓣）
-     * 来源：https://www.douban.com/note/658520175/
-     * <p>
-     * 颜色格式：&Haabbggrr，均为十六进制，取值0-F。
-     * 前2位(alpha)为透明度，00=不透明，FF=DEC255=全透明；后6是BGR蓝绿红颜色。
-     * 排在最前的00可以忽略不写,
-     * 如：{\c&HFF&}={\c&H0000FF&}为纯红色、&HFFFFFF=纯白色、&HC8000000=透明度为200的黑色。
-     *
-     * @param abgrColorString
-     * @return
-     */
-    public static String convertArgbColor(String abgrColorString) {
+    private static String convertArgbColor(String abgrColorString) {
         if (abgrColorString.length() == 8) {
             return abgrColorString.substring(6, 8)
                     + abgrColorString.substring(4, 6)
@@ -222,7 +218,7 @@ public class SubtitleReader {
      * @param bgrColorString
      * @return
      */
-    public static String convertRgbColor(String bgrColorString) {
+    private static String convertRgbColor(String bgrColorString) {
         return convertArgbColor(bgrColorString);
     }
 
@@ -232,7 +228,7 @@ public class SubtitleReader {
      * @param rgbColorString
      * @return
      */
-    public static String convertBgrColor(String rgbColorString) {
+    private static String convertBgrColor(String rgbColorString) {
         return convertRgbColor(rgbColorString);
     }
 
@@ -242,7 +238,7 @@ public class SubtitleReader {
      * @param argbColorString
      * @return
      */
-    public static String convertAbgrColor(String argbColorString) {
+    private static String convertAbgrColor(String argbColorString) {
         return convertRgbColor(argbColorString);
     }
 
@@ -254,9 +250,9 @@ public class SubtitleReader {
      * @param playOffset
      * @return
      */
-    public static int getLineNumber(List<SubtitleLineInfo> subtitleLineInfos,
-                                    long curPlayingTime,
-                                    long playOffset) {
+    private static int getLineNumber(List<SubtitleLineInfo> subtitleLineInfos,
+                                     long curPlayingTime,
+                                     long playOffset) {
         if (subtitleLineInfos != null && subtitleLineInfos.size() > 0) {
             //添加歌词增量
             long nowPlayingTime = curPlayingTime + playOffset;
@@ -272,5 +268,82 @@ public class SubtitleReader {
             }
         }
         return -1;
+    }
+
+    /**
+     * 解析字幕时间
+     *
+     * @param timeString 00:00:00,000
+     * @return
+     */
+    static int parseSubtitleTime(String timeString) {
+        timeString = timeString.replace(",", ":");
+        timeString = timeString.replace(".", ":");
+        String timedata[] = timeString.split(":");
+        int second = 1000;
+        int minute = 60 * second;
+        int hour = 60 * minute;
+        int msec = 0;
+        if (timedata[3].length() == 2) {
+            msec = Integer.parseInt(timedata[3]) * 10;
+        } else {
+            msec = Integer.parseInt(timedata[3]);
+        }
+        return Integer.parseInt(timedata[0]) * hour
+                + Integer.parseInt(timedata[1]) * minute
+                + Integer.parseInt(timedata[2]) * second + msec;
+    }
+
+    /**
+     * 毫秒转时间字符串
+     *
+     * @param msecTotal
+     * @return 00:00:00,000
+     */
+    private static String parseHHMMSSFFFString(int msecTotal) {
+        int msec = msecTotal % 1000;
+        msecTotal /= 1000;
+        int minute = msecTotal / 60;
+        int hour = minute / 60;
+        int second = msecTotal % 60;
+        minute %= 60;
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d,%03d",
+                hour, minute, second, msec);
+    }
+
+    /**
+     * 毫秒转时间字符串
+     *
+     * @param msecTotal
+     * @return 00:00:00.00
+     */
+    private static String parseHHMMSSFFString(int msecTotal) {
+        int msec = msecTotal % 1000;
+        msecTotal /= 1000;
+        int minute = msecTotal / 60;
+        int hour = minute / 60;
+        int second = msecTotal % 60;
+        minute %= 60;
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d.%02d",
+                hour, minute, second, msec / 10);
+    }
+
+    /**
+     * 毫秒转时间字符串
+     *
+     * @param msecTotal
+     * @return 00:00:00
+     */
+    private static String parseHHMMSSString(int msecTotal) {
+        msecTotal /= 1000;
+        int minute = msecTotal / 60;
+        int hour = minute / 60;
+        int second = msecTotal % 60;
+        minute %= 60;
+        return String.format(Locale.CHINA,
+                "%02d:%02d:%02d",
+                hour, minute, second);
     }
 }

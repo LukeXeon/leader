@@ -11,9 +11,9 @@ import android.view.animation.AccelerateInterpolator;
  * Created by long on 2016/11/4.
  */
 
-public final class AnimHelper {
+public final class AnimUtils {
 
-    private AnimHelper() {
+    private AnimUtils() {
         throw new AssertionError();
     }
 

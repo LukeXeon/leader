@@ -30,14 +30,12 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
             BufferedReader br = new BufferedReader(new InputStreamReader(in,
                     getDefaultCharset()));
             StringBuilder fileContentSB = new StringBuilder();
-            String lineInfo = "";
+            String lineInfo;
             while ((lineInfo = br.readLine()) != null) {
-                fileContentSB.append(lineInfo + "\n");
+                fileContentSB.append(lineInfo).append("\n");
             }
             in.close();
             br.close();
-            in = null;
-            br = null;
             return readText(fileContentSB.toString(), null);
         }
         return null;
@@ -50,16 +48,16 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
         subtitleInfo.setDefaultCharset(getDefaultCharset());
         subtitleInfo.setExt(getSupportFileExt());
 
-        List<SubtitleLineInfo> subtitleLineInfos = new ArrayList<SubtitleLineInfo>();
+        List<SubtitleLineInfo> subtitleLineInfos = new ArrayList<>();
 
         String[] fileContents = fileContentString.split("\n");
 
-        for (int i = 0; i < fileContents.length; i++) {
-            parseSubtitleInfo(fileContents[i], subtitleLineInfos);
+        for (String fileContent : fileContents) {
+            parseSubtitleInfo(fileContent, subtitleLineInfos);
         }
 
         //设置字幕
-        if (subtitleLineInfos != null && subtitleLineInfos.size() > 0) {
+        if (subtitleLineInfos.size() > 0) {
             subtitleInfo.setSubtitleLineInfos(subtitleLineInfos);
         }
 
@@ -85,21 +83,21 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
             String[] splitSubtitles = subtitleString.split("\\\\[N]");
 
             //加载字幕
-            String subtitleHtmlString = "";
-            String subtitleTextString = "";
+            StringBuilder subtitleHtmlString = new StringBuilder();
+            StringBuilder subtitleTextString = new StringBuilder();
             for (int i = 0; i < splitSubtitles.length; i++) {
                 String temp = subtitleAddStyle(subtitleLineString, splitSubtitles[i]);
-                String[] result = SubtitleReader.parseSubtitleText(temp);
-                subtitleTextString += result[0];
-                subtitleHtmlString += result[1];
+                String[] result = SubtitleHelper.parseSubtitleText(temp);
+                subtitleTextString.append(result[0]);
+                subtitleHtmlString.append(result[1]);
 
                 if (i != splitSubtitles.length - 1) {
-                    subtitleTextString += "\n";
-                    subtitleHtmlString += "<br>";
+                    subtitleTextString.append("\n");
+                    subtitleHtmlString.append("<br>");
                 }
             }
-            subtitleLineInfo.setSubtitleText(subtitleTextString);
-            subtitleLineInfo.setSubtitleHtml(subtitleHtmlString);
+            subtitleLineInfo.setSubtitleText(subtitleTextString.toString());
+            subtitleLineInfo.setSubtitleHtml(subtitleHtmlString.toString());
             subtitleLineInfos.add(subtitleLineInfo);
         }
     }
@@ -116,10 +114,10 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
         if (!TextUtils.isEmpty(styleName)) {
             Style style = mStyleMap.get(styleName);
             if (style != null) {
-                subtitleString = subtitleString.replaceAll("\\{\\r\\}", style.getStyleString());
+                subtitleString = subtitleString.replaceAll("\\{\\r}", style.getStyleString());
 
                 //分隔出没有样式的字幕内容
-                String regex = "\\{[^\\{]+\\}[^\\{]*";
+                String regex = "\\{[^{]+}[^{]*";
                 String[] splitSubtitles = subtitleString.split(regex, -1);
                 int index = 0;
                 StringBuilder subtitleTextSB = new StringBuilder();
@@ -128,7 +126,7 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
                 //遍历样式字符串
                 while (matcher.find()) {
                     if (index == 0 && splitSubtitles.length > 0 && !TextUtils.isEmpty(splitSubtitles[0])) {
-                        subtitleTextSB.append(style.getStyleString() + splitSubtitles[0]);
+                        subtitleTextSB.append(style.getStyleString()).append(splitSubtitles[0]);
                     }
                     String styleString = matcher.group();
                     if (index + 1 >= splitSubtitles.length) {
@@ -140,12 +138,12 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
                 }
                 //如果没有样式
                 if (index == 0 && splitSubtitles.length > 0 && !TextUtils.isEmpty(splitSubtitles[0])) {
-                    subtitleTextSB.append(style.getStyleString() + splitSubtitles[0]);
+                    subtitleTextSB.append(style.getStyleString()).append(splitSubtitles[0]);
                 }
                 //添加剩余的字幕内容
                 for (index++; index < splitSubtitles.length; index++) {
                     if (!TextUtils.isEmpty(splitSubtitles[index])) {
-                        subtitleTextSB.append(style.getStyleString() + splitSubtitles[index]);
+                        subtitleTextSB.append(style.getStyleString()).append(splitSubtitles[index]);
                     }
                 }
                 subtitleString = subtitleTextSB.toString();
@@ -217,10 +215,10 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(timeString);
         if (matcher.find()) {
-            int startTime = SubtitleTimes.parseSubtitleTime(matcher.group());
+            int startTime = SubtitleHelper.parseSubtitleTime(matcher.group());
             subtitleLineInfo.setStartTime(startTime);
             if (matcher.find()) {
-                int endTime = SubtitleTimes.parseSubtitleTime(matcher.group());
+                int endTime = SubtitleHelper.parseSubtitleTime(matcher.group());
                 subtitleLineInfo.setEndTime(endTime);
                 return true;
             }
@@ -347,31 +345,31 @@ public class AssSubtitleFileReader extends SubtitleFileReader {
             StringBuilder result = new StringBuilder();
             result.append("{");
             if (!TextUtils.isEmpty(fontname)) {
-                result.append("\\fn" + fontname);
+                result.append("\\fn").append(fontname);
             }
 
             if (!TextUtils.isEmpty(fontsize)) {
-                result.append("\\fs" + fontsize);
+                result.append("\\fs").append(fontsize);
             }
 
             if (!TextUtils.isEmpty(primaryColour)) {
-                result.append("\\1c&H" + (primaryColour.replaceAll("&H", "")) + "&");
+                result.append("\\1c&H").append(primaryColour.replaceAll("&H", "")).append("&");
             }
 
             if (!TextUtils.isEmpty(bold)) {
-                result.append("\\b" + Math.abs(Integer.parseInt(bold)));
+                result.append("\\b").append(Math.abs(Integer.parseInt(bold)));
             }
 
             if (!TextUtils.isEmpty(italic)) {
-                result.append("\\i" + Math.abs(Integer.parseInt(italic)));
+                result.append("\\i").append(Math.abs(Integer.parseInt(italic)));
             }
 
             if (!TextUtils.isEmpty(underline)) {
-                result.append("\\u" + Math.abs(Integer.parseInt(underline)));
+                result.append("\\u").append(Math.abs(Integer.parseInt(underline)));
             }
 
             if (!TextUtils.isEmpty(strikeout)) {
-                result.append("\\s" + Math.abs(Integer.parseInt(strikeout)));
+                result.append("\\s").append(Math.abs(Integer.parseInt(strikeout)));
             }
 
             result.append("}");

@@ -66,22 +66,15 @@ public abstract class SubtitleFileReader {
      *//**/
     public boolean saveFile(File saveFile, String fileContentString) throws Exception {
         if (saveFile != null) {
-
             if (!saveFile.getParentFile().exists()) {
                 saveFile.getParentFile().mkdirs();
             }
-
-
             OutputStreamWriter outstream = new OutputStreamWriter(
                     new FileOutputStream(saveFile),
                     getDefaultCharset());
             PrintWriter writer = new PrintWriter(outstream);
             writer.write(fileContentString);
             writer.close();
-
-            outstream = null;
-            writer = null;
-
             return true;
         }
 

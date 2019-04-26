@@ -29,12 +29,10 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
             StringBuilder fileContentSB = new StringBuilder();
             String lineInfo = "";
             while ((lineInfo = br.readLine()) != null) {
-                fileContentSB.append(lineInfo + "\n");
+                fileContentSB.append(lineInfo).append("\n");
             }
             in.close();
             br.close();
-            in = null;
-            br = null;
             return readText(fileContentSB.toString(), null);
         }
         return null;
@@ -51,13 +49,12 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
         List<SubtitleLineInfo> subtitleLineInfos = new ArrayList<SubtitleLineInfo>();
 
         String[] fileContents = fileContentString.split("\n\n");
-        for (int i = 0; i < fileContents.length; i++) {
-            String subtitleLineString = fileContents[i];
+        for (String subtitleLineString : fileContents) {
             parseSubtitleInfo(subtitleLineString, subtitleLineInfos);
         }
 
         //设置字幕
-        if (subtitleLineInfos != null && subtitleLineInfos.size() > 0) {
+        if (subtitleLineInfos.size() > 0) {
             subtitleInfo.setSubtitleLineInfos(subtitleLineInfos);
         }
 
@@ -81,19 +78,19 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
             if (!flag) return;
 
             //加载字幕
-            String subtitleHtmlString = "";
-            String subtitleTextString = "";
+            StringBuilder subtitleHtmlString = new StringBuilder();
+            StringBuilder subtitleTextString = new StringBuilder();
             for (int i = 2; i < subtitleLines.length; i++) {
-                String[] result = SubtitleReader.parseSubtitleText(subtitleLines[i]);
-                subtitleTextString += result[0];
-                subtitleHtmlString += result[1];
+                String[] result = SubtitleHelper.parseSubtitleText(subtitleLines[i]);
+                subtitleTextString.append(result[0]);
+                subtitleHtmlString.append(result[1]);
                 if (i != subtitleLines.length - 1) {
-                    subtitleTextString += "\n";
-                    subtitleHtmlString += "<br>";
+                    subtitleTextString.append("\n");
+                    subtitleHtmlString.append("<br>");
                 }
             }
-            subtitleLineInfo.setSubtitleText(subtitleTextString);
-            subtitleLineInfo.setSubtitleHtml(subtitleHtmlString);
+            subtitleLineInfo.setSubtitleText(subtitleTextString.toString());
+            subtitleLineInfo.setSubtitleHtml(subtitleHtmlString.toString());
             subtitleLineInfos.add(subtitleLineInfo);
         }
     }
@@ -109,10 +106,10 @@ public class SrtSubtitleFileReader extends SubtitleFileReader {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(timeString);
         if (matcher.find()) {
-            int startTime = SubtitleTimes.parseSubtitleTime(matcher.group());
+            int startTime = SubtitleHelper.parseSubtitleTime(matcher.group());
             subtitleLineInfo.setStartTime(startTime);
             if (matcher.find()) {
-                int endTime = SubtitleTimes.parseSubtitleTime(matcher.group());
+                int endTime = SubtitleHelper.parseSubtitleTime(matcher.group());
                 subtitleLineInfo.setEndTime(endTime);
                 return true;
             }
