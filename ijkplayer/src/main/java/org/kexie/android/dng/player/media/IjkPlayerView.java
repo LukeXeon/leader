@@ -57,7 +57,6 @@ import org.kexie.android.dng.player.utils.NetWorkUtils;
 import org.kexie.android.dng.player.utils.SoftInputUtils;
 import org.kexie.android.dng.player.utils.StringUtils;
 import org.kexie.android.dng.player.utils.WindowUtils;
-import org.kexie.android.dng.player.widgets.MarqueeTextView;
 
 import java.io.InputStream;
 import java.lang.annotation.ElementType;

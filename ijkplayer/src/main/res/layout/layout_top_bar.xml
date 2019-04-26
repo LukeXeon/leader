@@ -23,7 +23,7 @@
             android:paddingLeft="15dp"
             android:src="@mipmap/ic_return_back"/>
 
-        <org.kexie.android.dng.player.widgets.MarqueeTextView
+        <org.kexie.android.dng.player.media.MarqueeTextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
