@@ -19,7 +19,6 @@ package org.kexie.android.dng.player.media;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -398,17 +397,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return mUri;
     }
 
-    /**
-     * 截图
-     *
-     * @return
-     */
-    public Bitmap getScreenshot() {
-        if (mRenderView != null) {
-            return mRenderView.getVideoScreenshot();
-        }
-        return null;
-    }
     // REMOVED: addSubtitleSource
     // REMOVED: mPendingSubtitleTracks
 

@@ -194,13 +194,6 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         return null;
     }
 
-    @Override
-    public Bitmap getVideoScreenshot() {
-        getHolder();
-        return null;
-    }
-
-
     private SurfaceCallback mSurfaceCallback;
 
     private static final class SurfaceCallback implements SurfaceHolder.Callback {

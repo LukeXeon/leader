@@ -16,15 +16,14 @@
 
 package org.kexie.android.dng.player.media;
 
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 public interface IRenderView {
@@ -64,8 +63,6 @@ public interface IRenderView {
     void setTransform(Matrix transform);
     // add, 获取 Matrix，来做缩放操作
     Matrix getTransform();
-    // add, 获取截图
-    Bitmap getVideoScreenshot();
 
     interface ISurfaceHolder {
         void bindToMediaPlayer(IMediaPlayer mp);
