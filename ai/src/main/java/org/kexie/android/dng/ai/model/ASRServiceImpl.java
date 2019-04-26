@@ -1,8 +1,6 @@
 package org.kexie.android.dng.ai.model;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -26,6 +24,7 @@ import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
+//多进程
 @Route(path = PR.ai.asr_service,name = "语音识别服务")
 public class ASRServiceImpl implements ASRService
 {
@@ -35,10 +34,7 @@ public class ASRServiceImpl implements ASRService
     private static final String WEAK_UP_BIN = "assets:///WakeUp.bin";
     private static final String WEAK_UP_TEXT = "嘿领航员";
 
-    private HandlerThread worker = new HandlerThread(toString());
-    private Handler handler;
-    private EventManager mAsrManager;
-    private EventManager mWeakUpManager;
+    private EventManager mEventManager;
     private Gson mGson = new Gson();
     private MutableLiveData<Status> mStatus = new MutableLiveData<>(Status.Initialization);
     private MutableLiveData<Integer> mCurrentVolume = new MutableLiveData<>(0);
@@ -47,8 +43,7 @@ public class ASRServiceImpl implements ASRService
     private Observable<String> mFinalResult;
 
     @Override
-    public void init(Context context)
-    {
+    public void init(Context context) {
 
         Map<String, EventListener> eventHandlers = new ArrayMap<>();
         // 引擎准备就绪，可以开始说话
@@ -71,8 +66,7 @@ public class ASRServiceImpl implements ASRService
                 (name, params, data, offset, length) -> {
                     VolumeResult volumeResult
                             = mGson.fromJson(params, VolumeResult.class);
-                    if (!Status.Speaking.equals(mStatus.getValue()))
-                    {
+                    if (!Status.Speaking.equals(mStatus.getValue())) {
                         return;
                     }
                     mCurrentVolume.setValue(volumeResult.volumePercent);
@@ -112,47 +106,31 @@ public class ASRServiceImpl implements ASRService
                 .map(weakUpResult -> weakUpResult.word);
 
         // 异步初始化
-        worker.start();
-        handler = new Handler(worker.getLooper());
-        handler.post(() -> {
-            mAsrManager = EventManagerFactory.create(context, "asr");
-            mWeakUpManager = EventManagerFactory.create(context, "wp");
 
-            mWeakUpManager.registerListener((name, params, data, offset, length) -> {
-                Logger.d(name);
-                EventListener eventListener = eventHandlers2.get(name);
-                if (eventListener != null)
-                {
-                    eventListener.onEvent(name, params, data, offset, length);
-                }
-            });
-
-            mAsrManager.registerListener((name, params, data, offset, length) -> {
-                Logger.d(name);
-                EventListener eventListener = eventHandlers.get(name);
-                if (eventListener != null)
-                {
-                    eventListener.onEvent(name, params, data, offset, length);
-                }
-            });
-
-            mWeakUpManager.registerListener(new EventListener()
-            {
-                @Override
-                public void onEvent(String name, String params, byte[] data, int offset, int length)
-                {
-                    if (SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name))
-                    {
-                        mStatus.setValue(Status.Idle);
-                        mWeakUpManager.unregisterListener(this);
-                    }
-                }
-            });
-            mWeakUpManager.send(SpeechConstant.WAKEUP_START,
-                    mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, WEAK_UP_BIN)),
-                    null, 0, 0);
-            Logger.d(getClass().getName() + " start");
+        mEventManager = EventManagerFactory.create(context, "asr", true);
+        mEventManager.registerListener((name, params, data, offset, length) -> {
+            EventListener eventListener = eventHandlers.get(name);
+            if (eventListener != null) {
+                eventListener.onEvent(name, params, data, offset, length);
+            }
         });
+        EventManager mWeakUpManager = EventManagerFactory.create(context, "wp", true);
+        mWeakUpManager.registerListener((name, params, data, offset, length) -> {
+            Logger.d(name);
+            if (Status.Initialization.equals(mStatus.getValue())
+                    && SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name)) {
+                mStatus.setValue(Status.Idle);
+                return;
+            }
+            EventListener eventListener = eventHandlers2.get(name);
+            if (eventListener != null) {
+                eventListener.onEvent(name, params, data, offset, length);
+            }
+        });
+        mWeakUpManager.send(SpeechConstant.WAKEUP_START,
+                mGson.toJson(Collections.singletonMap(SpeechConstant.WP_WORDS_FILE, WEAK_UP_BIN)),
+                null, 0, 0);
+        Logger.d(getClass().getName() + " start");
     }
 
     @Override
@@ -165,25 +143,25 @@ public class ASRServiceImpl implements ASRService
         {
             return false;
         }
-        handler.post(()-> mAsrManager.send(SpeechConstant.ASR_START, mGson.toJson(
+        mEventManager.send(SpeechConstant.ASR_START, mGson.toJson(
                 new ArrayMap<String, Object>(4)
                 {
                     {
                         put(SpeechConstant.ACCEPT_AUDIO_VOLUME, true);
                         put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
                         put(SpeechConstant.PID, NORMAL_VID);
-                        put(SpeechConstant.AUDIO_MILLS, System.currentTimeMillis() - BACK_TRACK_IN_MS);
+                        put(SpeechConstant.AUDIO_MILLS,
+                                System.currentTimeMillis() - BACK_TRACK_IN_MS);
                     }
-                }), null, 0, 0));
+                }), null, 0, 0);
         mStatus.setValue(Status.Prepare);
         return true;
     }
 
     @Override
-    public void endTransaction()
-    {
-        handler.post(() -> mAsrManager.send(SpeechConstant.ASR_CANCEL,
-                "{}", null, 0, 0));
+    public void endTransaction() {
+        mEventManager.send(SpeechConstant.ASR_CANCEL,
+                "{}", null, 0, 0);
     }
 
     private static void assertMainThread()

@@ -27,6 +27,8 @@
         <meta-data
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="tjwfviK6NWsEcIbuIgMMwVRMfV96dLLx" />
-
+        <service
+            android:name="com.baidu.speech.aidl.EventRecognitionService"
+            android:process=":speech"/>
     </application>
 </manifest>
