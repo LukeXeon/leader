@@ -11,16 +11,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
-
-import com.bumptech.glide.Glide;
-
-import org.kexie.android.dng.ai.R;
-import org.kexie.android.dng.ai.databinding.ViewWaveform2Binding;
 
 import java.util.Objects;
 
@@ -28,14 +23,12 @@ import androidx.annotation.FloatRange;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-@SuppressLint("ViewConstructor")
 public final class WaveformView2
-        extends FrameLayout
+        extends WebView
 {
 
     public enum Provider {
@@ -47,7 +40,7 @@ public final class WaveformView2
         private final WaveformView2 mView;
 
         Provider() {
-            mView = new WaveformView2(Initializer.createInner());
+            mView = Initializer.createView();
         }
 
         @MainThread
@@ -58,8 +51,6 @@ public final class WaveformView2
             LifecycleOwner owner = (LifecycleOwner) context;
             owner.getLifecycle().addObserver(mView.mObserver);
             contextWrapper.setBaseContext(context);
-            Glide.with(mView).load(R.drawable.yy)
-                    .into(mView.mBinding.icon);
             return mView;
         }
 
@@ -70,25 +61,20 @@ public final class WaveformView2
             parent.removeView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
             contextWrapper.setBaseContext(Initializer.mApplication);
-            mView.mBinding.icon.setImageDrawable(null);
-            mView.setMicrophoneClickListener(null);
         }
     }
-
-    private final ViewWaveform2Binding mBinding;
-
     private final LifecycleObserver mObserver;
 
     @SuppressWarnings("deprecation")
     @SuppressLint({"SetJavaScriptEnabled"})
-    private WaveformView2(ViewWaveform2Binding binding) {
-        super(binding.getRoot().getContext());
-        mBinding = binding;
+    private WaveformView2(Context context) {
+        super(context);
+        WebView mWebView = this;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT);
         setLayoutParams(layoutParams);
-        WebSettings settings = mBinding.webView.getSettings();
+        WebSettings settings = mWebView.getSettings();
         //开启DOM缓存，关闭的话H5自身的一些操作是无效的
         settings.setDomStorageEnabled(true);
         settings.setAppCacheEnabled(true);
@@ -101,62 +87,55 @@ public final class WaveformView2
         settings.setLoadWithOverviewMode(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // chromium, enable hardware acceleration
-            mBinding.webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         } else {
             // older android version, disable hardware acceleration
-            mBinding.webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
-        mBinding.webView.setWebChromeClient(new WebChromeClient());
-        mBinding.webView.setBackgroundColor(Color.TRANSPARENT);
-        mBinding.webView.setVerticalScrollBarEnabled(false);
-        mBinding.webView.setHorizontalScrollBarEnabled(false);
-        mBinding.webView.loadUrl("file:///android_asset/voicewave.html");
+        mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setHorizontalScrollBarEnabled(false);
+        mWebView.loadUrl("file:///android_asset/voicewave.html");
         mObserver = (LifecycleEventObserver) (source, event) -> {
             switch (event) {
                 case ON_PAUSE: {
-                    mBinding.webView.onPause();
+                    mWebView.onPause();
                 }
                 break;
                 case ON_RESUME: {
-                    mBinding.webView.onResume();
+                    mWebView.onResume();
                 }
                 break;
             }
         };
-        addView(mBinding.getRoot());
-    }
-
-    public void setMicrophoneClickListener(View.OnClickListener listener) {
-        mBinding.icon.setOnClickListener(listener);
     }
 
     @SuppressWarnings("deprecation")
     @SuppressLint("ObsoleteSdkInt")
-    public void stop()
-    {
-        mBinding.webView.evaluateJavascript("javascript:SW9.stop(\"\")",
-                value -> mBinding.icon.setVisibility(VISIBLE));
-        mBinding.webView.removeAllViews();
-        mBinding.webView.clearHistory();
+    public void stop() {
+        WebView mWebView = this;
+        mWebView.evaluateJavascript("javascript:SW9.stop(\"\")", null);
+        mWebView.removeAllViews();
+        mWebView.clearHistory();
         //clearCache(true);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
-        {
-            mBinding.webView.clearView();
-        } else
-        {
-            mBinding.webView.loadUrl("about:blank");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            mWebView.clearView();
+        } else {
+            mWebView.loadUrl("about:blank");
         }
-        mBinding.webView.freeMemory();
-        mBinding.webView.pauseTimers();
-        mBinding.webView.loadUrl("file:///android_asset/voicewave.html");
+        mWebView.freeMemory();
+        mWebView.pauseTimers();
+        mWebView.loadUrl("file:///android_asset/voicewave.html");
     }
 
     public void prepare()
     {
+        WebView mWebView = this;
         DisplayMetrics displayMetrics = getContext()
                 .getResources()
                 .getDisplayMetrics();
-        mBinding.webView.evaluateJavascript("javascript:SW9.setWidth(\""
+        mWebView.evaluateJavascript("javascript:SW9.setWidth(\""
                         + displayMetrics.widthPixels * 92 / 100
                         + "\");"
                         + "javascript:SW9.start(\"\");",
@@ -165,8 +144,8 @@ public final class WaveformView2
 
     public void setAmplitude(@FloatRange(from = 0.1f, to = 1f) float value)
     {
-        mBinding.icon.setVisibility(INVISIBLE);
-        mBinding.webView.evaluateJavascript("javascript:SW9.setAmplitude(\""
+        WebView mWebView = this;
+        mWebView.evaluateJavascript("javascript:SW9.setAmplitude(\""
                         + Math.min(Math.max(value, 0.1f), 1f)
                         + "\")",
                 null);
@@ -176,12 +155,8 @@ public final class WaveformView2
     {
         private static Application mApplication;
 
-        private static ViewWaveform2Binding createInner() {
-            LayoutInflater inflater = LayoutInflater.from(mApplication)
-                    .cloneInContext(new MutableContextWrapper(mApplication));
-            return DataBindingUtil.inflate(inflater, R.layout.view_waveform2,
-                    new FrameLayout(mApplication),
-                    false);
+        private static WaveformView2 createView() {
+            return new WaveformView2(new MutableContextWrapper(mApplication));
         }
 
         @Override

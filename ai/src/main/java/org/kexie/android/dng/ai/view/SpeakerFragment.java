@@ -36,8 +36,7 @@ import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = PR.ai.speaker)
-public class SpeakerFragment extends Fragment
-{
+public class SpeakerFragment extends Fragment {
     private SpeakerViewModel speakerViewModel;
 
     private WaveformView2 waveformView2;
@@ -58,20 +57,19 @@ public class SpeakerFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
-    {
+                             @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_speaker,
                 container,
                 false);
         waveformView2 = WaveformView2.Provider.INSTANCE.attachTo(binding.animation);
+        binding.icon.bringToFront();
         return binding.getRoot();
     }
 
     @SuppressLint("MissingPermission")
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setRetainInstance(false);
 
@@ -103,37 +101,39 @@ public class SpeakerFragment extends Fragment
                     binding.setIsShowPartial(!TextUtils.isEmpty(s));
                     binding.setSpeechText(s);
                 });
-        waveformView2.setMicrophoneClickListener(v -> {
+        binding.setOnStart(v -> {
             speakerViewModel.stopSpeak();
             speakerViewModel.beginSpeechTransaction();
         });
+
         Transformations.map(speakerViewModel.getVolume(),
                 input -> input.floatValue() / 10f)
                 .observe(this, v -> waveformView2.setAmplitude(v));
         speakerViewModel.getStatus().observe(this, status -> {
-            switch (status)
-            {
+            switch (status) {
                 case Initialization:
-                case Idle:
-                {
+                case Idle: {
+                    binding.icon.postDelayed(
+                            () -> binding.icon.setVisibility(View.VISIBLE),
+                            100);
                     waveformView2.stop();
                     binding.setIsShowPartial(false);
                 }
                 break;
-                case Prepare:
-                {
+                case Prepare: {
+                    binding.icon.postDelayed(
+                            () -> binding.icon.setVisibility(View.GONE),
+                            100);
                     waveformView2.prepare();
                 }
                 break;
-                case Speaking:
-                {
+                case Speaking: {
                     Vibrator vibrator = (Vibrator) Objects.requireNonNull(requireContext()
                             .getSystemService(Context.VIBRATOR_SERVICE));
-                    vibrator.vibrate(100);
+                    vibrator.vibrate(200);
                 }
                 break;
-                case Recognition:
-                {
+                case Recognition: {
                     waveformView2.setAmplitude(0.1f);
                 }
                 break;
@@ -148,10 +148,8 @@ public class SpeakerFragment extends Fragment
                 requireFragmentManager()::popBackStackImmediate);
 
         Bundle bundle = getArguments();
-        if (bundle != null)
-        {
-            if (bundle.getBoolean("weakUp"))
-            {
+        if (bundle != null) {
+            if (bundle.getBoolean("weakUp")) {
                 speakerViewModel.beginSpeechTransaction();
             }
         }
@@ -160,8 +158,7 @@ public class SpeakerFragment extends Fragment
 
 
     @Override
-    public void onDestroyView()
-    {
+    public void onDestroyView() {
         super.onDestroyView();
         speakerViewModel.endSpeechTransaction();
         WaveformView2.Provider.INSTANCE.detach();

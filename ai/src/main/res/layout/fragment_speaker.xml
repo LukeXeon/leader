@@ -69,8 +69,16 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/animation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="100dp">
+                <ImageView
+                    android:id="@+id/icon"
+                    android:onClick="@{onStart}"
+                    android:layout_gravity="center"
+                    async_src="@{`yy`}"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp" />
+            </FrameLayout>
         </RelativeLayout>
     </eightbitlab.com.blurview.BlurView>
 </layout>
