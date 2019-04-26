@@ -12,7 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
-import org.kexie.android.dng.player.media.IjkPlayerView;
+import org.kexie.android.dng.player.media.video.IjkPlayerView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
