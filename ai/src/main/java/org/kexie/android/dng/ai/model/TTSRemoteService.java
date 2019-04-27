@@ -20,7 +20,7 @@ import org.kexie.android.dng.ai.R;
 
 import androidx.annotation.Nullable;
 
-public class SpeakService extends Service {
+public class TTSRemoteService extends Service {
 
     public static final int ACTION_STOP = 10001;
     public static final int ACTION_SEND = 10002;

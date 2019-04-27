@@ -30,12 +30,12 @@
         <service
             android:exported="false"
             android:enabled="true"
-            android:process=":speech"
+            android:process=":plugins"
             android:name="com.baidu.speech.aidl.EventRecognitionService" />
         <service
             android:exported="false"
             android:enabled="true"
-            android:process=":speech"
-            android:name=".model.SpeakService"/>
+            android:process=":plugins"
+            android:name=".model.TTSRemoteService"/>
     </application>
 </manifest>

@@ -74,7 +74,7 @@ dependencies {
     //api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
     //字幕
-    //api 'com.github.zhangliangming:Subtitle:v1.2'
+
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     //屏幕适配

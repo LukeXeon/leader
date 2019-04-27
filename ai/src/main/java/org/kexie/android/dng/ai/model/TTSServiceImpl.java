@@ -17,28 +17,36 @@ import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.model.TTSService;
 
 @Route(path = PR.ai.tts_service)
-public class TTSServiceImpl implements TTSService {
+public class TTSServiceImpl
+        implements TTSService,
+        ServiceConnection {
 
     private Messenger remote;
 
+    private Context context;
+
+    @Override
+    public synchronized void onServiceConnected(ComponentName name, IBinder service) {
+        remote = new Messenger(service);
+        Logger.d("tts link");
+    }
+
+    @Override
+    public synchronized void onServiceDisconnected(ComponentName name) {
+        remote = null;
+        rebind();
+        Logger.d("tts unlink");
+    }
+
+    private void rebind() {
+        Intent intent = new Intent(context, TTSRemoteService.class);
+        context.bindService(intent, this, Context.BIND_AUTO_CREATE);
+    }
+
     @Override
     public void init(Context context) {
-        Intent intent = new Intent(context, SpeakService.class);
-        context.bindService(intent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                synchronized (TTSServiceImpl.class) {
-                    remote = new Messenger(service);
-                }
-                Logger.d("tts link");
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Logger.d("tts unlink");
-                context.bindService(intent, this, Context.BIND_AUTO_CREATE);
-            }
-        }, Context.BIND_AUTO_CREATE);
+        this.context = context.getApplicationContext();
+        rebind();
     }
 
     @Override
@@ -46,9 +54,9 @@ public class TTSServiceImpl implements TTSService {
         if (remote == null) {
             return;
         }
-        Message message = obtainMessage(SpeakService.ACTION_SEND);
+        Message message = obtainMessage(TTSRemoteService.ACTION_SEND);
         Bundle bundle = new Bundle();
-        bundle.putString(SpeakService.SEND_KEY, text);
+        bundle.putString(TTSRemoteService.SEND_KEY, text);
         message.setData(bundle);
         try {
             remote.send(message);
@@ -62,7 +70,7 @@ public class TTSServiceImpl implements TTSService {
         if (remote == null) {
             return;
         }
-        Message message = obtainMessage(SpeakService.ACTION_STOP);
+        Message message = obtainMessage(TTSRemoteService.ACTION_STOP);
         try {
             remote.send(message);
         } catch (RemoteException e) {

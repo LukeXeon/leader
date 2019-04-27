@@ -49,9 +49,9 @@ import com.blankj.utilcode.util.NetworkUtils;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.player.R;
-import org.kexie.android.dng.player.subtitle.danmaku.BaseDanmakuConverter;
-import org.kexie.android.dng.player.subtitle.danmaku.BiliDanmakuParser;
-import org.kexie.android.dng.player.subtitle.danmaku.OnDanmakuListener;
+import org.kexie.android.dng.player.danmaku.BaseDanmakuConverter;
+import org.kexie.android.dng.player.danmaku.BiliDanmakuParser;
+import org.kexie.android.dng.player.danmaku.OnDanmakuListener;
 import org.kexie.android.dng.player.widget.AnimUtils;
 import org.kexie.android.dng.player.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;

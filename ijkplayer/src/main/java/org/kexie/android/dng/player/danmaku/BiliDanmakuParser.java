@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.subtitle.danmaku;
+package org.kexie.android.dng.player.danmaku;
 
 import android.graphics.Color;
 import android.text.TextUtils;
@@ -110,6 +110,7 @@ public class BiliDanmakuParser extends BaseDanmakuParser {
                     float textSize = Float.parseFloat(values[2]); // 字体大小
                     int color = (int) ((0x00000000ff000000 | Long.parseLong(values[3])) & 0x00000000ffffffff); // 颜色
                     // int poolType = Integer.parseInt(values[5]); // 弹幕池类型（忽略
+
                     item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
                     if (item != null) {
                         item.setTime(time);

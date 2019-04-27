@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.subtitle.danmaku;
+package org.kexie.android.dng.player.danmaku;
 
 import androidx.annotation.IntDef;
 
