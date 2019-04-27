@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -66,6 +66,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.IntDef;
 import androidx.appcompat.app.ActionBar;
@@ -172,30 +173,7 @@ public class IjkPlayerView extends FrameLayout
 
     private View mFlReload;
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MSG_UPDATE_SEEK) {
-                final int pos = _setProgress();
-                if (!mIsSeeking && mIsShowBar && mVideoView.isPlaying()) {
-                    // 这里会重复发送MSG，已达到实时更新 Seek 的效果
-                    msg = obtainMessage(MSG_UPDATE_SEEK);
-                    sendMessageDelayed(msg, 1000 - (pos % 1000));
-                }
-            } else if (msg.what == MSG_ENABLE_ORIENTATION) {
-                if (mOrientationListener != null) {
-                    mOrientationListener.enable();
-                }
-            } else if (msg.what == MSG_TRY_RELOAD) {
-                if (mIsNetConnected) {
-                    reload();
-                }
-                msg = obtainMessage(MSG_TRY_RELOAD);
-                sendMessageDelayed(msg, 3000);
-            }
-        }
-    };
+    private Handler mHandler;
     // 音量控制
     private AudioManager mAudioManager;
     // 手势控制
@@ -281,6 +259,30 @@ public class IjkPlayerView extends FrameLayout
     }
 
     private void _initView(Context context) {
+        mHandler = new Handler(Looper.getMainLooper(),(msg)-> {
+            if (msg.what == MSG_UPDATE_SEEK) {
+                final int pos = _setProgress();
+                if (!mIsSeeking && mIsShowBar && mVideoView.isPlaying()) {
+                    // 这里会重复发送MSG，已达到实时更新 Seek 的效果
+                    msg = mHandler.obtainMessage(MSG_UPDATE_SEEK);
+                    mHandler.sendMessageDelayed(msg, 1000 - (pos % 1000));
+                }
+                return true;
+            } else if (msg.what == MSG_ENABLE_ORIENTATION) {
+                if (mOrientationListener != null) {
+                    mOrientationListener.enable();
+                }
+                return true;
+            } else if (msg.what == MSG_TRY_RELOAD) {
+                if (mIsNetConnected) {
+                    reload();
+                }
+                msg = mHandler.obtainMessage(MSG_TRY_RELOAD);
+                mHandler.sendMessageDelayed(msg, 3000);
+                return true;
+            }
+            return false;
+        });
         if (context instanceof AppCompatActivity) {
             mAttachActivity = (AppCompatActivity) context;
         } else {
@@ -349,13 +351,15 @@ public class IjkPlayerView extends FrameLayout
     /**
      * 初始化
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void _initMediaPlayer() {
         // 加载 IjkMediaPlayer 库
         IjkMediaPlayer.loadLibrariesOnce(null);
         IjkMediaPlayer.native_profileBegin("libijkplayer.so");
         // 声音
         mAudioManager = (AudioManager) mAttachActivity.getSystemService(Context.AUDIO_SERVICE);
-        mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        mMaxVolume = Objects.requireNonNull(mAudioManager)
+                .getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         // 亮度
         try {
             float progress;
@@ -1228,7 +1232,7 @@ public class IjkPlayerView extends FrameLayout
                     // 判断左右或上下滑动
                     isLandscape = Math.abs(distanceX) >= Math.abs(distanceY);
                     // 判断是声音或亮度控制
-                    isVolume = mOldX > getResources().getDisplayMetrics().widthPixels * 0.5f;
+                    isVolume = mOldX > getMeasuredWidth() * 0.5f;
                     isDownTouch = false;
                 }
 

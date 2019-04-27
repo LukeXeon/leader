@@ -47,7 +47,7 @@ public final class WindowPlayer
                 .setX(Screen.width, 0)
                 .setY(Screen.height, 0)
                 .setDesktopShow(true)
-                .setMoveType(MoveType.slide)
+                .setMoveType(MoveType.active)
                 .setView(root)
                 .setViewStateListener(this)
                 .build();
@@ -68,8 +68,8 @@ public final class WindowPlayer
         }
         if (y < 0) {
             floatWindow.updateY(0);
-        } else if (y + height / 2 > displayMetrics.heightPixels) {
-            floatWindow.updateY(displayMetrics.heightPixels - height / 2);
+        } else if (y + height / 4 > displayMetrics.heightPixels) {
+            floatWindow.updateY(displayMetrics.heightPixels - height / 4);
         }
     }
 

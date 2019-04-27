@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -18,13 +19,16 @@ import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.ai.R;
 
+import java.util.ArrayList;
+
 import androidx.annotation.Nullable;
 
 public class TTSRemoteService extends Service {
 
     public static final int ACTION_STOP = 10001;
     public static final int ACTION_SEND = 10002;
-    public static final String SEND_KEY = "send_key";
+    public static final String SINGLE_SEND_KEY = "single_send_key";
+    public static final String LIST_SEND_KEY = "list_send_key";
 
     private Messenger messenger;
 
@@ -58,9 +62,19 @@ public class TTSRemoteService extends Service {
         messenger = new Messenger(new Handler(Looper.getMainLooper(), msg -> {
             switch (msg.what) {
                 case ACTION_SEND: {
-                    String s = msg.getData().getString(SEND_KEY);
+                    Bundle bundle = msg.getData();
+                    String s = bundle.getString(SINGLE_SEND_KEY);
                     if (!TextUtils.isEmpty(s)) {
                         speechSynthesizer.speak(s);
+                    } else {
+                        ArrayList<String> list = bundle.getStringArrayList(LIST_SEND_KEY);
+                        if (list != null && !list.isEmpty()) {
+                            for (String text : list) {
+                                if (!TextUtils.isEmpty(text)) {
+                                    speechSynthesizer.speak(text);
+                                }
+                            }
+                        }
                     }
                     return true;
                 }
