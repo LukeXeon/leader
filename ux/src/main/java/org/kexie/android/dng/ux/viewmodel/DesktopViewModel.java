@@ -89,8 +89,9 @@ public class DesktopViewModel
     private void loadDefaultFunctions() {
         disposable = loadFunction(Arrays.asList(
                 FunctionInfo.from("天气", R.mipmap.image_weather, PR.ux.weather),
-                FunctionInfo.from("多媒体", R.mipmap.image_media, PR.media.browse),
-                FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps)))
+                FunctionInfo.from("影库", R.mipmap.image_media, PR.media.browse),
+                FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps),
+                FunctionInfo.from("音乐", R.mipmap.image_music, PR.media.music)))
                 .subscribe(functions::setValue);
     }
 
