@@ -91,14 +91,11 @@ public final class WindowUtils {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(from, to);
         valueAnimator.setDuration(500);
         valueAnimator.addUpdateListener(
-                new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        WindowManager.LayoutParams params
-                                = window.getAttributes();
-                        params.alpha = (Float) animation.getAnimatedValue();
-                        window.setAttributes(params);
-                    }
+                animation -> {
+                    WindowManager.LayoutParams params
+                            = window.getAttributes();
+                    params.alpha = (Float) animation.getAnimatedValue();
+                    window.setAttributes(params);
                 });
         valueAnimator.start();
     }

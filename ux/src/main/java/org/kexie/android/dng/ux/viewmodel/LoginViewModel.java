@@ -33,13 +33,11 @@ public class LoginViewModel extends AndroidViewModel
 
     public final PublishSubject<String> onSuccess = PublishSubject.create();
 
-
     public LoginViewModel(@NonNull Application application)
     {
         super(application);
 
         singleTask.execute(()-> qrcode.postValue(getQrcode("test data")));
-
 
 //        Retrofit retrofit = new Retrofit.Builder()
 //                .addConverterFactory(GsonConverterFactory.create())

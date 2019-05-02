@@ -40,5 +40,7 @@ dependencies {
     implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
 //    compile 'com.github.Rukey7:ijkplayer-armv7a:0.7.5'
     // Danmaku
-    implementation 'com.github.ctiao:DanmakuFlameMaster:0.6.2'
+    //字幕
+    api 'com.github.LukeXeon:danmaku-subtitle-plugins:1.3.3'
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
 }

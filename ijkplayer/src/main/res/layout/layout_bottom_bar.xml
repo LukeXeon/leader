@@ -43,9 +43,11 @@
         android:visibility="gone">
 
         <ImageView
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="10dp"
             android:id="@+id/iv_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             android:background="@drawable/sel_item_background"
             android:padding="10dp"
@@ -58,19 +60,7 @@
             android:layout_gravity="center"
             android:text="00:00"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
-
-        <SeekBar
-            android:id="@+id/player_seek"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:maxHeight="4dp"
-            android:minHeight="4dp"
-            android:progressDrawable="@drawable/layer_seek_progress"
-            android:thumb="@drawable/shape_seek_ball"/>
-
+            android:textSize="20dp"/>
         <TextView
             android:id="@+id/tv_separator"
             android:layout_width="wrap_content"
@@ -80,7 +70,7 @@
             android:layout_marginRight="3dp"
             android:text="/"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="20dp"
             android:visibility="gone"/>
 
         <TextView
@@ -91,7 +81,17 @@
             android:layout_marginRight="5dp"
             android:text="00:00"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
+            android:textSize="20dp"/>
+        <SeekBar
+            android:id="@+id/player_seek"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxHeight="4dp"
+            android:minHeight="4dp"
+            android:progressDrawable="@drawable/layer_seek_progress"
+            android:thumb="@drawable/shape_seek_ball"/>
 
         <TextView
             android:id="@+id/tv_open_edit_danmaku"
@@ -111,15 +111,15 @@
 
         <ImageView
             android:id="@+id/iv_danmaku_control"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="3dp"
+            android:layout_marginRight="5dp"
             android:background="@drawable/sel_item_background"
             android:padding="5dp"
             android:src="@drawable/sel_btn_danmaku_control"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <TextView
             android:id="@+id/iv_media_quality"
@@ -144,6 +144,7 @@
             android:layout_marginRight="5dp"
             android:background="@drawable/sel_item_background"
             android:padding="5dp"
+            android:visibility="gone"
             android:src="@drawable/sel_btn_fullscreen"/>
     </LinearLayout>
 </merge>

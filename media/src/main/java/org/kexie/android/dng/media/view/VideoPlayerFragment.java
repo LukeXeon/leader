@@ -9,10 +9,14 @@ import android.widget.FrameLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.kexie.android.danmakux.utils.FileUtils;
 import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 import org.kexie.android.dng.player.media.video.IjkPlayerView;
+
+import java.io.File;
+import java.util.List;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -64,7 +68,7 @@ public class VideoPlayerFragment
 
         if (!isFormWindow) {
             Media info = requireArguments().getParcelable("media");
-            if (info != null) {
+            if (info != null && info.uri != null) {
                 Glide.with(this)
                         .load(info.uri)
                         .apply(RequestOptions.fitCenterTransform())
@@ -72,10 +76,16 @@ public class VideoPlayerFragment
 
                 // set title
                 player.init().setTitle(info.title)
+                        .enableDanmaku()
                         .setVideoPath(info.uri)
                         .alwaysFullScreen()
-                        .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH)  // set the initial video url
-                        .start();   // Start playing
+                        .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH);
+                List<File> files = FileUtils.getAttachedSubtitles(info.uri);
+                if (!files.isEmpty()) {
+                    File file = files.get(0);
+                    player.setDanmakuSource(file);
+                }
+                player.start();
             }
         }
         requireActivity().addOnBackPressedCallback(this, this);

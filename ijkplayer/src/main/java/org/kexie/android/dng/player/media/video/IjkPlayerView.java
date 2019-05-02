@@ -48,10 +48,8 @@ import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.orhanobut.logger.Logger;
 
+import org.kexie.android.danmakux.converter.SubtitleParserFactory;
 import org.kexie.android.dng.player.R;
-import org.kexie.android.dng.player.danmaku.BaseDanmakuConverter;
-import org.kexie.android.dng.player.danmaku.BiliDanmakuParser;
-import org.kexie.android.dng.player.danmaku.OnDanmakuListener;
 import org.kexie.android.dng.player.widget.AnimUtils;
 import org.kexie.android.dng.player.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
@@ -59,7 +57,7 @@ import org.kexie.android.dng.player.widget.NavBarUtils;
 import org.kexie.android.dng.player.widget.StringUtils;
 import org.kexie.android.dng.player.widget.WindowUtils;
 
-import java.io.InputStream;
+import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -86,7 +84,6 @@ import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.IDataSource;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -822,7 +819,7 @@ public class IjkPlayerView extends FrameLayout
                 mWindowTopBar.setVisibility(View.GONE);
                 mIvPlayerLock.setVisibility(isShowBar ? View.VISIBLE : View.GONE);
                 if (mIsEnableDanmaku) {
-                    mDanmakuPlayerSeek.setVisibility(isShowBar ? View.VISIBLE : View.GONE);
+                    mDanmakuPlayerSeek.setVisibility(View.GONE);
                 }
                 if (mIsNeedRecoverScreen) {
                     mTvRecoverScreen.setVisibility(isShowBar ? View.VISIBLE : View.GONE);
@@ -909,7 +906,7 @@ public class IjkPlayerView extends FrameLayout
             mFullscreenTopBar.setVisibility(View.VISIBLE);
             mLlBottomBar.setVisibility(View.VISIBLE);
             if (mIsEnableDanmaku) {
-                mDanmakuPlayerSeek.setVisibility(VISIBLE);
+                mDanmakuPlayerSeek.setVisibility(GONE);
             }
             if (mIsNeedRecoverScreen) {
                 mTvRecoverScreen.setVisibility(VISIBLE);
@@ -976,11 +973,9 @@ public class IjkPlayerView extends FrameLayout
         } else if (id == R.id.iv_danmaku_control) {
             _toggleDanmakuShow();
         } else if (id == R.id.tv_open_edit_danmaku) {
-            if (mDanmakuListener == null || mDanmakuListener.isValid()) {
-                editVideo();
-                mEditDanmakuLayout.setVisibility(VISIBLE);
-                KeyboardUtils.showSoftInput(mEtDanmakuContent);
-            }
+            editVideo();
+            mEditDanmakuLayout.setVisibility(VISIBLE);
+            KeyboardUtils.showSoftInput(mEtDanmakuContent);
         } else if (id == R.id.iv_cancel_send) {
             recoverFromEditVideo();
         } else if (id == R.id.iv_do_send) {
@@ -1740,16 +1735,6 @@ public class IjkPlayerView extends FrameLayout
     }
 
     /**
-     * 设置弹幕监听器
-     *
-     * @param danmakuListener
-     */
-    public IjkPlayerView setDanmakuListener(OnDanmakuListener danmakuListener) {
-        mDanmakuListener = danmakuListener;
-        return this;
-    }
-
-    /**
      * ============================ 播放清晰度 ============================
      */
 
@@ -2071,10 +2056,6 @@ public class IjkPlayerView extends FrameLayout
     private BaseDanmakuParser mDanmakuParser;
     // 弹幕加载器
     private ILoader mDanmakuLoader;
-    // 弹幕数据转换器
-    private BaseDanmakuConverter mDanmakuConverter;
-    // 弹幕监听器
-    private OnDanmakuListener mDanmakuListener;
     // 是否使能弹幕
     private boolean mIsEnableDanmaku = false;
     // 弹幕颜色
@@ -2097,7 +2078,7 @@ public class IjkPlayerView extends FrameLayout
         // 弹幕控制
         mDanmakuView = findViewById(R.id.sv_danmaku);
         mIvDanmakuControl = findViewById(R.id.iv_danmaku_control);
-        mTvOpenEditDanmaku = findViewById(R.id.tv_open_edit_danmaku);
+        //mTvOpenEditDanmaku = findViewById(R.id.tv_open_edit_danmaku);
         mTvTimeSeparator = findViewById(R.id.tv_separator);
         mEditDanmakuLayout = findViewById(R.id.ll_edit_danmaku);
         mEtDanmakuContent = findViewById(R.id.et_danmaku_content);
@@ -2114,7 +2095,7 @@ public class IjkPlayerView extends FrameLayout
         }
 
         mIvDanmakuControl.setOnClickListener(this);
-        mTvOpenEditDanmaku.setOnClickListener(this);
+        //mTvOpenEditDanmaku.setOnClickListener(this);
         mIvCancelSend.setOnClickListener(this);
         mIvDoSend.setOnClickListener(this);
 
@@ -2130,36 +2111,27 @@ public class IjkPlayerView extends FrameLayout
         mDanmakuTextSizeOptions = findViewById(R.id.input_options_group_textsize);
         mDanmakuTypeOptions = findViewById(R.id.input_options_group_type);
         mDanmakuColorOptions = findViewById(R.id.input_options_color_group);
-        mDanmakuTextSizeOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.input_options_small_textsize) {
-                    mDanmakuTextSize = 25f * (mDanmakuParser.getDisplayer().getDensity() - 0.6f) * 0.7f;
-                } else if (checkedId == R.id.input_options_medium_textsize) {
-                    mDanmakuTextSize = 25f * (mDanmakuParser.getDisplayer().getDensity() - 0.6f);
-                }
+        mDanmakuTextSizeOptions.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.input_options_small_textsize) {
+                mDanmakuTextSize = 25f * (mDanmakuParser.getDisplayer().getDensity() - 0.6f) * 0.7f;
+            } else if (checkedId == R.id.input_options_medium_textsize) {
+                mDanmakuTextSize = 25f * (mDanmakuParser.getDisplayer().getDensity() - 0.6f);
             }
         });
-        mDanmakuTypeOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.input_options_rl_type) {
-                    mDanmakuType = BaseDanmaku.TYPE_SCROLL_RL;
-                } else if (checkedId == R.id.input_options_top_type) {
-                    mDanmakuType = BaseDanmaku.TYPE_FIX_TOP;
-                } else if (checkedId == R.id.input_options_bottom_type) {
-                    mDanmakuType = BaseDanmaku.TYPE_FIX_BOTTOM;
-                }
+        mDanmakuTypeOptions.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.input_options_rl_type) {
+                mDanmakuType = BaseDanmaku.TYPE_SCROLL_RL;
+            } else if (checkedId == R.id.input_options_top_type) {
+                mDanmakuType = BaseDanmaku.TYPE_FIX_TOP;
+            } else if (checkedId == R.id.input_options_bottom_type) {
+                mDanmakuType = BaseDanmaku.TYPE_FIX_BOTTOM;
             }
         });
-        mDanmakuColorOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // 取的是 tag 字符串值，需转换为颜色
-                String color = (String) findViewById(checkedId).getTag();
-                mDanmakuTextColor = Color.parseColor(color);
-                mDanmakuCurColor.setBackgroundColor(mDanmakuTextColor);
-            }
+        mDanmakuColorOptions.setOnCheckedChangeListener((group, checkedId) -> {
+            // 取的是 tag 字符串值，需转换为颜色
+            String color = (String) findViewById(checkedId).getTag();
+            mDanmakuTextColor = Color.parseColor(color);
+            mDanmakuCurColor.setBackgroundColor(mDanmakuTextColor);
         });
     }
 
@@ -2202,6 +2174,7 @@ public class IjkPlayerView extends FrameLayout
             });
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.prepare(mDanmakuParser, mDanmakuContext);
+            Logger.d(mDanmakuParser);
         }
     }
 
@@ -2240,59 +2213,20 @@ public class IjkPlayerView extends FrameLayout
      * 设置弹幕资源，默认资源格式需满足 bilibili 的弹幕文件格式，
      * 配合{@link #setDanmakuCustomParser}来进行自定义弹幕解析方式，{@link #setDanmakuCustomParser}必须先调用
      *
-     * @param stream 弹幕资源
      * @return
      */
-    public IjkPlayerView setDanmakuSource(InputStream stream) {
-        if (stream == null) {
-            return this;
-        }
+    public IjkPlayerView setDanmakuSource(File file) {
         if (!mIsEnableDanmaku) {
             throw new RuntimeException("Danmaku is disable, use enableDanmaku() first");
         }
-        if (mDanmakuLoader == null) {
-            mDanmakuLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
-        }
-        try {
-            mDanmakuLoader.load(stream);
-        } catch (IllegalDataException e) {
-            e.printStackTrace();
-        }
-        IDataSource<?> dataSource = mDanmakuLoader.getDataSource();
+        mDanmakuLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
         if (mDanmakuParser == null) {
-            mDanmakuParser = new BiliDanmakuParser();
+            try {
+                mDanmakuParser = SubtitleParserFactory.forFile(file);
+            } catch (IllegalDataException e) {
+                e.printStackTrace();
+            }
         }
-        mDanmakuParser.load(dataSource);
-        return this;
-    }
-
-    /**
-     * 设置弹幕资源，默认资源格式需满足 bilibili 的弹幕文件格式，
-     * 配合{@link #setDanmakuCustomParser}来进行自定义弹幕解析方式，{@link #setDanmakuCustomParser}必须先调用
-     *
-     * @param uri 弹幕资源
-     * @return
-     */
-    public IjkPlayerView setDanmakuSource(String uri) {
-        if (TextUtils.isEmpty(uri)) {
-            return this;
-        }
-        if (!mIsEnableDanmaku) {
-            throw new RuntimeException("Danmaku is disable, use enableDanmaku() first");
-        }
-        if (mDanmakuLoader == null) {
-            mDanmakuLoader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
-        }
-        try {
-            mDanmakuLoader.load(uri);
-        } catch (IllegalDataException e) {
-            e.printStackTrace();
-        }
-        IDataSource<?> dataSource = mDanmakuLoader.getDataSource();
-        if (mDanmakuParser == null) {
-            mDanmakuParser = new BiliDanmakuParser();
-        }
-        mDanmakuParser.load(dataSource);
         return this;
     }
 
@@ -2301,13 +2235,11 @@ public class IjkPlayerView extends FrameLayout
      *
      * @param parser    解析器
      * @param loader    加载器
-     * @param converter 转换器
      * @return
      */
-    public IjkPlayerView setDanmakuCustomParser(BaseDanmakuParser parser, ILoader loader, BaseDanmakuConverter converter) {
+    public IjkPlayerView setDanmakuCustomParser(BaseDanmakuParser parser, ILoader loader) {
         mDanmakuParser = parser;
         mDanmakuLoader = loader;
-        mDanmakuConverter = converter;
         return this;
     }
 
@@ -2364,13 +2296,6 @@ public class IjkPlayerView extends FrameLayout
         danmaku.setTime(mDanmakuView.getCurrentTime() + 500);
         mDanmakuView.addDanmaku(danmaku);
 
-        if (mDanmakuListener != null) {
-            if (mDanmakuConverter != null) {
-                mDanmakuListener.onDataObtain(mDanmakuConverter.convertDanmaku(danmaku));
-            } else {
-                mDanmakuListener.onDataObtain(danmaku);
-            }
-        }
     }
 
     /**
@@ -2448,17 +2373,18 @@ public class IjkPlayerView extends FrameLayout
         if (mIsEnableDanmaku) {
             if (isShow) {
                 mIvDanmakuControl.setVisibility(VISIBLE);
-                mTvOpenEditDanmaku.setVisibility(VISIBLE);
+                //mTvOpenEditDanmaku.setVisibility(VISIBLE);
                 mTvTimeSeparator.setVisibility(VISIBLE);
-                mDanmakuPlayerSeek.setVisibility(VISIBLE);
-                mPlayerSeek.setVisibility(GONE);
+                //mDanmakuPlayerSeek.setVisibility(VISIBLE);
+                //mPlayerSeek.setVisibility(GONE);
             } else {
                 mIvDanmakuControl.setVisibility(GONE);
-                mTvOpenEditDanmaku.setVisibility(GONE);
+                //mTvOpenEditDanmaku.setVisibility(GONE);
                 mTvTimeSeparator.setVisibility(GONE);
-                mDanmakuPlayerSeek.setVisibility(GONE);
-                mPlayerSeek.setVisibility(VISIBLE);
+                //mDanmakuPlayerSeek.setVisibility(GONE);
             }
+            mDanmakuPlayerSeek.setVisibility(GONE);
+            mPlayerSeek.setVisibility(VISIBLE);
         }
 
     }
