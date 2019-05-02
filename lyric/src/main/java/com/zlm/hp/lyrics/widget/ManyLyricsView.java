@@ -180,7 +180,9 @@ public class ManyLyricsView extends AbstractLrcView {
                         mTouchEventStatus = TOUCHEVENTSTATUS_INIT;
                         int lyricsLineNum = getLyricsLineNum();
                         int deltaY = getLineAtHeightY(lyricsLineNum) - mScroller.getFinalY();
-                        mScroller.startScroll(0, mScroller.getFinalY(), 0, deltaY, mDuration);
+                        mScroller.startScroll(0,
+                                mScroller.getFinalY(),
+                                0, deltaY, mDuration);
                         invalidateView();
                     }
                     return true;
@@ -448,9 +450,11 @@ public class ManyLyricsView extends AbstractLrcView {
             //颜色透明度过渡
 
             if (lineBottomY < mShadeHeight) {
-                alpha = mMaxAlpha - (int) ((mShadeHeight - lineBottomY) * (mMaxAlpha - mMinAlpha) / mShadeHeight);
+                alpha = mMaxAlpha - (int) ((mShadeHeight - lineBottomY)
+                        * (mMaxAlpha - mMinAlpha) / mShadeHeight);
             } else if (lineBottomY > getHeight() - mShadeHeight) {
-                alpha = mMaxAlpha - (int) ((lineBottomY - (getHeight() - mShadeHeight)) * (mMaxAlpha - mMinAlpha) / mShadeHeight);
+                alpha = mMaxAlpha - (int) ((lineBottomY - (getHeight() - mShadeHeight))
+                        * (mMaxAlpha - mMinAlpha) / mShadeHeight);
             }
 
             alpha = Math.max(alpha, 0);
@@ -461,13 +465,36 @@ public class ManyLyricsView extends AbstractLrcView {
             float textX = (getWidth() - textWidth) * 0.5f;
             //
             if (i < curLyricsLineNum) {
-                LyricsUtils.drawText(canvas, paint, paintColors, text, textX, lineBottomY);
-                LyricsUtils.drawText(canvas, paintHL, paintHLColors, text, textX, lineBottomY);
+                LyricsUtils.drawText(canvas,
+                        paint,
+                        paintColors,
+                        text,
+                        textX,
+                        lineBottomY);
+                LyricsUtils.drawText(canvas,
+                        paintHL,
+                        paintHLColors,
+                        text,
+                        textX,
+                        lineBottomY);
 
             } else if (i == curLyricsLineNum) {
                 //绘画动感歌词
-                float lineLyricsHLWidth = LyricsUtils.getLineLyricsHLWidth(lyricsReader.getLyricsType(), paint, splitLyricsLineInfos.get(i), splitLyricsWordIndex, lyricsWordHLTime);
-                LyricsUtils.drawDynamicText(canvas, paint, paintHL, paintColors, paintHLColors, text, lineLyricsHLWidth, textX, lineBottomY);
+                float lineLyricsHLWidth = LyricsUtils
+                        .getLineLyricsHLWidth(lyricsReader.getLyricsType(),
+                                paint,
+                                splitLyricsLineInfos.get(i),
+                                splitLyricsWordIndex,
+                                lyricsWordHLTime);
+                LyricsUtils.drawDynamicText(canvas,
+                        paint,
+                        paintHL,
+                        paintColors,
+                        paintHLColors,
+                        text,
+                        lineLyricsHLWidth,
+                        textX,
+                        lineBottomY);
 
             } else if (i > curLyricsLineNum) {
                 LyricsUtils.drawText(canvas, paint, paintColors, text, textX, lineBottomY);
@@ -511,13 +538,32 @@ public class ManyLyricsView extends AbstractLrcView {
             //画翻译歌词
             if (translateLrcLineInfos != null && translateLrcLineInfos.size() > 0) {
                 //以动感歌词的形式显示翻译歌词
-                List<LyricsLineInfo> translateSplitLyricsLineInfos = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
+                List<LyricsLineInfo> translateSplitLyricsLineInfos
+                        = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineBottomY += extraLrcSpaceLineHeight - spaceLineHeight;
-                if (lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC && extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC && translateDrawType == AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC) {
-                    lineBottomY = drawDownLyrics(canvas, paint, paintHL, translateSplitLyricsLineInfos, extraSplitLyricsLineNum, extraSplitLyricsWordIndex, extraLrcSpaceLineHeight, translateLyricsWordHLTime, lineBottomY);
+                if (lyricsReader.getLyricsType() == LyricsInfo.DYNAMIC
+                        && extraLrcStatus == AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC
+                        && translateDrawType == AbstractLrcView.TRANSLATE_DRAW_TYPE_DYNAMIC) {
+                    lineBottomY = drawDownLyrics(canvas,
+                            paint,
+                            paintHL,
+                            translateSplitLyricsLineInfos,
+                            extraSplitLyricsLineNum,
+                            extraSplitLyricsWordIndex,
+                            extraLrcSpaceLineHeight,
+                            translateLyricsWordHLTime,
+                            lineBottomY);
                 } else {
                     //画lrc歌词
-                    lineBottomY = drawDownLyrics(canvas, paint, paintHL, translateSplitLyricsLineInfos, -1, -2, extraLrcSpaceLineHeight, -1, lineBottomY);
+                    lineBottomY = drawDownLyrics(canvas,
+                            paint,
+                            paintHL,
+                            translateSplitLyricsLineInfos,
+                            -1,
+                            -2,
+                            extraLrcSpaceLineHeight,
+                            -1,
+                            lineBottomY);
                 }
                 lineBottomY += spaceLineHeight - extraLrcSpaceLineHeight;
             }
@@ -525,9 +571,19 @@ public class ManyLyricsView extends AbstractLrcView {
             //画音译歌词
             if (transliterationLrcLineInfos != null && transliterationLrcLineInfos.size() > 0) {
                 //获取分割后的音译歌词行
-                List<LyricsLineInfo> transliterationSplitLrcLineInfos = transliterationLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
+                List<LyricsLineInfo> transliterationSplitLrcLineInfos
+                        = transliterationLrcLineInfos
+                        .get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineBottomY += extraLrcSpaceLineHeight - spaceLineHeight;
-                lineBottomY = drawDownLyrics(canvas, paint, paintHL, transliterationSplitLrcLineInfos, extraSplitLyricsLineNum, extraSplitLyricsWordIndex, extraLrcSpaceLineHeight, lyricsWordHLTime, lineBottomY);
+                lineBottomY = drawDownLyrics(canvas,
+                        paint,
+                        paintHL,
+                        transliterationSplitLrcLineInfos,
+                        extraSplitLyricsLineNum,
+                        extraSplitLyricsWordIndex,
+                        extraLrcSpaceLineHeight,
+                        lyricsWordHLTime,
+                        lineBottomY);
                 lineBottomY += spaceLineHeight - extraLrcSpaceLineHeight;
             }
         }
@@ -544,7 +600,12 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param extraLrcSpaceLineHeight
      * @param lineTopY                @return
      */
-    private float drawUpExtraLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, int lyricsLineNum, float extraLrcSpaceLineHeight, float lineTopY) {
+    private float drawUpExtraLyrics(Canvas canvas,
+                                    Paint paint,
+                                    List<LyricsLineInfo> splitLyricsLineInfos,
+                                    int lyricsLineNum,
+                                    float extraLrcSpaceLineHeight,
+                                    float lineTopY) {
         //获取数据
         int extraLrcStatus = getExtraLrcStatus();
         float spaceLineHeight = getSpaceLineHeight();
@@ -556,9 +617,11 @@ public class ManyLyricsView extends AbstractLrcView {
             //画翻译歌词
             if (translateLrcLineInfos != null && translateLrcLineInfos.size() > 0) {
                 //以动感歌词的形式显示翻译歌词
-                List<LyricsLineInfo> translateSplitLyricsLineInfos = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
+                List<LyricsLineInfo> translateSplitLyricsLineInfos
+                        = translateLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
-                lineTopY = drawUpLyrics(canvas, paint, translateSplitLyricsLineInfos, extraLrcSpaceLineHeight, lineTopY);
+                lineTopY = drawUpLyrics(canvas, paint, translateSplitLyricsLineInfos,
+                        extraLrcSpaceLineHeight, lineTopY);
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + extraLrcSpaceLineHeight);
 
                 //
@@ -568,13 +631,16 @@ public class ManyLyricsView extends AbstractLrcView {
             //画音译歌词
             if (transliterationLrcLineInfos != null && transliterationLrcLineInfos.size() > 0) {
                 //获取分割后的音译歌词行
-                List<LyricsLineInfo> transliterationSplitLrcLineInfos = transliterationLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
+                List<LyricsLineInfo> transliterationSplitLrcLineInfos
+                        = transliterationLrcLineInfos.get(lyricsLineNum).getSplitLyricsLineInfos();
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
-                lineTopY = drawUpLyrics(canvas, paint, transliterationSplitLrcLineInfos, extraLrcSpaceLineHeight, lineTopY);
+                lineTopY = drawUpLyrics(canvas, paint, transliterationSplitLrcLineInfos,
+                        extraLrcSpaceLineHeight, lineTopY);
                 lineTopY -= (LyricsUtils.getTextHeight(paint) + extraLrcSpaceLineHeight);
 
                 //
-                lineTopY = drawUpLyrics(canvas, paint, splitLyricsLineInfos, spaceLineHeight, lineTopY);
+                lineTopY = drawUpLyrics(canvas, paint, splitLyricsLineInfos,
+                        spaceLineHeight, lineTopY);
             }
         } else {
             lineTopY -= (LyricsUtils.getTextHeight(paint) + spaceLineHeight);
@@ -593,7 +659,11 @@ public class ManyLyricsView extends AbstractLrcView {
      * @param fristLineTextY       第一行文字位置
      * @return
      */
-    private float drawUpLyrics(Canvas canvas, Paint paint, List<LyricsLineInfo> splitLyricsLineInfos, float spaceLineHeight, float fristLineTextY) {
+    private float drawUpLyrics(Canvas canvas,
+                               Paint paint,
+                               List<LyricsLineInfo> splitLyricsLineInfos,
+                               float spaceLineHeight,
+                               float fristLineTextY) {
         int[] paintColors = getPaintColors();
 
 
@@ -621,9 +691,11 @@ public class ManyLyricsView extends AbstractLrcView {
             //颜色透明度过渡
 
             if (lineTopY < mShadeHeight) {
-                alpha = mMaxAlpha - (int) ((mShadeHeight - lineTopY) * (mMaxAlpha - mMinAlpha) / mShadeHeight);
+                alpha = mMaxAlpha - (int) ((mShadeHeight - lineTopY)
+                        * (mMaxAlpha - mMinAlpha) / mShadeHeight);
             } else if (lineTopY > getHeight() - mShadeHeight) {
-                alpha = mMaxAlpha - (int) ((lineTopY - (getHeight() - mShadeHeight)) * (mMaxAlpha - mMinAlpha) / mShadeHeight);
+                alpha = mMaxAlpha - (int) ((lineTopY - (getHeight() - mShadeHeight))
+                        * (mMaxAlpha - mMinAlpha) / mShadeHeight);
             }
 
             alpha = Math.max(alpha, 0);
@@ -679,7 +751,9 @@ public class ManyLyricsView extends AbstractLrcView {
         int rectL = rectR - circleR * 2;
         int rectT = getHeight() / 2;
         int rectB = rectT + circleR * 2;
-        mPlayBtnRect.set(rectL - padding, rectT - padding, rectR + padding, rectB + padding);
+        mPlayBtnRect.set(rectL - padding,
+                rectT - padding,
+                rectR + padding, rectB + padding);
 
         //画圆
         int cx = rectL + (rectR - rectL) / 2;
@@ -709,9 +783,17 @@ public class ManyLyricsView extends AbstractLrcView {
         float lineY = (getHeight() - lineH) / 2;
         float lineLeft = textX + textWidth + linePadding;
         float lineR = rectL - linePadding;
-        LinearGradient linearGradientHL = new LinearGradient(lineLeft, lineY + lineH, lineR, lineY + lineH, new int[]{ColorUtils.parserColor(mPaintLineColor, 255), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 0), ColorUtils.parserColor(mPaintLineColor, 255)}, new float[]{0f, 0.2f, 0.8f, 1f}, Shader.TileMode.CLAMP);
+        LinearGradient linearGradientHL = new LinearGradient(lineLeft,
+                lineY + lineH, lineR, lineY + lineH,
+                new int[]{ColorUtils.parserColor(mPaintLineColor, 255),
+                        ColorUtils.parserColor(mPaintLineColor, 0),
+                        ColorUtils.parserColor(mPaintLineColor, 0),
+                        ColorUtils.parserColor(mPaintLineColor, 255)},
+                new float[]{0f, 0.2f, 0.8f, 1f},
+                Shader.TileMode.CLAMP);
         mPaintLine.setShader(linearGradientHL);
-        canvas.drawRect(lineLeft, lineY, lineR, lineY + lineH, mPaintLine);
+        canvas.drawRect(lineLeft, lineY, lineR,
+                lineY + lineH, mPaintLine);
 
     }
 
@@ -727,7 +809,10 @@ public class ManyLyricsView extends AbstractLrcView {
         int lyricsLineNum = getLyricsLineNum();
 
         //
-        int newLyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(), lrcLineInfos, playProgress, lyricsReader.getPlayOffset());
+        int newLyricsLineNum = LyricsUtils.getLineNumber(lyricsReader.getLyricsType(),
+                lrcLineInfos,
+                playProgress,
+                lyricsReader.getPlayOffset());
         if (newLyricsLineNum != lyricsLineNum) {
             if (mTouchEventStatus == TOUCHEVENTSTATUS_INIT && !mIsTouchIntercept) {
                 //初始状态

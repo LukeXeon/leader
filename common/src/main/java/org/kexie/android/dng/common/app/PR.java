@@ -24,12 +24,11 @@ public final class PR
         public static final String location_service = "/navi/location";
     }
 
-    public static final class media
-    {
+    public static final class media {
         public static final String browse = "/media/browse";
         public static final String photo = "/media/photo";
         public static final String video = "/media/video";
-
+        public static final String music = "/media/music";
     }
 
     public static final class host

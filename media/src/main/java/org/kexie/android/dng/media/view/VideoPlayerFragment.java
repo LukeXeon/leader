@@ -13,7 +13,7 @@ import org.kexie.android.danmakux.utils.FileUtils;
 import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
-import org.kexie.android.dng.player.media.video.IjkPlayerView;
+import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import java.io.File;
 import java.util.List;

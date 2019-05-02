@@ -11,7 +11,7 @@ import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.widget.WindowPlayer;
-import org.kexie.android.dng.player.media.video.IjkPlayerView;
+import org.kexie.android.dng.player.media.IjkPlayerView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;

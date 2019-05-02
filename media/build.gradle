@@ -40,6 +40,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
     implementation project(':ijkplayer')
+
+    //之后我一定会把这个库换掉👇，代码质量真的太差了
+    implementation project(':lyric')
     annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
 
 //    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {

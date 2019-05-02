@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media.video;
+package org.kexie.android.dng.player.media;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
