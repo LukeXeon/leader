@@ -95,7 +95,7 @@
                     app:contentInsetLeft="0dp"
                     app:contentInsetStart="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp">
+                    android:layout_height="60dp">
                     <LinearLayout
                         android:gravity="bottom"
                         android:id="@+id/ll_title_root"

@@ -48,16 +48,15 @@ public class MusicPlayerFragment extends Fragment {
         });
         binding.appbarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
             float scrollRange = appBarLayout.getTotalScrollRange();
-            for (View view1 : new View[]{binding.tvTitle, binding.tvNowPlayer}) {
-                float offset = Math.abs(verticalOffset);
-                if (offset >= scrollRange * 0.9f) {
-                    offset -= (scrollRange * 0.9f);
-                    float openPer = offset / (scrollRange * 0.1f);
-                    view1.setAlpha(openPer);
-                    view1.setVisibility(View.VISIBLE);
-                } else {
-                    view1.setVisibility(View.GONE);
-                }
+            View view1 = binding.llTitleRoot;
+            float offset = Math.abs(verticalOffset);
+            if (offset >= scrollRange * 0.9f) {
+                offset -= (scrollRange * 0.9f);
+                float openPer = offset / (scrollRange * 0.1f);
+                view1.setAlpha(openPer);
+                view1.setVisibility(View.VISIBLE);
+            } else {
+                view1.setVisibility(View.GONE);
             }
         });
     }
