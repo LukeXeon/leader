@@ -51,7 +51,7 @@ import com.orhanobut.logger.Logger;
 import org.kexie.android.danmakux.converter.SubtitleParserFactory;
 import org.kexie.android.dng.player.R;
 import org.kexie.android.dng.player.widget.AnimUtils;
-import org.kexie.android.dng.player.widget.MarqueeTextView;
+import org.kexie.android.dng.common.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
 import org.kexie.android.dng.player.widget.NavBarUtils;
 import org.kexie.android.dng.player.widget.StringUtils;

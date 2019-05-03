@@ -46,7 +46,18 @@ public class MusicPlayerFragment extends Fragment {
                 getResources().getColor(R.color.deeppurplea700),
                 getResources().getColor(R.color.deeppurplea700)
         });
-
-
+        binding.appbarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            float scrollRange = appBarLayout.getTotalScrollRange();
+            float offset = Math.abs(verticalOffset);
+            if (offset >= scrollRange * 0.9f) {
+                offset -= (scrollRange * 0.9f);
+                float openPer = offset / (scrollRange * 0.1f);
+                int openAlpha = (int) (255f * openPer);
+                binding.llTitleRoot.setAlpha(openAlpha);
+                binding.llTitleRoot.setVisibility(View.VISIBLE);
+            } else {
+                binding.llTitleRoot.setVisibility(View.GONE);
+            }
+        });
     }
 }

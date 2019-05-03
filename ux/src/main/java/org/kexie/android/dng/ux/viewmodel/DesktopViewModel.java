@@ -91,7 +91,7 @@ public class DesktopViewModel
                 FunctionInfo.from("天气", R.mipmap.image_weather, PR.ux.weather),
                 FunctionInfo.from("影库", R.mipmap.image_media, PR.media.browse),
                 FunctionInfo.from("APPS", R.mipmap.image_apps, PR.ux.apps),
-                FunctionInfo.from("音乐", R.mipmap.image_music, PR.media.music)))
+                FunctionInfo.from("音乐", R.mipmap.image_music2, PR.media.music)))
                 .subscribe(functions::setValue);
     }
 

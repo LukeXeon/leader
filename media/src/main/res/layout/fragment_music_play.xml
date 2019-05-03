@@ -4,27 +4,29 @@
         android:background="@color/white"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar_layout"
             android:background="@color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:fitsSystemWindows="true"
                 android:background="@color/white"
-                app:contentScrim="@color/deeppurplea200"
+                app:contentScrim="@color/white"
                 app:expandedTitleMarginBottom="100dp"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="0dp">
                 <LinearLayout
                     android:background="@color/white"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     app:layout_collapseMode="parallax"
-                    android:layout_height="400dp">
+                    android:layout_height="match_parent">
                     <RelativeLayout
                         android:gravity="center"
                         android:layout_gravity="center"
@@ -88,14 +90,51 @@
                     </FrameLayout>
                 </LinearLayout>
                 <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    app:layout_collapseMode="pin"
+                    app:contentInsetLeft="0dp"
+                    app:contentInsetStart="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp">
+                    android:layout_height="60dp">
+                    <LinearLayout
+                        android:gravity="bottom"
+                        android:id="@+id/ll_title_root"
+                        android:orientation="horizontal"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/tv_now_player"
+                            android:textColor="@android:color/black"
+                            android:text="正在播放"
+                            android:textSize="30dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <FrameLayout
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:layout_width="0dp">
+                            <org.kexie.android.dng.common.widget.MarqueeTextView
+                                android:id="@+id/tv_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="marquee"
+                                android:focusable="true"
+                                android:focusableInTouchMode="true"
+                                android:marqueeRepeatLimit="marquee_forever"
+                                android:singleLine="true"
+                                android:text="TEXT"
+                                android:textColor="@android:color/black"
+                                android:textSize="30dp" />
+                        </FrameLayout>
+                    </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.CollapsingToolbarLayout>
             <androidx.cardview.widget.CardView
                 android:background="@color/white"
                 app:cardBackgroundColor="@color/white"
-                android:layout_marginTop="-5dp"
+                android:layout_marginTop="-15dp"
                 app:cardUseCompatPadding="true"
                 app:cardElevation="10dp"
                 app:cardCornerRadius="10dp"
@@ -150,8 +189,6 @@
                         android:layout_width="60dp"
                         android:layout_height="80dp" />
                     <SeekBar
-                        android:maxHeight="10dp"
-                        android:minHeight="10dp"
                         android:layout_width="150dp"
                         android:layout_height="match_parent" />
                     <ImageButton

@@ -399,7 +399,7 @@ public abstract class AbstractLrcView extends View {
 
 
         //初始默认数据
-        mDefText = context.getString(R.string.def_text);
+        mDefText = context.getString(R.string.default_text);
         mLoadingText = context.getString(R.string.loading_text);
         mLoadErrorText = context.getString(R.string.load_error_text);
         mNonsupportText = context.getString(R.string.nonsupport_text);
