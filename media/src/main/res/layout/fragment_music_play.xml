@@ -116,7 +116,7 @@
                                 android:textColor="@android:color/white"
                                 android:text="正在播放"
                                 android:singleLine="true"
-                                android:textSize="30dp"
+                                android:textSize="25dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
                         </FrameLayout>
@@ -137,7 +137,7 @@
                                 android:singleLine="true"
                                 android:text="歌曲名"
                                 android:textColor="@android:color/white"
-                                android:textSize="30dp" />
+                                android:textSize="25dp" />
                         </FrameLayout>
                     </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>

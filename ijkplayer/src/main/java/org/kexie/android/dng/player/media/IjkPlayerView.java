@@ -1,6 +1,7 @@
 package org.kexie.android.dng.player.media;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -49,9 +50,9 @@ import com.blankj.utilcode.util.NetworkUtils;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.danmakux.converter.SubtitleParserFactory;
+import org.kexie.android.dng.common.widget.MarqueeTextView;
 import org.kexie.android.dng.player.R;
 import org.kexie.android.dng.player.widget.AnimUtils;
-import org.kexie.android.dng.common.widget.MarqueeTextView;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
 import org.kexie.android.dng.player.widget.NavBarUtils;
 import org.kexie.android.dng.player.widget.StringUtils;
@@ -67,7 +68,6 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.IntDef;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MotionEventCompat;
@@ -164,7 +164,7 @@ public class IjkPlayerView extends FrameLayout
     private TextView mTvSettings;
     private RadioGroup mAspectRatioOptions;
     // 关联的Activity
-    private AppCompatActivity mAttachActivity;
+    private Activity mAttachActivity;
     // 重试
     private TextView mTvReload;
 
@@ -1093,14 +1093,14 @@ public class IjkPlayerView extends FrameLayout
      * @param isFullscreen
      */
     private void _handleActionBar(boolean isFullscreen) {
-        ActionBar supportActionBar = mAttachActivity.getSupportActionBar();
-        if (supportActionBar != null) {
-            if (isFullscreen) {
-                supportActionBar.hide();
-            } else {
-                supportActionBar.show();
-            }
-        }
+//        ActionBar supportActionBar = mAttachActivity.getSupportActionBar();
+//        if (supportActionBar != null) {
+//            if (isFullscreen) {
+//                supportActionBar.hide();
+//            } else {
+//                supportActionBar.show();
+//            }
+//        }
     }
 
     /**

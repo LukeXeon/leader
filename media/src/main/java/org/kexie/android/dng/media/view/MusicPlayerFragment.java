@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.SizeUtils;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
+import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
 
@@ -26,7 +27,7 @@ public class MusicPlayerFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        adapter = new GenericQuickAdapter<>(0, 0);
+        adapter = new GenericQuickAdapter<>(R.layout.item_music, BR.mediaInfo);
         super.onCreate(savedInstanceState);
     }
 
