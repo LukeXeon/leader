@@ -74,6 +74,8 @@ dependencies {
     //api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
 
+    //关于页面的基础库
+    api 'com.github.daniel-stoneuk:material-about-library:2.4.2'
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     //屏幕适配

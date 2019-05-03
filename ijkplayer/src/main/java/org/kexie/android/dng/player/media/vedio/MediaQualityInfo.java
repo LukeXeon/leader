@@ -1,6 +1,6 @@
-package org.kexie.android.dng.player.media;
+package org.kexie.android.dng.player.media.vedio;
 
-import org.kexie.android.dng.player.media.IjkPlayerView.MediaQuality;
+import org.kexie.android.dng.player.media.vedio.IjkPlayerView.MediaQuality;
 
 /**
  * Created by Rukey7 on 2016/10/29.

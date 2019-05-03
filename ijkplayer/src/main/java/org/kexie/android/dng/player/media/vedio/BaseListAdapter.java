@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media;
+package org.kexie.android.dng.player.media.vedio;
 
 import android.content.Context;
 import android.widget.BaseAdapter;

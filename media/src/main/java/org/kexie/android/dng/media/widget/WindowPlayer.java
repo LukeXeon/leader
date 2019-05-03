@@ -16,7 +16,7 @@ import com.yhao.floatwindow.Screen;
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.view.VideoPlayerFragment;
-import org.kexie.android.dng.player.media.IjkPlayerView;
+import org.kexie.android.dng.player.media.vedio.IjkPlayerView;
 
 import androidx.fragment.app.Fragment;
 

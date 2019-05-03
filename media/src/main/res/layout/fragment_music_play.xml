@@ -17,7 +17,7 @@
                 android:background="@color/white"
                 app:contentScrim="@color/white"
                 app:expandedTitleMarginBottom="100dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp">
@@ -95,57 +95,13 @@
                     app:contentInsetLeft="0dp"
                     app:contentInsetStart="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp">
-                    <LinearLayout
-                        android:gravity="bottom"
-                        android:id="@+id/ll_title_root"
-                        android:orientation="horizontal"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <FrameLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:gravity="center"
-                                android:background="@drawable/text_background700"
-                                android:layout_margin="5dp"
-                                android:id="@+id/tv_now_player"
-                                android:textColor="@android:color/white"
-                                android:text="正在播放"
-                                android:singleLine="true"
-                                android:textSize="25dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </FrameLayout>
-                        <FrameLayout
-                            android:layout_margin="5dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:layout_width="0dp">
-                            <org.kexie.android.dng.common.widget.MarqueeTextView
-                                android:background="@drawable/text_background200"
-                                android:id="@+id/tv_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ellipsize="marquee"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
-                                android:marqueeRepeatLimit="marquee_forever"
-                                android:singleLine="true"
-                                android:text="歌曲名"
-                                android:textColor="@android:color/white"
-                                android:textSize="25dp" />
-                        </FrameLayout>
-                    </LinearLayout>
+                    android:layout_height="0dp">
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.CollapsingToolbarLayout>
             <androidx.cardview.widget.CardView
                 android:background="@color/white"
                 app:cardBackgroundColor="@color/white"
-                android:layout_marginTop="-15dp"
+                android:layout_marginTop="-5dp"
                 app:cardUseCompatPadding="true"
                 app:cardElevation="10dp"
                 app:cardCornerRadius="10dp"

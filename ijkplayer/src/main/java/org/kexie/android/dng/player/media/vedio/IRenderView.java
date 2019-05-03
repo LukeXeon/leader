@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kexie.android.dng.player.media;
+package org.kexie.android.dng.player.media.vedio;
 
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;

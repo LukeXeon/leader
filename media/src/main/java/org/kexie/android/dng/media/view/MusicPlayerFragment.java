@@ -13,6 +13,7 @@ import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
+import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,7 @@ import androidx.fragment.app.Fragment;
 public class MusicPlayerFragment extends Fragment {
 
     private FragmentMusicPlayBinding binding;
-    private GenericQuickAdapter<Object> adapter;
+    private GenericQuickAdapter<Media> adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class MusicPlayerFragment extends Fragment {
                 R.layout.fragment_music_play,
                 container,
                 false);
+        adapter.setEmptyView(inflater.inflate(R.layout.view_empty2, container, false));
         return binding.getRoot();
     }
 
@@ -55,20 +57,8 @@ public class MusicPlayerFragment extends Fragment {
                 getResources().getColor(R.color.deeppurplea700),
                 getResources().getColor(R.color.deeppurplea700)
         });
-        binding.appbarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
-            float scrollRange = appBarLayout.getTotalScrollRange();
-            View view1 = binding.llTitleRoot;
-            float p = 0.8f;
-            float offset = Math.abs(verticalOffset);
-            if (offset >= scrollRange * p) {
-                offset -= (scrollRange * p);
-                float openPer = offset / (scrollRange * (1f - p));
-                view1.setAlpha(openPer);
-                view1.setVisibility(View.VISIBLE);
-            } else {
-                view1.setVisibility(View.GONE);
-            }
-        });
         binding.rvMusicList.setAdapter(adapter);
-    }
+        adapter.setOnItemClickListener((adapter, view12, position) -> {
+        });
+     }
 }

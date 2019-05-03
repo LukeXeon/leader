@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kexie.android.dng.player.media;
+package org.kexie.android.dng.player.media.vedio;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;

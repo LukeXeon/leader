@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media;
+package org.kexie.android.dng.player.media.vedio;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.IntDef;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.core.view.ViewCompat;
@@ -280,10 +279,10 @@ public class IjkPlayerView extends FrameLayout
             }
             return false;
         });
-        if (context instanceof AppCompatActivity) {
-            mAttachActivity = (AppCompatActivity) context;
+        if (context instanceof Activity) {
+            mAttachActivity = (Activity) context;
         } else {
-            throw new IllegalArgumentException("Context must be AppCompatActivity");
+            throw new IllegalArgumentException("Context must be Activity");
         }
         View.inflate(context, R.layout.layout_player_view, this);
         mVideoView = findViewById(R.id.video_view);
