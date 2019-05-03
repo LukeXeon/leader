@@ -64,7 +64,8 @@ public class MusicPlayerFragment extends Fragment {
         adapter.setOnItemClickListener((adapter, view12, position) -> {
 
         });
-
+        player.setNewSource("/storage/emulated/0/DCIM/Camera/20190317_224234.mp4");
+        player.start();
     }
 
     @Override

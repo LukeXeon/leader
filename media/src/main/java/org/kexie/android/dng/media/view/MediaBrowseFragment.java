@@ -12,6 +12,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
@@ -112,6 +113,9 @@ public class MediaBrowseFragment
 
         viewModel.medias.observe(this, mediasAdapter::setNewData);
         viewModel.title.observe(this, binding::setTitle);
+
+        viewModel.medias.observe(this, Logger::d);
+
         viewModel.loadPhoto();
 
         Map<String, View.OnClickListener> actions

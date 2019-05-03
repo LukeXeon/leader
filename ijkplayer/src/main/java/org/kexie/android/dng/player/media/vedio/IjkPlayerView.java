@@ -2174,7 +2174,6 @@ public class IjkPlayerView extends FrameLayout
             });
             mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.prepare(mDanmakuParser, mDanmakuContext);
-            Logger.d(mDanmakuParser);
         }
     }
 

@@ -724,13 +724,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 }
             };
 
-    private IMediaPlayer.OnSeekCompleteListener mSeekCompleteListener = new IMediaPlayer.OnSeekCompleteListener() {
-
-        @Override
-        public void onSeekComplete(IMediaPlayer mp) {
-            mSeekEndTime = System.currentTimeMillis();
-        }
-    };
+    private IMediaPlayer.OnSeekCompleteListener mSeekCompleteListener = mp -> mSeekEndTime = System.currentTimeMillis();
 
     /**
      * Register a callback to be invoked when the media file
@@ -815,10 +809,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             }
 
             mSurfaceHolder = holder;
-            if (mMediaPlayer != null)
+            if (mMediaPlayer != null) {
                 bindSurfaceHolder(mMediaPlayer, holder);
-            else
+            } else {
                 openVideo();
+            }
         }
 
         @Override
@@ -1092,6 +1087,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public IMediaPlayer createPlayer(int playerType) {
+
         IMediaPlayer mediaPlayer = null;
 
         switch (playerType) {
