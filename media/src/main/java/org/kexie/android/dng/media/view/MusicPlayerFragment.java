@@ -9,6 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.SizeUtils;
 
 import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
 
@@ -21,6 +22,13 @@ import androidx.fragment.app.Fragment;
 public class MusicPlayerFragment extends Fragment {
 
     private FragmentMusicPlayBinding binding;
+    private GenericQuickAdapter<Object> adapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        adapter = new GenericQuickAdapter<>(0, 0);
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -37,7 +45,7 @@ public class MusicPlayerFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.lrcView.setFontSize(SizeUtils.dp2px(20));
+        binding.lrcView.setFontSize(SizeUtils.sp2px(25));
         binding.lrcView.setPaintColor(new int[]{
                 getResources().getColor(R.color.deeppurplea100),
                 getResources().getColor(R.color.deeppurplea100)
@@ -49,15 +57,17 @@ public class MusicPlayerFragment extends Fragment {
         binding.appbarLayout.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
             float scrollRange = appBarLayout.getTotalScrollRange();
             View view1 = binding.llTitleRoot;
+            float p = 0.8f;
             float offset = Math.abs(verticalOffset);
-            if (offset >= scrollRange * 0.9f) {
-                offset -= (scrollRange * 0.9f);
-                float openPer = offset / (scrollRange * 0.1f);
+            if (offset >= scrollRange * p) {
+                offset -= (scrollRange * p);
+                float openPer = offset / (scrollRange * (1f - p));
                 view1.setAlpha(openPer);
                 view1.setVisibility(View.VISIBLE);
             } else {
                 view1.setVisibility(View.GONE);
             }
         });
+        binding.rvMusicList.setAdapter(adapter);
     }
 }

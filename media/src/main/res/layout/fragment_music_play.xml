@@ -95,15 +95,16 @@
                     app:contentInsetLeft="0dp"
                     app:contentInsetStart="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp">
+                    android:layout_height="70dp">
                     <LinearLayout
                         android:gravity="bottom"
                         android:id="@+id/ll_title_root"
                         android:orientation="horizontal"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content">
                         <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
@@ -198,9 +199,14 @@
                         android:src="@mipmap/ying_liang"
                         android:layout_width="60dp"
                         android:layout_height="80dp" />
-                    <SeekBar
+                    <androidx.appcompat.widget.AppCompatSeekBar
+                        android:background="@android:color/transparent"
+                        android:progressDrawable="@drawable/layer_music_seek_progress"
+                        android:thumb="@drawable/shape_music_seek_ball"
+                        android:maxHeight="4dp"
+                        android:minHeight="4dp"
                         android:layout_width="150dp"
-                        android:layout_height="match_parent" />
+                        android:layout_height="wrap_content" />
                     <ImageButton
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
@@ -217,9 +223,11 @@
             </androidx.cardview.widget.CardView>
         </com.google.android.material.appbar.AppBarLayout>
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_music_list"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
-            android:layout_height="1000dp">
+            android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
