@@ -14,6 +14,7 @@ import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
+import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,11 +26,13 @@ public class MusicPlayerFragment extends Fragment {
 
     private FragmentMusicPlayBinding binding;
     private GenericQuickAdapter<Media> adapter;
+    private IjkMusicPlayer player;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        adapter = new GenericQuickAdapter<>(R.layout.item_music, BR.mediaInfo);
         super.onCreate(savedInstanceState);
+        adapter = new GenericQuickAdapter<>(R.layout.item_music, BR.mediaInfo);
+        player = IjkMusicPlayer.newInstance(requireActivity());
     }
 
     @Nullable
@@ -52,13 +55,40 @@ public class MusicPlayerFragment extends Fragment {
         binding.lrcView.setPaintColor(new int[]{
                 getResources().getColor(R.color.deeppurplea100),
                 getResources().getColor(R.color.deeppurplea100)
-        });
+        }, false);
         binding.lrcView.setPaintHLColor(new int[]{
                 getResources().getColor(R.color.deeppurplea700),
                 getResources().getColor(R.color.deeppurplea700)
-        });
+        }, false);
         binding.rvMusicList.setAdapter(adapter);
         adapter.setOnItemClickListener((adapter, view12, position) -> {
+
         });
-     }
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.pause();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (player != null) {
+            player.destroy();
+            player = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (player != null) {
+            player.resume();
+        }
+    }
 }

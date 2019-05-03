@@ -190,7 +190,7 @@ public final class MeasureHelper {
                     width = widthSpecSize;
                 }
             } else {
-                // neither the width nor the height are fixed, try to use actual video size
+                // neither the width nor the height are fixed, try to use actual media size
                 width = mVideoWidth;
                 height = mVideoHeight;
                 if (heightSpecMode == View.MeasureSpec.AT_MOST && height > heightSpecSize) {

@@ -31,7 +31,6 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -51,6 +50,7 @@ import com.orhanobut.logger.Logger;
 
 import org.kexie.android.danmakux.converter.SubtitleParserFactory;
 import org.kexie.android.dng.common.widget.MarqueeTextView;
+import org.kexie.android.dng.player.BuildConfig;
 import org.kexie.android.dng.player.R;
 import org.kexie.android.dng.player.widget.AnimUtils;
 import org.kexie.android.dng.player.widget.MotionEventUtils;
@@ -351,7 +351,9 @@ public class IjkPlayerView extends FrameLayout
     private void _initMediaPlayer() {
         // 加载 IjkMediaPlayer 库
         IjkMediaPlayer.loadLibrariesOnce(null);
-        IjkMediaPlayer.native_profileBegin("libijkplayer.so");
+        if (BuildConfig.DEBUG) {
+            IjkMediaPlayer.native_profileBegin("libijkplayer.so");
+        }
         // 声音
         mAudioManager = (AudioManager) mAttachActivity.getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = Objects.requireNonNull(mAudioManager)
@@ -416,7 +418,7 @@ public class IjkPlayerView extends FrameLayout
         if (mIsScreenLocked) {
             // 如果出现锁屏则需要重新渲染器Render，不然会出现只有声音没有动画
             // 目前只在锁屏时会出现图像不动的情况，如果有遇到类似情况可以尝试按这个方法解决
-            mVideoView.setRender(IjkVideoView.RENDER_TEXTURE_VIEW);
+            mVideoView.setRender(IjkVideoView.RENDER_SURFACE_VIEW);
             mIsScreenLocked = false;
         }
         mVideoView.resume();
@@ -451,7 +453,9 @@ public class IjkPlayerView extends FrameLayout
         // 记录播放进度
         int curPosition = mVideoView.getCurrentPosition();
         mVideoView.destroy();
-        IjkMediaPlayer.native_profileEnd();
+        if (BuildConfig.DEBUG) {
+            IjkMediaPlayer.native_profileEnd();
+        }
         if (mDanmakuView != null) {
             // don't forget release!
             mDanmakuView.release();
@@ -649,7 +653,7 @@ public class IjkPlayerView extends FrameLayout
             }
         } else {
             mVideoView.release(false);
-            mVideoView.setRender(IjkVideoView.RENDER_TEXTURE_VIEW);
+            mVideoView.setRender(IjkVideoView.RENDER_SURFACE_VIEW);
             start();
         }
         // 更新进度
@@ -710,7 +714,7 @@ public class IjkPlayerView extends FrameLayout
         mIsNeverPlay = true;
         mCurPosition = 0;
         stop();
-        mVideoView.setRender(IjkVideoView.RENDER_TEXTURE_VIEW);
+        mVideoView.setRender(IjkVideoView.RENDER_SURFACE_VIEW);
     }
 
     /**============================ 控制栏处理 ============================*/
@@ -1791,16 +1795,13 @@ public class IjkPlayerView extends FrameLayout
         mLvMediaQuality = findViewById(R.id.lv_media_quality);
         mQualityAdapter = new AdapterMediaQuality(mAttachActivity);
         mLvMediaQuality.setAdapter(mQualityAdapter);
-        mLvMediaQuality.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mCurSelectQuality != mQualityAdapter.getItem(position).getIndex()) {
-                    setMediaQuality(mQualityAdapter.getItem(position).getIndex());
-                    mLoadingView.setVisibility(VISIBLE);
-                    start();
-                }
-                _toggleMediaQuality();
+        mLvMediaQuality.setOnItemClickListener((parent, view, position, id) -> {
+            if (mCurSelectQuality != mQualityAdapter.getItem(position).getIndex()) {
+                setMediaQuality(mQualityAdapter.getItem(position).getIndex());
+                mLoadingView.setVisibility(VISIBLE);
+                start();
             }
+            _toggleMediaQuality();
         });
     }
 
@@ -1897,7 +1898,7 @@ public class IjkPlayerView extends FrameLayout
             mCurPosition = mVideoView.getCurrentPosition();
             mVideoView.release(false);
         }
-        mVideoView.setRender(IjkVideoView.RENDER_TEXTURE_VIEW);
+        mVideoView.setRender(IjkVideoView.RENDER_SURFACE_VIEW);
         setVideoPath(mVideoSource.get(quality));
         return this;
     }

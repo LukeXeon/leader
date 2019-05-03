@@ -41,13 +41,14 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
+import tv.danmaku.ijk.media.player.BuildConfig;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
-    private String TAG = "TTAG";
+    private static final String TAG = "IjkVideoView";
     // settable by the client
     private Uri mUri;
     private Map<String, String> mHeaders;
@@ -60,7 +61,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentState = MediaPlayerParams.STATE_IDLE;
     private int mTargetState = MediaPlayerParams.STATE_IDLE;
 
-    // All the stuff we need for playing and showing a video
+    // All the stuff we need for playing and showing a media
     private IRenderView.ISurfaceHolder mSurfaceHolder = null;
     private IMediaPlayer mMediaPlayer = null;
     // private int         mAudioSession;
@@ -91,7 +92,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     //Auto Select=,RGB 565=fcc-rv16,RGB 888X=fcc-rv32,YV12=fcc-yv12,默认为RGB 888X
     private String mPixelFormat = "";
 
-    /** Subtitle rendering widget overlaid on top of the video. */
+    /** Subtitle rendering widget overlaid on top of the media. */
     // private RenderingWidget mSubtitleWidget;
 
     /**
@@ -119,6 +120,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private long mSeekStartTime = 0;
     private long mSeekEndTime = 0;
+
 
     public IjkVideoView(Context context) {
         super(context);
@@ -357,27 +359,27 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     /**
-     * Sets video path.
+     * Sets media path.
      *
-     * @param path the path of the video.
+     * @param path the path of the media.
      */
     public void setVideoPath(String path) {
         setVideoURI(Uri.parse(path));
     }
 
     /**
-     * Sets video URI.
+     * Sets media URI.
      *
-     * @param uri the URI of the video.
+     * @param uri the URI of the media.
      */
     public void setVideoURI(Uri uri) {
         setVideoURI(uri, null);
     }
 
     /**
-     * Sets video URI using specific headers.
+     * Sets media URI using specific headers.
      *
-     * @param uri     the URI of the video.
+     * @param uri     the URI of the media.
      * @param headers the headers for the URI request.
      *                Note that the cross domain redirection is allowed by default, but that can be
      *                changed with key/value pairs through the headers parameter with
@@ -412,7 +414,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mTargetState = MediaPlayerParams.STATE_IDLE;
             _notifyMediaStatus();
             AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-            am.abandonAudioFocus(null);
+            if (am != null) {
+                am.abandonAudioFocus(null);
+            }
         }
     }
 
@@ -427,7 +431,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         release(false);
         // 声音控制
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+        if (am != null) {
+            am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        }
 
         try {
             mMediaPlayer = createPlayer(2);
@@ -543,7 +550,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 seekTo(seekToPosition);
             }
             if (mVideoWidth != 0 && mVideoHeight != 0) {
-                //Log.i("@@@@", "video size: " + mVideoWidth +"/"+ mVideoHeight);
+                //Log.i("@@@@", "media size: " + mVideoWidth +"/"+ mVideoHeight);
                 // REMOVED: getHolder().setFixedSize(mVideoWidth, mVideoHeight);
                 if (mRenderView != null) {
                     mRenderView.setVideoSize(mVideoWidth, mVideoHeight);
@@ -551,7 +558,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     if (!mRenderView.shouldWaitForResize() || mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
                         // We didn't actually change the size (it was already at the size
                         // we need), so we won't get a "surface changed" callback, so
-                        // start the video here instead of in the callback.
+                        // start the media here instead of in the callback.
                         if (mTargetState == MediaPlayerParams.STATE_PLAYING) {
                             start();
                             if (mMediaController != null) {
@@ -560,15 +567,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                         } else if (!isPlaying() &&
                                 (seekToPosition != 0 || getCurrentPosition() > 0)) {
                             if (mMediaController != null) {
-                                // Show the media controls when we're paused into a video and make 'em stick.
+                                // Show the media controls when we're paused into a media and make 'em stick.
                                 mMediaController.show(0);
                             }
                         }
                     }
                 }
             } else {
-                // We don't know the video size yet, but should start anyway.
-                // The video size might be reported to us later.
+                // We don't know the media size yet, but should start anyway.
+                // The media size might be reported to us later.
                 if (mTargetState == MediaPlayerParams.STATE_PLAYING) {
                     start();
                 }
@@ -578,7 +585,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     /**
      * add，返回解码器
-     * @return  解码器
+     *
+     * @return 解码器
      */
     public IMediaPlayer getMediaPlayer() {
         return mMediaPlayer;
@@ -695,7 +703,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 //                                        new DialogInterface.OnClickListener() {
 //                                            public void onClick(DialogInterface dialog, int whichButton) {
 //                                            /* If we get here, there is no onError listener, so
-//                                             * at least inform them that the video is over.
+//                                             * at least inform them that the media is over.
 //                                             */
 //                                                if (mOnCompletionListener != null) {
 //                                                    mOnCompletionListener.onCompletion(mMediaPlayer);
@@ -848,7 +856,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 mTargetState = MediaPlayerParams.STATE_IDLE;
             }
             AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-            am.abandonAudioFocus(null);
+            if (am != null) {
+                am.abandonAudioFocus(null);
+            }
         }
     }
 
@@ -969,7 +979,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     /**
      * add
      * 获取中断的进度
-     * @return  进度
+     *
+     * @return 进度
      */
     public int getInterruptPosition() {
         if (mMediaPlayer != null) {
@@ -1034,7 +1045,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public int getAudioSessionId() {
-        return 0;
+        return mMediaPlayer.getAudioSessionId();
     }
 
     // REMOVED: getAudioSessionId();
@@ -1076,11 +1087,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      * 初始化渲染器
      */
     private void initRenders() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setRender(RENDER_TEXTURE_VIEW);
-        } else {
-            setRender(RENDER_SURFACE_VIEW);
-        }
+        //setRender(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? RENDER_TEXTURE_VIEW : RENDER_SURFACE_VIEW);
+        setRender(RENDER_SURFACE_VIEW);
     }
 
     public IMediaPlayer createPlayer(int playerType) {
@@ -1102,7 +1110,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 IjkMediaPlayer ijkMediaPlayer = null;
                 if (mUri != null) {
                     ijkMediaPlayer = new IjkMediaPlayer();
-                    ijkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
+
+                    if (BuildConfig.DEBUG) {
+                        IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
+                    }
 
                     if (mIsUsingMediaCodec) {
                         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 1);

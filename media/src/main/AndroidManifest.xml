@@ -5,7 +5,7 @@
             android:theme="@style/VideoTheme"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape"
-            android:name=".view.VideoPlayerHolderActivity">
+            android:name=".view.MediaHolderActivity">
         </activity>
     </application>
 </manifest>

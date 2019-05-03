@@ -83,7 +83,7 @@ public final class WindowPlayer
         } else if (id == R.id.transform) {
             Context context = player.getContext().getApplicationContext();
             ARouter.getInstance()
-                    .build(PR.media.video)
+                    .build(PR.media.media)
                     .withFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     .withBoolean(context.getString(R.string.is_form_window), true)
                     .navigation(context);

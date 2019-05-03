@@ -20,8 +20,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 //需要实现浮窗
 //多进程,单进程是在是顶不住了
-@Route(path = PR.media.video)
-public class VideoPlayerHolderActivity
+@Route(path = PR.media.media)
+public class MediaHolderActivity
         extends AppCompatActivity {
 
     private WindowPlayer windowPlayer;

@@ -78,8 +78,7 @@ public class VideoPlayerFragment
                 player.init().setTitle(info.title)
                         .enableDanmaku()
                         .setVideoPath(info.uri)
-                        .alwaysFullScreen()
-                        .setMediaQuality(IjkPlayerView.MEDIA_QUALITY_HIGH);
+                        .alwaysFullScreen();
                 List<File> files = FileUtils.getAttachedSubtitles(info.uri);
                 if (!files.isEmpty()) {
                     File file = files.get(0);
@@ -100,8 +99,8 @@ public class VideoPlayerFragment
     private void transformToWindow() {
         playerContainer.removeView(player);
         player.setFloatClickListener(null);
-        VideoPlayerHolderActivity holderActivity
-                = (VideoPlayerHolderActivity) requireActivity();
+        MediaHolderActivity holderActivity
+                = (MediaHolderActivity) requireActivity();
         holderActivity.holdByWindow(player);
         player = null;
         holderActivity.onBackPressed();

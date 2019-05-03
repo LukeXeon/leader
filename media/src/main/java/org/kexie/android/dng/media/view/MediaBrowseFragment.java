@@ -98,7 +98,7 @@ public class MediaBrowseFragment
                         break;
                         case MediaType.TYPE_VIDEO: {
                             Postcard postcard = ARouter.getInstance()
-                                    .build(PR.media.video);
+                                    .build(PR.media.media);
                             Bundle bundle = postcard.getExtras();
                             bundle.putParcelable("media", info);
                             postcard.navigation(requireContext());
