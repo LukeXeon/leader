@@ -13,8 +13,6 @@ import android.media.audiofx.Visualizer;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.orhanobut.logger.Logger;
-
 import org.kexie.android.dng.media.R;
 
 import androidx.annotation.Nullable;
@@ -99,7 +97,6 @@ public class VisualizerView extends View {
                 public void onFftDataCapture(Visualizer visualizer,
                                              byte[] fft,
                                              int samplingRate) {
-                    Logger.d(fft);
                     updateVisualizer(fft);
                 }
             }, Visualizer.getMaxCaptureRate() / 2, false, true);
@@ -134,6 +131,12 @@ public class VisualizerView extends View {
     private static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        release();
     }
 
     @Override

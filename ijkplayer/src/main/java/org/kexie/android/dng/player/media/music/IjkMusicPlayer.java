@@ -14,10 +14,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+import tv.danmaku.ijk.media.player.MediaInfo;
 
 @MainThread
 public final class IjkMusicPlayer {
 
+    private IMediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener;
+    private IMediaPlayer.OnCompletionListener mOnCompletionListener;
+    private IMediaPlayer.OnPreparedListener mOnPreparedListener;
     private IMediaPlayer mMediaPlayer;
     private AudioManager mAudioManager;
     private MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
@@ -52,9 +56,14 @@ public final class IjkMusicPlayer {
             }
             mMediaPlayer.setOnPreparedListener(iMediaPlayer ->
             {
+                if (mOnPreparedListener != null) {
+                    mOnCompletionListener.onCompletion(iMediaPlayer);
+                }
                 iMediaPlayer.seekTo(mMark);
                 mSessionId.setValue(iMediaPlayer.getAudioSessionId());
             });
+            mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+            mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
             mMediaPlayer.prepareAsync();
         }
     }
@@ -127,11 +136,19 @@ public final class IjkMusicPlayer {
     }
 
     public long duration() {
-        return mMediaPlayer != null ? mMediaPlayer.getDuration() : -1;
+        return mMediaPlayer != null ? mMediaPlayer.getDuration() : 0;
+    }
+
+    public boolean playing() {
+        return mMediaPlayer != null && mMediaPlayer.isPlaying();
+    }
+
+    public MediaInfo getInfo() {
+        return mMediaPlayer == null ? null : mMediaPlayer.getMediaInfo();
     }
 
     public long position() {
-        return mMediaPlayer != null ? mMediaPlayer.getCurrentPosition() : -1;
+        return mMediaPlayer != null ? mMediaPlayer.getCurrentPosition() : 0;
     }
 
     public void volume(@FloatRange(from = 0, to = 1) float percent) {
@@ -141,4 +158,15 @@ public final class IjkMusicPlayer {
                 (int) (maxVolume * percent), 0);
     }
 
+    public void setOnSeekCompleteListener(IMediaPlayer.OnSeekCompleteListener listener) {
+        mOnSeekCompleteListener = listener;
+    }
+
+    public void setOnCompletionListener(IMediaPlayer.OnCompletionListener listener) {
+        mOnCompletionListener = listener;
+    }
+
+    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener onPreparedListener) {
+        this.mOnPreparedListener = onPreparedListener;
+    }
 }

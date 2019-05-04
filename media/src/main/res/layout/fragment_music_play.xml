@@ -86,14 +86,14 @@
                             android:layout_marginRight="30dp"
                             android:layout_marginLeft="30dp"
                             android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            app:firstPartColor="@color/deeppurplea100"
-                            app:secondPartColor="@color/deeppurplea200"
-                            app:thirdPartColor="@color/deeppurplea400"
-                            app:fourthPartColor="@color/deeppurplea700"
+                            android:layout_height="80dp"
+                            app:firstPartColor="@color/deeppurplea700"
+                            app:secondPartColor="@color/deeppurplea400"
+                            app:thirdPartColor="@color/deeppurplea200"
+                            app:fourthPartColor="@color/deeppurplea100"
                             app:lineWidth="10dp"
-                            app:spaceWidth="5dp"
-                            app:baseHeight="25dp"
+                            app:spaceWidth="1dp"
+                            app:baseHeight="10dp"
                             app:lineIsSingleColor="false"/>
                     </FrameLayout>
                 </LinearLayout>
@@ -129,9 +129,8 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_skip_previous_black_48dp" />
                     <de.hdodenhof.circleimageview.CircleImageView
-                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:padding="10dp"
-                        android:id="@+id/buttonPlayMusicActivity"
+                        android:id="@+id/play"
                         android:layout_gravity="center"
                         app:civ_border_color="@color/deeppurplea200"
                         app:civ_border_width="15dp"
@@ -148,9 +147,11 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_skip_next_black_48dp" />
                     <com.zml.libs.widget.MusicSeekBar
+                        android:id="@+id/music_seek"
                         android:layout_weight="1"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_gravity="center"
+                        android:layout_height="50dp" />
                     <ImageButton
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"

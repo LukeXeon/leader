@@ -43,6 +43,7 @@ dependencies {
     implementation project(':lyricview')
     implementation 'com.github.zhangliangming:SeekBar:v1.3'
     annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 
 //    implementation('com.dou361.ijkplayer:jjdxm-ijkplayer:+') {
 //        exclude group: 'com.dou361.ijkplayer-armv7a',
