@@ -106,7 +106,7 @@ public class MusicPlayerFragment extends Fragment {
 
         });
         //musicSeek
-        binding.musicSeek.setBackgroundPaintColor(getResources().getColor(R.color.deeppurplea100));
+        binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
         binding.musicSeek.setProgressColor(getResources().getColor(R.color.deeppurplea200));
         binding.musicSeek.setThumbColor(getResources().getColor(R.color.deeppurplea700));
         binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
