@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.SizeUtils;
+import com.gauravk.audiovisualizer.base.BaseVisualizer;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
@@ -15,6 +16,8 @@ import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
+
+import java.lang.reflect.Field;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,8 +67,23 @@ public class MusicPlayerFragment extends Fragment {
         adapter.setOnItemClickListener((adapter, view12, position) -> {
 
         });
-        player.setNewSource("/storage/emulated/0/DCIM/Camera/20190317_224234.mp4");
+        player.source("/storage/emulated/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3");
         player.start();
+        player.sessionId().observe(this, sessionId -> {
+            BaseVisualizer visualizerView = binding.waveVisualizer;
+            visualizerView.release();
+            try {
+                Field field = BaseVisualizer.class
+                        .getDeclaredField("mVisualizer");
+                field.setAccessible(true);
+                field.set(visualizerView, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (sessionId != 0) {
+                visualizerView.setAudioSessionId(sessionId);
+            }
+        });
     }
 
     @Override

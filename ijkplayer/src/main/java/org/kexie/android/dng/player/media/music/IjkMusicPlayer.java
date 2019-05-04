@@ -1,178 +1,145 @@
 package org.kexie.android.dng.player.media.music;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.audiofx.Visualizer;
-import android.net.Uri;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-
-import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.player.BuildConfig;
-import org.kexie.android.dng.player.media.vedio.IjkVideoView;
-import org.kexie.android.dng.player.media.vedio.MediaPlayerParams;
 
-import java.lang.ref.WeakReference;
+import java.io.IOException;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.MainThread;
 import androidx.core.math.MathUtils;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
+@MainThread
 public final class IjkMusicPlayer {
 
-    private WeakReference<Activity> mAttach;
+    private IMediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager;
+    private MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
+    private String mPath;
+    private long mMark = 0;
 
-    private IjkVideoView mAudioOnlyView;
-
-    private Visualizer mVisualizer;
-
-    @MainThread
-    public static IjkMusicPlayer newInstance(Activity attach) {
-        return new IjkMusicPlayer(attach);
+    public static IjkMusicPlayer newInstance(Context context) {
+        return new IjkMusicPlayer(context);
     }
 
-    @SuppressLint("RtlHardcoded")
-    private IjkMusicPlayer(Activity attach) {
-        this.mAttach = new WeakReference<>(attach);
+    private IjkMusicPlayer(Context context) {
+        //mContext = context;
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    private void openInternal() {
         IjkMediaPlayer.loadLibrariesOnce(null);
         if (BuildConfig.DEBUG) {
             IjkMediaPlayer.native_profileBegin("libijkplayer.so");
         }
-        mAudioOnlyView = new IjkVideoView(attach);
-        ViewGroup decorView = (ViewGroup) attach.getWindow().getDecorView();
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(1, 1);
-        params.leftMargin = -1;
-        params.topMargin = -1;
-        params.gravity = Gravity.TOP | Gravity.LEFT;
-        Logger.d(decorView.getClass().getSuperclass());
-        mAudioOnlyView.setLayoutParams(params);
-        decorView.addView(mAudioOnlyView);
-        mAudioOnlyView.setOnInfoListener((mediaPlayer, state, noUse) -> {
-            switch (state) {
-                case MediaPlayerParams.STATE_PREPARED: {
-                    if (mVisualizer != null) {
-                        mVisualizer.release();
-                    }
-                    mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
-                    int max = Visualizer.getMaxCaptureRate();
-                    mVisualizer.setDataCaptureListener(
-                            new Visualizer.OnDataCaptureListener() {
-                                @Override
-                                public void onWaveFormDataCapture(Visualizer visualizer,
-                                                                  byte[] waveform,
-                                                                  int samplingRate) {
-                                    Logger.d(waveform);
-                                }
-
-                                @Override
-                                public void onFftDataCapture(Visualizer visualizer,
-                                                             byte[] fft,
-                                                             int samplingRate) {
-
-                                }
-                            },
-                            max / 2,
-                            true,
-                            false);
-                    Logger.d(mediaPlayer.getAudioSessionId());
-                    mVisualizer.setEnabled(true);
-                    Logger.d(mVisualizer.getEnabled());
-                }
-                break;
-                case MediaPlayerParams.STATE_COMPLETED:
-                case MediaPlayerParams.STATE_PAUSED: {
-                    if (mVisualizer != null) {
-                        mVisualizer.release();
-                        mVisualizer = null;
-                    }
-                }
-                break;
+        mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if (mPath != null) {
+            if (BuildConfig.DEBUG) {
+                IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
             }
-            return false;
-        });
-    }
-
-    @MainThread
-    public void setNewSource(String file) {
-        mAudioOnlyView.setVideoURI(Uri.parse(file));
-        seekTo(0);
-    }
-
-    @MainThread
-    void setVolume(@FloatRange(from = 0f, to = 1f) float percent) {
-        percent = MathUtils.clamp(percent, 0, 1f);
-        Activity activity;
-        AudioManager audioManager;
-        if ((activity = mAttach.get()) != null && (audioManager = (AudioManager) activity
-                .getSystemService(Context.AUDIO_SERVICE)) != null) {
-            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                    (int) (maxVolume * percent), 0);
-        } else {
-            destroy();
+            mMediaPlayer = new IjkMediaPlayer();
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                mMediaPlayer.setDataSource(mPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mMediaPlayer.setOnPreparedListener(iMediaPlayer ->
+                    mSessionId.setValue(iMediaPlayer.getAudioSessionId()));
+            mMediaPlayer.prepareAsync();
         }
     }
 
-    @MainThread
-    public void seekTo(int ms) {
-        if (mAttach != null) {
-            mAudioOnlyView.seekTo(ms);
-        }
-    }
-
-    @MainThread
-    public void pause() {
-        if (mAttach != null) {
-            mAudioOnlyView.pause();
-        }
-    }
-
-    @MainThread
-    public int position() {
-        return mAttach == null ? -1 : mAudioOnlyView.getCurrentPosition();
-    }
-
-    @MainThread
-    public int duration() {
-        return mAttach == null ? -1 : mAudioOnlyView.getDuration();
-    }
-
-    @MainThread
-    public void destroy() {
-        if (mAttach != null) {
-            mAudioOnlyView.setOnInfoListener(null);
-            mAudioOnlyView.setOnInfoListener(null);
-            mAudioOnlyView.destroy();
+    private void releaseInternal() {
+        if (mMediaPlayer != null) {
             if (BuildConfig.DEBUG) {
                 IjkMediaPlayer.native_profileEnd();
             }
-            mAttach = null;
-            mAudioOnlyView = null;
-        }
-
-    }
-
-    @MainThread
-    public void resume() {
-        if (mAttach != null) {
-            mAudioOnlyView.resume();
+            mAudioManager.abandonAudioFocus(null);
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 
-    @MainThread
+    public LiveData<Integer> sessionId() {
+        return mSessionId;
+    }
+
+    public void source(String path) {
+        mPath = path;
+        if (mMediaPlayer != null) {
+            releaseInternal();
+        }
+        openInternal();
+        mSessionId.setValue(mMediaPlayer.getAudioSessionId());
+    }
+
     public void start() {
-        if (mAttach != null && mAttach.get() != null) {
-            if (mAudioOnlyView.isPlaying()) {
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.pause();
                 seekTo(0);
-                pause();
+                mMediaPlayer.start();
             } else {
-                mAudioOnlyView.start();
+                mMediaPlayer.start();
             }
         }
     }
+
+    public void pause() {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+            mMark = mMediaPlayer.getCurrentPosition();
+            releaseInternal();
+            mSessionId.setValue(0);
+        } else {
+            mMark = 0;
+        }
+    }
+
+    public void seekTo(long ms) {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.seekTo(ms);
+        } else {
+            mMark = Math.max(0, ms);
+        }
+    }
+
+    public void resume() {
+        if (mMediaPlayer == null) {
+            openInternal();
+            mSessionId.setValue(mMediaPlayer.getAudioSessionId());
+        }
+        if (mMark > 0) {
+            seekTo(mMark);
+        }
+    }
+
+    public void destroy() {
+        releaseInternal();
+        mSessionId.setValue(0);
+    }
+
+    public long duration() {
+        return mMediaPlayer != null ? mMediaPlayer.getDuration() : -1;
+    }
+
+    public long position() {
+        return mMediaPlayer != null ? mMediaPlayer.getCurrentPosition() : -1;
+    }
+
+    public void volume(@FloatRange(from = 0, to = 1) float percent) {
+        percent = MathUtils.clamp(percent, 0, 1f);
+        int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                (int) (maxVolume * percent), 0);
+    }
+
 }

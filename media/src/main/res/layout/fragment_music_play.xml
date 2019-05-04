@@ -80,13 +80,18 @@
                             android:id="@+id/lrc_view"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
-                        <org.kexie.android.dng.media.widget.WaveformView
+                        <com.gauravk.audiovisualizer.visualizer.WaveVisualizer
+                            android:layout_gravity="bottom"
                             android:layout_marginRight="30dp"
                             android:layout_marginLeft="30dp"
-                            android:layout_marginBottom="-20dp"
-                            android:layout_gravity="bottom"
+                            xmlns:custom="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/waveVisualizer"
                             android:layout_width="match_parent"
-                            android:layout_height="80dp" />
+                            android:layout_height="120dp"
+                            custom:avDensity="0.8"
+                            custom:avType="fill"
+                            custom:avColor="@color/deeppurplea200"
+                            custom:avSpeed="fast"/>
                     </FrameLayout>
                 </LinearLayout>
                 <androidx.appcompat.widget.Toolbar

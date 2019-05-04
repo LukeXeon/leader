@@ -34,6 +34,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 
+import org.kexie.android.dng.player.BuildConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -41,7 +43,6 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
-import tv.danmaku.ijk.media.player.BuildConfig;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
