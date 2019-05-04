@@ -80,18 +80,21 @@
                             android:id="@+id/lrc_view"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
-                        <com.gauravk.audiovisualizer.visualizer.WaveVisualizer
-                            android:layout_gravity="bottom"
+                        <org.kexie.android.dng.media.widget.VisualizerView
+                            android:id="@+id/visualizer"
+                            android:layout_gravity="bottom|center"
                             android:layout_marginRight="30dp"
                             android:layout_marginLeft="30dp"
-                            xmlns:custom="http://schemas.android.com/apk/res-auto"
-                            android:id="@+id/waveVisualizer"
                             android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            custom:avDensity="0.8"
-                            custom:avType="fill"
-                            custom:avColor="@color/deeppurplea200"
-                            custom:avSpeed="fast"/>
+                            android:layout_height="100dp"
+                            app:firstPartColor="@color/deeppurplea100"
+                            app:secondPartColor="@color/deeppurplea200"
+                            app:thirdPartColor="@color/deeppurplea400"
+                            app:fourthPartColor="@color/deeppurplea700"
+                            app:lineWidth="10dp"
+                            app:spaceWidth="5dp"
+                            app:baseHeight="25dp"
+                            app:lineIsSingleColor="false"/>
                     </FrameLayout>
                 </LinearLayout>
                 <androidx.appcompat.widget.Toolbar

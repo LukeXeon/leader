@@ -51,7 +51,10 @@ public final class IjkMusicPlayer {
                 e.printStackTrace();
             }
             mMediaPlayer.setOnPreparedListener(iMediaPlayer ->
-                    mSessionId.setValue(iMediaPlayer.getAudioSessionId()));
+            {
+                iMediaPlayer.seekTo(mMark);
+                mSessionId.setValue(iMediaPlayer.getAudioSessionId());
+            });
             mMediaPlayer.prepareAsync();
         }
     }
@@ -115,10 +118,6 @@ public final class IjkMusicPlayer {
     public void resume() {
         if (mMediaPlayer == null) {
             openInternal();
-            mSessionId.setValue(mMediaPlayer.getAudioSessionId());
-        }
-        if (mMark > 0) {
-            seekTo(mMark);
         }
     }
 
