@@ -192,7 +192,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

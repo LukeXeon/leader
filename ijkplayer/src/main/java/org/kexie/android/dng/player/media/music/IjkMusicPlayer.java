@@ -25,8 +25,8 @@ public final class IjkMusicPlayer {
     private final PublishSubject<Boolean> OnPlayCompleted = PublishSubject.create();
     private final PublishSubject<Boolean> mOnSourcePrepared = PublishSubject.create();
     private final MutableLiveData<byte[]> mFft = new MutableLiveData<>();
-    private final MutableLiveData<Long> mDuration = new MutableLiveData<>(0L);
-    private final MutableLiveData<Long> mPosition = new MutableLiveData<>(0L);
+    private final MutableLiveData<Long> mDuration = new MutableLiveData<>();
+    private final MutableLiveData<Long> mPosition = new MutableLiveData<>();
     private final MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
     private final IPlayerCallback.Stub mCallback = new IPlayerCallback.Stub() {
         @Override

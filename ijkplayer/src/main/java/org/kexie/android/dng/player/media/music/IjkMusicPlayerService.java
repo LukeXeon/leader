@@ -104,7 +104,7 @@ public final class IjkMusicPlayerService extends Service {
     private final Runnable mPositionUpdater = new Runnable() {
         @Override
         public void run() {
-            beginInvoke(callback -> callback.onNewPosition(mMediaPlayer != null
+            beginInvoke(callback -> callback.onNewPosition(mMediaPlayer == null
                     ? 0 : mMediaPlayer.getCurrentPosition()));
             mMainThread.postDelayed(this, mInterval);
         }
@@ -113,7 +113,7 @@ public final class IjkMusicPlayerService extends Service {
     private AudioManager mAudioManager;
     private String mPath;
     private long mMarker = 0;
-    private long mInterval = 500;
+    private long mInterval = MIN_INTERVAL;
     private IMediaPlayer mMediaPlayer;
     private Visualizer mVisualizer;
 

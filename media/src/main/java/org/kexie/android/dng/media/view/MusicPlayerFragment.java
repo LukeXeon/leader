@@ -60,7 +60,6 @@ public class MusicPlayerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         //lrcView
         binding.lrcView.setFontSize(SizeUtils.sp2px(25));
-
         binding.lrcView.setPaintColor(new int[]{
                 getResources().getColor(R.color.deeppurplea100),
                 getResources().getColor(R.color.deeppurplea100)
@@ -70,38 +69,6 @@ public class MusicPlayerFragment extends Fragment {
                 getResources().getColor(R.color.deeppurplea700)
         }, false);
         binding.rvMusicList.setAdapter(adapter);
-        //viewModel
-        musicPlayer.getPosition().observe(this,
-                position -> {
-                    int duration = (int) safeUnBox(musicPlayer.getDuration().getValue());
-                    binding.musicSeek.setEnabled(true);
-                    if (binding.musicSeek.getMax() == 0) {
-                        binding.musicSeek.setMax(duration);
-                    }
-                    binding.musicSeek.setProgress((int) safeUnBox(position));
-                });
-        musicPlayer.getFft().observe(this,
-                bytes -> binding.visualizer.updateVisualizer(bytes));
-//        viewModel.onNewReader.as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-//                .subscribe(lyricsReader -> {
-//                    ManyLyricsView manyLyricsView = binding.lrcView;
-//                    if (lyricsReader.isPresent()) {
-//                        manyLyricsView.setLyricsReader(lyricsReader.get());
-//                        int state = manyLyricsView.getLrcStatus();
-//                        if (viewModel.playing() && state == ManyLyricsView.LRCSTATUS_LRC) {
-//                            Integer integer;
-//                            binding.lrcView.play((integer = viewModel
-//                                    .position
-//                                    .getValue()) == null ? 0 : integer);
-//                        }
-//                    } else {
-//                        manyLyricsView.setLyricsReader(null);
-//                        manyLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_ERROR);
-//                    }
-//                });
-        adapter.setOnItemClickListener((adapter, view12, position) -> {
-
-        });
         //musicSeek
         binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
         binding.musicSeek.setProgressColor(getResources().getColor(R.color.deeppurplea200));
@@ -131,9 +98,17 @@ public class MusicPlayerFragment extends Fragment {
         binding.play.setOnClickListener(v -> {
             musicPlayer.setNewSource("/storage/emulated/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3");
         });
-//        musicPlayer.onSourcePrepared()
-//                .as(autoDisposable(from(this, Event.ON_DESTROY)))
-//                .subscribe(aBoolean -> musicPlayer.start());
+        //musicPlayer
+        musicPlayer.getFft().observe(this,
+                bytes -> binding.visualizer.updateVisualizer(bytes));
+        musicPlayer.getDuration().observe(this,
+                duration -> binding.musicSeek.setMax((int) safeUnBox(duration)));
+        musicPlayer.getPosition().observe(this,
+                position -> binding.musicSeek.setProgress((int) safeUnBox(position)));
+        binding.musicSeek.setEnabled(true);
+        adapter.setOnItemClickListener((adapter, view12, position) -> {
+
+        });
 
         binding.lrcView.setOnLrcClickListener(progress -> {
             Logger.d(progress);
