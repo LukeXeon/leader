@@ -9,7 +9,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader;
-import android.media.audiofx.Visualizer;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -23,7 +22,6 @@ import androidx.annotation.Nullable;
  */
 public class VisualizerView extends View {
 
-    private Visualizer mVisualizer;
     private int mColor;// 主色调
     private int mLineWidth;// 频谱线条宽度
     private int mSpeceNum;// 空隙个数(不设置自己计算)
@@ -80,39 +78,7 @@ public class VisualizerView extends View {
         }
     }
 
-    public void setAudioSessionId(int id) {
-        release();
-        if (id != 0) {
-            mVisualizer = new Visualizer(id);
-            mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-            mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
-                @Override
-                public void onWaveFormDataCapture(Visualizer visualizer,
-                                                  byte[] waveform,
-                                                  int samplingRate) {
-
-                }
-
-                @Override
-                public void onFftDataCapture(Visualizer visualizer,
-                                             byte[] fft,
-                                             int samplingRate) {
-                    updateVisualizer(fft);
-                }
-            }, Visualizer.getMaxCaptureRate() / 2, false, true);
-            mVisualizer.setEnabled(true);
-        }
-    }
-
-    public void release() {
-        if (mVisualizer != null) {
-            mVisualizer.setEnabled(false);
-            mVisualizer.release();
-            mVisualizer = null;
-        }
-    }
-
-    private void updateVisualizer(byte[] fft) {
+    public void updateVisualizer(byte[] fft) {
         byte[] model = new byte[fft.length / 2 + 1];
         model[0] = (byte) Math.abs(fft[0]);
         if (mSpeceNum == 0) {
@@ -131,12 +97,6 @@ public class VisualizerView extends View {
     private static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        release();
     }
 
     @Override

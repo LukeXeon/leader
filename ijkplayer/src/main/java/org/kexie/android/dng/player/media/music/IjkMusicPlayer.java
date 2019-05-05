@@ -1,172 +1,233 @@
 package org.kexie.android.dng.player.media.music;
 
+import android.content.ComponentName;
 import android.content.Context;
-import android.media.AudioManager;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.text.TextUtils;
 
-import org.kexie.android.dng.player.BuildConfig;
-
-import java.io.IOException;
-
-import androidx.annotation.FloatRange;
 import androidx.annotation.MainThread;
-import androidx.core.math.MathUtils;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
-import tv.danmaku.ijk.media.player.MediaInfo;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.PublishSubject;
 
 @MainThread
 public final class IjkMusicPlayer {
-
-    private IMediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener;
-    private IMediaPlayer.OnCompletionListener mOnCompletionListener;
-    private IMediaPlayer.OnPreparedListener mOnPreparedListener;
-    private IMediaPlayer mMediaPlayer;
-    private AudioManager mAudioManager;
-    private MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
-    private String mPath;
-    private long mMark = 0;
-
-    public static IjkMusicPlayer newInstance(Context context) {
-        return new IjkMusicPlayer(context);
-    }
-
-    private IjkMusicPlayer(Context context) {
-        //mContext = context;
-        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-    }
-
-    private void openInternal() {
-        IjkMediaPlayer.loadLibrariesOnce(null);
-        if (BuildConfig.DEBUG) {
-            IjkMediaPlayer.native_profileBegin("libijkplayer.so");
+    private final PublishSubject<Boolean> OnPlayCompleted = PublishSubject.create();
+    private final PublishSubject<Boolean> mOnSourcePrepared = PublishSubject.create();
+    private final MutableLiveData<byte[]> mFft = new MutableLiveData<>();
+    private final MutableLiveData<Long> mDuration = new MutableLiveData<>(0L);
+    private final MutableLiveData<Long> mPosition = new MutableLiveData<>(0L);
+    private final MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
+    private final IPlayerCallback.Stub mCallback = new IPlayerCallback.Stub() {
+        @Override
+        public void onNewFft(byte[] fft) {
+            mFft.postValue(fft);
         }
-        mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if (mPath != null) {
-            if (BuildConfig.DEBUG) {
-                IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
-            }
-            mMediaPlayer = new IjkMediaPlayer();
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        @Override
+        public void onPrepared(int audioSessionId, long duration) {
+            mSessionId.postValue(audioSessionId);
+            mDuration.postValue(duration);
+            mOnSourcePrepared.onNext(Boolean.TRUE);
+        }
+
+        @Override
+        public void onPlayCompleted() {
+            OnPlayCompleted.onNext(Boolean.TRUE);
+        }
+
+        @Override
+        public void onNewPosition(long ms) {
+            mPosition.postValue(ms);
+        }
+    };
+    private final LifecycleObserver mLifecycleCallback = new LifecycleEventObserver() {
+        @Override
+        public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
             try {
-                mMediaPlayer.setDataSource(mPath);
-            } catch (IOException e) {
+                switch (event) {
+                    case ON_RESUME: {
+                        mService.resume(true);
+                    }
+                    break;
+                    case ON_PAUSE: {
+                        mService.pause(true);
+                    }
+                    break;
+                    case ON_DESTROY: {
+                        mService.destroy();
+                    }
+                    break;
+                }
+            } catch (RemoteException e) {
                 e.printStackTrace();
             }
-            mMediaPlayer.setOnPreparedListener(iMediaPlayer ->
-            {
-                if (mOnPreparedListener != null) {
-                    mOnCompletionListener.onCompletion(iMediaPlayer);
+        }
+    };
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = IMusicPlayer.Stub.asInterface(service);
+            try {
+                mService.register(mCallback);
+                if (!TextUtils.isEmpty(mPendingSource)) {
+                    mService.setNewSource(mPendingSource);
                 }
-                iMediaPlayer.seekTo(mMark);
-                mSessionId.setValue(iMediaPlayer.getAudioSessionId());
-            });
-            mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
-            mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
-            mMediaPlayer.prepareAsync();
-        }
-    }
-
-    private void releaseInternal() {
-        if (mMediaPlayer != null) {
-            if (BuildConfig.DEBUG) {
-                IjkMediaPlayer.native_profileEnd();
+                if (mHolder != null) {
+                    mHolder.addObserver(mLifecycleCallback);
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-            mAudioManager.abandonAudioFocus(null);
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
         }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            if (mHolder != null) {
+                mHolder.removeObserver(mLifecycleCallback);
+            }
+            mService = null;
+            if (!mIsFinish) {
+                Intent intent = new Intent(mAppContext, IjkMusicPlayerService.class);
+                mAppContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            }
+        }
+    };
+
+    private boolean mIsFinish = false;
+    private String mPendingSource;
+    private Context mAppContext;
+    private Lifecycle mHolder;
+    private IMusicPlayer mService;
+
+    public static IjkMusicPlayer newInstance(Context context, LifecycleOwner owner) {
+        return new IjkMusicPlayer(context.getApplicationContext(), owner.getLifecycle());
     }
 
-    public LiveData<Integer> sessionId() {
+    private IjkMusicPlayer(Context context, Lifecycle lifecycle) {
+        this.mAppContext = context;
+        this.mHolder = lifecycle;
+        Intent intent = new Intent(mAppContext, IjkMusicPlayerService.class);
+        mAppContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public Observable<Boolean> onPlayCompleted() {
+        return OnPlayCompleted.observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Boolean> onSourcePrepared() {
+        return mOnSourcePrepared.observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public LiveData<byte[]> getFft() {
+        return mFft;
+    }
+
+    public LiveData<Long> getPosition() {
+        return mPosition;
+    }
+
+    public LiveData<Integer> getAudioSessionId() {
         return mSessionId;
     }
 
-    public void source(String path) {
-        mPath = path;
-        if (mMediaPlayer != null) {
-            releaseInternal();
-        }
-        openInternal();
-        mSessionId.setValue(mMediaPlayer.getAudioSessionId());
+    public LiveData<Long> getDuration() {
+        return mDuration;
     }
 
-    public void start() {
-        if (mMediaPlayer != null) {
-            if (mMediaPlayer.isPlaying()) {
-                mMediaPlayer.pause();
-                seekTo(0);
-                mMediaPlayer.start();
-            } else {
-                mMediaPlayer.start();
+    public void seekTo(long ms) {
+        if (mService != null) {
+            try {
+                mService.seekTo(ms);
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
         }
     }
 
     public void pause() {
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
-            mMark = mMediaPlayer.getCurrentPosition();
-            releaseInternal();
-            mSessionId.setValue(0);
-        } else {
-            mMark = 0;
+        if (mService != null) {
+            try {
+                mService.pause(false);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void seekTo(long ms) {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.seekTo(ms);
-        } else {
-            mMark = Math.max(0, ms);
+    public void start() {
+        if (mService != null) {
+            try {
+                mService.resume(false);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void resume() {
-        if (mMediaPlayer == null) {
-            openInternal();
+    public void setInterval(long ms) {
+        if (mService != null) {
+            try {
+                mService.setInterval(ms);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setVolume(float value) {
+        if (mService != null) {
+            try {
+                mService.setVolume(value);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setNewSource(String path) {
+        if (mService != null) {
+            try {
+                mService.setNewSource(path);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            mPendingSource = path;
         }
     }
 
     public void destroy() {
-        releaseInternal();
-        mSessionId.setValue(0);
+        if (mService != null) {
+            try {
+                mIsFinish = true;
+                mService.destroy();
+                mAppContext.unbindService(mConnection);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public long duration() {
-        return mMediaPlayer != null ? mMediaPlayer.getDuration() : 0;
-    }
+    public boolean isPlaying() {
+        if (mService != null) {
+            try {
+                return mService.isPlaying();
+            } catch (RemoteException e) {
+                e.printStackTrace();
 
-    public boolean playing() {
-        return mMediaPlayer != null && mMediaPlayer.isPlaying();
-    }
-
-    public MediaInfo getInfo() {
-        return mMediaPlayer == null ? null : mMediaPlayer.getMediaInfo();
-    }
-
-    public long position() {
-        return mMediaPlayer != null ? mMediaPlayer.getCurrentPosition() : 0;
-    }
-
-    public void volume(@FloatRange(from = 0, to = 1) float percent) {
-        percent = MathUtils.clamp(percent, 0, 1f);
-        int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                (int) (maxVolume * percent), 0);
-    }
-
-    public void setOnSeekCompleteListener(IMediaPlayer.OnSeekCompleteListener listener) {
-        mOnSeekCompleteListener = listener;
-    }
-
-    public void setOnCompletionListener(IMediaPlayer.OnCompletionListener listener) {
-        mOnCompletionListener = listener;
-    }
-
-    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener onPreparedListener) {
-        this.mOnPreparedListener = onPreparedListener;
+            }
+        }
+        return false;
     }
 }
