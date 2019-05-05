@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
@@ -23,6 +24,8 @@ import io.reactivex.subjects.PublishSubject;
 @MainThread
 @SuppressWarnings("WeakerAccess")
 public final class IjkMusicPlayer {
+    private static final Looper MAIN_LOOPER = Looper.getMainLooper();
+
     private final PublishSubject<Boolean> OnPlayCompleted = PublishSubject.create();
     private final PublishSubject<Boolean> mOnSourcePrepared = PublishSubject.create();
     private final MutableLiveData<byte[]> mFft = new MutableLiveData<>();
@@ -122,31 +125,44 @@ public final class IjkMusicPlayer {
         mAppContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    private void assetInternal() {
+        if (!MAIN_LOOPER.equals(Looper.myLooper()) && !mIsFinish) {
+            throw new IllegalStateException();
+        }
+    }
+
     public Observable<Boolean> onPlayCompleted() {
+        assetInternal();
         return OnPlayCompleted.observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<Boolean> onSourcePrepared() {
+        assetInternal();
         return mOnSourcePrepared.observeOn(AndroidSchedulers.mainThread());
     }
 
     public LiveData<byte[]> getFft() {
+        assetInternal();
         return mFft;
     }
 
     public LiveData<Long> getPosition() {
+        assetInternal();
         return mPosition;
     }
 
     public LiveData<Integer> getAudioSessionId() {
+        assetInternal();
         return mSessionId;
     }
 
     public LiveData<Long> getDuration() {
+        assetInternal();
         return mDuration;
     }
 
     public void seekTo(long ms) {
+        assetInternal();
         if (mService != null) {
             try {
                 mService.seekTo(ms);
@@ -157,6 +173,7 @@ public final class IjkMusicPlayer {
     }
 
     public void pause() {
+        assetInternal();
         if (mService != null) {
             try {
                 mService.pause(false);
@@ -167,6 +184,7 @@ public final class IjkMusicPlayer {
     }
 
     public void start() {
+        assetInternal();
         if (mService != null) {
             try {
                 mService.resume(false);
@@ -177,6 +195,7 @@ public final class IjkMusicPlayer {
     }
 
     public void setInterval(long ms) {
+        assetInternal();
         if (mService != null) {
             try {
                 mService.setInterval(ms);
@@ -187,6 +206,7 @@ public final class IjkMusicPlayer {
     }
 
     public void setNewSource(String path) {
+        assetInternal();
         if (mService != null) {
             try {
                 mService.setNewSource(path);
@@ -199,6 +219,7 @@ public final class IjkMusicPlayer {
     }
 
     public void destroy() {
+        assetInternal();
         mPendingSource = null;
         if (mService != null) {
             try {
@@ -212,6 +233,7 @@ public final class IjkMusicPlayer {
     }
 
     public boolean isPlaying() {
+        assetInternal();
         if (mService != null) {
             try {
                 return mService.isPlaying();
