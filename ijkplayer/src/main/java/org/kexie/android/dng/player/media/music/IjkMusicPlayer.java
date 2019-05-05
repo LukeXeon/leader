@@ -114,8 +114,8 @@ public final class IjkMusicPlayer {
     private Lifecycle mHolder;
     private IMusicPlayer mService;
 
-    public static IjkMusicPlayer newInstance(Context context, LifecycleOwner owner) {
-        return new IjkMusicPlayer(context.getApplicationContext(), owner.getLifecycle());
+    public static IjkMusicPlayer newInstance(Context context, Lifecycle lifecycle) {
+        return new IjkMusicPlayer(context.getApplicationContext(), lifecycle);
     }
 
     private IjkMusicPlayer(Context context, Lifecycle lifecycle) {

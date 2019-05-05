@@ -12,43 +12,40 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.SizeUtils;
 import com.orhanobut.logger.Logger;
 import com.zlm.hp.lyrics.utils.TimeUtils;
+import com.zlm.hp.lyrics.widget.ManyLyricsView;
 import com.zml.libs.widget.MusicSeekBar;
 
 import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
-import org.kexie.android.dng.media.viewmodel.MusicBrowseViewModel;
-import org.kexie.android.dng.media.viewmodel.entity.Media;
-import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
+import org.kexie.android.dng.media.viewmodel.LifecycleViewModelFactory;
+import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.math.MathUtils;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = PR.media.music)
 public class MusicPlayerFragment extends Fragment {
 
     private FragmentMusicPlayBinding binding;
-    private GenericQuickAdapter<Media> adapter;
-    private MusicBrowseViewModel viewModel;
-    private IjkMusicPlayer musicPlayer;
-    private AudioManager audioManager;
-    private MutableLiveData<Integer> volume = new MutableLiveData<>();
+    private MusicPlayerViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new GenericQuickAdapter<>(R.layout.item_music, BR.mediaInfo);
-        viewModel = ViewModelProviders.of(this).get(MusicBrowseViewModel.class);
-        musicPlayer = IjkMusicPlayer.newInstance(requireContext(), this);
-        audioManager = (AudioManager) requireContext().getSystemService(Context.AUDIO_SERVICE);
+        LifecycleViewModelFactory factory = new LifecycleViewModelFactory(
+                requireActivity().getApplication(),
+                getLifecycle()
+        );
+        viewModel = ViewModelProviders.of(this, factory)
+                .get(MusicPlayerViewModel.class);
     }
 
     @Nullable
@@ -61,7 +58,7 @@ public class MusicPlayerFragment extends Fragment {
                 R.layout.fragment_music_play,
                 container,
                 false);
-        adapter.setEmptyView(inflater.inflate(R.layout.view_empty2, container, false));
+        viewModel.adapter.setEmptyView(inflater.inflate(R.layout.view_empty2, container, false));
         return binding.getRoot();
     }
 
@@ -78,7 +75,7 @@ public class MusicPlayerFragment extends Fragment {
                 getResources().getColor(R.color.deeppurplea700),
                 getResources().getColor(R.color.deeppurplea700)
         }, false);
-        binding.rvMusicList.setAdapter(adapter);
+        binding.rvMusicList.setAdapter(viewModel.adapter);
         //musicSeek
         binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
         binding.musicSeek.setProgressColor(getResources().getColor(R.color.deeppurplea200));
@@ -101,28 +98,43 @@ public class MusicPlayerFragment extends Fragment {
 
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
-                musicPlayer.seekTo(musicSeekBar.getProgress());
+                viewModel.musicPlayer.seekTo(musicSeekBar.getProgress());
                 binding.lrcView.seekto(musicSeekBar.getProgress());
             }
         });
-        binding.play.setOnClickListener(v -> {
-            musicPlayer.setNewSource("/storage/emulated/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3");
-        });
-
-
+        binding.play.setOnClickListener(v -> viewModel.playNewTask("/storage/emulated" +
+                "/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3")
+                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(readerOptional -> {
+                    if (readerOptional.isPresent()) {
+                        binding.lrcView.setLyricsReader(readerOptional.get());
+                        binding.lrcView.play((int) safeUnBox(viewModel.musicPlayer.getPosition().getValue()));
+                    }
+                    else {
+                        binding.lrcView.setLrcStatus(ManyLyricsView.LRCSTATUS_NOLRC_DEFTEXT);
+                    }
+                }));
         //musicPlayer
-        musicPlayer.getFft().observe(this,
+        viewModel.musicPlayer.getFft().observe(this,
                 bytes -> binding.visualizer.updateVisualizer(bytes));
-        musicPlayer.getDuration().observe(this,
+        viewModel.musicPlayer.getDuration().observe(this,
                 duration -> binding.musicSeek.setMax((int) safeUnBox(duration)));
-        musicPlayer.getPosition().observe(this,
+        viewModel.musicPlayer.getPosition().observe(this,
                 position -> binding.musicSeek.setProgress((int) safeUnBox(position)));
         binding.musicSeek.setEnabled(true);
-        adapter.setOnItemClickListener((adapter, view12, position) -> {
+        viewModel.adapter.setOnItemClickListener((adapter, view12, position) -> {
 
         });
-        binding.setVolume(volume);
-        {
+        binding.lrcView.setOnLrcClickListener(progress -> {
+            Logger.d(progress);
+            binding.musicSeek.setProgress(progress);
+            viewModel.musicPlayer.seekTo(progress);
+        });
+        binding.setVolume(viewModel.volume);
+
+        AudioManager audioManager = (AudioManager) requireContext()
+                .getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null) {
             float max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             float current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             int value = Math.min(100, Math.round(current / max * 100));
@@ -132,19 +144,6 @@ public class MusicPlayerFragment extends Fragment {
                 binding.volume.setProgress(value);
             }
         }
-        Transformations.map(volume, input -> (float) input / 100f)
-                .observe(this, value -> {
-                    float percent = MathUtils.clamp(value, 0, 1f);
-                    int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                            (int) (maxVolume * percent), 0);
-                });
-
-        binding.lrcView.setOnLrcClickListener(progress -> {
-            Logger.d(progress);
-            binding.musicSeek.setProgress(progress);
-            musicPlayer.seekTo(progress);
-        });
     }
 
     private static long safeUnBox(Long value) {
