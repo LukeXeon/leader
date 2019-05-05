@@ -1,5 +1,8 @@
 package org.kexie.android.dng.media.view;
 
+import android.content.Context;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +25,11 @@ import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.math.MathUtils;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
 
 @Route(path = PR.media.music)
@@ -33,6 +39,8 @@ public class MusicPlayerFragment extends Fragment {
     private GenericQuickAdapter<Media> adapter;
     private MusicBrowseViewModel viewModel;
     private IjkMusicPlayer musicPlayer;
+    private AudioManager audioManager;
+    private MutableLiveData<Integer> volume = new MutableLiveData<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +48,7 @@ public class MusicPlayerFragment extends Fragment {
         adapter = new GenericQuickAdapter<>(R.layout.item_music, BR.mediaInfo);
         viewModel = ViewModelProviders.of(this).get(MusicBrowseViewModel.class);
         musicPlayer = IjkMusicPlayer.newInstance(requireContext(), this);
+        audioManager = (AudioManager) requireContext().getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Nullable
@@ -57,7 +66,8 @@ public class MusicPlayerFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
         //lrcView
         binding.lrcView.setFontSize(SizeUtils.sp2px(25));
         binding.lrcView.setPaintColor(new int[]{
@@ -98,6 +108,8 @@ public class MusicPlayerFragment extends Fragment {
         binding.play.setOnClickListener(v -> {
             musicPlayer.setNewSource("/storage/emulated/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3");
         });
+
+
         //musicPlayer
         musicPlayer.getFft().observe(this,
                 bytes -> binding.visualizer.updateVisualizer(bytes));
@@ -109,6 +121,24 @@ public class MusicPlayerFragment extends Fragment {
         adapter.setOnItemClickListener((adapter, view12, position) -> {
 
         });
+        binding.setVolume(volume);
+        {
+            float max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            float current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int value = Math.min(100, Math.round(current / max * 100));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                binding.volume.setProgress(value, true);
+            } else {
+                binding.volume.setProgress(value);
+            }
+        }
+        Transformations.map(volume, input -> (float) input / 100f)
+                .observe(this, value -> {
+                    float percent = MathUtils.clamp(value, 0, 1f);
+                    int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            (int) (maxVolume * percent), 0);
+                });
 
         binding.lrcView.setOnLrcClickListener(progress -> {
             Logger.d(progress);

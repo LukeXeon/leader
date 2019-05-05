@@ -11,7 +11,6 @@ interface IMusicPlayer {
     void resume(boolean fromComponent);
     void register(IPlayerCallback callback);
     void setInterval(long ms);
-    void setVolume(float value);
     void setNewSource(String path);
     void destroy();
     boolean isPlaying();

@@ -21,6 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 
 @MainThread
+@SuppressWarnings("WeakerAccess")
 public final class IjkMusicPlayer {
     private final PublishSubject<Boolean> OnPlayCompleted = PublishSubject.create();
     private final PublishSubject<Boolean> mOnSourcePrepared = PublishSubject.create();
@@ -65,7 +66,7 @@ public final class IjkMusicPlayer {
                     }
                     break;
                     case ON_DESTROY: {
-                        mService.destroy();
+                        destroy();
                     }
                     break;
                 }
@@ -185,16 +186,6 @@ public final class IjkMusicPlayer {
         }
     }
 
-    public void setVolume(float value) {
-        if (mService != null) {
-            try {
-                mService.setVolume(value);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void setNewSource(String path) {
         if (mService != null) {
             try {
@@ -208,6 +199,7 @@ public final class IjkMusicPlayer {
     }
 
     public void destroy() {
+        mPendingSource = null;
         if (mService != null) {
             try {
                 mIsFinish = true;
@@ -225,7 +217,6 @@ public final class IjkMusicPlayer {
                 return mService.isPlaying();
             } catch (RemoteException e) {
                 e.printStackTrace();
-
             }
         }
         return false;

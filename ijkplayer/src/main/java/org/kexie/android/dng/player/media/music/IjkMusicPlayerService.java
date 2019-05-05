@@ -10,13 +10,12 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.text.TextUtils;
 
 import org.kexie.android.dng.player.BuildConfig;
 
-
 import java.io.IOException;
 
-import androidx.core.math.MathUtils;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -27,77 +26,81 @@ public final class IjkMusicPlayerService extends Service {
     private final IMusicPlayer.Stub mBinder = new IMusicPlayer.Stub() {
         @Override
         public void seekTo(long ms) {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.seekTo(ms);
-            }
+            mMainThread.post(() -> {
+                if (mMediaPlayer != null) {
+                    mMediaPlayer.seekTo(ms);
+                }
+            });
         }
 
         @Override
         public void pause(boolean fromComponent) {
-            mMainThread.removeCallbacks(mPositionUpdater);
-            if (mMediaPlayer != null) {
-                if (fromComponent) {
-                    mMarker = mMediaPlayer.getCurrentPosition();
-                    mMediaPlayer.pause();
-                    release();
-                } else {
-                    mMediaPlayer.pause();
+            mMainThread.post(() -> {
+                mMainThread.removeCallbacks(mPositionUpdater);
+                if (mMediaPlayer != null) {
+                    if (fromComponent) {
+                        mMarker = mMediaPlayer.getCurrentPosition();
+                        mMediaPlayer.pause();
+                        release();
+                    } else {
+                        mMediaPlayer.pause();
+                    }
                 }
-            }
+            });
         }
 
         @Override
         public void resume(boolean fromComponent) {
-            if (fromComponent) {
-                if (mMediaPlayer != null) {
-                    release();
+            mMainThread.post(() -> {
+                if (fromComponent) {
+                    if (mMediaPlayer != null) {
+                        release();
+                    }
+                    if (!TextUtils.isEmpty(mPath)) {
+                        open(mPath);
+                    }
+                } else {
+                    if (mMediaPlayer != null) {
+                        mMediaPlayer.start();
+                        mMainThread.post(mPositionUpdater);
+                    }
                 }
-                open();
-            } else {
-                if (mMediaPlayer != null) {
-                    mMediaPlayer.start();
-                    mMainThread.post(mPositionUpdater);
-                }
-            }
+            });
         }
 
         @Override
         public void register(IPlayerCallback callback) {
-            mClientCallback.register(callback);
+            mMainThread.post(() -> mClientCallback.register(callback));
         }
 
         @Override
         public void setInterval(long ms) {
-            mInterval = Math.max(MIN_INTERVAL, ms);
-        }
-
-        @Override
-        public void setVolume(float percent) {
-            percent = MathUtils.clamp(percent, 0, 1f);
-            int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                    (int) (maxVolume * percent), 0);
+            mMainThread.post(() -> mInterval = Math.max(MIN_INTERVAL, ms));
         }
 
         @Override
         public void setNewSource(String path) {
-            mPath = path;
-            mMarker = 0;
-            if (mMediaPlayer != null) {
-                mMediaPlayer.pause();
-                release();
-            }
-            open();
+            mMainThread.post(() -> {
+                if (mMediaPlayer != null) {
+                    release();
+                }
+                mPath = path;
+                mMarker = 0;
+                if (!TextUtils.isEmpty(mPath)) {
+                    open(mPath);
+                }
+            });
         }
 
         @Override
         public void destroy() {
-            release();
+            mMainThread.post(() -> release());
         }
 
         @Override
         public boolean isPlaying() {
-            return mMediaPlayer != null && mMediaPlayer.isPlaying();
+            IMediaPlayer mediaPlayer = mMediaPlayer;
+            return mediaPlayer != null && mediaPlayer.isPlaying();
         }
     };
     private final Handler mMainThread = new Handler(Looper.getMainLooper());
@@ -114,7 +117,7 @@ public final class IjkMusicPlayerService extends Service {
     private String mPath;
     private long mMarker = 0;
     private long mInterval = MIN_INTERVAL;
-    private IMediaPlayer mMediaPlayer;
+    private volatile IMediaPlayer mMediaPlayer;
     private Visualizer mVisualizer;
 
     @Override
@@ -139,21 +142,16 @@ public final class IjkMusicPlayerService extends Service {
         mClientCallback.finishBroadcast();
     }
 
-    private void open() {
-        mMainThread.removeCallbacks(mPositionUpdater);
-        if (mVisualizer != null) {
-            mVisualizer.setEnabled(false);
-            mVisualizer.release();
-            mVisualizer = null;
-        }
-        mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
+    private void open(String path) {
+        mAudioManager.requestAudioFocus(null,
+                AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
         IjkMediaPlayer.loadLibrariesOnce(null);
         if (BuildConfig.DEBUG) {
             IjkMediaPlayer.native_profileBegin("libijkplayer.so");
             IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
         }
-        if (mPath != null) {
+        if (path != null) {
             mMediaPlayer = new IjkMediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setOnPreparedListener(iMediaPlayer -> {
@@ -186,7 +184,8 @@ public final class IjkMusicPlayerService extends Service {
                 if (mMarker > 0) {
                     iMediaPlayer.seekTo(mMarker);
                 }
-                beginInvoke(callback -> callback.onPrepared(id, iMediaPlayer.getDuration()));
+                beginInvoke(callback -> callback.onPrepared(id,
+                        iMediaPlayer.getDuration()));
             });
             mMediaPlayer.setOnCompletionListener(iMediaPlayer
                     -> beginInvoke(IPlayerCallback::onPlayCompleted));
@@ -203,6 +202,8 @@ public final class IjkMusicPlayerService extends Service {
     }
 
     private void release() {
+        mPath = null;
+        mMarker = 0;
         mMainThread.removeCallbacks(mPositionUpdater);
         if (mMediaPlayer != null) {
             if (BuildConfig.DEBUG) {

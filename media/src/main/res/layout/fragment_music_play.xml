@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+    <data>
+        <variable
+            name="volume"
+            type="androidx.lifecycle.MutableLiveData&lt;Integer&gt;"/>
+    </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="@color/white"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -165,6 +170,8 @@
                         android:layout_width="60dp"
                         android:layout_height="80dp" />
                     <androidx.appcompat.widget.AppCompatSeekBar
+                        android:id="@+id/volume"
+                        android:progress="@={volume}"
                         android:background="@android:color/transparent"
                         android:progressDrawable="@drawable/layer_music_seek_progress"
                         android:thumb="@drawable/shape_music_seek_ball"
@@ -192,7 +199,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
