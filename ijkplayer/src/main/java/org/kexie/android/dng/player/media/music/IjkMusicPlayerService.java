@@ -22,8 +22,8 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public final class IjkMusicPlayerService extends Service {
     private static final int MIN_INTERVAL = 500;
 
-    private final RemoteCallbackList<IPlayerCallback> mClientCallback = new RemoteCallbackList<>();
-    private final IMusicPlayer.Stub mBinder = new IMusicPlayer.Stub() {
+    private final RemoteCallbackList<IMusicPlayerClient> mClientCallback = new RemoteCallbackList<>();
+    private final IMusicPlayerService.Stub mBinder = new IMusicPlayerService.Stub() {
         @Override
         public void seekTo(long ms) {
             mMainThread.post(() -> {
@@ -39,8 +39,8 @@ public final class IjkMusicPlayerService extends Service {
                 mMainThread.removeCallbacks(mPositionUpdater);
                 if (mMediaPlayer != null) {
                     if (fromComponent) {
-                        mMarker = mMediaPlayer.getCurrentPosition();
                         mMediaPlayer.pause();
+                        mMarker = mMediaPlayer.getCurrentPosition();
                         release();
                     } else {
                         mMediaPlayer.pause();
@@ -69,8 +69,8 @@ public final class IjkMusicPlayerService extends Service {
         }
 
         @Override
-        public void register(IPlayerCallback callback) {
-            mMainThread.post(() -> mClientCallback.register(callback));
+        public void register(IMusicPlayerClient client) {
+            mMainThread.post(() -> mClientCallback.register(client));
         }
 
         @Override
@@ -93,8 +93,13 @@ public final class IjkMusicPlayerService extends Service {
         }
 
         @Override
-        public void destroy() {
-            mMainThread.post(() -> release());
+        public void destroy(IMusicPlayerClient client) {
+            mMainThread.post(() -> {
+                release();
+                mMarker = 0;
+                mPath = null;
+                mClientCallback.unregister(client);
+            });
         }
 
         @Override
@@ -126,11 +131,11 @@ public final class IjkMusicPlayerService extends Service {
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
-    private interface CallbackInvoker {
-        void invoke(IPlayerCallback callback) throws RemoteException;
+    private interface ClientInvoker {
+        void invoke(IMusicPlayerClient client) throws RemoteException;
     }
 
-    private void beginInvoke(CallbackInvoker invoker) {
+    private void beginInvoke(ClientInvoker invoker) {
         int size = mClientCallback.beginBroadcast();
         for (int i = 0; i < size; ++i) {
             try {
@@ -188,7 +193,7 @@ public final class IjkMusicPlayerService extends Service {
                         iMediaPlayer.getDuration()));
             });
             mMediaPlayer.setOnCompletionListener(iMediaPlayer
-                    -> beginInvoke(IPlayerCallback::onPlayCompleted));
+                    -> beginInvoke(IMusicPlayerClient::onPlayCompleted));
             mMediaPlayer.setOnSeekCompleteListener(iMediaPlayer
                     -> beginInvoke(callback ->
                     callback.onNewPosition(iMediaPlayer.getCurrentPosition())));
@@ -202,8 +207,6 @@ public final class IjkMusicPlayerService extends Service {
     }
 
     private void release() {
-        mPath = null;
-        mMarker = 0;
         mMainThread.removeCallbacks(mPositionUpdater);
         if (mMediaPlayer != null) {
             if (BuildConfig.DEBUG) {

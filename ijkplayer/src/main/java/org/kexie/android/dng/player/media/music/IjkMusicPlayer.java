@@ -32,7 +32,7 @@ public final class IjkMusicPlayer {
     private final MutableLiveData<Long> mDuration = new MutableLiveData<>();
     private final MutableLiveData<Long> mPosition = new MutableLiveData<>();
     private final MutableLiveData<Integer> mSessionId = new MutableLiveData<>();
-    private final IPlayerCallback.Stub mCallback = new IPlayerCallback.Stub() {
+    private final IMusicPlayerClient.Stub mTheClient = new IMusicPlayerClient.Stub() {
         @Override
         public void onNewFft(byte[] fft) {
             mFft.postValue(fft);
@@ -81,9 +81,9 @@ public final class IjkMusicPlayer {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = IMusicPlayer.Stub.asInterface(service);
+            mService = IMusicPlayerService.Stub.asInterface(service);
             try {
-                mService.register(mCallback);
+                mService.register(mTheClient);
                 if (!TextUtils.isEmpty(mPendingSource)) {
                     mService.setNewSource(mPendingSource);
                 }
@@ -112,7 +112,7 @@ public final class IjkMusicPlayer {
     private String mPendingSource;
     private Context mAppContext;
     private Lifecycle mHolder;
-    private IMusicPlayer mService;
+    private IMusicPlayerService mService;
 
     public static IjkMusicPlayer newInstance(Context context, Lifecycle lifecycle) {
         return new IjkMusicPlayer(context.getApplicationContext(), lifecycle);
@@ -125,44 +125,44 @@ public final class IjkMusicPlayer {
         mAppContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private void assetInternal() {
+    private void assetContext() {
         if (!MAIN_LOOPER.equals(Looper.myLooper()) && !mIsFinish) {
             throw new IllegalStateException();
         }
     }
 
     public Observable<Boolean> onPlayCompleted() {
-        assetInternal();
+        assetContext();
         return OnPlayCompleted.observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<Boolean> onSourcePrepared() {
-        assetInternal();
+        assetContext();
         return mOnSourcePrepared.observeOn(AndroidSchedulers.mainThread());
     }
 
     public LiveData<byte[]> getFft() {
-        assetInternal();
+        assetContext();
         return mFft;
     }
 
     public LiveData<Long> getPosition() {
-        assetInternal();
+        assetContext();
         return mPosition;
     }
 
     public LiveData<Integer> getAudioSessionId() {
-        assetInternal();
+        assetContext();
         return mSessionId;
     }
 
     public LiveData<Long> getDuration() {
-        assetInternal();
+        assetContext();
         return mDuration;
     }
 
     public void seekTo(long ms) {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 mService.seekTo(ms);
@@ -173,7 +173,7 @@ public final class IjkMusicPlayer {
     }
 
     public void pause() {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 mService.pause(false);
@@ -184,7 +184,7 @@ public final class IjkMusicPlayer {
     }
 
     public void start() {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 mService.resume(false);
@@ -195,7 +195,7 @@ public final class IjkMusicPlayer {
     }
 
     public void setInterval(long ms) {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 mService.setInterval(ms);
@@ -206,7 +206,7 @@ public final class IjkMusicPlayer {
     }
 
     public void setNewSource(String path) {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 mService.setNewSource(path);
@@ -219,12 +219,12 @@ public final class IjkMusicPlayer {
     }
 
     public void destroy() {
-        assetInternal();
+        assetContext();
         mPendingSource = null;
         if (mService != null) {
             try {
                 mIsFinish = true;
-                mService.destroy();
+                mService.destroy(mTheClient);
                 mAppContext.unbindService(mConnection);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -233,7 +233,7 @@ public final class IjkMusicPlayer {
     }
 
     public boolean isPlaying() {
-        assetInternal();
+        assetContext();
         if (mService != null) {
             try {
                 return mService.isPlaying();

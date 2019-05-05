@@ -4,6 +4,12 @@
         <variable
             name="volume"
             type="androidx.lifecycle.MutableLiveData&lt;Integer&gt;"/>
+        <variable
+            name="songName"
+            type="String"/>
+        <variable
+            name="singerName"
+            type="String"/>
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="@color/white"
@@ -60,7 +66,8 @@
                             android:layout_marginBottom="-20dp"
                             android:gravity="center"
                             android:layout_width="match_parent"
-                            android:textColor="@android:color/black"
+                            android:textColor="@color/colorBlackAlpha54"
+                            android:text="@{songName}"
                             android:hint="歌曲名"
                             android:textSize="40dp"
                             android:layout_height="wrap_content" />
@@ -68,7 +75,8 @@
                             android:layout_marginTop="-20dp"
                             android:layout_below="@+id/cv_image"
                             android:layout_marginBottom="10dp"
-                            android:textColor="@android:color/black"
+                            android:textColor="@color/colorBlackAlpha54"
+                            android:text="@{singerName}"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:hint="歌手"

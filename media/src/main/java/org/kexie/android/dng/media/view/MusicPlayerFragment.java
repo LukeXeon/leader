@@ -66,7 +66,7 @@ public class MusicPlayerFragment extends Fragment {
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
         //lrcView
-        binding.lrcView.setFontSize(SizeUtils.sp2px(25));
+        binding.lrcView.setFontSize(SizeUtils.sp2px(20));
         binding.lrcView.setPaintColor(new int[]{
                 getResources().getColor(R.color.deeppurplea100),
                 getResources().getColor(R.color.deeppurplea100)
