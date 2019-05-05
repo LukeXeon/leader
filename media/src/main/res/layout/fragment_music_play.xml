@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
+        <import type="androidx.databinding.adapters.Converters"/>
         <variable
             name="volume"
             type="androidx.lifecycle.MutableLiveData&lt;Integer&gt;"/>
         <variable
-            name="songName"
-            type="String"/>
-        <variable
-            name="singerName"
-            type="String"/>
+            name="details"
+            type="org.kexie.android.dng.media.viewmodel.entity.MediaDetails"/>
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:background="@color/white"
@@ -57,7 +55,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@color/deeppurplea700"
+                                android:src="@{details.icon==null?Converters.convertColorToDrawable(@color/deeppurplea700):details.icon}"
                                 app:riv_corner_radius="10dp" />
                         </androidx.cardview.widget.CardView>
                         <TextView
@@ -67,7 +65,7 @@
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:textColor="@color/colorBlackAlpha54"
-                            android:text="@{songName}"
+                            android:text="@{details.songName}"
                             android:hint="歌曲名"
                             android:textSize="40dp"
                             android:layout_height="wrap_content" />
@@ -76,7 +74,7 @@
                             android:layout_below="@+id/cv_image"
                             android:layout_marginBottom="10dp"
                             android:textColor="@color/colorBlackAlpha54"
-                            android:text="@{singerName}"
+                            android:text="@{details.singerName}"
                             android:gravity="center"
                             android:layout_width="match_parent"
                             android:hint="歌手"

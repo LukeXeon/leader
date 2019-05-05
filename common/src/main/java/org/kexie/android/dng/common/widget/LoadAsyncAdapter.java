@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -30,26 +31,25 @@ public final class LoadAsyncAdapter
     }
 
     @BindingAdapter({"async_src"})
-    public static void loadAsyncToSrc(ImageView view, String name)
-    {
+    public static void loadAsyncToSrc(ImageView view, String name) {
+        if (TextUtils.isEmpty(name)) {
+            return;
+        }
         Context context = view.getContext()
                 .getApplicationContext();
         int res = context.getResources()
                 .getIdentifier(name,
                         "mipmap",
                         context.getPackageName());
-        if (res == 0)
-        {
+        if (res == 0) {
             res = context.getResources()
                     .getIdentifier(name,
                             "drawable",
                             context.getPackageName());
         }
-        if (res != 0)
-        {
+        if (res != 0) {
             loadAsync(Glide.with(view).load(res), view);
-        } else
-        {
+        } else {
             loadAsync(Glide.with(view).load(name), view);
         }
     }

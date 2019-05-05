@@ -75,8 +75,7 @@ dependencies {
     //api 'com.android.tools.ddms:ddmlib:26.4.0'
     //api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
-
-    api 'androidx.media2:media2:1.0.0-alpha03'
+    
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     //屏幕适配

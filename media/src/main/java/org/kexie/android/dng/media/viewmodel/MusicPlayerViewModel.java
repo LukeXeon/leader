@@ -2,13 +2,19 @@ package org.kexie.android.dng.media.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 
 import com.blankj.utilcode.util.FileUtils;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestOptions;
 import com.zlm.hp.lyrics.LyricsReader;
 
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
+import org.kexie.android.dng.media.viewmodel.entity.MediaDetails;
 import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 
 import java.io.File;
@@ -31,6 +37,7 @@ public class MusicPlayerViewModel
         extends AndroidViewModel {
 
     public IjkMusicPlayer musicPlayer;
+    public MutableLiveData<MediaDetails> details = new MutableLiveData<>();
     public MutableLiveData<Integer> volume = new MutableLiveData<>();
     public GenericQuickAdapter<Media> adapter = new GenericQuickAdapter<>(0, 0);
 
@@ -64,6 +71,43 @@ public class MusicPlayerViewModel
         musicPlayer.setNewSource(path);
         Observable<Optional<LyricsReader>> lrc = Observable.just(path)
                 .observeOn(Schedulers.io())
+                .doOnNext(path1 -> {
+
+                    String title = null;
+                    // 专辑名
+                    String album;
+                    // 媒体格式
+                    String mime;
+                    // 艺术家
+                    String artist = null;
+
+                    Drawable drawable = null;
+
+                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                    try {
+                        retriever.setDataSource(path1);
+                        title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                        album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+                        mime = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
+                        artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                        byte[] picture = retriever.getEmbeddedPicture();
+                        if (picture != null && picture.length != 0) {
+                            drawable = Glide.with(getApplication())
+                                    .load(picture)
+                                    .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
+                                    .submit()
+                                    .get();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        artist = artist == null ? "--" : artist;
+                        title = title == null ? FileUtils.getFileNameNoExtension(path1) : title;
+                    } finally {
+                        retriever.release();
+                    }
+                    MediaDetails mediaDetails = new MediaDetails(drawable, title, artist);
+                    details.postValue(mediaDetails);
+                })
                 .map(File::new)
                 .map(file -> {
                     String noExt = FileUtils.getFileNameNoExtension(file);

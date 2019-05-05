@@ -125,6 +125,8 @@ public class MusicPlayerFragment extends Fragment {
         viewModel.adapter.setOnItemClickListener((adapter, view12, position) -> {
 
         });
+        viewModel.details.observe(this,
+                mediaDetails -> binding.setDetails(mediaDetails));
         binding.lrcView.setOnLrcClickListener(progress -> {
             Logger.d(progress);
             binding.musicSeek.setProgress(progress);
