@@ -10,8 +10,11 @@
             name="onBack"
             type="Action"/>
     </data>
-    <eightbitlab.com.blurview.BlurView
+    <org.kexie.android.dng.common.widget.BlurFrameLayout
         android:id="@+id/rootView"
+        app:blk_blurRadius="12"
+        app:blk_downscaleFactor="0.12"
+        app:blk_fps="60"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
@@ -34,5 +37,5 @@
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
-    </eightbitlab.com.blurview.BlurView>
+    </org.kexie.android.dng.common.widget.BlurFrameLayout>
 </layout>

@@ -12,8 +12,11 @@
             name="isLoading"
             type="Boolean"/>
     </data>
-    <eightbitlab.com.blurview.BlurView
+    <org.kexie.android.dng.common.widget.BlurFrameLayout
         android:id="@+id/rootView"
+        app:blk_blurRadius="12"
+        app:blk_downscaleFactor="0.12"
+        app:blk_fps="60"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <FrameLayout
@@ -49,5 +52,5 @@
                 </FrameLayout>
             </LinearLayout>
         </FrameLayout>
-    </eightbitlab.com.blurview.BlurView>
+    </org.kexie.android.dng.common.widget.BlurFrameLayout>
 </layout>

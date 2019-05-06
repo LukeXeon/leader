@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import eightbitlab.com.blurview.RenderScriptBlur;
 
 @Route(path = PR.ux.apps)
 public class AppsFragment extends Fragment {
@@ -86,13 +85,14 @@ public class AppsFragment extends Fragment {
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
         binding.setAdapter(adapter);
         binding.setLifecycleOwner(this);
-        binding.rootView.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
+        binding.rootView.setLifecycle(getLifecycle());
+//        binding.rootView.setupWith((ViewGroup) view.getParent())
+//                .setFrameClearDrawable(requireActivity().getWindow()
+//                        .getDecorView()
+//                        .getBackground())
+//                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+//                .setBlurRadius(20f)
+//                .setHasFixedTransformationMatrix(true);
     }
 
     @Override

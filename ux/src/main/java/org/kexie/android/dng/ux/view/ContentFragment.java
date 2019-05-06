@@ -16,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import eightbitlab.com.blurview.RenderScriptBlur;
 
 @Route(path = PR.ux.content)
 public class ContentFragment extends Fragment
@@ -43,13 +42,14 @@ public class ContentFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
         binding.setOnBack(v -> requireActivity().onBackPressed());
-        binding.rootView.setupWith((ViewGroup) view.getRootView())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
+        binding.rootView.setLifecycle(getLifecycle());
+//        binding.rootView.setupWith((ViewGroup) view.getRootView())
+//                .setFrameClearDrawable(requireActivity().getWindow()
+//                        .getDecorView()
+//                        .getBackground())
+//                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+//                .setBlurRadius(20f)
+//                .setHasFixedTransformationMatrix(true);
 
         Fragment fragment = (Fragment) ARouter.getInstance()
                 .build(PR.ux.content_login)

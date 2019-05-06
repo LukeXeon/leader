@@ -17,8 +17,10 @@
             name="onStart"
             type="View.OnClickListener"/>
     </data>
-    <eightbitlab.com.blurview.BlurView
-        app:blurOverlayColor="@color/colorBlackAlpha54"
+    <org.kexie.android.dng.common.widget.BlurFrameLayout
+        app:blk_blurRadius="12"
+        app:blk_downscaleFactor="0.12"
+        app:blk_fps="60"
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -80,5 +82,5 @@
                     android:layout_height="80dp" />
             </FrameLayout>
         </RelativeLayout>
-    </eightbitlab.com.blurview.BlurView>
+    </org.kexie.android.dng.common.widget.BlurFrameLayout>
 </layout>

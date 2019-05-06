@@ -27,7 +27,6 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import eightbitlab.com.blurview.RenderScriptBlur;
 import es.dmoral.toasty.Toasty;
 
 @Route(path = PR.media.photo)
@@ -57,15 +56,16 @@ public class PhotoViewFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
 
         binding.setLifecycleOwner(this);
-        binding.blurView.setupWith(binding.photo)
-                .setFrameClearDrawable(
-                        requireActivity()
-                                .getWindow()
-                                .getDecorView()
-                                .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
+        binding.blurView.setLifecycle(getLifecycle());
+//        binding.blurView.setupWith(binding.photo)
+//                .setFrameClearDrawable(
+//                        requireActivity()
+//                                .getWindow()
+//                                .getDecorView()
+//                                .getBackground())
+//                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
+//                .setBlurRadius(20f)
+//                .setHasFixedTransformationMatrix(true);
         binding.getRoot().setOnTouchListener((v, event) -> true);
         binding.setInfo(requireArguments().getParcelable("media"));
         binding.setHide(false);

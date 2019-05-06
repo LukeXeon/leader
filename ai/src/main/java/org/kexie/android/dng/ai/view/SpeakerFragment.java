@@ -28,7 +28,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProviders;
-import eightbitlab.com.blurview.RenderScriptBlur;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static androidx.lifecycle.Lifecycle.Event;
@@ -70,17 +69,16 @@ public class SpeakerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         messageGenericQuickAdapter = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
-
         binding.setLifecycleOwner(this);
-        binding.background.setupWith((ViewGroup) view.getParent())
-                .setFrameClearDrawable(requireActivity().getWindow()
-                        .getDecorView()
-                        .getBackground())
-                .setBlurAlgorithm(new RenderScriptBlur(requireContext()))
-                .setBlurRadius(20f)
-                .setHasFixedTransformationMatrix(true);
+        binding.background.setLifecycle(getLifecycle());
+//        binding.background.setupWith((ViewGroup) view.getParent())
+//                .setFrameClearDrawable(requireActivity().getWindow()
+//                        .getDecorView()
+//                        .getBackground())
+//                .setBlurAlgorithm(new RenderScriptBlur(requireContext()))
+//                .setBlurRadius(20f)
+//                .setHasFixedTransformationMatrix(true);
         binding.setAdapter(messageGenericQuickAdapter);
         binding.setIsShowPartial(false);
 

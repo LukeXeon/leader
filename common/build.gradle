@@ -53,8 +53,8 @@ dependencies {
     //api 'com.github.ishaan1995:ButtonProgressBar:1.0'
     api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
     //高斯模糊
-    api 'jp.wasabeef:blurry:3.0.0'
-    api 'com.eightbitlab:blurview:1.6.1'
+    api 'io.alterac.blurkit:blurkit:1.1.1'
+    //api 'jp.wasabeef:blurry:3.0.0'
     api 'com.github.chrisbanes:PhotoView:2.3.0'
     //万能适配器
     api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
@@ -69,13 +69,14 @@ dependencies {
     //api 'com.dnkilic.waveform:waveform:0.9.3'
     //api 'com.flipboard:bottomsheet-core:1.5.3'
 
-    //util framework
+
 
     //debugApi 'com.didichuxing.doraemonkit:doraemonkit:1.1.2'
     //releaseApi 'com.didichuxing.doraemonkit:doraemonkit-no-op:1.1.2'
     //api 'com.android.tools.ddms:ddmlib:26.4.0'
     //api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
+    //util framework
     
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'

@@ -24,19 +24,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <com.github.chrisbanes.photoview.PhotoView
-                android:onClick='@{actions.get("hide")}'
+                android:onClick="@{actions.get(`hide`)}"
                 async_src="@{info.uri}"
                 android:scaleType="fitCenter"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </FrameLayout>
-        <eightbitlab.com.blurview.BlurView
+        <org.kexie.android.dng.common.widget.BlurFrameLayout
             android:id="@+id/blurView"
-            app:blurOverlayColor="@color/translucent_whitesmoke"
+            app:blk_blurRadius="12"
+            app:blk_downscaleFactor="0.12"
+            app:blk_fps="60"
             android:layout_width="match_parent"
             android:layout_height="70dp">
             <LinearLayout
-                android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -63,6 +64,6 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"/>
             </LinearLayout>
-        </eightbitlab.com.blurview.BlurView>
+        </org.kexie.android.dng.common.widget.BlurFrameLayout>
     </RelativeLayout>
 </layout>
