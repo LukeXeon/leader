@@ -42,7 +42,6 @@ public final class SelectFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
                 .get(QueryViewModel.class);
     }

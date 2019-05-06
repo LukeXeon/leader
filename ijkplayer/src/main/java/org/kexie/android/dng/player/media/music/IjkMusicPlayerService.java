@@ -213,11 +213,13 @@ public final class IjkMusicPlayerService extends Service {
                 IjkMediaPlayer.native_profileEnd();
             }
             mAudioManager.abandonAudioFocus(null);
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        if (mVisualizer != null) {
             mVisualizer.setEnabled(false);
             mVisualizer.release();
             mVisualizer = null;
-            mMediaPlayer.release();
-            mMediaPlayer = null;
         }
     }
 

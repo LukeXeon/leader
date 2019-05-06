@@ -41,8 +41,6 @@ public class ContentFragment extends Fragment
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
-
         binding.setLifecycleOwner(this);
         binding.setOnBack(v -> requireActivity().onBackPressed());
         binding.rootView.setupWith((ViewGroup) view.getRootView())
@@ -60,6 +58,6 @@ public class ContentFragment extends Fragment
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.info_host, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 }

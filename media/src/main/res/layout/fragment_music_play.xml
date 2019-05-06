@@ -55,9 +55,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@{details.icon==null
-                                ?Converters.convertColorToDrawable(@color/deeppurplea700)
-                                :details.icon}"
+                                android:src="@{details.icon==null?Converters.convertColorToDrawable(@color/deeppurplea700):details.icon}"
                                 app:riv_corner_radius="10dp" />
                         </androidx.cardview.widget.CardView>
                         <TextView

@@ -14,6 +14,7 @@ import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.host.R;
 import org.kexie.android.dng.host.databinding.ActivityHostBinding;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -81,7 +82,7 @@ public final class HostActivity extends AppCompatActivity
                                 .add(R.id.fragment_container, fragment, PR.ai.speaker)
                                 .addToBackStack(null)
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .commit();
+                                .commitAllowingStateLoss();
                     }
                 })
                 .build());
@@ -103,7 +104,7 @@ public final class HostActivity extends AppCompatActivity
                                 .add(R.id.fragment_container, fragment, PR.ai.speaker)
                                 .addToBackStack(null)
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                .commit();
+                                .commitAllowingStateLoss();
                     }
                 });
 
@@ -116,7 +117,7 @@ public final class HostActivity extends AppCompatActivity
                 .beginTransaction()
                 .add(R.id.fragment_container, fragment, PR.ux.desktop)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override
@@ -124,6 +125,11 @@ public final class HostActivity extends AppCompatActivity
     {
         super.onResume();
         SystemUtil.hideSystemUi(getWindow());
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override

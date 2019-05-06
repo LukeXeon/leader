@@ -31,7 +31,6 @@ public final class QueryFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         queryViewModel = ViewModelProviders.of(requireParentFragment())
                 .get(QueryViewModel.class);
     }
@@ -62,7 +61,7 @@ public final class QueryFragment extends Fragment
                 .beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .add(R.id.fragment_content, fragment)
-                .commit();
+                .commitAllowingStateLoss();
 
         ProgressFragment.observeWith(queryViewModel.isLoading(), this);
 

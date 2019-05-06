@@ -36,7 +36,6 @@ public final class RunningFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         runningViewModel = ViewModelProviders.of(requireParentFragment())
                 .get(RunningViewModel.class);
     }

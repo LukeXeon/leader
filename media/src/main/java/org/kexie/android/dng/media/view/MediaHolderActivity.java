@@ -63,7 +63,7 @@ public class MediaHolderActivity
                 .addToBackStack(null)
                 .add(android.R.id.content, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     public void holdByWindow(IjkPlayerView player) {

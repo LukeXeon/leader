@@ -106,7 +106,6 @@ public final class NaviFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         navi = AMapNavi.getInstance(requireContext().getApplicationContext());
         NaviViewModelFactory factory = new NaviViewModelFactory(requireContext(), navi);
         runningViewModel = ViewModelProviders.of(this, factory).get(RunningViewModel.class);
@@ -265,7 +264,7 @@ public final class NaviFragment extends Fragment
                     .beginTransaction()
                     .replace(R.id.map_upper, fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
+                    .commitAllowingStateLoss();
         });
         runningViewModel.isRunning().setValue(false);
     }

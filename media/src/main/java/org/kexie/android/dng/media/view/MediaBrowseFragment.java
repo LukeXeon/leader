@@ -52,7 +52,6 @@ public class MediaBrowseFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         viewModel = ViewModelProviders.of(this)
                 .get(MediaBrowseViewModel.class);
     }
@@ -157,7 +156,7 @@ public class MediaBrowseFragment
                 .add(getId(), fragment)
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     @Override

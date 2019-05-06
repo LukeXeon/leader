@@ -52,7 +52,6 @@ public class DesktopFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         appsViewModel = ViewModelProviders.of(requireActivity())
                 .get(AppsViewModel.class);
         infoViewModel = ViewModelProviders.of(requireActivity())
@@ -144,10 +143,11 @@ public class DesktopFragment extends Fragment {
     }
 
     private void jumpToNoHide(Postcard postcard) {
-        getTransaction(postcard).commit();
+        getTransaction(postcard).commitAllowingStateLoss();
     }
 
     private void jumpTo(Postcard postcard) {
-        getTransaction(postcard).hide(this).commit();
+        getTransaction(postcard).hide(this)
+                .commitAllowingStateLoss();
     }
 }

@@ -49,7 +49,6 @@ public final class TipsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(false);
         inputTipsViewModel = ViewModelProviders.of(this)
                 .get(InputTipsViewModel.class);
         queryViewModel = ViewModelProviders.of(requireParentFragment().requireParentFragment())
@@ -135,7 +134,7 @@ public final class TipsFragment extends Fragment {
                         .addToBackStack(null)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .add(getId(), fragment, PR.navi.query_select)
-                        .commit();
+                        .commitAllowingStateLoss();
             }
         });
         queryViewModel.getOnError().mergeWith(inputTipsViewModel.getOnError())

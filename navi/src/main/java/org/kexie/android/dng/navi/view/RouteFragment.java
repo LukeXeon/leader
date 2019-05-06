@@ -34,7 +34,6 @@ public final class RouteFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         Fragment root = requireParentFragment()
                 .requireParentFragment()
                 .requireParentFragment();

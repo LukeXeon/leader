@@ -35,7 +35,6 @@ public class AppsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         appsViewModel = ViewModelProviders.of(requireActivity())
                 .get(AppsViewModel.class);
     }

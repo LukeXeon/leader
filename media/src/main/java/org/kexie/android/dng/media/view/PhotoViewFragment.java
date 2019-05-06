@@ -55,7 +55,6 @@ public class PhotoViewFragment extends Fragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
 
         binding.setLifecycleOwner(this);
         binding.blurView.setupWith(binding.photo)

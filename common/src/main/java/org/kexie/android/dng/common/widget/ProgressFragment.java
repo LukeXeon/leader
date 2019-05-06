@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,33 +14,41 @@ import android.widget.TextView;
 import org.kexie.android.dng.common.R;
 import org.kexie.android.dng.common.databinding.ViewProgressBinding;
 
-import java.util.Objects;
-
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 public final class ProgressFragment
-        extends Fragment
-{
-    private final static int UPDATE = 1;
-    private final static int REMOVE = 2;
+        extends Fragment {
     private ViewProgressBinding binding;
     private RoundCornerImageView mProgressIv;
     private ImageView mBotIv;
     private TextView mProgressMessage;
     private Handler mHandler;
+    private int mValue = 0;
+    private Runnable mUpdater = new Runnable() {
+        @Override
+        public void run() {
+            if (mValue < 100) {
+                updatePercent(++mValue);
+                setMessage("加载中" + mValue + "%");
+            } else {
+                mValue = 0;
+            }
+            mHandler.postDelayed(this,50);
+        }
+    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.view_progress,
@@ -54,8 +61,7 @@ public final class ProgressFragment
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState)
-    {
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.getRoot().setOnTouchListener((x, y) -> true);
 
@@ -63,35 +69,11 @@ public final class ProgressFragment
         //新增进度条
         mProgressIv = view.findViewById(R.id.p_cover_iv);
         mBotIv = view.findViewById(R.id.p_bot_iv);
-        Message message = mHandler.obtainMessage();
-        message.what = UPDATE;
-        message.obj = new Runnable()
-        {
-            private int value = 0;
-
-            @Override
-            public void run()
-            {
-                if (value < 100)
-                {
-                    updatePercent(++value);
-                    setMessage("加载中" + value + "%");
-                } else
-                {
-                    value = 0;
-                }
-                Message newMessage = mHandler.obtainMessage();
-                newMessage.what = UPDATE;
-                newMessage.obj = this;
-                mHandler.sendMessageDelayed(newMessage, 50);
-            }
-        };
-        message.sendToTarget();
+        mHandler.post(mUpdater);
     }
 
 
-    private void updatePercent(int percent)
-    {
+    private void updatePercent(int percent) {
         float percentFloat = percent / 100.0f;//除以100，得到百分比
         final int ivWidth = mBotIv.getWidth();//获取总长度
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)
@@ -103,96 +85,82 @@ public final class ProgressFragment
     }
 
     @Override
-    public void onDestroyView()
-    {
+    public void onDestroyView() {
         super.onDestroyView();
-        mHandler.removeMessages(UPDATE);
+        mHandler.removeCallbacks(mUpdater);
         binding = null;
         mBotIv = null;
         mProgressIv = null;
     }
 
-    private void setMessage(String message)
-    {
-        if (mProgressMessage != null)
-        {
+    private void setMessage(String message) {
+        if (mProgressMessage != null) {
             mProgressMessage.setText(message);
         }
     }
 
-    public static void observeWith(LiveData<Boolean> liveData, Fragment root)
-    {
-        liveData.observe(root, new ObserverImpl(root));
+    public static void observeWith(LiveData<Boolean> liveData, Fragment root) {
+        liveData.observe(root, new ObserverHandler(root));
     }
 
-    private static final class ObserverImpl
+    private static final class ObserverHandler
             extends Handler
             implements Observer<Boolean>,
-            OnBackPressedCallback
-    {
-        private final ProgressFragment progressFragment = new ProgressFragment();
+            OnBackPressedCallback,
+            Runnable {
 
-        private ObserverImpl(Fragment fragment)
-        {
+        private final FragmentManager manager;
+        private final Fragment target;
+        private boolean isAdding = false;
+
+        private ObserverHandler(Fragment fragment) {
             super(Looper.getMainLooper());
-            progressFragment.setTargetFragment(fragment, 0);
-            progressFragment.mHandler = this;
-            progressFragment.setMessage("加载中");
+            target = fragment;
+            manager = fragment.requireFragmentManager();
         }
 
         @Override
-        public void onChanged(Boolean aBoolean)
-        {
-            Fragment target = Objects.requireNonNull(progressFragment.getTargetFragment());
-            if (aBoolean != null && aBoolean)
-            {
-                if (!progressFragment.isAdded())
-                {
-                    target.requireFragmentManager()
-                            .beginTransaction()
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .add(target.getId(), progressFragment)
-                            .show(progressFragment)
-                            .commit();
-                    target.requireActivity()
-                            .addOnBackPressedCallback(this);
+        public void run() {
+            removeCallbacks(this);
+            if (!manager.isDestroyed()) {
+                ProgressFragment fragment = (ProgressFragment) manager
+                        .findFragmentByTag(ProgressFragment.class.getName());
+                if (fragment != null) {
+                    manager.beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                            .remove(fragment)
+                            .commitAllowingStateLoss();
                 }
-            } else
-            {
-                Message message = Message.obtain();
-                message.obj = (Runnable) () -> {
-                    this.removeMessages(REMOVE);
-                    if (progressFragment.isAdded())
-                    {
-                        progressFragment.requireFragmentManager()
-                                .beginTransaction()
-                                .remove(progressFragment)
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                                .commit();
-                        progressFragment.requireActivity()
-                                .removeOnBackPressedCallback(this);
-                    }
-                };
-                message.what = REMOVE;
-                sendMessageDelayed(message, 200);
             }
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
-            Object run = msg.obj;
-            if (run instanceof Runnable)
-            {
-                ((Runnable) run).run();
+        public void onChanged(Boolean show) {
+            if (!manager.isDestroyed()) {
+                ProgressFragment fragment = (ProgressFragment) manager
+                        .findFragmentByTag(ProgressFragment.class.getName());
+                if (fragment == null && !isAdding && show != null && show) {
+                    fragment = new ProgressFragment();
+                    fragment.mHandler = this;
+                    isAdding = true;
+                    fragment.setMessage("加载中");
+                    manager.beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .add(target.getId(), fragment, ProgressFragment.class.getName())
+                            .runOnCommit(() -> isAdding = false)
+                            .commitAllowingStateLoss();
+                    target.requireActivity()
+                            .getOnBackPressedDispatcher()
+                            .addCallback(fragment, this);
+                } else {
+                    postDelayed(this, 200);
+                }
             }
         }
 
         @Override
-        public boolean handleOnBackPressed()
-        {
+        public boolean handleOnBackPressed() {
             return true;
         }
-
     }
 }

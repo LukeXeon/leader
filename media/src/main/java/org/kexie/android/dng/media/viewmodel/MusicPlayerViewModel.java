@@ -88,7 +88,7 @@ public class MusicPlayerViewModel
                                 return ext.equalsIgnoreCase("lrc")
                                         && noExt.equals(noExt2);
                             });
-                    return files.length >= 1
+                    return files != null && files.length >= 1
                             ? Optional.of(files[0])
                             : Optional.<File>empty();
                 })

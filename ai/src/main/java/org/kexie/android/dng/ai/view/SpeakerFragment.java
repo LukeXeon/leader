@@ -48,7 +48,6 @@ public class SpeakerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         speakerViewModel = ViewModelProviders.of(this)
                 .get(SpeakerViewModel.class);
     }
@@ -71,7 +70,6 @@ public class SpeakerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setRetainInstance(false);
 
         messageGenericQuickAdapter = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
 
