@@ -14,7 +14,9 @@ import org.kexie.android.dng.media.model.entity.PhotoInfo;
 import org.kexie.android.dng.media.model.entity.VideoInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class MediaInfoLoader {
     public static List<PhotoInfo> getPhotoInfos(Context context) {
@@ -31,11 +33,12 @@ public class MediaInfoLoader {
         //指定格式
         String[] whereArgs = {"image/jpeg", "image/png", "image/jpg"};
         //查询
+
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, where, whereArgs,
                 MediaStore.Images.Media.DATE_MODIFIED + " desc ");
         if (cursor == null) {
-            return list;
+            return Collections.emptyList();
         }
         //遍历
         while (cursor.moveToNext()) {
@@ -99,45 +102,60 @@ public class MediaInfoLoader {
 
     public static List<MusicInfo> getMusicInfos(Context context) {
         List<MusicInfo> list = new ArrayList<>();
+        List<Future<Drawable>> futures = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                 , null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-                String singer = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                //int duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                if (size > 1024 * 800) {
-                    Drawable drawable = getMusicDrawable(context, id, albumId);
-                    MusicInfo song = new MusicInfo(name, path, drawable, singer);
-                    list.add(song);
-                }
+        if (cursor == null) {
+            return Collections.emptyList();
+        }
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+            String singer = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+            String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            //int duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+            long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
+            long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+            long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+            if (size > 1024 * 800) {
+                Future<Drawable> future = requestDrawable(context, id, albumId);
+                MusicInfo song = new MusicInfo(name, path, singer);
+                list.add(song);
+                futures.add(future);
             }
         }
-        if (cursor != null) {
-            cursor.close();
+        cursor.close();
+        for (int i = 0; i < futures.size(); i++) {
+            Future<Drawable> future = futures.get(i);
+            try {
+                list.get(i).drawable = future.get();
+            } catch (Exception ignored) {
+
+            }
         }
         return list;
     }
 
-    private static Drawable getMusicDrawable(Context context, long songId, long albumId) {
+    private static Future<Drawable>
+    requestDrawable(Context context,
+                    long songId,
+                    long albumId) {
         if (songId < 0 && albumId < 0) {
             return null;
         }
         try {
             if (albumId < 0) {
                 Uri uri = Uri.parse("content://media/external/audio/media/" + songId + "/albumart");
-                return Glide.with(context).load(uri).submit().get();
+                return Glide.with(context)
+                        .load(uri)
+                        .submit();
             } else {
                 Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
                 Uri uri = ContentUris.withAppendedId(albumArtUri, albumId);
-                return Glide.with(context).load(uri).submit().get();
+                return Glide.with(context)
+                        .load(uri)
+                        .submit();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return null;
     }

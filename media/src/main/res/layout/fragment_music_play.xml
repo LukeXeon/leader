@@ -89,6 +89,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent">
                         <org.kexie.android.dng.media.widget.LyricView
+                            android:layout_marginTop="10dp"
                             android:background="@null"
                             android:id="@+id/lrc_view"
                             app:bigTextSize="30dp"

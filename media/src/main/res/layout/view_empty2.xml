@@ -9,7 +9,7 @@
     <TextView
         android:layout_margin="5dp"
         android:layout_gravity="center"
-        android:background="@drawable/text_background200"
+        android:background="@drawable/text_background_red"
         android:textColor="@color/white"
         android:text="这里什么也没有  请重新打开尝试"
         android:textSize="30sp"
