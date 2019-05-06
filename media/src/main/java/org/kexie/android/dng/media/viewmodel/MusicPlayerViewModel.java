@@ -18,12 +18,14 @@ import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.core.math.MathUtils;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -50,7 +52,16 @@ public class MusicPlayerViewModel
 
     private Lifecycle lifecycle;
     private AudioManager audioManager;
-    private Observer<Float> observer = new Observer<Float>() {
+
+    private final class VolumeObserver implements Observer<Float>,
+            LifecycleEventObserver {
+
+        private final LiveData<Float> liveData;
+
+        private VolumeObserver(LiveData<Float> liveData) {
+            this.liveData = liveData;
+        }
+
         @Override
         public void onChanged(Float value) {
             float percent = MathUtils.clamp(value, 0, 1f);
@@ -58,7 +69,14 @@ public class MusicPlayerViewModel
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                     (int) (maxVolume * percent), 0);
         }
-    };
+
+        @Override
+        public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+            if (event.equals(Lifecycle.Event.ON_DESTROY)) {
+                liveData.removeObserver(this);
+            }
+        }
+    }
 
     public MusicPlayerViewModel(@NonNull Application application, Lifecycle lifecycle) {
         super(application);
@@ -66,15 +84,8 @@ public class MusicPlayerViewModel
         audioManager = (AudioManager) application
                 .getSystemService(Context.AUDIO_SERVICE);
         this.lifecycle = lifecycle;
-
         LiveData<Float> liveData = Transformations.map(volume, input -> (float) input / 100f);
-        liveData.observeForever(observer);
-        lifecycle.addObserver((LifecycleEventObserver) (source, event) -> {
-            if (event.equals(Lifecycle.Event.ON_DESTROY)) {
-                liveData.removeObserver(observer);
-            }
-        });
-
+        liveData.observeForever(new VolumeObserver(liveData));
         initMusicList();
     }
 
@@ -103,7 +114,7 @@ public class MusicPlayerViewModel
         Observable.zip(prepared, lrc, (aBoolean, lrcData) -> lrcData)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(Logger::d)
-                .as(autoDisposable(from(lifecycle, Lifecycle.Event.ON_DESTROY)))
+                .as(autoDisposable(from(lifecycle, Lifecycle.Event.ON_PAUSE)))
                 .subscribe(lyricData -> lyrics.setValue(lyricData));
     }
 
@@ -121,5 +132,19 @@ public class MusicPlayerViewModel
                 .observeOn(AndroidSchedulers.mainThread())
                 .as(autoDisposable(from(lifecycle, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(musicDetails -> adapter.setNewData(musicDetails));
+    }
+
+    public int getVolume() {
+        float max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        float current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        return Math.min(100, Math.round(current / max * 100));
+    }
+
+    public static String getProgressTime(int msecTotal) {
+        msecTotal /= 1000;
+        int minute = msecTotal / 60;
+        int second = msecTotal % 60;
+        minute %= 60;
+        return String.format(Locale.CHINA, "%02d:%02d", minute, second);
     }
 }

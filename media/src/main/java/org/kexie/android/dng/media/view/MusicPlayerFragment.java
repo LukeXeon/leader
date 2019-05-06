@@ -1,7 +1,5 @@
 package org.kexie.android.dng.media.view;
 
-import android.content.Context;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.blankj.utilcode.util.TimeUtils;
 import com.zml.libs.widget.MusicSeekBar;
 
 import org.kexie.android.dng.common.app.PR;
@@ -66,7 +63,7 @@ public class MusicPlayerFragment extends Fragment {
         binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return TimeUtils.millis2String(binding.musicSeek.getProgress());
+                return MusicPlayerViewModel.getProgressTime(binding.musicSeek.getProgress());
             }
 
             @Override
@@ -111,23 +108,11 @@ public class MusicPlayerFragment extends Fragment {
         viewModel.details.observe(this,
                 mediaDetails -> binding.setDetails(mediaDetails));
         binding.setVolume(viewModel.volume);
-        initVolumeSeekBar();
-
-    }
-
-    private void initVolumeSeekBar()
-    {
-        AudioManager audioManager = (AudioManager) requireContext()
-                .getSystemService(Context.AUDIO_SERVICE);
-        if (audioManager != null) {
-            float max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            float current = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            int value = Math.min(100, Math.round(current / max * 100));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                binding.volume.setProgress(value, true);
-            } else {
-                binding.volume.setProgress(value);
-            }
+        int value = viewModel.getVolume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            binding.volume.setProgress(value, true);
+        } else {
+            binding.volume.setProgress(value);
         }
     }
 
