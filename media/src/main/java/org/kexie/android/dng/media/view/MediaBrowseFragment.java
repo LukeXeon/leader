@@ -21,7 +21,7 @@ import org.kexie.android.dng.common.widget.RxOnClickWrapper;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
-import org.kexie.android.dng.media.model.entity.MediaType;
+import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 
@@ -87,7 +87,7 @@ public class MediaBrowseFragment
                         return;
                     }
                     switch (info.type) {
-                        case MediaType.TYPE_PHOTO: {
+                        case MediaInfo.TYPE_PHOTO: {
                             Postcard postcard = ARouter.getInstance()
                                     .build(PR.media.photo);
                             Bundle bundle = postcard.getExtras();
@@ -97,7 +97,7 @@ public class MediaBrowseFragment
                             jumpTo(fragment);
                         }
                         break;
-                        case MediaType.TYPE_VIDEO: {
+                        case MediaInfo.TYPE_VIDEO: {
                             Postcard postcard = ARouter.getInstance()
                                     .build(PR.media.media);
                             Bundle bundle = postcard.getExtras();

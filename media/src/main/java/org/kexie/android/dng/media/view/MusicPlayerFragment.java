@@ -122,7 +122,7 @@ public class MusicPlayerFragment extends Fragment {
         viewModel.musicPlayer.getPosition().observe(this,
                 position -> binding.musicSeek.setProgress((int) safeUnBox(position)));
         binding.musicSeek.setEnabled(true);
-        viewModel.adapter.setOnItemClickListener((adapter, view12, position) -> {
+        viewModel.adapter.setOnItemChildClickListener((adapter, view1, position) -> {
 
         });
         viewModel.details.observe(this,
@@ -133,7 +133,12 @@ public class MusicPlayerFragment extends Fragment {
             viewModel.musicPlayer.seekTo(progress);
         });
         binding.setVolume(viewModel.volume);
+        initVolumeSeekBar();
 
+    }
+
+    private void initVolumeSeekBar()
+    {
         AudioManager audioManager = (AudioManager) requireContext()
                 .getSystemService(Context.AUDIO_SERVICE);
         if (audioManager != null) {

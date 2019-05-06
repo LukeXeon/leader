@@ -2,19 +2,15 @@ package org.kexie.android.dng.media.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestOptions;
 import com.zlm.hp.lyrics.LyricsReader;
 
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.media.viewmodel.entity.Media;
-import org.kexie.android.dng.media.viewmodel.entity.MediaDetails;
+import org.kexie.android.dng.media.model.MediaInfoLoader;
+import org.kexie.android.dng.media.viewmodel.entity.MusicDetails;
+import org.kexie.android.dng.media.widget.MusicQuickAdapter;
 import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 
 import java.io.File;
@@ -29,18 +25,25 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import java8.util.Optional;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
+
+import static com.uber.autodispose.AutoDispose.autoDisposable;
+import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 public class MusicPlayerViewModel
         extends AndroidViewModel {
 
     public IjkMusicPlayer musicPlayer;
-    public MutableLiveData<MediaDetails> details = new MutableLiveData<>();
+    public MutableLiveData<MusicDetails> details = new MutableLiveData<>();
     public MutableLiveData<Integer> volume = new MutableLiveData<>();
-    public GenericQuickAdapter<Media> adapter = new GenericQuickAdapter<>(0, 0);
+    public GenericQuickAdapter<MusicDetails> adapter = new MusicQuickAdapter();
 
+    private Lifecycle lifecycle;
     private AudioManager audioManager;
     private Observer<Float> observer = new Observer<Float>() {
         @Override
@@ -57,6 +60,8 @@ public class MusicPlayerViewModel
         musicPlayer = IjkMusicPlayer.newInstance(application, lifecycle);
         audioManager = (AudioManager) application
                 .getSystemService(Context.AUDIO_SERVICE);
+        this.lifecycle = lifecycle;
+
         LiveData<Float> liveData = Transformations.map(volume, input -> (float) input / 100f);
         liveData.observeForever(observer);
         lifecycle.addObserver((LifecycleEventObserver) (source, event) -> {
@@ -64,6 +69,8 @@ public class MusicPlayerViewModel
                 liveData.removeObserver(observer);
             }
         });
+
+        initMusicList();
     }
 
     public Observable<Optional<LyricsReader>> playNewTask(String path) {
@@ -71,43 +78,6 @@ public class MusicPlayerViewModel
         musicPlayer.setNewSource(path);
         Observable<Optional<LyricsReader>> lrc = Observable.just(path)
                 .observeOn(Schedulers.io())
-                .doOnNext(path1 -> {
-
-                    String title = null;
-                    // 专辑名
-                    String album;
-                    // 媒体格式
-                    String mime;
-                    // 艺术家
-                    String artist = null;
-
-                    Drawable drawable = null;
-
-                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                    try {
-                        retriever.setDataSource(path1);
-                        title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                        album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-                        mime = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-                        artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                        byte[] picture = retriever.getEmbeddedPicture();
-                        if (picture != null && picture.length != 0) {
-                            drawable = Glide.with(getApplication())
-                                    .load(picture)
-                                    .apply(RequestOptions.priorityOf(Priority.IMMEDIATE))
-                                    .submit()
-                                    .get();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        artist = artist == null ? "--" : artist;
-                        title = title == null ? FileUtils.getFileNameNoExtension(path1) : title;
-                    } finally {
-                        retriever.release();
-                    }
-                    MediaDetails mediaDetails = new MediaDetails(drawable, title, artist);
-                    details.postValue(mediaDetails);
-                })
                 .map(File::new)
                 .map(file -> {
                     String noExt = FileUtils.getFileNameNoExtension(file);
@@ -137,5 +107,21 @@ public class MusicPlayerViewModel
                 })
                 .observeOn(AndroidSchedulers.mainThread());
         return Observable.zip(prepared, lrc, (aBoolean, readerOptional) -> readerOptional);
+    }
+
+    private void initMusicList() {
+        Single.<Context>just(getApplication())
+                .observeOn(Schedulers.io())
+                .map(MediaInfoLoader::getMusicInfos)
+                .map(mediaInfos -> StreamSupport.stream(mediaInfos)
+                        .map(mediaInfo -> new MusicDetails(
+                                mediaInfo.uri,
+                                mediaInfo.drawable,
+                                mediaInfo.title,
+                                mediaInfo.singer))
+                        .collect(Collectors.toList()))
+                .observeOn(AndroidSchedulers.mainThread())
+                .as(autoDisposable(from(lifecycle, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(musicDetails -> adapter.setNewData(musicDetails));
     }
 }

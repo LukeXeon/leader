@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="mediaInfo"
-            type="org.kexie.android.dng.media.viewmodel.entity.Media" />
+            type="org.kexie.android.dng.media.viewmodel.entity.MusicDetails" />
     </data>
 
     <LinearLayout
@@ -48,10 +47,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="30dp"
-                    android:text="TextView" />
+                    android:text="@{mediaInfo.songName}" />
                 <TextView
                     android:singleLine="true"
-                    android:text="TextView"
+                    android:text="@{mediaInfo.singerName}"
                     android:textSize="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

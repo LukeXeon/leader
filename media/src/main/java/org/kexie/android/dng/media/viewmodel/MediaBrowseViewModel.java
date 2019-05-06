@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import android.provider.MediaStore;
 
 import org.kexie.android.dng.media.model.MediaInfoLoader;
-import org.kexie.android.dng.media.model.entity.MediaType;
+import org.kexie.android.dng.media.model.entity.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 
 import java.util.List;
@@ -52,8 +52,8 @@ public class MediaBrowseViewModel extends AndroidViewModel {
         isLoading.setValue(true);
         singleTask.post(() -> {
             List<Media> medias = StreamSupport.stream(TYPE_VIDEO.equals(type)
-                    ? MediaInfoLoader.getVideoModels(getApplication())
-                    : MediaInfoLoader.getPhotoModels(getApplication()))
+                    ? MediaInfoLoader.getVideoInfos(getApplication())
+                    : MediaInfoLoader.getPhotoInfos(getApplication()))
                     .map(x -> new Media(x.title, x.uri, x.type))
                     .collect(Collectors.toList());
             this.medias.postValue(medias);
@@ -64,7 +64,7 @@ public class MediaBrowseViewModel extends AndroidViewModel {
 
     public boolean delete(Media info) {
         boolean success;
-        if (info.type == MediaType.TYPE_PHOTO) {
+        if (info.type == MediaInfo.TYPE_PHOTO) {
             success = getApplication().getContentResolver()
                     .delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                             MediaStore.Images.Media.DATA + "=?",
