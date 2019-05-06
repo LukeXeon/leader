@@ -88,9 +88,12 @@
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="match_parent">
-                        <com.zlm.hp.lyrics.widget.ManyLyricsView
+                        <org.kexie.android.dng.media.widget.LyricView
                             android:background="@null"
                             android:id="@+id/lrc_view"
+                            app:bigTextSize="30dp"
+                            app:smallTextSize="20dp"
+                            app:lineHeight="50dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
                         <org.kexie.android.dng.media.widget.VisualizerView

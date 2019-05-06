@@ -5,8 +5,10 @@ import android.content.Context;
 import android.media.AudioManager;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.zlm.hp.lyrics.LyricsReader;
+import com.orhanobut.logger.Logger;
 
+import org.kexie.android.danmakux.converter.LyricParser;
+import org.kexie.android.danmakux.model.Lyric;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.model.MediaInfoLoader;
 import org.kexie.android.dng.media.viewmodel.entity.MusicDetails;
@@ -14,6 +16,8 @@ import org.kexie.android.dng.media.widget.MusicQuickAdapter;
 import org.kexie.android.dng.player.media.music.IjkMusicPlayer;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.core.math.MathUtils;
@@ -41,6 +45,7 @@ public class MusicPlayerViewModel
     public IjkMusicPlayer musicPlayer;
     public MutableLiveData<MusicDetails> details = new MutableLiveData<>();
     public MutableLiveData<Integer> volume = new MutableLiveData<>();
+    public MutableLiveData<List<Lyric>> lyrics = new MutableLiveData<>();
     public GenericQuickAdapter<MusicDetails> adapter = new MusicQuickAdapter();
 
     private Lifecycle lifecycle;
@@ -73,10 +78,10 @@ public class MusicPlayerViewModel
         initMusicList();
     }
 
-    public Observable<Optional<LyricsReader>> playNewTask(String path) {
+    public void play(String path) {
         Observable<Boolean> prepared = musicPlayer.onSourcePrepared();
         musicPlayer.setNewSource(path);
-        Observable<Optional<LyricsReader>> lrc = Observable.just(path)
+        Observable<List<Lyric>> lrc = Observable.just(path)
                 .observeOn(Schedulers.io())
                 .map(File::new)
                 .map(file -> {
@@ -92,21 +97,14 @@ public class MusicPlayerViewModel
                             ? Optional.of(files[0])
                             : Optional.<File>empty();
                 })
-                .map(fileOptional -> {
-                    if (fileOptional.isPresent()) {
-                        File file = fileOptional.get();
-                        LyricsReader reader = new LyricsReader();
-                        try {
-                            reader.loadLrc(file);
-                            return Optional.of(reader);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return Optional.<LyricsReader>empty();
-                })
-                .observeOn(AndroidSchedulers.mainThread());
-        return Observable.zip(prepared, lrc, (aBoolean, readerOptional) -> readerOptional);
+                .map(fileOptional -> fileOptional.isPresent()
+                        ? LyricParser.loadFile(fileOptional.get())
+                        : Collections.emptyList());
+        Observable.zip(prepared, lrc, (aBoolean, lrcData) -> lrcData)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(Logger::d)
+                .as(autoDisposable(from(lifecycle, Lifecycle.Event.ON_DESTROY)))
+                .subscribe(lyricData -> lyrics.setValue(lyricData));
     }
 
     private void initMusicList() {

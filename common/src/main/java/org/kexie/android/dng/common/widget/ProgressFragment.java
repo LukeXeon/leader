@@ -122,6 +122,10 @@ public final class ProgressFragment
         @Override
         public void run() {
             removeCallbacks(this);
+            if (isAdding) {
+                postDelayed(this,200);
+                return;
+            }
             if (!manager.isDestroyed()) {
                 ProgressFragment fragment = (ProgressFragment) manager
                         .findFragmentByTag(ProgressFragment.class.getName());

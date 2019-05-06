@@ -9,10 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.blankj.utilcode.util.SizeUtils;
-import com.orhanobut.logger.Logger;
-import com.zlm.hp.lyrics.utils.TimeUtils;
-import com.zlm.hp.lyrics.widget.ManyLyricsView;
+import com.blankj.utilcode.util.TimeUtils;
 import com.zml.libs.widget.MusicSeekBar;
 
 import org.kexie.android.dng.common.app.PR;
@@ -25,11 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
-
-import static com.uber.autodispose.AutoDispose.autoDisposable;
-import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
 @Route(path = PR.media.music)
 public class MusicPlayerFragment extends Fragment {
@@ -65,16 +58,6 @@ public class MusicPlayerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
-        //lrcView
-        binding.lrcView.setFontSize(SizeUtils.sp2px(20));
-        binding.lrcView.setPaintColor(new int[]{
-                getResources().getColor(R.color.deeppurplea100),
-                getResources().getColor(R.color.deeppurplea100)
-        }, false);
-        binding.lrcView.setPaintHLColor(new int[]{
-                getResources().getColor(R.color.deeppurplea700),
-                getResources().getColor(R.color.deeppurplea700)
-        }, false);
         binding.rvMusicList.setAdapter(viewModel.adapter);
         //musicSeek
         binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
@@ -83,7 +66,7 @@ public class MusicPlayerFragment extends Fragment {
         binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return TimeUtils.parseMMSSString(binding.musicSeek.getProgress());
+                return TimeUtils.millis2String(binding.musicSeek.getProgress());
             }
 
             @Override
@@ -99,39 +82,34 @@ public class MusicPlayerFragment extends Fragment {
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
                 viewModel.musicPlayer.seekTo(musicSeekBar.getProgress());
-                binding.lrcView.seekto(musicSeekBar.getProgress());
+
             }
         });
-        binding.play.setOnClickListener(v -> viewModel.playNewTask("/storage/emulated" +
-                "/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3")
-                .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
-                .subscribe(readerOptional -> {
-                    if (readerOptional.isPresent()) {
-                        binding.lrcView.setLyricsReader(readerOptional.get());
-                        binding.lrcView.play((int) safeUnBox(viewModel.musicPlayer.getPosition().getValue()));
-                    }
-                    else {
-                        binding.lrcView.setLrcStatus(ManyLyricsView.LRCSTATUS_NOLRC_DEFTEXT);
-                    }
-                }));
+        binding.play.setOnClickListener(v -> viewModel.play("/storage/emulated" +
+                "/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3"));
         //musicPlayer
+        viewModel.lyrics.observe(this, lyrics -> {
+            binding.lrcView.setLrc(lyrics);
+            binding.lrcView.start();
+        });
         viewModel.musicPlayer.getFft().observe(this,
                 bytes -> binding.visualizer.updateVisualizer(bytes));
         viewModel.musicPlayer.getDuration().observe(this,
-                duration -> binding.musicSeek.setMax((int) safeUnBox(duration)));
+                duration -> {
+                    binding.lrcView.setDuration(safeUnBoxInt(duration));
+                    binding.musicSeek.setMax(safeUnBoxInt(duration));
+                });
         viewModel.musicPlayer.getPosition().observe(this,
-                position -> binding.musicSeek.setProgress((int) safeUnBox(position)));
+                position -> {
+                    binding.musicSeek.setProgress(safeUnBoxInt(position));
+                    binding.lrcView.seekTo(safeUnBoxInt(position));
+                });
         binding.musicSeek.setEnabled(true);
         viewModel.adapter.setOnItemChildClickListener((adapter, view1, position) -> {
 
         });
         viewModel.details.observe(this,
                 mediaDetails -> binding.setDetails(mediaDetails));
-        binding.lrcView.setOnLrcClickListener(progress -> {
-            Logger.d(progress);
-            binding.musicSeek.setProgress(progress);
-            viewModel.musicPlayer.seekTo(progress);
-        });
         binding.setVolume(viewModel.volume);
         initVolumeSeekBar();
 
@@ -151,6 +129,10 @@ public class MusicPlayerFragment extends Fragment {
                 binding.volume.setProgress(value);
             }
         }
+    }
+
+    private static int safeUnBoxInt(Long value) {
+        return (int) safeUnBox(value);
     }
 
     private static long safeUnBox(Long value) {
