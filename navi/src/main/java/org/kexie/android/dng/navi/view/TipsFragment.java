@@ -12,7 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.navi.BR;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviQueryTipsBinding;
@@ -86,23 +86,22 @@ public final class TipsFragment extends Fragment {
 
 
         inputTipQuickAdapter = new GenericQuickAdapter<>(R.layout.item_tip, BR.inputTip);
-        inputTipQuickAdapter.setOnItemClickListener(RxOnClickWrapper
-                .create(BaseQuickAdapter.OnItemClickListener.class)
-                .owner(this)
-                .inner((adapter, view1, position) -> {
+        inputTipQuickAdapter.setOnItemClickListener(RxUtils.debounce(
+                BaseQuickAdapter.OnItemClickListener.class,
+                getLifecycle(),
+                (adapter, view1, position) -> {
                     InputTip inputTip = (InputTip) adapter.getItem(position);
                     if (inputTip == null) {
                         return;
                     }
                     queryViewModel.query(inputTip);
-                })
-                .build());
+                }));
 
         binding.setIsShowQuery(false);
-        binding.setStartQuery(RxOnClickWrapper.create(View.OnClickListener.class)
-                .owner(this)
-                .inner(v -> binding.setIsShowQuery(true))
-                .build());
+        binding.setStartQuery(RxUtils.debounce(
+                View.OnClickListener.class,
+                getLifecycle(),
+                v -> binding.setIsShowQuery(true)));
         binding.setLifecycleOwner(this);
         binding.setQueryText(inputTipsViewModel.getQuery());
         binding.setTipsAdapter(inputTipQuickAdapter);

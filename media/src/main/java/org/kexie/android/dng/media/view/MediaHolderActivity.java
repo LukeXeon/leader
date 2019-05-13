@@ -72,7 +72,7 @@ public class MediaHolderActivity
 
     @Override
     public void onBackPressed() {
-        getOnBackPressedDispatcher().onBackPressed();
+        super.onBackPressed();
         ARouter.getInstance()
                 .build(PR.host.host)
                 .navigation(this);

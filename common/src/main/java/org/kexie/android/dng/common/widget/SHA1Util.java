@@ -17,7 +17,6 @@ public class SHA1Util
 {
     private SHA1Util()
     {
-
     }
 
     public static String getSHA1(Context context)

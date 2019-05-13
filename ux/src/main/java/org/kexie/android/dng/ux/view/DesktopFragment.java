@@ -12,7 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
@@ -78,10 +78,10 @@ public class DesktopFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GenericQuickAdapter<Function> functionsAdapter
                 = new GenericQuickAdapter<>(R.layout.item_desktop_function, BR.function);
-        functionsAdapter.setOnItemClickListener(RxOnClickWrapper
-                .create(BaseQuickAdapter.OnItemClickListener.class)
-                .owner(this)
-                .inner((adapter, view1, position) -> {
+        functionsAdapter.setOnItemClickListener(RxUtils.debounce(
+                BaseQuickAdapter.OnItemClickListener.class,
+                getLifecycle(),
+                (adapter, view1, position) -> {
                     Function function = (Function) adapter.getItem(position);
                     if (function == null) {
                         return;
@@ -93,8 +93,7 @@ public class DesktopFragment extends Fragment {
                     } else {
                         jumpTo(postcard);
                     }
-                })
-                .build());
+                }));
 
         desktopViewModel.functions.observe(this, functionsAdapter::setNewData);
         desktopViewModel.time.observe(this, binding::setTime);
@@ -113,16 +112,12 @@ public class DesktopFragment extends Fragment {
         Map<String, View.OnClickListener> actions
                 = new ArrayMap<String, View.OnClickListener>() {
             {
-                put("个人信息", RxOnClickWrapper
-                        .create(View.OnClickListener.class)
-                        .lifecycle(getLifecycle())
-                        .inner(v -> jumpToNoHide(ARouter.getInstance().build(PR.ux.content)))
-                        .build());
-                put("导航", RxOnClickWrapper
-                        .create(View.OnClickListener.class)
-                        .lifecycle(getLifecycle())
-                        .inner(v -> jumpToNoHide(ARouter.getInstance().build(PR.navi.navi)))
-                        .build());
+                put("个人信息", RxUtils.debounce(View.OnClickListener.class,
+                        getLifecycle(),
+                        v -> jumpToNoHide(ARouter.getInstance().build(PR.ux.content))));
+                put("导航", RxUtils.debounce(View.OnClickListener.class,
+                        getLifecycle(),
+                        v -> jumpToNoHide(ARouter.getInstance().build(PR.navi.navi))));
             }
         };
 

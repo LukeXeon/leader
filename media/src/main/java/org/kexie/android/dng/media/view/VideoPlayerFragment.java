@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.kexie.android.danmakux.utils.FileUtils;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.viewmodel.entity.Media;
 import org.kexie.android.dng.player.media.vedio.IjkPlayerView;
@@ -89,11 +89,10 @@ public class VideoPlayerFragment
         }
         requireActivity().addOnBackPressedCallback(this, this);
         player.setOnClickBackListener(requireActivity()::onBackPressed);
-        player.setFloatClickListener(RxOnClickWrapper
-                .create(View.OnClickListener.class)
-                .owner(this)
-                .inner(v -> transformToWindow())
-                .build());
+        player.setFloatClickListener(RxUtils.debounce(
+                View.OnClickListener.class,
+                getLifecycle(),
+                v -> transformToWindow()));
     }
 
     private void transformToWindow() {

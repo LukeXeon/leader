@@ -14,7 +14,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.AnimationAdapter;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
 import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
@@ -79,15 +79,12 @@ public class PhotoViewFragment extends Fragment
             Map<String, View.OnClickListener> actions
                     = new ArrayMap<String, View.OnClickListener>() {
                 {
-                    put("back", RxOnClickWrapper
-                            .create(View.OnClickListener.class)
-                            .lifecycle(getLifecycle())
-                            .inner(v -> requireActivity().onBackPressed())
-                            .build());
-                    put("delete", RxOnClickWrapper
-                            .create(View.OnClickListener.class)
-                            .lifecycle(getLifecycle())
-                            .inner(v -> {
+                    put("back", RxUtils.debounce(View.OnClickListener.class,
+                            getLifecycle(),
+                            v -> requireActivity().onBackPressed()));
+                    put("delete", RxUtils.debounce(View.OnClickListener.class,
+                            getLifecycle(),
+                            v -> {
                                 if (viewModel.delete(binding.getInfo())) {
                                     Fragment fragment = getTargetFragment();
                                     if (fragment != null) {
@@ -99,13 +96,11 @@ public class PhotoViewFragment extends Fragment
                                 } else {
                                     Toasty.error(requireContext(), "删除失败").show();
                                 }
-                            })
-                            .build());
-                    put("hide", RxOnClickWrapper
-                            .create(View.OnClickListener.class)
-                            .lifecycle(getLifecycle())
-                            .inner(v -> doHideAnimation())
-                            .build());
+                            }));
+                    put("hide", RxUtils.debounce(
+                            View.OnClickListener.class,
+                            getLifecycle(),
+                            v -> doHideAnimation()));
                 }
             };
 

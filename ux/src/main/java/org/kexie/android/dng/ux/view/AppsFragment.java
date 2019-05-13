@@ -12,7 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
@@ -58,10 +58,10 @@ public class AppsFragment extends Fragment {
         view.setOnTouchListener((x, y) -> true);
 
         GenericQuickAdapter<App> adapter = appsViewModel.appAdapter;
-        adapter.setOnItemClickListener(RxOnClickWrapper
-                .create(BaseQuickAdapter.OnItemClickListener.class)
-                .owner(this)
-                .inner((adapter1, view1, position) -> {
+        adapter.setOnItemClickListener(RxUtils.debounce(
+                BaseQuickAdapter.OnItemClickListener.class,
+                getLifecycle(),
+                (adapter1, view1, position) -> {
                     App app = (App) adapter1.getItem(position);
                     if (app == null) {
                         return;
@@ -73,10 +73,8 @@ public class AppsFragment extends Fragment {
                     if (intent != null) {
                         startActivity(intent);
                     }
-                })
-                .build());
+                }));
         adapter.setOnItemLongClickListener((adapter12, view12, position) -> {
-
 
 
             return true;

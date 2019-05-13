@@ -153,9 +153,8 @@ public final class ProgressFragment
                             .add(target.getId(), fragment, ProgressFragment.class.getName())
                             .runOnCommit(() -> isAdding = false)
                             .commitAllowingStateLoss();
-                    target.requireActivity()
-                            .getOnBackPressedDispatcher()
-                            .addCallback(fragment, this);
+                    target.requireActivity().addOnBackPressedCallback(fragment,
+                            this);
                 } else {
                     postDelayed(this, 200);
                 }

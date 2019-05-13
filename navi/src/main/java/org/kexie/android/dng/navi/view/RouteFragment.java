@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.widget.RxOnClickWrapper;
+import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNaviSelectRouteBinding;
 import org.kexie.android.dng.navi.viewmodel.QueryViewModel;
@@ -69,11 +69,10 @@ public final class RouteFragment extends Fragment {
                 RouteInfo routeInfo = routeInfos.get(id);
                 if (routeInfo != null) {
                     binding.setRoute(routeInfo);
-                    binding.setOnJumpToNavi(RxOnClickWrapper
-                            .create(View.OnClickListener.class)
-                            .lifecycle(getLifecycle())
-                            .inner(v -> runningViewModel.isRunning().setValue(true))
-                            .build());
+                    binding.setOnJumpToNavi(RxUtils.debounce(
+                            View.OnClickListener.class,
+                            getLifecycle(),
+                            v -> runningViewModel.isRunning().setValue(true)));
                 }
             }
         }
