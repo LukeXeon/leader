@@ -12,7 +12,7 @@
             name="isLoading"
             type="Boolean"/>
     </data>
-    <org.kexie.android.dng.common.widget.BlurFrameLayout
+    <org.keixe.andorid.design.GaussLayout
         android:id="@+id/rootView"
         app:blk_blurRadius="12"
         app:blk_downscaleFactor="0.12"
@@ -52,5 +52,5 @@
                 </FrameLayout>
             </LinearLayout>
         </FrameLayout>
-    </org.kexie.android.dng.common.widget.BlurFrameLayout>
+    </org.keixe.andorid.design.GaussLayout>
 </layout>

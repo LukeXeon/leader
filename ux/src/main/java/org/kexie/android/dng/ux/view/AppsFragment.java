@@ -83,7 +83,7 @@ public class AppsFragment extends Fragment {
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
         binding.setAdapter(adapter);
         binding.setLifecycleOwner(this);
-        binding.rootView.setLifecycle(getLifecycle());
+        //binding.rootView.setLifecycle(getLifecycle());
 //        binding.rootView.setupWith((ViewGroup) view.getParent())
 //                .setFrameClearDrawable(requireActivity().getWindow()
 //                        .getDecorView()

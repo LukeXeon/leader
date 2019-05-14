@@ -42,7 +42,7 @@ public class ContentFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
         binding.setLifecycleOwner(this);
         binding.setOnBack(v -> requireActivity().onBackPressed());
-        binding.rootView.setLifecycle(getLifecycle());
+        //binding.rootView.setLifecycle(getLifecycle());
 //        binding.rootView.setupWith((ViewGroup) view.getRootView())
 //                .setFrameClearDrawable(requireActivity().getWindow()
 //                        .getDecorView()
