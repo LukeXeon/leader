@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.Choreographer;
 
 import org.kexie.android.danmakux.model.Lyric;
 import org.kexie.android.dng.media.R;
@@ -78,13 +79,13 @@ public class LyricView extends AppCompatTextView {
     private int mCurrent;
     private Rect mBounds;
     private Rect mSingleBounds;
-    private Runnable mUpdater = new Runnable() {
+    private Choreographer.FrameCallback mUpdater = new Choreographer.FrameCallback() {
         @Override
-        public void run() {
+        public void doFrame(long frameTimeNanos) {
             if (mCurrent < mDuration) {
                 mCurrent += UPDATE_INTERVAL;
                 invalidate();
-                postDelayed(this, UPDATE_INTERVAL);
+                Choreographer.getInstance().postFrameCallbackDelayed(this, UPDATE_INTERVAL);
             }
         }
     };
@@ -97,24 +98,27 @@ public class LyricView extends AppCompatTextView {
     }
 
     public void pause() {
-        removeCallbacks(mUpdater);
+        Choreographer.getInstance().removeFrameCallback(mUpdater);
     }
 
     public void seekTo(int ms) {
         mCurrent = ms;
-        removeCallbacks(mUpdater);
-        mUpdater.run();
+        Choreographer choreographer = Choreographer.getInstance();
+        choreographer.removeFrameCallback(mUpdater);
+        choreographer.postFrameCallback(mUpdater);
     }
 
     public void start() {
-        removeCallbacks(mUpdater);
-        mUpdater.run();
+        Choreographer choreographer = Choreographer.getInstance();
+        choreographer.removeFrameCallback(mUpdater);
+        choreographer.postFrameCallback(mUpdater);
     }
 
     public void setDuration(int ms) {
         mDuration = ms;
-        removeCallbacks(mUpdater);
-        mUpdater.run();
+        Choreographer choreographer = Choreographer.getInstance();
+        choreographer.removeFrameCallback(mUpdater);
+        choreographer.postFrameCallback(mUpdater);
     }
 
     @Override
@@ -218,8 +222,9 @@ public class LyricView extends AppCompatTextView {
         musicLyrList = lrcList == null ? Collections.emptyList() : lrcList;
         //默认剧中行=0
         mCenterLine = 0;
-        removeCallbacks(mUpdater);
-        mUpdater.run();
+        Choreographer choreographer = Choreographer.getInstance();
+        choreographer.removeFrameCallback(mUpdater);
+        choreographer.postFrameCallback(mUpdater);
     }
 
     private void drawSingLine(Canvas canvas) {
