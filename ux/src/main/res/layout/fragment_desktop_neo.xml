@@ -5,32 +5,29 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
+            async_background="@{`background_ux2`}"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="15dp"
             android:paddingRight="15dp">
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v1"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                android:background="#08cfe0"
-                app:clip_background="true"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/navi"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="30dp"
-                    android:scaleType="centerInside"
-                    app:riv_corner_radius="20dp" />
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -41,24 +38,24 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v2"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/time"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -69,9 +66,10 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v3"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
@@ -80,13 +78,13 @@
                 android:layout_marginBottom="30dp"
                 app:round_corner="20dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/fm"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -97,24 +95,24 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v4"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/video"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -125,24 +123,24 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v5"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -153,9 +151,10 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
             <LinearLayout
+                android:id="@+id/v6"
                 android:layout_width="700dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
@@ -170,21 +169,20 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <com.gcssloop.widget.RCRelativeLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:paddingRight="15dp"
-                        android:paddingBottom="15dp"
-                        app:round_corner="20dp">
+                        android:paddingBottom="15dp">
 
-                        <pl.droidsonroids.gif.GifImageView
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            app:riv_corner_radius="20dp"
                             android:id="@+id/apps"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="#08cfe0"
-                            app:riv_corner_radius="20dp" />
+                            android:src="#08cfe0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -195,25 +193,24 @@
                             android:textColor="@android:color/white"
                             android:textSize="40dp"
                             android:textStyle="bold" />
-                    </com.gcssloop.widget.RCRelativeLayout>
+                    </FrameLayout>
 
-                    <com.gcssloop.widget.RCRelativeLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:paddingTop="15dp"
                         android:paddingRight="15dp"
                         app:layout_columnWeight="1"
-                        app:layout_rowWeight="1"
-                        app:round_corner="20dp">
+                        app:layout_rowWeight="1">
 
-                        <pl.droidsonroids.gif.GifImageView
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            app:riv_corner_radius="20dp"
                             android:id="@+id/info"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="#08cfe0"
-                            app:riv_corner_radius="20dp" />
+                            android:src="#08cfe0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -224,7 +221,7 @@
                             android:textColor="@android:color/white"
                             android:textSize="40dp"
                             android:textStyle="bold" />
-                    </com.gcssloop.widget.RCRelativeLayout>
+                    </FrameLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -233,23 +230,22 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <com.gcssloop.widget.RCRelativeLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:paddingLeft="15dp"
                         android:paddingBottom="15dp"
                         app:layout_columnWeight="1"
-                        app:layout_rowWeight="1"
-                        app:round_corner="20dp">
+                        app:layout_rowWeight="1">
 
-                        <pl.droidsonroids.gif.GifImageView
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            app:riv_corner_radius="20dp"
                             android:id="@+id/music"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="#08cfe0"
-                            app:riv_corner_radius="20dp" />
+                            android:src="#08cfe0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -260,25 +256,24 @@
                             android:textColor="@android:color/white"
                             android:textSize="40dp"
                             android:textStyle="bold" />
-                    </com.gcssloop.widget.RCRelativeLayout>
+                    </FrameLayout>
 
-                    <com.gcssloop.widget.RCRelativeLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:paddingLeft="15dp"
                         android:paddingTop="15dp"
                         app:layout_columnWeight="1"
-                        app:layout_rowWeight="1"
-                        app:round_corner="20dp">
+                        app:layout_rowWeight="1">
 
-                        <pl.droidsonroids.gif.GifImageView
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            app:riv_corner_radius="20dp"
                             android:id="@+id/weather"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="#08cfe0"
-                            app:riv_corner_radius="20dp" />
+                            android:src="#08cfe0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -289,26 +284,26 @@
                             android:textColor="@android:color/white"
                             android:textSize="40dp"
                             android:textStyle="bold" />
-                    </com.gcssloop.widget.RCRelativeLayout>
+                    </FrameLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v7"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/store"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -319,26 +314,24 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
-            <com.gcssloop.widget.RCRelativeLayout
+            <FrameLayout
+                android:id="@+id/v8"
                 android:layout_width="325dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="30dp"
-                android:background="#97bbe7"
-                app:round_corner="20dp">
+                android:layout_marginBottom="30dp">
 
-                <pl.droidsonroids.gif.GifImageView
+                <com.makeramen.roundedimageview.RoundedImageView
+                    app:riv_corner_radius="20dp"
                     android:id="@+id/setting"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="40dp"
-                    android:scaleType="centerInside"
-                    android:src="#08cfe0"
-                    app:riv_corner_radius="20dp" />
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -349,7 +342,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="60dp"
                     android:textStyle="bold" />
-            </com.gcssloop.widget.RCRelativeLayout>
+            </FrameLayout>
 
         </LinearLayout>
     </HorizontalScrollView>

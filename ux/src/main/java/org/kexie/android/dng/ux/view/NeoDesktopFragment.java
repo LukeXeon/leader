@@ -7,18 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bumptech.glide.Glide;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopNeoBinding;
 
-import java.io.IOException;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import pl.droidsonroids.gif.GifDrawable;
+
 
 @Route(path = PR.ux.desktop)
 public class NeoDesktopFragment extends Fragment {
@@ -40,26 +39,20 @@ public class NeoDesktopFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        loadGif(binding.navi, R.mipmap.image_car_anim);
-        loadGif(binding.store, R.mipmap.app_store);
-        loadGif(binding.fm, R.mipmap.fm);
-        loadGif(binding.apps, R.mipmap.apps);
-        loadGif(binding.info, R.mipmap.info);
-        loadGif(binding.music, R.mipmap.music);
-        loadGif(binding.setting, R.mipmap.setting);
-        loadGif(binding.time, R.mipmap.time);
-        loadGif(binding.video, R.mipmap.video);
-        loadGif(binding.photo, R.mipmap.photo);
-        loadGif(binding.weather, R.mipmap.weather);
+        loadImage(binding.navi, R.drawable.icon_navi);
+        loadImage(binding.store, R.drawable.icon_store);
+        loadImage(binding.fm, R.drawable.icon_fm);
+        loadImage(binding.apps, R.drawable.icon_apps);
+        loadImage(binding.info, R.drawable.icon_info);
+        loadImage(binding.music, R.drawable.icon_music);
+        loadImage(binding.setting, R.drawable.icon_setting);
+        loadImage(binding.time, R.drawable.icon_time);
+        loadImage(binding.video, R.drawable.icon_video);
+        loadImage(binding.photo, R.drawable.icon_photo);
+        loadImage(binding.weather, R.drawable.icon_weather);
     }
 
-    private void loadGif(ImageView imageView, int id) {
-        try {
-            GifDrawable gifDrawable = new GifDrawable(getResources(), id);
-            imageView.setImageDrawable(gifDrawable);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static void loadImage(ImageView imageView, int id) {
+        Glide.with(imageView).load(id).into(imageView);
     }
 }

@@ -38,7 +38,6 @@ import static androidx.lifecycle.Lifecycle.Event;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-
 public class DesktopFragment extends Fragment {
     private FragmentDesktopBinding binding;
 
