@@ -8,6 +8,7 @@ import org.kexie.android.dng.common.widget.SHA1Util;
 import org.kexie.android.dng.host.BuildConfig;
 
 import androidx.multidex.MultiDexApplication;
+import cn.jpush.android.api.JPushInterface;
 import me.jessyan.autosize.AutoSize;
 import me.jessyan.autosize.AutoSizeConfig;
 
@@ -21,10 +22,13 @@ public final class AppGlobal extends MultiDexApplication
 
         if (BuildConfig.DEBUG)
         {
+            JPushInterface.setDebugMode(true);
             Logger.addLogAdapter(new AndroidLogAdapter());
             ARouter.openLog();     // Print log
             ARouter.openDebug();
         }
+
+        JPushInterface.init(this);
 
         ARouter.init(this);
 

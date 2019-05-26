@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                android:background="#08cfe0"
+                app:clip_background="true"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/navi"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="30dp"
+                    android:scaleType="centerInside"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="导航"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/time"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="时间"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/fm"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="收音机"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="视频"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="照片"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="700dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="30dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.gcssloop.widget.RCRelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:paddingRight="15dp"
+                        android:paddingBottom="15dp"
+                        app:round_corner="20dp">
+
+                        <pl.droidsonroids.gif.GifImageView
+                            android:id="@+id/apps"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="#08cfe0"
+                            app:riv_corner_radius="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:singleLine="true"
+                            android:text="应用程序"
+                            android:textColor="@android:color/white"
+                            android:textSize="40dp"
+                            android:textStyle="bold" />
+                    </com.gcssloop.widget.RCRelativeLayout>
+
+                    <com.gcssloop.widget.RCRelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:paddingTop="15dp"
+                        android:paddingRight="15dp"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1"
+                        app:round_corner="20dp">
+
+                        <pl.droidsonroids.gif.GifImageView
+                            android:id="@+id/info"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="#08cfe0"
+                            app:riv_corner_radius="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:singleLine="true"
+                            android:text="个人信息"
+                            android:textColor="@android:color/white"
+                            android:textSize="40dp"
+                            android:textStyle="bold" />
+                    </com.gcssloop.widget.RCRelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.gcssloop.widget.RCRelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:paddingLeft="15dp"
+                        android:paddingBottom="15dp"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1"
+                        app:round_corner="20dp">
+
+                        <pl.droidsonroids.gif.GifImageView
+                            android:id="@+id/music"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="#08cfe0"
+                            app:riv_corner_radius="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:singleLine="true"
+                            android:text="音乐"
+                            android:textColor="@android:color/white"
+                            android:textSize="40dp"
+                            android:textStyle="bold" />
+                    </com.gcssloop.widget.RCRelativeLayout>
+
+                    <com.gcssloop.widget.RCRelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1"
+                        app:round_corner="20dp">
+
+                        <pl.droidsonroids.gif.GifImageView
+                            android:id="@+id/weather"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="#08cfe0"
+                            app:riv_corner_radius="20dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:singleLine="true"
+                            android:text="天气"
+                            android:textColor="@android:color/white"
+                            android:textSize="40dp"
+                            android:textStyle="bold" />
+                    </com.gcssloop.widget.RCRelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/store"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="应用商店"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+            <com.gcssloop.widget.RCRelativeLayout
+                android:layout_width="325dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="30dp"
+                android:background="#97bbe7"
+                app:round_corner="20dp">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="40dp"
+                    android:scaleType="centerInside"
+                    android:src="#08cfe0"
+                    app:riv_corner_radius="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:singleLine="true"
+                    android:text="设置"
+                    android:textColor="@android:color/white"
+                    android:textSize="60dp"
+                    android:textStyle="bold" />
+            </com.gcssloop.widget.RCRelativeLayout>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</layout>

@@ -35,6 +35,7 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.1.0-alpha04'
     api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha04'
     api 'com.google.android.material:material:1.1.0-alpha05'
+    api 'androidx.gridlayout:gridlayout:1.0.0'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //api 'androidx.legacy:legacy-support-v13:1.0.0'
     //api "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -43,8 +44,10 @@ dependencies {
     //api 'com.google.guava:guava:27.0.1-android'
 
     //ui widget
-    api 'com.github.LukeXeon:GaussLayout:0.2.2'
-    api 'com.qmuiteam:qmui:1.2.0'
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
+    api 'com.github.LukeXeon:GaussLayout:0.3.3'
+    api 'com.gcssloop.widget:rclayout:1.8.1'
+    //api 'com.qmuiteam:qmui:1.2.0'
     //悬浮窗
     api 'com.github.yhaolpz:FloatWindow:1.0.9'
     api 'com.mikhaellopez:circularprogressbar:2.0.0'
@@ -77,7 +80,9 @@ dependencies {
     //api 'io.reactivex.rxjava2:rxkotlin:2.3.0'
 
     //util framework
-    
+
+    api 'cn.jiguang.sdk:jpush:3.3.1'  // 此处以JPush 3.3.1 版本为例。
+    api 'cn.jiguang.sdk:jcore:2.0.1'  // 此处以JCore 2.0.1 版本为例。
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     //屏幕适配

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.Postcard;
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 
@@ -39,7 +38,7 @@ import static androidx.lifecycle.Lifecycle.Event;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = PR.ux.desktop)
+
 public class DesktopFragment extends Fragment {
     private FragmentDesktopBinding binding;
 

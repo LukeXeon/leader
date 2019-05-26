@@ -10,7 +10,7 @@
             name="onBack"
             type="Action"/>
     </data>
-    <org.keixe.andorid.design.GaussLayout
+    <org.keixe.andorid.design.gausslayout.GaussLayout
         android:id="@+id/rootView"
         app:blk_blurRadius="12"
         app:blk_downscaleFactor="0.12"
@@ -37,5 +37,5 @@
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
-    </org.keixe.andorid.design.GaussLayout>
+    </org.keixe.andorid.design.gausslayout.GaussLayout>
 </layout>
