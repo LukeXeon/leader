@@ -44,9 +44,10 @@ dependencies {
     //api 'com.google.guava:guava:27.0.1-android'
 
     //ui widget
-    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
+    api 'jp.wasabeef:recyclerview-animators:3.0.0'
+    //api 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
     api 'com.github.LukeXeon:GaussLayout:0.3.3'
-    api 'com.gcssloop.widget:rclayout:1.8.1'
+    //api 'com.gcssloop.widget:rclayout:1.8.1'
     //api 'com.qmuiteam:qmui:1.2.0'
     //悬浮窗
     api 'com.github.yhaolpz:FloatWindow:1.0.9'

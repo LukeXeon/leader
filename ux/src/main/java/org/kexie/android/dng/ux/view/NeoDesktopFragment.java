@@ -1,22 +1,23 @@
 package org.kexie.android.dng.ux.view;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.bumptech.glide.Glide;
 
 import org.kexie.android.dng.common.app.PR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopNeoBinding;
+import org.kexie.android.dng.ux.widget.NeoDesktop;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 @Route(path = PR.ux.desktop)
@@ -38,21 +39,18 @@ public class NeoDesktopFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        loadImage(binding.navi, R.drawable.icon_navi);
-        loadImage(binding.store, R.drawable.icon_store);
-        loadImage(binding.fm, R.drawable.icon_fm);
-        loadImage(binding.apps, R.drawable.icon_apps);
-        loadImage(binding.info, R.drawable.icon_info);
-        loadImage(binding.music, R.drawable.icon_music);
-        loadImage(binding.setting, R.drawable.icon_setting);
-        loadImage(binding.time, R.drawable.icon_time);
-        loadImage(binding.video, R.drawable.icon_video);
-        loadImage(binding.photo, R.drawable.icon_photo);
-        loadImage(binding.weather, R.drawable.icon_weather);
-    }
+        binding.list.setAdapter(NeoDesktop.newAdapter(action -> {
 
-    private static void loadImage(ImageView imageView, int id) {
-        Glide.with(imageView).load(id).into(imageView);
+        }));
+        binding.background.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.background_ux2));
+        binding.list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                float range = recyclerView.computeHorizontalScrollRange();
+                float width = binding.background.getDrawable().getBounds().width() * 0.75f;
+                int x = Math.round(width * (dx / range));
+                binding.background.scrollBy(x, 0);
+            }
+        });
     }
 }

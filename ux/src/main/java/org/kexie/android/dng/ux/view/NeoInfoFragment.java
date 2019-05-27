@@ -1,4 +1,4 @@
-package org.kexie.android.dng.ux;
+package org.kexie.android.dng.ux.view;
 
 import androidx.fragment.app.Fragment;
 
