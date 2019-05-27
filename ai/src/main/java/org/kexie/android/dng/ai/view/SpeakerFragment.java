@@ -71,7 +71,7 @@ public class SpeakerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         messageGenericQuickAdapter = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
         binding.setLifecycleOwner(this);
-        binding.background.setLifecycle(getLifecycle());
+        //binding.background.setLifecycle(getLifecycle());
 //        binding.background.setupWith((ViewGroup) view.getParent())
 //                .setFrameClearDrawable(requireActivity().getWindow()
 //                        .getDecorView()

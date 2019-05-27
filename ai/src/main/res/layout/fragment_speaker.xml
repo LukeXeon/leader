@@ -17,10 +17,8 @@
             name="onStart"
             type="View.OnClickListener"/>
     </data>
-    <org.kexie.android.dng.common.widget.BlurFrameLayout
-        app:blk_blurRadius="12"
-        app:blk_downscaleFactor="0.12"
-        app:blk_fps="60"
+    <FrameLayout
+        async_background="@{`background_ux`}"
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -82,5 +80,5 @@
                     android:layout_height="80dp" />
             </FrameLayout>
         </RelativeLayout>
-    </org.kexie.android.dng.common.widget.BlurFrameLayout>
+    </FrameLayout>
 </layout>

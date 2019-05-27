@@ -12,11 +12,9 @@
             name="isLoading"
             type="Boolean"/>
     </data>
-    <org.keixe.andorid.design.gausslayout.GaussLayout
+    <FrameLayout
+        async_background="@{`background_ux`}"
         android:id="@+id/rootView"
-        app:blk_blurRadius="12"
-        app:blk_downscaleFactor="0.12"
-        app:blk_fps="60"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <FrameLayout
@@ -52,5 +50,5 @@
                 </FrameLayout>
             </LinearLayout>
         </FrameLayout>
-    </org.keixe.andorid.design.gausslayout.GaussLayout>
+    </FrameLayout>
 </layout>

@@ -46,7 +46,7 @@ dependencies {
     //ui widget
     api 'jp.wasabeef:recyclerview-animators:3.0.0'
     //api 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
-    api 'com.github.LukeXeon:GaussLayout:0.3.3'
+    //api 'com.github.LukeXeon:GaussLayout:0.3.3'
     //api 'com.gcssloop.widget:rclayout:1.8.1'
     //api 'com.qmuiteam:qmui:1.2.0'
     //悬浮窗
@@ -57,7 +57,8 @@ dependencies {
     //api 'com.github.ishaan1995:ButtonProgressBar:1.0'
     api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
     //高斯模糊
-    api 'io.alterac.blurkit:blurkit:1.1.1'
+    //api 'at.favre.lib:dali:0.3.5'
+    //api 'io.alterac.blurkit:blurkit:1.1.1'
     //api 'jp.wasabeef:blurry:3.0.0'
     api 'com.github.chrisbanes:PhotoView:2.3.0'
     //万能适配器
@@ -73,8 +74,6 @@ dependencies {
     //api 'com.dnkilic.waveform:waveform:0.9.3'
     //api 'com.flipboard:bottomsheet-core:1.5.3'
 
-
-
     //debugApi 'com.didichuxing.doraemonkit:doraemonkit:1.1.2'
     //releaseApi 'com.didichuxing.doraemonkit:doraemonkit-no-op:1.1.2'
     //api 'com.android.tools.ddms:ddmlib:26.4.0'
@@ -84,6 +83,7 @@ dependencies {
 
     api 'cn.jiguang.sdk:jpush:3.3.1'  // 此处以JPush 3.3.1 版本为例。
     api 'cn.jiguang.sdk:jcore:2.0.1'  // 此处以JCore 2.0.1 版本为例。
+
     //java8 stream api
     api 'net.sourceforge.streamsupport:streamsupport:1.7.0'
     //屏幕适配
@@ -118,6 +118,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha05'
 
 }
+
 repositories {
     mavenCentral()
 }

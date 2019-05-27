@@ -56,7 +56,7 @@ public class PhotoViewFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
 
         binding.setLifecycleOwner(this);
-        binding.blurView.setLifecycle(getLifecycle());
+        //binding.blurView.setLifecycle(getLifecycle());
 //        binding.blurView.setupWith(binding.photo)
 //                .setFrameClearDrawable(
 //                        requireActivity()
