@@ -2,13 +2,20 @@ package org.kexie.android.dng.common.app;
 
 public final class PR
 {
-    public static final class ux
-    {
-        public static final String desktop = "/ux/desktop";
+    public static final class ux {
+
         public static final String content = "/ux/content";
         public static final String content_inner = "/ux/content/inner";
         public static final String content_info = "/ux/content/info";
         public static final String content_login = "/ux/content/login";
+
+
+        public static final String fm = "ux/fm";
+        public static final String time = "ux/time";
+        public static final String setting = "ux/setting";
+        public static final String store = "ux/store";
+        public static final String info = "ux/info";
+        public static final String desktop = "/ux/desktop";
         public static final String weather = "/ux/weather";
         public static final String apps = "/ux/apps";
     }
@@ -26,9 +33,15 @@ public final class PR
 
     public static final class media {
         public static final String browse = "/media/browse";
-        public static final String photo = "/media/photo";
         public static final String media = "/media/media";
+
+
+        public static final String photo_browse = "/media/photo/browse";
+        public static final String video_player = "/media/video/player";
+        public static final String music_player = "/media/music/player";
+        public static final String photo = "/media/photo";
         public static final String music = "/media/music";
+        public static final String video = "/media/video";
     }
 
     public static final class host
