@@ -1,6 +1,5 @@
 package org.kexie.android.dng.ux.view;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 
 @Route(path = PR.ux.desktop)
@@ -42,15 +40,6 @@ public class NeoDesktopFragment extends Fragment {
         binding.list.setAdapter(NeoDesktop.newAdapter(action -> {
 
         }));
-        binding.background.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.background_ux2));
-        binding.list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                float range = recyclerView.computeHorizontalScrollRange();
-                float width = binding.background.getDrawable().getBounds().width() * 0.75f;
-                int x = Math.round(width * (dx / range));
-                binding.background.scrollBy(x, 0);
-            }
-        });
+
     }
 }
