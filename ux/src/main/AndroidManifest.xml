@@ -1,10 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.kexie.android.dng.ux">
     <application>
-        <provider
-            android:authorities="${applicationId}.ux-module-loader"
-            android:exported="false"
-            android:multiprocess="false"
-            android:name=".app.ModuleLoader"/>
     </application>
 </manifest>

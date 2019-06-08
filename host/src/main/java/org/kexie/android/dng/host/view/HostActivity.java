@@ -104,7 +104,7 @@ public final class HostActivity extends AppCompatActivity {
 
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(PR.ux.desktop)
+                .build(PR.ux.login)
                 .navigation();
 
         getSupportFragmentManager()

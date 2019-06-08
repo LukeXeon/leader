@@ -35,7 +35,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import jp.wasabeef.recyclerview.adapters.AnimationAdapter;
 
-public final class NeoDesktopAdapter extends AnimationAdapter {
+public final class DesktopController extends AnimationAdapter {
 
     private static final class NeoDesktopTimerViewHolder
             extends NeoDesktopViewHolder
@@ -90,7 +90,7 @@ public final class NeoDesktopAdapter extends AnimationAdapter {
     private static final int VIEW_TYPE_TIMER = 3;
 
     @SuppressWarnings("unchecked")
-    public NeoDesktopAdapter(Lifecycle lifecycle, Action action) {
+    public DesktopController(Lifecycle lifecycle, Action action) {
         super((RecyclerView.Adapter) new Inner(lifecycle, action));
         setFirstOnly(false);
         setInterpolator(new AnticipateOvershootInterpolator());
@@ -119,8 +119,8 @@ public final class NeoDesktopAdapter extends AnimationAdapter {
                 new NeoDesktopItem[]{
                         item("APPS", R.drawable.icon_apps, PR.ux.apps),
                         item("音乐", R.drawable.icon_music, PR.media.music),
-                        item("个人中心", R.drawable.icon_info, PR.ux.content_info),
-                        item("天气", R.drawable.icon_weather, PR.ux.info)
+                        item("个人中心", R.drawable.icon_info, PR.ux.info),
+                        item("天气", R.drawable.icon_weather, PR.ux.weather)
                 },
                 item("应用商店", R.drawable.icon_store, PR.ux.store),
                 item("设置", R.drawable.icon_setting, PR.ux.setting)

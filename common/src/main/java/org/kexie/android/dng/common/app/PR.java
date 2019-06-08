@@ -10,11 +10,15 @@ public final class PR
         public static final String content_login = "/ux/content/login";
 
 
-        public static final String fm = "ux/fm";
-        public static final String time = "ux/time";
-        public static final String setting = "ux/setting";
-        public static final String store = "ux/store";
-        public static final String info = "ux/info";
+
+        //shared
+        public static final String login = "/ux/login";
+        //module
+        public static final String fm = "/ux/fm";
+        public static final String time = "/ux/time";
+        public static final String setting = "/ux/setting";
+        public static final String store = "/ux/store";
+        public static final String info = "/ux/info";
         public static final String desktop = "/ux/desktop";
         public static final String weather = "/ux/weather";
         public static final String apps = "/ux/apps";

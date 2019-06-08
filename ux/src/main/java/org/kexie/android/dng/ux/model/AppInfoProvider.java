@@ -19,6 +19,7 @@ import java.util.List;
  */
 
 public final class AppInfoProvider {
+
     private AppInfoProvider() {
         throw new AssertionError();
     }
@@ -58,7 +59,8 @@ public final class AppInfoProvider {
         return localArrayList;
     }
 
-    private static AppInfo toAppInfo(ResolveInfo localResolveInfo, PackageManager packageManager) {
+    private static AppInfo toAppInfo(ResolveInfo localResolveInfo,
+                                     PackageManager packageManager) {
         AppInfo localAppBean = new AppInfo();
         localAppBean.setIcon(localResolveInfo.activityInfo.loadIcon(packageManager));
         localAppBean.setName(localResolveInfo.activityInfo.loadLabel(packageManager).toString());
