@@ -13,7 +13,7 @@ import com.yhao.floatwindow.IFloatWindow;
 import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.view.VideoPlayerFragment;
 import org.kexie.android.dng.player.media.vedio.IjkPlayerView;
@@ -83,7 +83,7 @@ public final class WindowPlayer
         } else if (id == R.id.transform) {
             Context context = player.getContext().getApplicationContext();
             ARouter.getInstance()
-                    .build(PR.media.media)
+                    .build(Module.Media.videoPlayer)
                     .withFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     .withBoolean(context.getString(R.string.is_form_window), true)
                     .navigation(context);

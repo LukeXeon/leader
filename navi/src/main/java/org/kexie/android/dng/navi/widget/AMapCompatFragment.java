@@ -27,34 +27,28 @@ import androidx.fragment.app.Fragment;
 import me.jessyan.autosize.internal.CancelAdapt;
 
 public final class AMapCompatFragment extends Fragment
-        implements CancelAdapt
-{
+        implements CancelAdapt {
     private AMap map;
     private IMapFragmentDelegate mapFragmentDelegate;
 
-    public AMapCompatFragment()
-    {
+    public AMapCompatFragment() {
     }
 
-    public static AMapCompatFragment newInstance()
-    {
+    public static AMapCompatFragment newInstance() {
         return newInstance(new AMapOptions());
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static AMapCompatFragment newInstance(AMapOptions var0)
-    {
+    public static AMapCompatFragment newInstance(AMapOptions var0) {
         AMapCompatFragment var1 = new AMapCompatFragment();
         Bundle var2 = new Bundle();
 
         Parcel var3;
-        try
-        {
+        try {
             var3 = Parcel.obtain();
             var0.writeToParcel(var3, 0);
             var2.putByteArray("MAP_OPTIONS", var3.marshall());
-        } catch (Throwable var4)
-        {
+        } catch (Throwable var4) {
             var4.printStackTrace();
         }
 
@@ -62,20 +56,15 @@ public final class AMapCompatFragment extends Fragment
         return var1;
     }
 
-    private IMapFragmentDelegate getMapFragmentDelegate(Context var1)
-    {
-        if (this.mapFragmentDelegate == null)
-        {
-            try
-            {
+    private IMapFragmentDelegate getMapFragmentDelegate(Context var1) {
+        if (this.mapFragmentDelegate == null) {
+            try {
                 this.mapFragmentDelegate = on.a(var1, ht.f(), var1.getString(R.string.amap_inner_class_name),
                         ck.class, new Class[]{Integer.TYPE}, new Object[]{1});
-            } catch (Throwable ignored)
-            {
+            } catch (Throwable ignored) {
 
             }
-            if (this.mapFragmentDelegate == null)
-            {
+            if (this.mapFragmentDelegate == null) {
                 this.mapFragmentDelegate = new ck(1);
                 this.mapFragmentDelegate.setContext(var1);
             }
@@ -83,43 +72,32 @@ public final class AMapCompatFragment extends Fragment
         return this.mapFragmentDelegate;
     }
 
-    private IMapFragmentDelegate getMapFragmentDelegate()
-    {
+    private IMapFragmentDelegate getMapFragmentDelegate() {
         return this.getMapFragmentDelegate(this.getActivity());
     }
 
-    public AMap getMap()
-    {
+    public AMap getMap() {
         IMapFragmentDelegate var1;
-        if ((var1 = this.getMapFragmentDelegate()) == null)
-        {
+        if ((var1 = this.getMapFragmentDelegate()) == null) {
             return null;
-        } else
-        {
+        } else {
             IAMap var3;
-            try
-            {
+            try {
                 var3 = var1.getMap();
-            } catch (Throwable var2)
-            {
+            } catch (Throwable var2) {
                 return null;
             }
 
-            if (var3 == null)
-            {
+            if (var3 == null) {
                 return null;
-            } else
-            {
-                if (this.map == null)
-                {
-                    try
-                    {
+            } else {
+                if (this.map == null) {
+                    try {
                         Constructor<AMap> constructor = AMap.class
                                 .getDeclaredConstructor(IAMap.class);
                         constructor.setAccessible(true);
                         this.map = constructor.newInstance(var3);
-                    } catch (Throwable e)
-                    {
+                    } catch (Throwable e) {
                         e.printStackTrace();
                     }
                 }
@@ -129,77 +107,60 @@ public final class AMapCompatFragment extends Fragment
     }
 
     @Override
-    public void onInflate(@NonNull Context var1, @NonNull AttributeSet var2, Bundle var3)
-    {
+    public void onInflate(@NonNull Context var1, @NonNull AttributeSet var2, Bundle var3) {
         super.onInflate(var1, var2, var3);
-        try
-        {
+        try {
             this.getMapFragmentDelegate(var1).onInflate((Activity) var1, new AMapOptions(), var3);
-        } catch (Throwable var4)
-        {
+        } catch (Throwable var4) {
             var4.printStackTrace();
         }
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater var1, ViewGroup var2, Bundle var3)
-    {
-        try
-        {
-            if (var3 == null)
-            {
+    public View onCreateView(@NonNull LayoutInflater var1, ViewGroup var2, Bundle var3) {
+        try {
+            if (var3 == null) {
                 var3 = this.getArguments();
             }
             return this.getMapFragmentDelegate().onCreateView(var1, var2, var3);
-        } catch (Throwable var4)
-        {
+        } catch (Throwable var4) {
             var4.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ViewGroup viewGroup = (ViewGroup) view;
         viewGroup.removeView(viewGroup.getChildAt(2));
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
-        try
-        {
+        try {
             this.getMapFragmentDelegate().onResume();
-        } catch (Throwable var1)
-        {
+        } catch (Throwable var1) {
             var1.printStackTrace();
         }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
-        try
-        {
+        try {
             this.getMapFragmentDelegate().onPause();
-        } catch (Throwable var1)
-        {
+        } catch (Throwable var1) {
             var1.printStackTrace();
         }
     }
 
     @Override
-    public void onDestroyView()
-    {
-        try
-        {
+    public void onDestroyView() {
+        try {
             this.getMapFragmentDelegate().onDestroyView();
-        } catch (Throwable var1)
-        {
+        } catch (Throwable var1) {
             var1.printStackTrace();
         }
 
@@ -207,40 +168,31 @@ public final class AMapCompatFragment extends Fragment
     }
 
     @Override
-    public void onDestroy()
-    {
-        try
-        {
+    public void onDestroy() {
+        try {
             this.getMapFragmentDelegate().onDestroy();
             this.map = null;
-        } catch (Throwable var1)
-        {
+        } catch (Throwable var1) {
             var1.printStackTrace();
         }
         super.onDestroy();
     }
 
     @Override
-    public void onLowMemory()
-    {
+    public void onLowMemory() {
         super.onLowMemory();
-        try
-        {
+        try {
             this.getMapFragmentDelegate().onLowMemory();
-        } catch (Throwable var1)
-        {
+        } catch (Throwable var1) {
             var1.printStackTrace();
         }
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle var1)
-    {
-        try
-        {
+    public void onSaveInstanceState(@NonNull Bundle var1) {
+        try {
             this.getMapFragmentDelegate().onSaveInstanceState(var1);
-        } catch (Throwable var2)
-        {
+        } catch (Throwable var2) {
             var2.printStackTrace();
         }
 
@@ -248,26 +200,20 @@ public final class AMapCompatFragment extends Fragment
     }
 
     @Override
-    public void setArguments(Bundle var1)
-    {
-        try
-        {
+    public void setArguments(Bundle var1) {
+        try {
             super.setArguments(var1);
-        } catch (Throwable var2)
-        {
+        } catch (Throwable var2) {
             var2.printStackTrace();
         }
     }
 
     @Override
-    public void setUserVisibleHint(boolean var1)
-    {
+    public void setUserVisibleHint(boolean var1) {
         super.setUserVisibleHint(var1);
-        if (var1)
-        {
+        if (var1) {
             this.getMapFragmentDelegate().setVisibility(0);
-        } else
-        {
+        } else {
             this.getMapFragmentDelegate().setVisibility(8);
         }
     }

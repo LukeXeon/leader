@@ -8,10 +8,8 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.model.ASRService;
-import org.kexie.android.dng.common.widget.RxUtils;
-import org.kexie.android.dng.common.widget.SystemUtil;
 import org.kexie.android.dng.host.R;
 import org.kexie.android.dng.host.databinding.ActivityHostBinding;
 
@@ -27,12 +25,12 @@ import java8.util.stream.IntStreams;
 import static com.uber.autodispose.AutoDispose.autoDisposable;
 import static com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider.from;
 
-@Route(path = PR.host.host)
+@Route(path = Module.host.host)
 public final class HostActivity extends AppCompatActivity {
 
     private ActivityHostBinding binding;
 
-    @Autowired(name = PR.ai.asr_service)
+    @Autowired(name = Module.ai.asr_service)
     ASRService asrService;
 
     @Override
@@ -69,13 +67,13 @@ public final class HostActivity extends AppCompatActivity {
                 getLifecycle(),
                 v -> {
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    Fragment fragment = fragmentManager.findFragmentByTag(PR.ai.speaker);
+                    Fragment fragment = fragmentManager.findFragmentByTag(Module.ai.speaker);
                     if (fragment == null) {
                         fragment = (Fragment) ARouter.getInstance()
-                                .build(PR.ai.speaker)
+                                .build(Module.ai.speaker)
                                 .navigation();
                         fragmentManager.beginTransaction()
-                                .add(R.id.fragment_container, fragment, PR.ai.speaker)
+                                .add(R.id.fragment_container, fragment, Module.ai.speaker)
                                 .addToBackStack(null)
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .commitAllowingStateLoss();
@@ -88,14 +86,14 @@ public final class HostActivity extends AppCompatActivity {
                 .as(autoDisposable(from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(s -> {
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    Fragment fragment = fragmentManager.findFragmentByTag(PR.ai.speaker);
+                    Fragment fragment = fragmentManager.findFragmentByTag(Module.ai.speaker);
                     if (fragment == null) {
                         fragment = (Fragment) ARouter.getInstance()
-                                .build(PR.ai.speaker)
+                                .build(Module.ai.speaker)
                                 .withBoolean("weakUp", true)
                                 .navigation();
                         fragmentManager.beginTransaction()
-                                .add(R.id.fragment_container, fragment, PR.ai.speaker)
+                                .add(R.id.fragment_container, fragment, Module.ai.speaker)
                                 .addToBackStack(null)
                                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                                 .commitAllowingStateLoss();
@@ -104,12 +102,12 @@ public final class HostActivity extends AppCompatActivity {
 
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(PR.ux.login)
+                .build(Module.ux.login)
                 .navigation();
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, fragment, PR.ux.desktop)
+                .add(R.id.fragment_container, fragment, Module.ux.desktop)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commitAllowingStateLoss();
     }

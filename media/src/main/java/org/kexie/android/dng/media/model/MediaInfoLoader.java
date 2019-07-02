@@ -112,7 +112,7 @@ public class MediaInfoLoader {
             String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
             String singer = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-            //int duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+            //int duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Resource.DURATION));
             long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
             long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
             long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));

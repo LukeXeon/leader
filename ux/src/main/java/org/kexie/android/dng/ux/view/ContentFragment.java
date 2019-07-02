@@ -6,9 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentContentBinding;
 
@@ -17,7 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-@Route(path = PR.ux.content)
+@Route(path = Module.Ux.userInfo)
 public class ContentFragment extends Fragment
 {
     private FragmentContentBinding binding;
@@ -50,14 +49,5 @@ public class ContentFragment extends Fragment
 //                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
 //                .setBlurRadius(20f)
 //                .setHasFixedTransformationMatrix(true);
-
-        Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(PR.ux.content_login)
-                .navigation();
-
-        getChildFragmentManager()
-                .beginTransaction()
-                .add(R.id.info_host, fragment)
-                .commitAllowingStateLoss();
     }
 }

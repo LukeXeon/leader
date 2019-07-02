@@ -9,7 +9,7 @@ import com.alibaba.android.arouter.facade.Postcard;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
 import org.kexie.android.dng.ux.widget.DesktopController;
@@ -21,7 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 
-@Route(path = PR.ux.desktop)
+@Route(path = Module.Ux.desktop)
 public class DesktopFragment extends Fragment {
 
     private FragmentDesktopBinding binding;
@@ -40,14 +40,8 @@ public class DesktopFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.list.setAdapter(new DesktopController(getLifecycle(), action -> {
-            Postcard postcard = ARouter.getInstance().build(action);
-            if (PR.ux.apps.equals(action)) {
-                jumpToNoHide(postcard);
-            } else {
-                jumpTo(postcard);
-            }
-        }));
+        binding.list.setAdapter(new DesktopController(getLifecycle(),
+                action -> jumpTo(ARouter.getInstance().build(action))));
     }
 
     private FragmentTransaction getTransaction(Postcard postcard) {
@@ -57,10 +51,6 @@ public class DesktopFragment extends Fragment {
                 .add(getId(), fragment, postcard.getPath())
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-    }
-
-    private void jumpToNoHide(Postcard postcard) {
-        getTransaction(postcard).commitAllowingStateLoss();
     }
 
     private void jumpTo(Postcard postcard) {

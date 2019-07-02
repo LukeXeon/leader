@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.zml.libs.widget.MusicSeekBar;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
 import org.kexie.android.dng.media.viewmodel.LifecycleViewModelFactory;
-import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
+import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel2;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,11 +21,11 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = PR.media.music)
+@Route(path = Module.Media.music)
 public class MusicPlayerFragment extends Fragment {
 
     private FragmentMusicPlayBinding binding;
-    private MusicPlayerViewModel viewModel;
+    private MusicPlayerViewModel2 viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class MusicPlayerFragment extends Fragment {
                 getLifecycle()
         );
         viewModel = ViewModelProviders.of(this, factory)
-                .get(MusicPlayerViewModel.class);
+                .get(MusicPlayerViewModel2.class);
     }
 
     @Nullable
@@ -45,7 +45,7 @@ public class MusicPlayerFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
                 inflater,
-                R.layout.fragment_music_play,
+                R.layout.fragment_music_player,
                 container,
                 false);
         viewModel.adapter.setEmptyView(inflater.inflate(R.layout.view_empty2, container, false));
@@ -63,7 +63,7 @@ public class MusicPlayerFragment extends Fragment {
         binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return MusicPlayerViewModel.getProgressTime(binding.musicSeek.getProgress());
+                return MusicPlayerViewModel2.getProgressTime(binding.musicSeek.getProgress());
             }
 
             @Override

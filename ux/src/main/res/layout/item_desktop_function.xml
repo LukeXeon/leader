@@ -6,7 +6,7 @@
     <data>
         <variable
             name="function"
-            type="org.kexie.android.dng.ux.viewmodel.entity.Function"/>
+            type="org.kexie.android.dng.ux.org.kexie.android.dng.ai.viewmodel.entity.Function"/>
     </data>
     <RelativeLayout
         android:layout_width="wrap_content"

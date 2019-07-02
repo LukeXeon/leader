@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.Gravity"/>
-        <import type="org.kexie.android.dng.ai.viewmodel.entity.Message"/>
+        <import type="org.kexie.android.dng.ai.viewmodel.beans.TextMessage"/>
         <variable
             name="message"
-            type="org.kexie.android.dng.ai.viewmodel.entity.Message"/>
+            type="TextMessage"/>
     </data>
     <LinearLayout
-        android:gravity="@{message.type==Message.TYPE_AI?Gravity.LEFT:Gravity.RIGHT}"
+        android:gravity="@{message.type==TextMessage.TYPE_AI?Gravity.LEFT:Gravity.RIGHT}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.cardview.widget.CardView

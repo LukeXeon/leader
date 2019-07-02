@@ -36,6 +36,6 @@
             android:exported="false"
             android:enabled="true"
             android:process=":plugins"
-            android:name=".model.TTSRemoteService"/>
+            android:name=".model.BaiduTTS$RemoteService"/>
     </application>
 </manifest>

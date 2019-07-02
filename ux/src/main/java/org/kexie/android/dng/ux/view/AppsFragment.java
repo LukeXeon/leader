@@ -8,11 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.chad.library.adapter.base.BaseQuickAdapter;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
@@ -24,7 +22,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = PR.ux.apps)
+@Route(path = Module.Ux.apps)
 public class AppsFragment extends Fragment {
 
     private FragmentAppsBinding binding;
@@ -58,39 +56,26 @@ public class AppsFragment extends Fragment {
         view.setOnTouchListener((x, y) -> true);
 
         GenericQuickAdapter<App> adapter = appsViewModel.appAdapter;
-        adapter.setOnItemClickListener(RxUtils.debounce(
-                BaseQuickAdapter.OnItemClickListener.class,
-                getLifecycle(),
-                (adapter1, view1, position) -> {
-                    App app = (App) adapter1.getItem(position);
-                    if (app == null) {
-                        return;
-                    }
-                    String packName = app.packageName;
-                    Intent intent = requireContext()
-                            .getPackageManager()
-                            .getLaunchIntentForPackage(packName);
-                    if (intent != null) {
-                        startActivity(intent);
-                    }
-                }));
+        adapter.setOnItemClickListener((adapter1, view1, position) -> {
+            App app = (App) adapter1.getItem(position);
+            if (app == null) {
+                return;
+            }
+            String packName = app.packageName;
+            Intent intent = requireContext()
+                    .getPackageManager()
+                    .getLaunchIntentForPackage(packName);
+            if (intent != null) {
+                startActivity(intent);
+            }
+        });
         adapter.setOnItemLongClickListener((adapter12, view12, position) -> {
-
-
             return true;
         });
 
         appsViewModel.isLoading.observe(this, binding::setIsLoading);
         binding.setAdapter(adapter);
         binding.setLifecycleOwner(this);
-        //binding.rootView.setLifecycle(getLifecycle());
-//        binding.rootView.setupWith((ViewGroup) view.getParent())
-//                .setFrameClearDrawable(requireActivity().getWindow()
-//                        .getDecorView()
-//                        .getBackground())
-//                .setBlurAlgorithm(new RenderScriptBlur(getContext()))
-//                .setBlurRadius(20f)
-//                .setHasFixedTransformationMatrix(true);
     }
 
     @Override

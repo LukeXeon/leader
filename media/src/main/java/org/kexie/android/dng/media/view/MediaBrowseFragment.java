@@ -14,16 +14,15 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.orhanobut.logger.Logger;
 
-import org.kexie.android.dng.common.app.PR;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.common.widget.ProgressFragment;
-import org.kexie.android.dng.common.widget.RxUtils;
 import org.kexie.android.dng.media.BR;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMediaBrowseBinding;
 import org.kexie.android.dng.media.model.entity.MediaInfo;
-import org.kexie.android.dng.media.viewmodel.MediaBrowseViewModel;
-import org.kexie.android.dng.media.viewmodel.entity.Media;
+import org.kexie.android.dng.media.viewmodel.BrowserViewModel;
+import org.kexie.android.dng.media.viewmodel.beans.Resource;
 
 import java.util.Map;
 import java.util.Objects;
@@ -36,14 +35,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = PR.media.browse)
+@Route(path = Module.media.browse)
 public class MediaBrowseFragment
         extends Fragment {
-    private MediaBrowseViewModel viewModel;
+    private BrowserViewModel viewModel;
 
     private FragmentMediaBrowseBinding binding;
 
-    private GenericQuickAdapter<Media> mediasAdapter;
+    private GenericQuickAdapter<Resource> mediasAdapter;
 
     private static final int REQUEST_TO_PHOTO = 1000;
     private static final int REQUEST_TO_VIDEO = 1001;
@@ -52,7 +51,7 @@ public class MediaBrowseFragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(this)
-                .get(MediaBrowseViewModel.class);
+                .get(BrowserViewModel.class);
     }
 
     @Nullable
@@ -73,20 +72,20 @@ public class MediaBrowseFragment
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mediasAdapter = new GenericQuickAdapter<>(R.layout.item_media_info, BR.mediaInfo);
+        mediasAdapter = new GenericQuickAdapter<>(R.layout.item_resource, BR.mediaInfo);
         mediasAdapter.setOnItemClickListener(
                 RxUtils.debounce(
                         BaseQuickAdapter.OnItemClickListener.class,
                         getLifecycle(),
                         (adapter, view1, position) -> {
-                            Media info = (Media) adapter.getItem(position);
+                            Resource info = (Resource) adapter.getItem(position);
                             if (info == null) {
                                 return;
                             }
                             switch (info.type) {
                                 case MediaInfo.TYPE_PHOTO: {
                                     Postcard postcard = ARouter.getInstance()
-                                            .build(PR.media.photo);
+                                            .build(Module.media.photo);
                                     Bundle bundle = postcard.getExtras();
                                     bundle.putParcelable("media", info);
                                     Fragment fragment = (Fragment) postcard.navigation();
@@ -96,7 +95,7 @@ public class MediaBrowseFragment
                                 break;
                                 case MediaInfo.TYPE_VIDEO: {
                                     Postcard postcard = ARouter.getInstance()
-                                            .build(PR.media.media);
+                                            .build(Module.media.media);
                                     Bundle bundle = postcard.getExtras();
                                     bundle.putParcelable("media", info);
                                     postcard.navigation(requireContext());
@@ -154,7 +153,7 @@ public class MediaBrowseFragment
                                  @Nullable Intent data) {
         if (requestCode == REQUEST_TO_PHOTO
                 && Activity.RESULT_FIRST_USER == resultCode) {
-            Media media = Objects.requireNonNull(data)
+            Resource media = Objects.requireNonNull(data)
                     .getParcelableExtra("media");
             int index = mediasAdapter.getData().indexOf(media);
             if (index != -1) {

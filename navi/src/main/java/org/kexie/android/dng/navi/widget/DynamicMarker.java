@@ -1,6 +1,5 @@
 package org.kexie.android.dng.navi.widget;
 
-public final class DynamicMarker
-{
+public final class DynamicMarker {
 
 }

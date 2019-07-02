@@ -12,6 +12,7 @@ import com.amap.api.navi.enums.LaneAction;
 import com.amap.api.navi.model.AMapLaneInfo;
 
 import org.kexie.android.dng.navi.R;
+import org.kexie.android.dng.navi.util.DensityUtils;
 
 /**
  * 车道信息View

@@ -7,7 +7,7 @@
         <import type="androidx.databinding.adapters.Converters"/>
         <variable
             name="mediaInfo"
-            type="org.kexie.android.dng.media.viewmodel.entity.MusicDetails" />
+            type="org.kexie.android.dng.media.viewmodel.beans.MusicDetail" />
     </data>
 
     <LinearLayout

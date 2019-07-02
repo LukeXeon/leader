@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.amap.api.navi.enums.IconType;
 
 import org.kexie.android.dng.navi.R;
-import org.kexie.android.dng.navi.viewmodel.entity.GuideInfo;
+import org.kexie.android.dng.navi.viewmodel.beans.StationDescription;
 
 import java.util.List;
 import java.util.Locale;
@@ -23,10 +23,10 @@ import java.util.Locale;
 public class NaviGuideAdapter extends BaseExpandableListAdapter
 {
 
-    private List<GuideInfo> groupList;
+    private List<StationDescription> groupList;
     private Context mContext;
 
-    public NaviGuideAdapter(Context context, List<GuideInfo> guideInfoList)
+    public NaviGuideAdapter(Context context, List<StationDescription> guideInfoList)
     {
         mContext = context;
         groupList = guideInfoList;
@@ -98,7 +98,7 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
                 holder = (GroupHolder) convertView.getTag();
             }
 
-            GuideInfo group = groupList.get(groupPosition);
+            StationDescription group = groupList.get(groupPosition);
             if (null != group)
             {
                 int iconType = group.getGroupIconType();
@@ -176,7 +176,7 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
                 holder = (ChildHolder) convertView.getTag();
             }
 
-            GuideInfo.Step guidStep = groupList.get(groupPosition).getSteps().get(childPosition);
+            StationDescription.Step guidStep = groupList.get(groupPosition).getSteps().get(childPosition);
             if (null != guidStep)
             {
                 holder.ivChildIcon.setBackgroundResource(getDrawableId(guidStep.getStepIconType()));

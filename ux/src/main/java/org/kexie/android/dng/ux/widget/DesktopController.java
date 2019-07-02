@@ -14,8 +14,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
 
-import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.widget.RxUtils;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.ItemDesktopGroupBinding;
 import org.kexie.android.dng.ux.databinding.ItemDesktopTimerBinding;
@@ -111,19 +110,19 @@ public final class DesktopController extends AnimationAdapter {
         private final Map<View, String> mapping = new ArrayMap<>();
         private final View.OnClickListener onClick;
         private final Object[] items = {
-                item("导航", R.drawable.icon_navi, PR.navi.navi),
-                item("时间", R.drawable.icon_time, PR.ux.time),
-                item("收音机", R.drawable.icon_fm, PR.ux.fm),
-                item("视频", R.drawable.icon_video, PR.media.media),
-                item("照片", R.drawable.icon_photo, PR.media.photo),
+                item("导航", R.drawable.icon_navi, Module.navi.navi),
+                item("时间", R.drawable.icon_time, Module.ux.time),
+                item("收音机", R.drawable.icon_fm, Module.ux.fm),
+                item("视频", R.drawable.icon_video, Module.media.media),
+                item("照片", R.drawable.icon_photo, Module.media.photo),
                 new NeoDesktopItem[]{
-                        item("APPS", R.drawable.icon_apps, PR.ux.apps),
-                        item("音乐", R.drawable.icon_music, PR.media.music),
-                        item("个人中心", R.drawable.icon_info, PR.ux.info),
-                        item("天气", R.drawable.icon_weather, PR.ux.weather)
+                        item("APPS", R.drawable.icon_apps, Module.ux.apps),
+                        item("音乐", R.drawable.icon_music, Module.media.music),
+                        item("个人中心", R.drawable.icon_info, Module.ux.info),
+                        item("天气", R.drawable.icon_weather, Module.ux.weather)
                 },
-                item("应用商店", R.drawable.icon_store, PR.ux.store),
-                item("设置", R.drawable.icon_setting, PR.ux.setting)
+                item("应用商店", R.drawable.icon_store, Module.ux.store),
+                item("设置", R.drawable.icon_setting, Module.ux.setting)
         };
 
         private Inner(Lifecycle lifecycle, Action action) {
@@ -143,7 +142,7 @@ public final class DesktopController extends AnimationAdapter {
         public int getItemViewType(int position) {
             Object item = items[position];
             if (item instanceof NeoDesktopItem) {
-                return PR.ux.time.equals(((NeoDesktopItem) item).path)
+                return Module.ux.time.equals(((NeoDesktopItem) item).path)
                         ? VIEW_TYPE_TIMER
                         : VIEW_TYPE_NORMAL;
             } else {

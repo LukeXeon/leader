@@ -10,9 +10,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.kexie.android.danmakux.utils.FileUtils;
-import org.kexie.android.dng.common.widget.RxUtils;
-import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.viewmodel.entity.Media;
+import org.kexie.android.dng.media.viewmodel.beans.Resource;
 import org.kexie.android.dng.player.media.vedio.IjkPlayerView;
 
 import java.io.File;
@@ -25,8 +23,7 @@ import androidx.fragment.app.Fragment;
 
 
 public class VideoPlayerFragment
-        extends Fragment
-        implements OnBackPressedCallback {
+        extends Fragment {
 
     private IjkPlayerView player;
 
@@ -39,10 +36,7 @@ public class VideoPlayerFragment
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        playerContainer = (FrameLayout) inflater
-                .inflate(R.layout.fragment_player_container,
-                        container,
-                        false);
+        playerContainer = new FrameLayout(inflater.getContext());
         if (!isFormWindow) {
             player = new IjkPlayerView(inflater.getContext());
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
@@ -67,7 +61,7 @@ public class VideoPlayerFragment
         super.onViewCreated(view, savedInstanceState);
 
         if (!isFormWindow) {
-            Media info = requireArguments().getParcelable("media");
+            Resource info = requireArguments().getParcelable("media");
             if (info != null && info.uri != null) {
                 Glide.with(this)
                         .load(info.uri)
@@ -87,19 +81,26 @@ public class VideoPlayerFragment
                 player.start();
             }
         }
-        requireActivity().addOnBackPressedCallback(this, this);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (player != null && player.onBackPressed()) {
+                            return;
+                        }
+                        setEnabled(false);
+                        requireActivity().onBackPressed();
+                    }
+                });
         player.setOnClickBackListener(requireActivity()::onBackPressed);
-        player.setFloatClickListener(RxUtils.debounce(
-                View.OnClickListener.class,
-                getLifecycle(),
-                v -> transformToWindow()));
+        player.setFloatClickListener(v -> transformToWindow());
     }
 
     private void transformToWindow() {
         playerContainer.removeView(player);
         player.setFloatClickListener(null);
-        MediaHolderActivity holderActivity
-                = (MediaHolderActivity) requireActivity();
+        HoldingPlayerActivity holderActivity
+                = (HoldingPlayerActivity) requireActivity();
         holderActivity.holdByWindow(player);
         player = null;
         holderActivity.onBackPressed();
@@ -129,13 +130,5 @@ public class VideoPlayerFragment
         if (player != null) {
             player.onResume();
         }
-    }
-
-    @Override
-    public boolean handleOnBackPressed() {
-        if (player != null) {
-            player.onBackPressed();
-        }
-        return false;
     }
 }

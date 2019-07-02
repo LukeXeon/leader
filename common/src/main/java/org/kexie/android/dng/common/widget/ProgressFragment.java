@@ -25,25 +25,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 public final class ProgressFragment
-        extends Fragment {
+        extends Fragment
+        implements Runnable {
     private ViewProgressBinding binding;
-    private RoundCornerImageView mProgressIv;
-    private ImageView mBotIv;
-    private TextView mProgressMessage;
-    private Handler mHandler;
-    private int mValue = 0;
-    private Runnable mUpdater = new Runnable() {
-        @Override
-        public void run() {
-            if (mValue < 100) {
-                updatePercent(++mValue);
-                setMessage("加载中" + mValue + "%");
-            } else {
-                mValue = 0;
-            }
-            mHandler.postDelayed(this,50);
-        }
-    };
+    private RoundImageView progressImage;
+    private ImageView botImage;
+    private TextView message;
+    private Handler handler;
+    private int value = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,65 +54,89 @@ public final class ProgressFragment
         super.onViewCreated(view, savedInstanceState);
         binding.getRoot().setOnTouchListener((x, y) -> true);
 
-        mProgressMessage = view.findViewById(R.id.progress_message);
+        message = view.findViewById(R.id.progress_message);
         //新增进度条
-        mProgressIv = view.findViewById(R.id.p_cover_iv);
-        mBotIv = view.findViewById(R.id.p_bot_iv);
-        mHandler.post(mUpdater);
+        progressImage = view.findViewById(R.id.p_cover_iv);
+        botImage = view.findViewById(R.id.p_bot_iv);
+        handler.post(this);
     }
 
 
     private void updatePercent(int percent) {
-        float percentFloat = percent / 100.0f;//除以100，得到百分比
-        final int ivWidth = mBotIv.getWidth();//获取总长度
+        //除以100，得到百分比
+        float percentFloat = percent / 100.0f;
+        //获取总长度
+        final int ivWidth = botImage.getWidth();
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)
-                mProgressIv.getLayoutParams();
-        int marginEnd = (int) ((1 - percentFloat) * ivWidth); //获取剩下的长度
+                progressImage.getLayoutParams();
+        //获取剩下的长度
+        int marginEnd = (int) ((1 - percentFloat) * ivWidth);
         lp.width = ivWidth - marginEnd;
-        mProgressIv.setLayoutParams(lp);
-        mProgressIv.postInvalidate();
+        progressImage.setLayoutParams(lp);
+        progressImage.postInvalidate();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mHandler.removeCallbacks(mUpdater);
+        handler.removeCallbacks(this);
         binding = null;
-        mBotIv = null;
-        mProgressIv = null;
+        botImage = null;
+        progressImage = null;
     }
 
     private void setMessage(String message) {
-        if (mProgressMessage != null) {
-            mProgressMessage.setText(message);
+        if (this.message != null) {
+            this.message.setText(message);
         }
     }
 
+
     public static void observeWith(LiveData<Boolean> liveData, Fragment root) {
-        liveData.observe(root, new ObserverHandler(root));
+        liveData.observe(root, new EventHandler(root));
     }
 
-    private static final class ObserverHandler
+    @Override
+    public void run() {
+        if (value < 100) {
+            updatePercent(++value);
+            setMessage("加载中" + value + "%");
+        } else {
+            value = 0;
+        }
+        handler.postDelayed(this, 50);
+    }
+
+
+    private static final class EventHandler
             extends Handler
             implements Observer<Boolean>,
-            OnBackPressedCallback,
             Runnable {
 
+        private final OnBackPressedCallback onBackPressed
+                = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+            }
+        };
         private final FragmentManager manager;
         private final Fragment target;
         private boolean isAdding = false;
 
-        private ObserverHandler(Fragment fragment) {
+        private EventHandler(Fragment fragment) {
             super(Looper.getMainLooper());
             target = fragment;
             manager = fragment.requireFragmentManager();
+            fragment.requireActivity()
+                    .getOnBackPressedDispatcher()
+                    .addCallback(fragment, onBackPressed);
         }
 
         @Override
         public void run() {
             removeCallbacks(this);
             if (isAdding) {
-                postDelayed(this,200);
+                postDelayed(this, 200);
                 return;
             }
             if (!manager.isDestroyed()) {
@@ -134,8 +147,10 @@ public final class ProgressFragment
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                             .remove(fragment)
                             .commitAllowingStateLoss();
+
                 }
             }
+            onBackPressed.setEnabled(false);
         }
 
         @Override
@@ -145,7 +160,7 @@ public final class ProgressFragment
                         .findFragmentByTag(ProgressFragment.class.getName());
                 if (fragment == null && !isAdding && show != null && show) {
                     fragment = new ProgressFragment();
-                    fragment.mHandler = this;
+                    fragment.handler = this;
                     isAdding = true;
                     fragment.setMessage("加载中");
                     manager.beginTransaction()
@@ -153,17 +168,12 @@ public final class ProgressFragment
                             .add(target.getId(), fragment, ProgressFragment.class.getName())
                             .runOnCommit(() -> isAdding = false)
                             .commitAllowingStateLoss();
-                    target.requireActivity().addOnBackPressedCallback(fragment,
-                            this);
+                    onBackPressed.setEnabled(true);
                 } else {
+
                     postDelayed(this, 200);
                 }
             }
-        }
-
-        @Override
-        public boolean handleOnBackPressed() {
-            return true;
         }
     }
 }

@@ -8,8 +8,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import org.kexie.android.dng.common.app.PR;
-import org.kexie.android.dng.common.widget.RxUtils;
+import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentLoginBinding;
 import org.kexie.android.dng.ux.viewmodel.LoginViewModel;
@@ -21,7 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 
-@Route(path = PR.ux.login)
+@Route(path = Module.Ux.login)
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
     private LoginViewModel viewModel;
@@ -49,10 +48,7 @@ public class LoginFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         viewModel.qrcode.observe(this,
                 drawable -> binding.qrCode.setImageDrawable(drawable));
-        binding.qrCode.setOnClickListener(RxUtils.debounce(
-                View.OnClickListener.class,
-                getLifecycle(),
-                v -> viewModel.requestQrcode()));
+        binding.qrCode.setOnClickListener(v -> viewModel.requestQrcode());
         viewModel.result.observe(this,
                 result -> {
                     Toast toast = result

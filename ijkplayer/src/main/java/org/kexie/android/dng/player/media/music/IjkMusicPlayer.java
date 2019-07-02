@@ -9,6 +9,8 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import org.kexie.android.dng.common.util.LiveEvent;
+
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -17,17 +19,14 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.subjects.PublishSubject;
 
 @MainThread
 @SuppressWarnings("WeakerAccess")
 public final class IjkMusicPlayer {
     private static final Looper MAIN_LOOPER = Looper.getMainLooper();
 
-    private final PublishSubject<Boolean> OnPlayCompleted = PublishSubject.create();
-    private final PublishSubject<Boolean> mOnSourcePrepared = PublishSubject.create();
+    private final LiveEvent<Boolean> mOnSourcePrepared = new LiveEvent<>();
+    private final LiveEvent<Boolean> mOnPlayCompleted = new LiveEvent<>();
     private final MutableLiveData<byte[]> mFft = new MutableLiveData<>();
     private final MutableLiveData<Long> mDuration = new MutableLiveData<>();
     private final MutableLiveData<Long> mPosition = new MutableLiveData<>();
@@ -42,12 +41,12 @@ public final class IjkMusicPlayer {
         public void onPrepared(int audioSessionId, long duration) {
             mSessionId.postValue(audioSessionId);
             mDuration.postValue(duration);
-            mOnSourcePrepared.onNext(Boolean.TRUE);
+            mOnSourcePrepared.post(Boolean.TRUE);
         }
 
         @Override
         public void onPlayCompleted() {
-            OnPlayCompleted.onNext(Boolean.TRUE);
+            mOnPlayCompleted.post(Boolean.TRUE);
         }
 
         @Override
@@ -125,20 +124,18 @@ public final class IjkMusicPlayer {
         mAppContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    public LiveEvent<Boolean> getOnSourcePrepared() {
+        return mOnSourcePrepared;
+    }
+
+    public LiveEvent<Boolean> getOnPlayCompleted() {
+        return mOnPlayCompleted;
+    }
+
     private void assetContext() {
         if (!MAIN_LOOPER.equals(Looper.myLooper()) && !mIsFinish) {
             throw new IllegalStateException();
         }
-    }
-
-    public Observable<Boolean> onPlayCompleted() {
-        assetContext();
-        return OnPlayCompleted.observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Observable<Boolean> onSourcePrepared() {
-        assetContext();
-        return mOnSourcePrepared.observeOn(AndroidSchedulers.mainThread());
     }
 
     public LiveData<byte[]> getFft() {
