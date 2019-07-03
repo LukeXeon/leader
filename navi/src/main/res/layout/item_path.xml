@@ -8,11 +8,9 @@
         <variable
             name="path"
             type="org.kexie.android.dng.navi.viewmodel.beans.PathDescription"/>
-
         <variable
-            name="onJumpToNavi"
+            name="onJump"
             type="android.view.View.OnClickListener"/>
-
     </data>
 
     <FrameLayout
@@ -104,7 +102,7 @@
                     android:layout_gravity="bottom"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/btn_draw"
-                    android:onClick="@{onJumpToNavi}"
+                    android:onClick="@{onJump}"
                     android:text="@string/string_submit"
                     android:textColor="@color/white"
                     android:textSize="30sp"/>

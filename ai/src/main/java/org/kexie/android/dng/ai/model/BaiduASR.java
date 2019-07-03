@@ -72,7 +72,7 @@ public class BaiduASR implements ASR, EventListener {
     public void init(Context context) {
         context = context.getApplicationContext();
         EventManager weakUpManager = EventManagerFactory.create(context, "wp", true);
-        eventManager.registerListener(this);
+        weakUpManager.registerListener(this);
         eventManager = EventManagerFactory.create(context, "asr", true);
         eventManager.registerListener(this);
         weakUpManager.send(SpeechConstant.WAKEUP_START,

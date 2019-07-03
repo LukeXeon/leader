@@ -90,15 +90,15 @@ public class PhotoViewerFragment extends Fragment {
         if (animation != null) {
             animation.cancel();
         }
-        if (Utils.safeUnBox(binding.getHide()))//show
-        {
+        if (Utils.safeUnBox(binding.getHide())) {
+            //show
             binding.blurView.setVisibility(View.VISIBLE);
             AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
             alphaAnimation.setDuration(200);
             binding.blurView.startAnimation(alphaAnimation);
             binding.blurView.setTag(alphaAnimation);
-        } else//hide
-        {
+        } else {
+            //hide
             AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
             alphaAnimation.setAnimationListener(new AnimationAdapter() {
                 @Override

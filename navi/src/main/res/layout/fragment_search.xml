@@ -18,155 +18,18 @@
         <variable
             name="tipsAdapter"
             type="androidx.recyclerview.widget.RecyclerView.Adapter"/>
-
-        <variable
-            name="actions"
-            type="java.util.Map&lt;String,Action&gt;"/>
-
-        <variable
-            name="queryText"
-            type="androidx.lifecycle.MutableLiveData&lt;String&gt;"/>
-
-        <variable
-            name="isShowQuery"
-            type="Boolean"/>
-
-        <variable
-            name="isShowTips"
-            type="Boolean"/>
-
-        <variable
-            name="startQuery"
-            type="View.OnClickListener"/>
-
     </data>
 
-    <FrameLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <FrameLayout
-            android:id="@+id/tip_root"
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="120dp"
-            android:layout_marginRight="120dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:orientation="vertical">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick='@{startQuery}'
-                        android:visibility="@{!safeUnbox(isShowQuery)?View.VISIBLE:View.GONE}"
-                        app:cardBackgroundColor="@android:color/white"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="10dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="20dp"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:hint="@string/string_find_poi"
-                                android:singleLine="true"
-                                android:textColor="@color/grey1000"
-                                android:textColorHint="@color/grey600"
-                                android:textSize="35sp"
-                                android:textStyle="bold"
-                                tools:ignore="RtlHardcoded"/>
-
-                            <ImageView
-                                async_src='@{"image_search"}'
-                                android:layout_width="50dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginBottom="5dp"
-                                android:scaleType="centerInside"
-                                tools:ignore="RtlHardcoded"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="@{safeUnbox(isShowQuery)?View.VISIBLE:View.GONE}"
-                        app:cardBackgroundColor="@android:color/white"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="10dp"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:orientation="horizontal">
-
-                            <EditText
-                                android:id="@+id/edit_query"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="20dp"
-                                android:layout_weight="1"
-                                android:background="@null"
-                                android:gravity="center_vertical"
-                                android:singleLine="true"
-                                android:text="@={queryText}"
-                                android:textColor="@color/grey1000"
-                                android:textColorHint="@color/grey600"
-                                android:textSize="35sp"
-                                android:textStyle="bold"
-                                tools:ignore="RtlHardcoded"/>
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                </FrameLayout>
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/tip_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="-10dp"
-                    android:visibility="@{safeUnbox(isShowTips)?View.VISIBLE:View.GONE}"
-                    app:cardBackgroundColor="@android:color/white"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="10dp"
-                    app:cardPreventCornerOverlap="false"
-                    app:cardUseCompatPadding="true">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="20dp"
-                        android:adapter="@{tipsAdapter}"
-                        android:orientation="vertical"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-        </FrameLayout>
-    </FrameLayout>
+            android:layout_margin="20dp"
+            android:adapter="@{tipsAdapter}"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+    </LinearLayout>
 </layout>

@@ -77,7 +77,6 @@ public class MusicPlayerFragment extends Fragment {
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
                 viewModel.seekTo(musicSeekBar.getProgress());
-
             }
         });
         binding.play.setOnClickListener(v -> viewModel.setNewSource("/storage/emulated" +

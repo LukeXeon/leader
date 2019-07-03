@@ -12,23 +12,31 @@
         <variable
             name="openSearch"
             type="android.view.View.OnClickListener"/>
+        <variable
+            name="onBack"
+            type="android.view.View.OnClickListener"/>
     </data>
     <RelativeLayout
         android:id="@+id/pager_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false">
-        <androidx.recyclerview.widget.RecyclerView
+        <org.kexie.android.dng.navi.widget.PileLayout
             android:visibility="@{!safeUnbox(isPreview)?View.GONE:View.VISIBLE}"
             android:layout_alignParentRight="true"
-            android:id="@+id/path"
+            android:id="@+id/paths"
             android:layout_width="450dp"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:displayCount="1.8"
+            app:interval="10dp"
+            app:scaleStep="0.32"
+            app:sizeRatio="1.12"/>
         <Button
             android:visibility="@{!safeUnbox(isPreview)?View.GONE:View.VISIBLE}"
             android:textColor="@color/colorBlackAlpha54"
             android:textSize="25dp"
             android:text="返回"
+            android:onClick="@{onBack}"
             android:background="@color/whitesmoke"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
@@ -60,6 +68,8 @@
                     android:gravity="center|left"
                     android:textSize="23dp"
                     android:text="@{formText}"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/colorBlackAlpha26"
                     android:hint="正在获取起点位置......"
                     android:layout_weight="1"
                     android:layout_width="match_parent"

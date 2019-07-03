@@ -3,6 +3,7 @@ package org.kexie.android.dng.navi.view;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +36,6 @@ import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.navi.model.RouteOverlayOptions;
 import com.amap.api.navi.view.AmapCameraOverlay;
 import com.amap.api.navi.view.RouteOverLay;
-import com.dingmouren.layoutmanagergroup.skidright.SkidRightLayoutManager;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.contract.Module;
@@ -45,6 +46,7 @@ import org.kexie.android.dng.navi.databinding.FragmentNavigatorRunningBinding;
 import org.kexie.android.dng.navi.model.beans.Point;
 import org.kexie.android.dng.navi.viewmodel.NavigatorViewModel;
 import org.kexie.android.dng.navi.viewmodel.beans.PathDescription;
+import org.kexie.android.dng.navi.viewmodel.beans.TipText;
 import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarMarker;
 
@@ -112,12 +114,12 @@ public class NavigatorFragment extends Fragment {
         map = bindMapToViewModel();
         carMarker = CarMarker.getDefault(requireContext(), map);
         cameraOverlay = new AmapCameraOverlay(requireContext());
-        viewModel.descriptions.observe(this, pathDescriptions -> {
-            if (pathDescriptions.isEmpty()) {
+        viewModel.paths.observe(this, descriptions -> {
+            if (descriptions.isEmpty()) {
                 //默认选择第一条路
                 clearRoutes();
             } else {
-                drawRoutes(pathDescriptions);
+                drawRoutes(descriptions);
             }
         });
         viewModel.select.observe(this, select -> {
@@ -169,18 +171,23 @@ public class NavigatorFragment extends Fragment {
                 }
             }
         });
-        viewModel.isRunning.observe(this, isRun -> {
-            Fragment fragment;
-            if (isRun) {
-                fragment = new RunningFragment();
-                setRunningMapState();
-            } else {
-                fragment = new PreviewFragment();
-                setQueryMapState();
-            }
+        initMapState();
+    }
+
+    private void initMapState() {
+        Fragment previewFragment = new PreviewFragment();
+        setPreviewMapState();
+        getChildFragmentManager()
+                .beginTransaction()
+                .replace(R.id.map_upper, previewFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
+        viewModel.onPrepare.observe(this, __ -> {
+            Fragment runningFragment = new RunningFragment();
+            setRunningMapState();
             getChildFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.map_upper, fragment)
+                    .replace(R.id.map_upper, runningFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commitAllowingStateLoss();
         });
@@ -189,7 +196,15 @@ public class NavigatorFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        if (requestCode == R.id.search_request_code) {
+            if (Activity.RESULT_OK == resultCode && data != null) {
+                Bundle bundle = data.getExtras();
+                if (bundle != null) {
+                    TipText tipText = bundle.getParcelable("tip");
+                    viewModel.enterPreviewModeByUser(tipText);
+                }
+            }
+        }
     }
 
     private Observer<Location> locationObserver = location -> {
@@ -206,6 +221,7 @@ public class NavigatorFragment extends Fragment {
                         i * 800);
                 circleAnimators.put(circle, animator);
             }
+            zoomMapToLocation();
         } else {
             for (Circle circle : circleAnimators.keySet()) {
                 circle.setCenter(latLng);
@@ -213,7 +229,7 @@ public class NavigatorFragment extends Fragment {
         }
     };
 
-    private void setQueryMapState() {
+    private void setPreviewMapState() {
         MyLocationStyle myLocationStyle = new MyLocationStyle()
                 .radiusFillColor(Color.TRANSPARENT)
                 .strokeColor(Color.TRANSPARENT)
@@ -265,18 +281,17 @@ public class NavigatorFragment extends Fragment {
             Logger.d("select=" + select);
             for (int i = 0; i < routeOverLays.size(); i++) {
                 RouteOverLay routeOverLay = routeOverLays.valueAt(i);
-
                 if (routeOverLays.keyAt(i) == select) {
                     selectRoute(routeOverLay);
                     animatedNavigationBegin();
                     break;
                 }
             }
-            removeQueryMapState();
+            removePreviewMapState();
         }
     }
 
-    private void removeQueryMapState() {
+    private void removePreviewMapState() {
         map.setMyLocationEnabled(false);
         UiSettings uiSettings = map.getUiSettings();
         uiSettings.setMyLocationButtonEnabled(false);
@@ -407,7 +422,7 @@ public class NavigatorFragment extends Fragment {
 
     private AMap bindMapToViewModel() {
         AMapCompatFragment mapCompatFragment = (AMapCompatFragment)
-                requireFragmentManager().findFragmentById(R.id.map_view);
+                getChildFragmentManager().findFragmentById(R.id.map_view);
         if (mapCompatFragment != null) {
             AMap aMap = mapCompatFragment.getMap();
             viewModel.bindMapLocation(aMap);
@@ -420,7 +435,7 @@ public class NavigatorFragment extends Fragment {
 
         private NavigatorViewModel viewModel;
 
-        private long last = System.currentTimeMillis();
+        private long last = SystemClock.uptimeMillis();
 
         private FragmentNavigatorRunningBinding binding;
 
@@ -443,7 +458,8 @@ public class NavigatorFragment extends Fragment {
         }
 
         @Override
-        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        public void onViewCreated(@NonNull View view,
+                                  @Nullable Bundle savedInstanceState) {
             binding.setLifecycleOwner(this);
             viewModel.naviDescription.observe(this, naviDescription -> {
                 binding.myTrafficBar.update(
@@ -455,9 +471,9 @@ public class NavigatorFragment extends Fragment {
                 binding.textNextRoadName.setText(naviDescription.nextRoadName);
                 binding.textNextRoadDistance.setText(naviDescription.nextRoadDistance);
             });
-            viewModel.isPrepare.observe(this, isPrepare -> {
-                binding.setIsLoading(isPrepare);
-                binding.progressBar.enableIndeterminateMode(isPrepare);
+            viewModel.isRunning.observe(this, isRunning -> {
+                binding.setIsLoading(!isRunning);
+                binding.progressBar.enableIndeterminateMode(!isRunning);
             });
             viewModel.laneInfo.observe(this, laneInfo -> {
                 if (laneInfo != null) {
@@ -487,7 +503,7 @@ public class NavigatorFragment extends Fragment {
                     .addCallback(this, new OnBackPressedCallback(true) {
                         @Override
                         public void handleOnBackPressed() {
-                            long now = System.currentTimeMillis();
+                            long now = SystemClock.uptimeMillis();
                             if (now - last > 1000) {
                                 Logger.d(now - last);
                                 Toasty.warning(requireContext(), "再按一次退出导航")
@@ -528,10 +544,7 @@ public class NavigatorFragment extends Fragment {
 
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            binding.path.setLayoutManager(
-                    new SkidRightLayoutManager(1.5f, 0.85f)
-            );
-            binding.path.setAdapter(viewModel.descriptions);
+            binding.paths.setAdapter(viewModel.paths);
             viewModel.selfLocationName.observe(this, s -> binding.setFormText(s));
             viewModel.isPreview.observe(this, val -> binding.setIsPreview(val));
             binding.setOpenSearch(v -> {
@@ -546,6 +559,7 @@ public class NavigatorFragment extends Fragment {
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commitAllowingStateLoss();
             });
+            binding.setOnBack(v -> viewModel.exitPreviewMode());
         }
     }
 }

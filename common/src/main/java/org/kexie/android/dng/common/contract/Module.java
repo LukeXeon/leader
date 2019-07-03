@@ -52,7 +52,7 @@ public final class Module {
          */
         public static final String navigator = "/navi/navigator";
         public static final String search = "/navi/search";
-        public static final String location = "navi/location";
+        public static final String location = "/navi/location";
     }
 
     public static final class Media {

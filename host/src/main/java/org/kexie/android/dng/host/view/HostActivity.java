@@ -2,7 +2,6 @@ package org.kexie.android.dng.host.view;
 
 import android.os.Bundle;
 
-import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.Logger;
@@ -27,7 +26,6 @@ public final class HostActivity extends AppCompatActivity {
 
     private ActivityHostBinding binding;
 
-    @Autowired(name = Module.Ai.asr)
     ASR asrService;
 
     @Override
@@ -67,7 +65,7 @@ public final class HostActivity extends AppCompatActivity {
             }
         });
 
-        ARouter.getInstance().inject(this);
+        asrService = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
 
         asrService.addHandler(new ASR.Handler() {
             @Override
@@ -105,7 +103,7 @@ public final class HostActivity extends AppCompatActivity {
 
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(Module.Ux.login)
+                .build(Module.Navi.navigator)
                 .navigation();
 
         getSupportFragmentManager()

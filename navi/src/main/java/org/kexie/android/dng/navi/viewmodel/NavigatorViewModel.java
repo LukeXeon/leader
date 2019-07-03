@@ -38,7 +38,6 @@ import com.orhanobut.logger.Logger;
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.contract.TTS;
 import org.kexie.android.dng.common.util.LiveEvent;
-import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.navi.model.beans.Point;
 import org.kexie.android.dng.navi.model.beans.Query;
 import org.kexie.android.dng.navi.util.AMapCompat;
@@ -74,7 +73,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
     public static final int NO_SELECT = Integer.MIN_VALUE;
 
-    public final GenericQuickAdapter<PathDescription> descriptions;
+    public final PathAdapter paths;
 
     public final MutableLiveData<String> selfLocationName = new MutableLiveData<>();
 
@@ -90,11 +89,11 @@ public class NavigatorViewModel extends AndroidViewModel {
 
     public final MutableLiveData<AMapNaviCross> crossImage = new MutableLiveData<>();
 
+    public final LiveEvent<Void> onPrepare = new LiveEvent<>();
+
     public final MutableLiveData<Boolean> isRunning = new MutableLiveData<>(false);
 
     public final MutableLiveData<Boolean> isPreview = new MutableLiveData<>(false);
-
-    public final MutableLiveData<Boolean> isPrepare = new MutableLiveData<>(false);
 
     public final MutableLiveData<Integer> select = new MutableLiveData<>(NO_SELECT);
 
@@ -124,12 +123,18 @@ public class NavigatorViewModel extends AndroidViewModel {
         worker = new Handler(workerThread.getLooper());
         main = new Handler(Looper.getMainLooper());
         tts = (TTS) ARouter.getInstance().build(Module.Ai.tts).navigation(application);
-        descriptions = new PathAdapter(this::select);
+        paths = new PathAdapter(() -> onPrepare.post(null), this::select);
     }
 
     public void beginNavigation() {
         navi.setEmulatorNaviSpeed(40);
         navi.startNavi(NaviType.EMULATOR);
+        isRunning.setValue(true);
+    }
+
+    public void exitPreviewMode() {
+        isPreview.setValue(false);
+        paths.setValue(Collections.emptyList());
     }
 
     public void bindMapLocation(AMap map) {
@@ -160,29 +165,32 @@ public class NavigatorViewModel extends AndroidViewModel {
         }
     }
 
-    public void findPathByUser(TipText tip) {
+    public void enterPreviewModeByUser(TipText tip) {
         worker.post(() -> {
             try {
-                PoiSearch.Query query = new PoiSearch.Query(tip.text, "");
-                query.setDistanceSort(false);
-                query.requireSubPois(true);
-                PoiSearch poiSearch = new PoiSearch(getApplication(), query);
+                PoiSearch.Query poiQuery = new PoiSearch.Query(tip.text, "");
+                poiQuery.setDistanceSort(false);
+                poiQuery.requireSubPois(true);
+                PoiSearch poiSearch = new PoiSearch(getApplication(), poiQuery);
                 PoiItem poiItem = poiSearch.searchPOIId(tip.id);
-                Query query1 = new Query.Builder()
+                Query query = new Query.Builder()
                         .to(toPoiPoint(poiItem))
                         .mode(10)
                         .build();
-                findPathByInternal(query1);
+                findPaths(query);
+                isPreview.postValue(true);
             } catch (Exception e) {
                 e.printStackTrace();
+
             }
         });
     }
 
-    public void findPathByRemote(Query query) {
+    public void enterPreviewModeByRemote(Query query) {
         worker.post(() -> {
             try {
-                findPathByInternal(query);
+                findPaths(query);
+                isPreview.postValue(true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -190,7 +198,7 @@ public class NavigatorViewModel extends AndroidViewModel {
     }
 
     @WorkerThread
-    private void findPathByInternal(Query query) throws Exception {
+    private void findPaths(Query query) throws Exception {
         int[] ids = requestPathIds(query);
         List<PathDescription> pathDescriptions = new LinkedList<>();
         for (int id : ids) {
@@ -200,7 +208,7 @@ public class NavigatorViewModel extends AndroidViewModel {
             }
         }
         main.post(() -> {
-            descriptions.setNewData(pathDescriptions);
+            paths.setValue(pathDescriptions);
             select(ids[0]);
         });
     }
@@ -520,5 +528,4 @@ public class NavigatorViewModel extends AndroidViewModel {
             }
         }
     }
-
 }
