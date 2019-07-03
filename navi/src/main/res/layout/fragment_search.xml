@@ -1,35 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-
-        <import
-            alias="Action"
-            type="android.view.View.OnClickListener"/>
-
         <import type="org.kexie.android.dng.navi.R"/>
-
         <import type="android.view.View"/>
-
-
         <variable
             name="tipsAdapter"
             type="androidx.recyclerview.widget.RecyclerView.Adapter"/>
     </data>
 
     <LinearLayout
+        android:background="@color/white"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:textSize="30dp"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:textColorHint="@color/colorBlackAlpha26"
+            android:hint="点击打开语音输入"
             android:layout_margin="20dp"
-            android:adapter="@{tipsAdapter}"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            android:background="@drawable/input_background"
+            android:layout_width="match_parent"
+            android:layout_height="60dp" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 </layout>
