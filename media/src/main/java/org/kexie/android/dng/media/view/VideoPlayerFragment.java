@@ -99,8 +99,8 @@ public class VideoPlayerFragment
     private void transformToWindow() {
         playerContainer.removeView(player);
         player.setFloatClickListener(null);
-        HoldingPlayerActivity holderActivity
-                = (HoldingPlayerActivity) requireActivity();
+        VideoPlayerHolder holderActivity
+                = (VideoPlayerHolder) requireActivity();
         holderActivity.holdByWindow(player);
         player = null;
         holderActivity.onBackPressed();

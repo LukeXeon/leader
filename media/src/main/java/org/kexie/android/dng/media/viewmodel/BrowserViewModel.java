@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import android.provider.MediaStore;
 
 import org.kexie.android.dng.media.model.MediaInfoLoader;
-import org.kexie.android.dng.media.model.entity.MediaInfo;
+import org.kexie.android.dng.media.model.beans.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.beans.Resource;
 
 import java.util.List;

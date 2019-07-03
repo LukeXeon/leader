@@ -9,9 +9,9 @@ import android.provider.MediaStore;
 
 import com.bumptech.glide.Glide;
 
-import org.kexie.android.dng.media.model.entity.MusicInfo;
-import org.kexie.android.dng.media.model.entity.PhotoInfo;
-import org.kexie.android.dng.media.model.entity.VideoInfo;
+import org.kexie.android.dng.media.model.beans.MusicInfo;
+import org.kexie.android.dng.media.model.beans.PhotoInfo;
+import org.kexie.android.dng.media.model.beans.VideoInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -11,9 +11,9 @@ import com.zml.libs.widget.MusicSeekBar;
 
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.databinding.FragmentMusicPlayBinding;
-import org.kexie.android.dng.media.viewmodel.LifecycleViewModelFactory;
-import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel2;
+import org.kexie.android.dng.media.databinding.FragmentMusicPlayerBinding;
+import org.kexie.android.dng.media.util.Utils;
+import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,18 +24,14 @@ import androidx.lifecycle.ViewModelProviders;
 @Route(path = Module.Media.music)
 public class MusicPlayerFragment extends Fragment {
 
-    private FragmentMusicPlayBinding binding;
-    private MusicPlayerViewModel2 viewModel;
+    private FragmentMusicPlayerBinding binding;
+    private MusicPlayerViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LifecycleViewModelFactory factory = new LifecycleViewModelFactory(
-                requireActivity().getApplication(),
-                getLifecycle()
-        );
-        viewModel = ViewModelProviders.of(this, factory)
-                .get(MusicPlayerViewModel2.class);
+        viewModel = ViewModelProviders.of(this)
+                .get(MusicPlayerViewModel.class);
     }
 
     @Nullable
@@ -48,14 +44,16 @@ public class MusicPlayerFragment extends Fragment {
                 R.layout.fragment_music_player,
                 container,
                 false);
-        viewModel.adapter.setEmptyView(inflater.inflate(R.layout.view_empty2, container, false));
+        viewModel.details.setEmptyView(inflater.inflate(R.layout.view_empty2,
+                container,
+                false));
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
-        binding.rvMusicList.setAdapter(viewModel.adapter);
+        binding.rvMusicList.setAdapter(viewModel.details);
         //musicSeek
         binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
         binding.musicSeek.setProgressColor(getResources().getColor(R.color.deeppurplea200));
@@ -63,7 +61,7 @@ public class MusicPlayerFragment extends Fragment {
         binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return MusicPlayerViewModel2.getProgressTime(binding.musicSeek.getProgress());
+                return Utils.getProgressTime(binding.musicSeek.getProgress());
             }
 
             @Override
@@ -78,49 +76,41 @@ public class MusicPlayerFragment extends Fragment {
 
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
-                viewModel.musicPlayer.seekTo(musicSeekBar.getProgress());
+                viewModel.seekTo(musicSeekBar.getProgress());
 
             }
         });
-        binding.play.setOnClickListener(v -> viewModel.play("/storage/emulated" +
+        binding.play.setOnClickListener(v -> viewModel.setNewSource("/storage/emulated" +
                 "/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3"));
         //musicPlayer
-        viewModel.lyrics.observe(this, lyrics -> {
+        viewModel.lyricSet.observe(this, lyrics -> {
             binding.lrcView.setLrc(lyrics);
             binding.lrcView.start();
         });
-        viewModel.musicPlayer.getFft().observe(this,
+        viewModel.getFft().observe(this,
                 bytes -> binding.visualizer.updateVisualizer(bytes));
-        viewModel.musicPlayer.getDuration().observe(this,
+        viewModel.duration.observe(this,
                 duration -> {
-                    binding.lrcView.setDuration(safeUnBoxInt(duration));
-                    binding.musicSeek.setMax(safeUnBoxInt(duration));
+                    binding.lrcView.setDuration(Utils.safeUnBoxInt(duration));
+                    binding.musicSeek.setMax(Utils.safeUnBoxInt(duration));
                 });
-        viewModel.musicPlayer.getPosition().observe(this,
+        viewModel.getPosition().observe(this,
                 position -> {
-                    binding.musicSeek.setProgress(safeUnBoxInt(position));
-                    binding.lrcView.seekTo(safeUnBoxInt(position));
+                    binding.musicSeek.setProgress(Utils.safeUnBoxInt(position));
+                    binding.lrcView.seekTo(Utils.safeUnBoxInt(position));
                 });
         binding.musicSeek.setEnabled(true);
-        viewModel.adapter.setOnItemChildClickListener((adapter, view1, position) -> {
+        viewModel.details.setOnItemChildClickListener((adapter, view1, position) -> {
 
         });
-        viewModel.details.observe(this,
+        viewModel.current.observe(this,
                 mediaDetails -> binding.setDetails(mediaDetails));
-        binding.setVolume(viewModel.volume);
+        binding.setVolume(viewModel.volumePercent);
         int value = viewModel.getVolume();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             binding.volume.setProgress(value, true);
         } else {
             binding.volume.setProgress(value);
         }
-    }
-
-    private static int safeUnBoxInt(Long value) {
-        return (int) safeUnBox(value);
-    }
-
-    private static long safeUnBox(Long value) {
-        return value == null ? 0 : value;
     }
 }

@@ -43,4 +43,6 @@ dependencies {
     //字幕
     api 'com.github.LukeXeon:danmaku-subtitle-plugins:1.4.2'
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
+
+    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 }

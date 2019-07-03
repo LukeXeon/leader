@@ -1,5 +1,5 @@
 
-package org.kexie.android.dng.media.model.entity;
+package org.kexie.android.dng.media.model.beans;
 
 public abstract class MediaInfo
 {

@@ -15,7 +15,8 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.widget.AnimationAdapter;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.databinding.FragmentPhotoViewBinding;
+import org.kexie.android.dng.media.databinding.FragmentPhotoViewerBinding;
+import org.kexie.android.dng.media.util.Utils;
 import org.kexie.android.dng.media.viewmodel.BrowserViewModel;
 
 import java.util.Map;
@@ -29,17 +30,15 @@ import androidx.lifecycle.ViewModelProviders;
 import es.dmoral.toasty.Toasty;
 
 @Route(path = Module.Media.photoViewer)
-public class PhotoViewerFragment extends Fragment
-{
+public class PhotoViewerFragment extends Fragment {
 
-    private FragmentPhotoViewBinding binding;
+    private FragmentPhotoViewerBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
-    {
+                             @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_photo_viewer,
@@ -64,48 +63,34 @@ public class PhotoViewerFragment extends Fragment
         if (target != null) {
             BrowserViewModel viewModel = ViewModelProviders.of(target)
                     .get(BrowserViewModel.class);
-
-            Map<String, View.OnClickListener> actions
-                    = new ArrayMap<String, View.OnClickListener>() {
-                {
-                    put("back", RxUtils.debounce(View.OnClickListener.class,
-                            getLifecycle(),
-                            v -> requireActivity().onBackPressed()));
-                    put("delete", RxUtils.debounce(View.OnClickListener.class,
-                            getLifecycle(),
-                            v -> {
-                                if (viewModel.delete(binding.getInfo())) {
-                                    Fragment fragment = getTargetFragment();
-                                    if (fragment != null) {
-                                        fragment.onActivityResult(getTargetRequestCode(),
-                                                Activity.RESULT_FIRST_USER, new Intent().putExtras(requireArguments()));
-                                    }
-                                    Toasty.success(requireContext(), "删除成功").show();
-                                    requireActivity().onBackPressed();
-                                } else {
-                                    Toasty.error(requireContext(), "删除失败").show();
-                                }
-                            }));
-                    put("hide", RxUtils.debounce(
-                            View.OnClickListener.class,
-                            getLifecycle(),
-                            v -> doHideAnimation()));
+            Map<String, View.OnClickListener> actions = new ArrayMap<>();
+            actions.put("back", v -> requireActivity().onBackPressed());
+            actions.put("delete", v -> {
+                if (viewModel.delete(binding.getInfo())) {
+                    Fragment fragment = getTargetFragment();
+                    if (fragment != null) {
+                        fragment.onActivityResult(getTargetRequestCode(),
+                                Activity.RESULT_FIRST_USER, new Intent()
+                                        .putExtras(requireArguments()));
+                    }
+                    Toasty.success(requireContext(), "删除成功").show();
+                    requireActivity().onBackPressed();
+                } else {
+                    Toasty.error(requireContext(), "删除失败").show();
                 }
-            };
-
+            });
+            actions.put("hide", v -> doHideAnimation());
             binding.setActions(actions);
         }
     }
 
-    private void doHideAnimation()
-    {
+    private void doHideAnimation() {
         AlphaAnimation animation
                 = (AlphaAnimation) binding.blurView.getTag();
-        if (animation != null)
-        {
+        if (animation != null) {
             animation.cancel();
         }
-        if (binding.getHide())//show
+        if (Utils.safeUnBox(binding.getHide()))//show
         {
             binding.blurView.setVisibility(View.VISIBLE);
             AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
@@ -115,13 +100,10 @@ public class PhotoViewerFragment extends Fragment
         } else//hide
         {
             AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-            alphaAnimation.setAnimationListener(new AnimationAdapter()
-            {
+            alphaAnimation.setAnimationListener(new AnimationAdapter() {
                 @Override
-                public void onAnimationEnd(Animation animation)
-                {
-                    if (binding.getHide())
-                    {
+                public void onAnimationEnd(Animation animation) {
+                    if (Utils.safeUnBox(binding.getHide())) {
                         binding.blurView.setVisibility(View.GONE);
                     }
                 }
@@ -130,6 +112,6 @@ public class PhotoViewerFragment extends Fragment
             binding.blurView.startAnimation(alphaAnimation);
             binding.blurView.setTag(alphaAnimation);
         }
-        binding.setHide(!binding.getHide());
+        binding.setHide(!Utils.safeUnBox(binding.getHide()));
     }
 }

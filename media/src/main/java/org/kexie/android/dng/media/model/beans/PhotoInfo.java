@@ -1,4 +1,4 @@
-package org.kexie.android.dng.media.model.entity;
+package org.kexie.android.dng.media.model.beans;
 
 public class PhotoInfo extends MediaInfo {
     public PhotoInfo(String title, String uri) {
