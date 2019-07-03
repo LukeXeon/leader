@@ -6,7 +6,7 @@
     <data>
         <import type="androidx.databinding.adapters.Converters"/>
         <variable
-            name="mediaInfo"
+            name="music"
             type="org.kexie.android.dng.media.viewmodel.beans.MusicDetail" />
     </data>
 
@@ -27,7 +27,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerInParent="true"
                 android:layout_margin="15dp"
-                android:src="@{mediaInfo.icon==null?Converters.convertColorToDrawable(@color/deeppurplea700):mediaInfo.icon}"
+                android:src="@{music.icon==null?Converters.convertColorToDrawable(@color/deeppurplea700):music.icon}"
                 android:scaleType="centerCrop"
                 tools:srcCompat="@tools:sample/backgrounds/scenic[1]" />
             <ImageButton
@@ -51,10 +51,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="30dp"
-                    android:text="@{mediaInfo.songName}" />
+                    android:text="@{music.songName}" />
                 <TextView
                     android:singleLine="true"
-                    android:text="@{mediaInfo.singerName}"
+                    android:text="@{music.singerName}"
                     android:textSize="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

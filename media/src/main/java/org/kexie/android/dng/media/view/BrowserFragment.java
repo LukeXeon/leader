@@ -2,11 +2,11 @@ package org.kexie.android.dng.media.view;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 
-import org.kexie.android.dng.common.contract.Module;
+import org.kexie.android.dng.media.model.SplitFlow;
 
 import androidx.fragment.app.Fragment;
 
-@Route(path = Module.Media._$browser)
+@Route(path = SplitFlow.browser)
 public class BrowserFragment extends Fragment {
 
 }

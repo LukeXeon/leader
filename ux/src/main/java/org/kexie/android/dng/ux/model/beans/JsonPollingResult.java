@@ -1,4 +1,4 @@
-package org.kexie.android.dng.ux.model.entity;
+package org.kexie.android.dng.ux.model.beans;
 
 /**
  * Created by Mr.小世界 on 2018/11/28.

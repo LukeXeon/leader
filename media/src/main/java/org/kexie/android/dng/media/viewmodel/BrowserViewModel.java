@@ -3,8 +3,10 @@ package org.kexie.android.dng.media.viewmodel;
 import android.app.Application;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.provider.MediaStore;
 
+import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.model.MediaInfoLoader;
 import org.kexie.android.dng.media.model.beans.MediaInfo;
 import org.kexie.android.dng.media.viewmodel.beans.Resource;
@@ -30,9 +32,11 @@ public class BrowserViewModel extends AndroidViewModel {
         return new Handler(workerThread.getLooper());
     }).apply(workerThread);
 
+    private final Handler main = new Handler(Looper.getMainLooper());
+
     public final MutableLiveData<String> title = new MutableLiveData<>();
 
-    public final MutableLiveData<List<Resource>> resources = new MutableLiveData<>();
+    public final GenericQuickAdapter<Resource> resources = new GenericQuickAdapter<>(0,0);
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
@@ -56,7 +60,7 @@ public class BrowserViewModel extends AndroidViewModel {
                     : MediaInfoLoader.getPhotoInfos(getApplication()))
                     .map(x -> new Resource(x.title, x.uri, x.type))
                     .collect(Collectors.toList());
-            this.resources.postValue(medias);
+            main.post(()-> resources.setNewData(medias));
             isLoading.postValue(false);
             title.postValue(type);
         });

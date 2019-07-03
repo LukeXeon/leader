@@ -14,7 +14,7 @@ import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentAppsBinding;
 import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
-import org.kexie.android.dng.ux.viewmodel.entity.App;
+import org.kexie.android.dng.ux.viewmodel.beans.App;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -5,7 +5,7 @@
 
         <variable
             name="app"
-            type="org.kexie.android.dng.ux.org.kexie.android.dng.ai.viewmodel.entity.App"/>
+            type="org.kexie.android.dng.ux.viewmodel.beans.App"/>
     </data>
 
     <LinearLayout

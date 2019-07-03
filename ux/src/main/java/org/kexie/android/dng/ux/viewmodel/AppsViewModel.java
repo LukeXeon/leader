@@ -14,8 +14,8 @@ import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.model.AppInfoProvider;
-import org.kexie.android.dng.ux.model.entity.AppInfo;
-import org.kexie.android.dng.ux.viewmodel.entity.App;
+import org.kexie.android.dng.ux.model.beans.AppInfo;
+import org.kexie.android.dng.ux.viewmodel.beans.App;
 
 import java.util.List;
 

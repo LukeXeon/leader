@@ -19,7 +19,7 @@ import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.ItemDesktopGroupBinding;
 import org.kexie.android.dng.ux.databinding.ItemDesktopTimerBinding;
 import org.kexie.android.dng.ux.databinding.ItemDsektopNormalBinding;
-import org.kexie.android.dng.ux.viewmodel.entity.NeoDesktopItem;
+import org.kexie.android.dng.ux.viewmodel.beans.DesktopItem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -96,8 +96,8 @@ public final class DesktopController extends AnimationAdapter {
         setDuration(600);
     }
 
-    private static NeoDesktopItem item(String name, int imageId, String path) {
-        return new NeoDesktopItem(name, imageId, path);
+    private static DesktopItem item(String name, int imageId, String path) {
+        return new DesktopItem(name, imageId, path);
     }
 
     private static final class Inner
@@ -110,26 +110,25 @@ public final class DesktopController extends AnimationAdapter {
         private final Map<View, String> mapping = new ArrayMap<>();
         private final View.OnClickListener onClick;
         private final Object[] items = {
-                item("导航", R.drawable.icon_navi, Module.navi.navi),
-                item("时间", R.drawable.icon_time, Module.ux.time),
-                item("收音机", R.drawable.icon_fm, Module.ux.fm),
-                item("视频", R.drawable.icon_video, Module.media.media),
-                item("照片", R.drawable.icon_photo, Module.media.photo),
-                new NeoDesktopItem[]{
-                        item("APPS", R.drawable.icon_apps, Module.ux.apps),
-                        item("音乐", R.drawable.icon_music, Module.media.music),
-                        item("个人中心", R.drawable.icon_info, Module.ux.info),
-                        item("天气", R.drawable.icon_weather, Module.ux.weather)
+                item("导航", R.drawable.icon_navi, Module.Navi.navigator),
+                item("时间", R.drawable.icon_time, Module.Ux.time),
+                item("收音机", R.drawable.icon_fm, Module.Ux.fm),
+                item("视频", R.drawable.icon_video, Module.Media.video),
+                item("照片", R.drawable.icon_photo, Module.Media.photo),
+                new DesktopItem[]{
+                        item("APPS", R.drawable.icon_apps, Module.Ux.apps),
+                        item("音乐", R.drawable.icon_music, Module.Media.music),
+                        item("个人中心", R.drawable.icon_info, Module.Ux.userInfo),
+                        item("天气", R.drawable.icon_weather, Module.Ux.weather)
                 },
-                item("应用商店", R.drawable.icon_store, Module.ux.store),
-                item("设置", R.drawable.icon_setting, Module.ux.setting)
+                item("应用商店", R.drawable.icon_store, Module.Ux.appStore),
+                item("设置", R.drawable.icon_setting, Module.Ux.setting)
         };
 
         private Inner(Lifecycle lifecycle, Action action) {
             this.action = action;
             this.lifecycle = lifecycle;
-            onClick = RxUtils.debounce(View.OnClickListener.class,
-                    lifecycle, this);
+            onClick = this;
         }
 
 
@@ -141,8 +140,8 @@ public final class DesktopController extends AnimationAdapter {
         @Override
         public int getItemViewType(int position) {
             Object item = items[position];
-            if (item instanceof NeoDesktopItem) {
-                return Module.ux.time.equals(((NeoDesktopItem) item).path)
+            if (item instanceof DesktopItem) {
+                return Module.Ux.time.equals(((DesktopItem) item).path)
                         ? VIEW_TYPE_TIMER
                         : VIEW_TYPE_NORMAL;
             } else {
@@ -177,17 +176,17 @@ public final class DesktopController extends AnimationAdapter {
                         Pair.create(binding.image2, binding.text2),
                         Pair.create(binding.image3, binding.text3),
                         Pair.create(binding.image4, binding.text4));
-                NeoDesktopItem[] subItems = (NeoDesktopItem[]) items[position];
+                DesktopItem[] subItems = (DesktopItem[]) items[position];
                 for (int i = 0; i < 4; i++) {
                     Pair<ImageView, TextView> view = views.get(i);
-                    NeoDesktopItem item = subItems[i];
+                    DesktopItem item = subItems[i];
                     Glide.with(view.first).load(item.image).into(view.first);
                     view.second.setText(item.name);
                     view.first.setOnClickListener(onClick);
                     mapping.put(view.first, item.path);
                 }
             } else {
-                NeoDesktopItem item = (NeoDesktopItem) items[position];
+                DesktopItem item = (DesktopItem) items[position];
                 ImageView imageView;
                 TextView textView;
                 if (holder.type == VIEW_TYPE_NORMAL) {

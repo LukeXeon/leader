@@ -4,6 +4,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
+import org.kexie.android.dng.common.util.Utils;
 import org.kexie.android.dng.host.BuildConfig;
 
 import androidx.multidex.MultiDexApplication;
@@ -36,7 +37,7 @@ public final class AppGlobal extends MultiDexApplication
                 .setCustomFragment(true);
         AutoSize.initCompatMultiProcess(this);
 
-        Logger.d(SHA1Util.getSHA1(this));
+        Logger.d(Utils.getSha1Code(this));
     }
 
     @Override

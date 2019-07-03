@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 28
@@ -30,9 +30,9 @@ android {
         enabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = '1.6'
-    }
+//    kotlinOptions {
+//        jvmTarget = '1.6'
+//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

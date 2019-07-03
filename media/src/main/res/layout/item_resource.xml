@@ -4,8 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
-            name="mediaInfo"
-            type="org.kexie.android.dng.media.org.kexie.android.dng.ai.viewmodel.entity.Media"/>
+            name="res"
+            type="org.kexie.android.dng.media.viewmodel.beans.Resource"/>
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.makeramen.roundedimageview.RoundedImageView
-                    async_src="@{mediaInfo.uri}"
+                    async_src="@{res.uri}"
                     android:scaleType="centerCrop"
                     app:riv_corner_radius_top_left="10dp"
                     app:riv_corner_radius_top_right="10dp"
@@ -30,7 +30,7 @@
                     android:layout_height="150dp"/>
                 <TextView
                     android:textSize="25sp"
-                    android:text="@{mediaInfo.title}"
+                    android:text="@{res.title}"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="10dp"

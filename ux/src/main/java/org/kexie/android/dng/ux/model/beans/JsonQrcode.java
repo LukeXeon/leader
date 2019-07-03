@@ -1,4 +1,4 @@
-package org.kexie.android.dng.ux.model.entity;
+package org.kexie.android.dng.ux.model.beans;
 
 public class JsonQrcode
 {

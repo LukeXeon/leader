@@ -59,7 +59,7 @@
                     android:padding="5dp"
                     android:gravity="center|left"
                     android:textSize="23dp"
-                    android:text="@{form}"
+                    android:text="@{formText}"
                     android:hint="正在获取起点位置......"
                     android:layout_weight="1"
                     android:layout_width="match_parent"

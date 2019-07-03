@@ -7,7 +7,7 @@ import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 
 public class MusicQuickAdapter extends GenericQuickAdapter<MusicDetail> {
     public MusicQuickAdapter() {
-        super(R.layout.item_music, BR.mediaInfo);
+        super(R.layout.item_music, BR.music);
     }
 
     @Override

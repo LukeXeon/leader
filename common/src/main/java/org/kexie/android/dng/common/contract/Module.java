@@ -68,15 +68,8 @@ public final class Module {
          * 音乐播放
          */
         public static final String music = "/media/music";
-        /**
-         * 重定向到{@link Media#_$browser}
-         */
         public static final String photo = "/media/photo/browse";
         public static final String video = "/media/video/browse";
-        /**
-         * 内部逻辑
-         */
-        public static final String _$browser = "/media/inner-use/browse";
     }
 
     public static final class Host {

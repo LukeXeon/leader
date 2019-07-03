@@ -1,4 +1,4 @@
-package org.kexie.android.dng.ux.viewmodel.entity;
+package org.kexie.android.dng.ux.viewmodel.beans;
 
 import android.graphics.drawable.Drawable;
 

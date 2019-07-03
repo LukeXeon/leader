@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
 
-import org.kexie.android.dng.ux.model.entity.AppInfo;
+import org.kexie.android.dng.ux.model.beans.AppInfo;
 
 import java.util.ArrayList;
 import java.util.Iterator;

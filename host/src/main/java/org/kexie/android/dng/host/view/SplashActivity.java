@@ -12,6 +12,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.bumptech.glide.Glide;
 
 import org.kexie.android.dng.common.contract.Module;
+import org.kexie.android.dng.common.util.Utils;
 import org.kexie.android.dng.host.BuildConfig;
 import org.kexie.android.dng.host.R;
 import org.kexie.android.dng.host.databinding.ActivitySplashBinding;
@@ -32,7 +33,7 @@ public final class SplashActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Window window = getWindow();
-        SystemUtil.hideSystemUi(window);
+        Utils.hideSystemUi(window);
         ActivitySplashBinding binding = DataBindingUtil
                 .setContentView(this, R.layout.activity_splash);
 
@@ -41,7 +42,7 @@ public final class SplashActivity extends AppCompatActivity {
         boolean isFirst = preferences.getBoolean(IS_FIRST, true);
         Runnable jump = () -> {
             ARouter.getInstance()
-                    .build(Module.host.host)
+                    .build(Module.Host.host)
                     .navigation(this);
             finish();
         };
