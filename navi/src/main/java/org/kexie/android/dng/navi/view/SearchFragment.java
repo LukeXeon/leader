@@ -1,5 +1,6 @@
 package org.kexie.android.dng.navi.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,9 +50,10 @@ public class SearchFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        binding.getRoot().setOnTouchListener((v, event) -> true);
         binding.setTipsAdapter(viewModel.tips);
         binding.setOnSpeech(v -> {
             Fragment fragment = new SpeakerFragment();
