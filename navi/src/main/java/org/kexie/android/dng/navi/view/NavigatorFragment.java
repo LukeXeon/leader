@@ -43,6 +43,7 @@ import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorBinding;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorPreviewBinding;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorRunningBinding;
+import org.kexie.android.dng.navi.databinding.WidgetPilePathBinding;
 import org.kexie.android.dng.navi.model.beans.Point;
 import org.kexie.android.dng.navi.viewmodel.NavigatorViewModel;
 import org.kexie.android.dng.navi.viewmodel.beans.PathDescription;
@@ -457,7 +458,8 @@ public class NavigatorFragment extends Fragment {
             });
             viewModel.isRunning.observe(this, isRunning -> {
                 binding.setIsLoading(!isRunning);
-                binding.progressBar.enableIndeterminateMode(!isRunning);;
+                binding.progressBar.enableIndeterminateMode(!isRunning);
+                ;
             });
             viewModel.laneInfo.observe(this, laneInfo -> {
                 if (laneInfo != null) {
@@ -540,6 +542,8 @@ public class NavigatorFragment extends Fragment {
 
         private FragmentNavigatorPreviewBinding binding;
 
+        private WidgetPilePathBinding widget;
+
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -560,9 +564,24 @@ public class NavigatorFragment extends Fragment {
 
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            binding.paths.setAdapter(viewModel.paths);
             viewModel.selfLocationName.observe(this, s -> binding.setFormText(s));
-            viewModel.isPreview.observe(this, val -> binding.setIsPreview(val));
+            viewModel.isPreview.observe(this, val -> {
+                if (val) {
+                    widget = DataBindingUtil.inflate(
+                            getLayoutInflater(),
+                            R.layout.widget_pile_path,
+                            (ViewGroup) binding.getRoot(),
+                            false);
+                    ((ViewGroup) binding.getRoot())
+                            .addView(widget.getRoot());
+                    widget.paths.setAdapter(viewModel.paths);
+                } else if (widget != null) {
+                    ((ViewGroup) binding.getRoot())
+                            .removeView(widget.getRoot());
+                    widget = null;
+                }
+                binding.setIsPreview(val);
+            });
             binding.setOpenSearch(v -> {
                 Fragment fragment = (Fragment) ARouter.getInstance()
                         .build(Module.Navi.search)

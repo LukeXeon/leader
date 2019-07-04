@@ -11,7 +11,6 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
@@ -95,12 +94,9 @@ public class PileLayout extends ViewGroup {
             }
         };
 
-        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (getHeight() > 0 && null != adapter && !hasSetAdapter) {
-                    setAdapter(adapter);
-                }
+        getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            if (getHeight() > 0 && null != adapter && !hasSetAdapter) {
+                setAdapter(adapter);
             }
         });
     }
@@ -451,7 +447,7 @@ public class PileLayout extends ViewGroup {
     /**
      * 数据更新通知
      */
-    private void onDataSetChanged() {
+    private void onChanged() {
         int num = getChildCount();
         for (int i = 0; i < num; i++) {
             FrameLayout frameLayout = (FrameLayout) getChildAt(i);
@@ -546,7 +542,7 @@ public class PileLayout extends ViewGroup {
         @MainThread
         public void notifyDataSetChanged() {
             for (PileLayout pileLayout : layouts) {
-                pileLayout.onDataSetChanged();
+                pileLayout.onChanged();
             }
         }
     }

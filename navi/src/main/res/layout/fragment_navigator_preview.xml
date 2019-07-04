@@ -21,21 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false">
-        <FrameLayout
-            android:layout_alignParentRight="true"
-            android:layout_width="450dp"
-            android:layout_height="match_parent">
-            <org.kexie.android.dng.navi.widget.PileLayout
-                android:layout_gravity="center_vertical"
-                android:visibility="@{!safeUnbox(isPreview)?View.GONE:View.VISIBLE}"
-                android:id="@+id/paths"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:displayCount="1.3"
-                app:interval="10dp"
-                app:scaleStep="0.32"
-                app:sizeRatio="1.3"/>
-        </FrameLayout>
         <Button
             android:visibility="@{!safeUnbox(isPreview)?View.GONE:View.VISIBLE}"
             android:textColor="@color/colorBlackAlpha54"
