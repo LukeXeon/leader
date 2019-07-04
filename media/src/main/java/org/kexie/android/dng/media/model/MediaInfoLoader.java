@@ -7,16 +7,25 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
 
 import org.kexie.android.dng.media.model.beans.MusicInfo;
 import org.kexie.android.dng.media.model.beans.PhotoInfo;
 import org.kexie.android.dng.media.model.beans.VideoInfo;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Future;
+
+import androidx.exifinterface.media.ExifInterface;
 
 public class MediaInfoLoader {
     public static List<PhotoInfo> getPhotoInfos(Context context) {
@@ -44,11 +53,23 @@ public class MediaInfoLoader {
         while (cursor.moveToNext()) {
             String title = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME));
             //获取图片的名称
+
             long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media.SIZE)); // 大小
             String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            Date date;
+            DateFormat format = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss",
+                    Locale.getDefault());
+            try {
+                ExifInterface exifInterface = new ExifInterface(path);
+                String watermarkTime = exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
+                date = TimeUtils.string2Date(watermarkTime, format);
+            } catch (IOException e) {
+                e.printStackTrace();
+                date = TimeUtils.millis2Date(new File(path).lastModified());
+            }
             if (size < 5 * 1024 * 1024) {
                 //<5M
-                PhotoInfo materialBean = new PhotoInfo(title, path);
+                PhotoInfo materialBean = new PhotoInfo(title, path, date);
                 list.add(materialBean);
             }
         }

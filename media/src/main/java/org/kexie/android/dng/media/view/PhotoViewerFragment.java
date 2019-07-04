@@ -1,8 +1,6 @@
 package org.kexie.android.dng.media.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import org.kexie.android.dng.common.widget.AnimationAdapter;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewerBinding;
 import org.kexie.android.dng.media.util.Utils;
-import org.kexie.android.dng.media.viewmodel.BrowserViewModel;
 
 import java.util.Map;
 
@@ -26,8 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
-import es.dmoral.toasty.Toasty;
 
 @Route(path = Module.Media.photoViewer)
 public class PhotoViewerFragment extends Fragment {
@@ -61,24 +56,8 @@ public class PhotoViewerFragment extends Fragment {
         Fragment target = getTargetFragment();
 
         if (target != null) {
-            BrowserViewModel viewModel = ViewModelProviders.of(target)
-                    .get(BrowserViewModel.class);
             Map<String, View.OnClickListener> actions = new ArrayMap<>();
             actions.put("back", v -> requireActivity().onBackPressed());
-            actions.put("delete", v -> {
-                if (viewModel.delete(binding.getInfo())) {
-                    Fragment fragment = getTargetFragment();
-                    if (fragment != null) {
-                        fragment.onActivityResult(getTargetRequestCode(),
-                                Activity.RESULT_FIRST_USER, new Intent()
-                                        .putExtras(requireArguments()));
-                    }
-                    Toasty.success(requireContext(), "删除成功").show();
-                    requireActivity().onBackPressed();
-                } else {
-                    Toasty.error(requireContext(), "删除失败").show();
-                }
-            });
             actions.put("hide", v -> doHideAnimation());
             binding.setActions(actions);
         }
