@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kexie.android.dng.player.media.vedio;
+package org.kexie.android.dng.player.vedio;
 
 import java.io.File;
 import java.io.IOException;

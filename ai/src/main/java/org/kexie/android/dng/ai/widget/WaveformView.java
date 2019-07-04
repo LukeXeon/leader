@@ -27,7 +27,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-public final class WaveformView2
+public final class WaveformView
         extends WebView
 {
 
@@ -37,14 +37,14 @@ public final class WaveformView2
          */
         INSTANCE;
 
-        private final WaveformView2 mView;
+        private final WaveformView mView;
 
         Provider() {
             mView = Initializer.createView();
         }
 
         @MainThread
-        public WaveformView2 attachTo(FrameLayout viewGroup) {
+        public WaveformView attachTo(FrameLayout viewGroup) {
             viewGroup.addView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
             Context context = viewGroup.getContext();
@@ -67,7 +67,7 @@ public final class WaveformView2
 
     @SuppressWarnings("deprecation")
     @SuppressLint({"SetJavaScriptEnabled"})
-    private WaveformView2(Context context) {
+    private WaveformView(Context context) {
         super(context);
         WebView mWebView = this;
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
@@ -155,8 +155,8 @@ public final class WaveformView2
     {
         private static Application mApplication;
 
-        private static WaveformView2 createView() {
-            return new WaveformView2(new MutableContextWrapper(mApplication));
+        private static WaveformView createView() {
+            return new WaveformView(new MutableContextWrapper(mApplication));
         }
 
         @Override

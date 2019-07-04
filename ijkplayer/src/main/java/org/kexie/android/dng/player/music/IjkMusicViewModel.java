@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media.music;
+package org.kexie.android.dng.player.music;
 
 import android.app.Application;
 import android.content.Context;

@@ -50,6 +50,26 @@ public interface ASR extends IProvider {
 
         @MainThread
         void onResult(boolean isFinal, @NonNull String text);
+    }
 
+    abstract class WeakUpHandler implements Handler {
+
+        @Override
+        public final void onStatusUpdate(int status) {
+
+        }
+
+        @Override
+        public final void onVolumeUpdate(int value) {
+
+        }
+
+        @Override
+        public abstract void onWeakUp(@NonNull String text);
+
+        @Override
+        public final void onResult(boolean isFinal, @NonNull String text) {
+
+        }
     }
 }

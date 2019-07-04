@@ -14,7 +14,7 @@ import org.kexie.android.dng.media.model.MediaInfoLoader;
 import org.kexie.android.dng.media.model.beans.MusicInfo;
 import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 import org.kexie.android.dng.media.widget.MusicQuickAdapter;
-import org.kexie.android.dng.player.media.music.IjkMusicViewModel;
+import org.kexie.android.dng.player.music.IjkMusicViewModel;
 
 import java.io.File;
 import java.util.Collections;

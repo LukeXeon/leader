@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import org.kexie.android.danmakux.utils.FileUtils;
 import org.kexie.android.dng.media.viewmodel.beans.Resource;
-import org.kexie.android.dng.player.media.vedio.IjkPlayerView;
+import org.kexie.android.dng.player.vedio.IjkPlayerView;
 
 import java.io.File;
 import java.util.List;

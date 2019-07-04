@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media.vedio;
+package org.kexie.android.dng.player.vedio;
 
 public class MediaPlayerParams {
 

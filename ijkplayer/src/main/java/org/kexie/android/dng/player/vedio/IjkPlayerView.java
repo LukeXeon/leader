@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media.vedio;
+package org.kexie.android.dng.player.vedio;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -52,11 +52,11 @@ import org.kexie.android.danmakux.converter.SubtitleParserFactory;
 import org.kexie.android.dng.common.widget.MarqueeTextView;
 import org.kexie.android.dng.player.BuildConfig;
 import org.kexie.android.dng.player.R;
-import org.kexie.android.dng.player.widget.AnimUtils;
-import org.kexie.android.dng.player.widget.MotionEventUtils;
-import org.kexie.android.dng.player.widget.NavBarUtils;
-import org.kexie.android.dng.player.widget.StringUtils;
-import org.kexie.android.dng.player.widget.WindowUtils;
+import org.kexie.android.dng.player.util.AnimUtils;
+import org.kexie.android.dng.player.util.MotionEventUtils;
+import org.kexie.android.dng.player.util.NavBarUtils;
+import org.kexie.android.dng.player.util.StringUtils;
+import org.kexie.android.dng.player.util.WindowUtils;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -89,7 +89,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import static android.view.GestureDetector.OnGestureListener;
 import static android.view.GestureDetector.SimpleOnGestureListener;
 import static android.widget.SeekBar.OnSeekBarChangeListener;
-import static org.kexie.android.dng.player.widget.StringUtils.generateTime;
+import static org.kexie.android.dng.player.util.StringUtils.generateTime;
 import static tv.danmaku.ijk.media.player.IMediaPlayer.OnInfoListener;
 
 /**

@@ -14,7 +14,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import org.kexie.android.dng.ai.R;
 import org.kexie.android.dng.ai.databinding.FragmentSiriBinding;
 import org.kexie.android.dng.ai.viewmodel.SiriViewModel;
-import org.kexie.android.dng.ai.widget.WaveformView2;
+import org.kexie.android.dng.ai.widget.WaveformView;
 import org.kexie.android.dng.common.contract.ASR;
 import org.kexie.android.dng.common.contract.Module;
 
@@ -28,7 +28,7 @@ import androidx.lifecycle.ViewModelProviders;
 @Route(path = Module.Ai.siri)
 public class SiriFragment extends Fragment {
 
-    private WaveformView2 waveformView2;
+    private WaveformView waveformView;
 
     private FragmentSiriBinding binding;
 
@@ -50,7 +50,7 @@ public class SiriFragment extends Fragment {
                 R.layout.fragment_siri,
                 container,
                 false);
-        waveformView2 = WaveformView2.Provider.INSTANCE.attachTo(binding.animation);
+        waveformView = WaveformView.Provider.INSTANCE.attachTo(binding.animation);
         binding.icon.bringToFront();
         return binding.getRoot();
     }
@@ -72,7 +72,7 @@ public class SiriFragment extends Fragment {
             viewModel.asr.begin();
         });
         viewModel.volume.observe(this,
-                integer -> waveformView2.setAmplitude(integer.floatValue() / 100f));
+                integer -> waveformView.setAmplitude(integer.floatValue() / 100f));
         viewModel.status.observe(this, status -> {
             switch (status) {
                 case ASR.INITIALIZATION: {
@@ -80,14 +80,14 @@ public class SiriFragment extends Fragment {
                             () -> binding.icon.setVisibility(View.VISIBLE),
                             100);
                 }
-                waveformView2.stop();
+                waveformView.stop();
                 binding.setIsShowPartial(false);
                 break;
                 case ASR.PREPARE: {
                     binding.icon.postDelayed(
                             () -> binding.icon.setVisibility(View.GONE),
                             100);
-                    waveformView2.prepare();
+                    waveformView.prepare();
                 }
                 break;
                 case ASR.SPEAKING: {
@@ -99,7 +99,7 @@ public class SiriFragment extends Fragment {
                 }
                 break;
                 case ASR.RECOGNITION: {
-                    waveformView2.setAmplitude(0.1f);
+                    waveformView.setAmplitude(0.1f);
                 }
                 break;
             }
@@ -127,6 +127,6 @@ public class SiriFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        WaveformView2.Provider.INSTANCE.detach();
+        WaveformView.Provider.INSTANCE.detach();
     }
 }

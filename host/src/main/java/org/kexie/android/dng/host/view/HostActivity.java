@@ -67,17 +67,7 @@ public final class HostActivity extends AppCompatActivity {
 
         asrService = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
 
-        asrService.addHandler(new ASR.Handler() {
-            @Override
-            public void onStatusUpdate(int status) {
-
-            }
-
-            @Override
-            public void onVolumeUpdate(int value) {
-
-            }
-
+        asrService.addHandler(new ASR.WeakUpHandler(){
             @Override
             public void onWeakUp(@NonNull String text) {
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -93,11 +83,6 @@ public final class HostActivity extends AppCompatActivity {
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .commitAllowingStateLoss();
                 }
-            }
-
-            @Override
-            public void onResult(boolean isFinal, @NonNull String text) {
-
             }
         });
 

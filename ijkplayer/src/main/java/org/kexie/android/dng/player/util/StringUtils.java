@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.widget;
+package org.kexie.android.dng.player.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

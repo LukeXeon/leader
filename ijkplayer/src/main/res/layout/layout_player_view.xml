@@ -7,7 +7,7 @@
              android:focusableInTouchMode="true"
              android:background="@android:color/black">
 
-    <org.kexie.android.dng.player.media.vedio.IjkVideoView
+    <org.kexie.android.dng.player.vedio.IjkVideoView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

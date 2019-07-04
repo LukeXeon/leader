@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kexie.android.dng.player.media.vedio;
+package org.kexie.android.dng.player.vedio;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;

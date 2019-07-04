@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.widget;
+package org.kexie.android.dng.player.util;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;

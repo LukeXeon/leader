@@ -1,4 +1,4 @@
-package org.kexie.android.dng.player.media.vedio;
+package org.kexie.android.dng.player.vedio;
 
 import android.content.Context;
 import android.view.LayoutInflater;
