@@ -12,6 +12,10 @@ public class PathDescription {
     public final AMapNaviPath path;
     public final List<StationDescription> stationDescriptions;
 
+    public String getLengthAndTime() {
+        return length + "(" + time + ")";
+    }
+
     private PathDescription(Builder builder) {
         id = builder.id;
         name = builder.name;

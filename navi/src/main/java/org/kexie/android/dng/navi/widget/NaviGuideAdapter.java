@@ -220,7 +220,7 @@ public class NaviGuideAdapter extends BaseExpandableListAdapter
 //    public static final int MainAction_Slow            = 0x0D;    //!< 减速行驶
 //    public static final int MainAction_Plug_Continue      = 0x0E;      //!< 插入直行（泛亚特有）
 //    public static final int MainAction_Count          = 0x0F;
-    private int[] defaultIconTypes = {
+    private static final int[] defaultIconTypes = {
             R.drawable.action0,
             R.drawable.action0,
             R.drawable.action2,

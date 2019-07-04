@@ -79,7 +79,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
     public final MutableLiveData<Location> selfLocation = new MutableLiveData<>();
 
-    public final MutableLiveData<Boolean> isLockCamera = new MutableLiveData<>();
+    public final MutableLiveData<Boolean> isLockCamera = new MutableLiveData<>(false);
 
     public final MutableLiveData<AMapNaviCameraInfo[]> cameraInfoSet = new MutableLiveData<>();
 
@@ -130,6 +130,7 @@ public class NavigatorViewModel extends AndroidViewModel {
         navi.setEmulatorNaviSpeed(40);
         navi.startNavi(NaviType.EMULATOR);
         isRunning.setValue(true);
+        isLockCamera.setValue(true);
     }
 
     public void exitPreviewMode() {
@@ -308,7 +309,7 @@ public class NavigatorViewModel extends AndroidViewModel {
             for (int i = startSeg; i < count + startSeg; i++) {
                 AMapNaviStep step = aMapNaviSteps.get(i);
                 traffics += step.getTrafficLightNumber();
-                String roadName = "";
+                String roadName;
                 if (i == (count + startSeg - 1) && j == aMapNaviGuides.size() - 1) {
                     roadName = "终点";
                 } else if (i == (count + startSeg - 1) && j + 1 < aMapNaviGuides.size() - 1) {
@@ -400,7 +401,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void hideLaneInfo() {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             laneInfo.setValue(null);
@@ -408,7 +409,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             laneInfo.setValue(aMapLaneInfo);
@@ -416,7 +417,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void showCross(AMapNaviCross aMapNaviCross) {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             crossImage.setValue(aMapNaviCross);
@@ -424,7 +425,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void hideCross() {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             crossImage.setValue(null);
@@ -478,7 +479,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void hideModeCross() {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             modelCrossImage.setValue(null);
@@ -486,7 +487,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void notifyParallelRoad(int code) {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             switch (code) {
@@ -507,7 +508,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             naviLocation.setValue(aMapNaviLocation);
@@ -515,7 +516,7 @@ public class NavigatorViewModel extends AndroidViewModel {
 
         @Override
         public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
-            if (isRunning()) {
+            if (!isRunning()) {
                 return;
             }
             cameraInfoSet.setValue(aMapNaviCameraInfos);

@@ -82,12 +82,6 @@ public class NavigatorFragment extends Fragment {
 
     private SparseArrayCompat<RouteOverLay> routeOverLays;
 
-    private CrossOverlay crossOverlay;
-
-    private CarMarker carMarker;
-
-    private AmapCameraOverlay cameraOverlay;
-
     private Map<Circle, Animator> circleAnimators;
 
     @Override
@@ -112,8 +106,6 @@ public class NavigatorFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         binding.setLifecycleOwner(this);
         map = bindMapToViewModel();
-        carMarker = CarMarker.getDefault(requireContext(), map);
-        cameraOverlay = new AmapCameraOverlay(requireContext());
         viewModel.paths.observe(this, descriptions -> {
             if (descriptions.isEmpty()) {
                 //默认选择第一条路
@@ -123,7 +115,7 @@ public class NavigatorFragment extends Fragment {
             }
         });
         viewModel.select.observe(this, select -> {
-            if (select != null && select != NavigatorViewModel.NO_SELECT
+            if (select != NavigatorViewModel.NO_SELECT
                     && routeOverLays != null && routeOverLays.size() != 0) {
                 for (int i = 0; i < routeOverLays.size(); i++) {
                     RouteOverLay routeOverLay = routeOverLays.valueAt(i);
@@ -133,26 +125,6 @@ public class NavigatorFragment extends Fragment {
                 if (routeOverLay != null) {
                     routeOverLay.setTransparency(1);
                     routeOverLay.setZindex(Integer.MAX_VALUE);
-                }
-            }
-        });
-        viewModel.isLockCamera.observe(this,
-                isLock -> carMarker.setLock(isLock));
-        viewModel.naviLocation.observe(this,
-                location -> carMarker.draw(Point.box(location.getCoord()), location.getBearing()));
-        viewModel.cameraInfoSet.observe(this, set -> cameraOverlay.draw(map, set));
-        viewModel.modelCrossImage.observe(this, modelCross -> {
-            if (modelCross != null) {
-                crossOverlay = map.addCrossOverlay(
-                        new CrossOverlayOptions()
-                                .setAttribute(modelCross.attr)
-                                .setRes(modelCross.res));
-                crossOverlay.setData(modelCross.buffer);
-                crossOverlay.setVisible(true);
-            } else {
-                if (crossOverlay != null) {
-                    crossOverlay.setVisible(false);
-                    crossOverlay.remove();
                 }
             }
         });
@@ -310,8 +282,6 @@ public class NavigatorFragment extends Fragment {
         Location location = map.getMyLocation();
         LatLng latLng = new LatLng(location.getLatitude(),
                 location.getLongitude());
-        carMarker.setLock(false);
-        carMarker.draw(Point.box(latLng), location.getBearing());
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
                 .bearing(location.getBearing())
@@ -324,7 +294,6 @@ public class NavigatorFragment extends Fragment {
                 1000, new AMap.CancelableCallback() {
                     @Override
                     public void onFinish() {
-                        carMarker.setLock(true);
                         viewModel.beginNavigation();
                     }
 
@@ -433,7 +402,15 @@ public class NavigatorFragment extends Fragment {
 
     public static final class RunningFragment extends Fragment {
 
+        private CrossOverlay crossOverlay;
+
+        private CarMarker carMarker;
+
+        private AmapCameraOverlay cameraOverlay;
+
         private NavigatorViewModel viewModel;
+
+        private AMap map;
 
         private long last = SystemClock.uptimeMillis();
 
@@ -461,6 +438,13 @@ public class NavigatorFragment extends Fragment {
         public void onViewCreated(@NonNull View view,
                                   @Nullable Bundle savedInstanceState) {
             binding.setLifecycleOwner(this);
+            map = getMap();
+            carMarker = CarMarker.getDefault(requireContext(), map);
+            cameraOverlay = new AmapCameraOverlay(requireContext());
+            Location location = map.getMyLocation();
+            LatLng latLng = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            carMarker.draw(Point.box(latLng), location.getBearing());
             viewModel.naviDescription.observe(this, naviDescription -> {
                 binding.myTrafficBar.update(
                         naviDescription.allLength,
@@ -473,7 +457,7 @@ public class NavigatorFragment extends Fragment {
             });
             viewModel.isRunning.observe(this, isRunning -> {
                 binding.setIsLoading(!isRunning);
-                binding.progressBar.enableIndeterminateMode(!isRunning);
+                binding.progressBar.enableIndeterminateMode(!isRunning);;
             });
             viewModel.laneInfo.observe(this, laneInfo -> {
                 if (laneInfo != null) {
@@ -494,6 +478,27 @@ public class NavigatorFragment extends Fragment {
             });
             viewModel.showText.observe(this,
                     text -> Toasty.info(requireContext(), text).show());
+            viewModel.isLockCamera.observe(this,
+                    isLock -> carMarker.setLock(isLock));
+            viewModel.naviLocation.observe(this,
+                    naviLocation -> carMarker.draw(Point.box(naviLocation.getCoord()),
+                            naviLocation.getBearing()));
+            viewModel.cameraInfoSet.observe(this, set -> cameraOverlay.draw(map, set));
+            viewModel.modelCrossImage.observe(this, modelCross -> {
+                if (modelCross != null) {
+                    crossOverlay = map.addCrossOverlay(
+                            new CrossOverlayOptions()
+                                    .setAttribute(modelCross.attr)
+                                    .setRes(modelCross.res));
+                    crossOverlay.setData(modelCross.buffer);
+                    crossOverlay.setVisible(true);
+                } else {
+                    if (crossOverlay != null) {
+                        crossOverlay.setVisible(false);
+                        crossOverlay.remove();
+                    }
+                }
+            });
             getLifecycle().addObserver((LifecycleEventObserver) (source, event) -> {
                 if (Lifecycle.Event.ON_DESTROY.equals(event)) {
                     binding.myZoomInIntersectionView.recycleResource();
@@ -515,6 +520,17 @@ public class NavigatorFragment extends Fragment {
                             requireActivity().onBackPressed();
                         }
                     });
+        }
+
+        private AMap getMap() {
+            AMapCompatFragment mapCompatFragment = (AMapCompatFragment)
+                    requireFragmentManager().findFragmentById(R.id.map_view);
+            if (mapCompatFragment != null) {
+                AMap aMap = mapCompatFragment.getMap();
+                viewModel.bindMapLocation(aMap);
+                return aMap;
+            }
+            throw new AssertionError();
         }
     }
 
@@ -551,11 +567,12 @@ public class NavigatorFragment extends Fragment {
                 Fragment fragment = (Fragment) ARouter.getInstance()
                         .build(Module.Navi.search)
                         .navigation();
-                fragment.setTargetFragment(requireParentFragment(), 1000);
-                requireParentFragment()
-                        .requireFragmentManager()
+                Fragment parent = requireParentFragment();
+                fragment.setTargetFragment(parent, R.id.search_request_code);
+                parent.requireFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.map_upper, fragment)
+                        .addToBackStack(null)
+                        .add(parent.getId(), fragment)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commitAllowingStateLoss();
             });

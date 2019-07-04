@@ -50,6 +50,7 @@ public class BaiduASR implements ASR, EventListener {
         assertMainThread();
         // 必须待机态
         if (IDLE != session.status) {
+            Logger.d("asr no idle");
             return false;
         }
         ArrayMap<String, Object> map = new ArrayMap<>(4);
@@ -99,10 +100,10 @@ public class BaiduASR implements ASR, EventListener {
 
     @Override
     public void onEvent(String name, String pram, byte[] data, int offset, int length) {
-        Logger.d(name);
+ //       Logger.d(name);
         if (session.status == INITIALIZATION
                 && SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name)) {
-
+            session.status = IDLE;
             return;
         }
         switch (name) {

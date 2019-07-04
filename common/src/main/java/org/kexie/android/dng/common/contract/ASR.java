@@ -2,6 +2,9 @@ package org.kexie.android.dng.common.contract;
 
 import com.alibaba.android.arouter.facade.template.IProvider;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.MainThread;
@@ -20,6 +23,7 @@ public interface ASR extends IProvider {
     //识别中
     int RECOGNITION = 4;
 
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({INITIALIZATION, IDLE, PREPARE, SPEAKING, RECOGNITION})
     @interface Status {
     }

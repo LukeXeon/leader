@@ -26,7 +26,7 @@ public final class HostActivity extends AppCompatActivity {
 
     private ActivityHostBinding binding;
 
-    ASR asrService;
+    private ASR asr;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,9 +65,9 @@ public final class HostActivity extends AppCompatActivity {
             }
         });
 
-        asrService = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
+        asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
 
-        asrService.addHandler(new ASR.WeakUpHandler(){
+        asr.addHandler(new ASR.WeakUpHandler(){
             @Override
             public void onWeakUp(@NonNull String text) {
                 FragmentManager fragmentManager = getSupportFragmentManager();

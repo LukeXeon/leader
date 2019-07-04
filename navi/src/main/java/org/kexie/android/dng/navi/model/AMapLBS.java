@@ -6,26 +6,25 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.contract.LBS;
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.navi.model.beans.Point;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Route(path = Module.Navi.location)
-public class LocationService implements LBS {
+public class AMapLBS implements LBS,AMapLocationListener {
 
     private AMapLocationClient locationSource;
-    private int refCount;
+    private AtomicInteger refCount = new AtomicInteger(0);
 
     @Override
     public void init(Context context) {
         locationSource = new AMapLocationClient(context.getApplicationContext());
-        locationSource.stopLocation();
-        AMapLocationClientOption option = new AMapLocationClientOption();
-        option.setInterval(1000);
-        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        option.setNeedAddress(false);
-        locationSource.setLocationOption(option);
+        locationSource.setLocationListener(this);
     }
 
     @Override
@@ -33,23 +32,32 @@ public class LocationService implements LBS {
         return new SessionImpl();
     }
 
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+
+    }
+
     private final class SessionImpl implements Session {
         boolean isClose = false;
 
         SessionImpl() {
-            if (refCount == 0) {
+            if (refCount.getAndIncrement() == 0) {
+                AMapLocationClientOption option = new AMapLocationClientOption();
+                option.setInterval(1000);
+                option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+                option.setNeedAddress(false);
+                locationSource.setLocationOption(option);
+                locationSource.stopLocation();
                 locationSource.startLocation();
+//                Logger.d("start lbs");
             }
-            refCount++;
         }
 
         @Override
         public IPoint lastLocation() throws InterruptedException {
-            if (locationSource.isStarted()) {
-                throw new AssertionError();
-            }
             AMapLocation location;
             while ((location = locationSource.getLastKnownLocation()) == null) {
+                Logger.d("wait location");
                 Thread.sleep(100);
             }
             return Point.form(location.getLongitude(), location.getLatitude());
@@ -59,8 +67,8 @@ public class LocationService implements LBS {
         public void close() {
             if (!isClose) {
                 isClose = true;
-                refCount--;
-                if (refCount == 0) {
+                if (refCount.decrementAndGet() == 0) {
+  //                  Logger.d("stop lbs");
                     locationSource.stopLocation();
                 }
             }

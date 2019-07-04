@@ -7,7 +7,6 @@ import org.kexie.android.dng.navi.databinding.ItemPathBinding;
 import org.kexie.android.dng.navi.viewmodel.beans.PathDescription;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import androidx.databinding.DataBindingUtil;
@@ -37,25 +36,24 @@ public class PathAdapter
 
     @Override
     public int getItemCount() {
-        return getValue().size();
+        List<PathDescription> descriptions = data.getValue();
+        return descriptions != null ? descriptions.size() : 0;
     }
 
-    private List<PathDescription> getValue() {
-        List<PathDescription> descriptions = data.getValue();
-        return descriptions == null ? Collections.emptyList() : descriptions;
-    }
 
     @Override
     public void bindView(View view, int index) {
+        List<PathDescription> descriptions = data.getValue();
         ItemPathBinding binding = DataBindingUtil.bind(view);
-        if (binding != null) {
-            binding.setPath(getValue().get(index));
+        if (binding != null && descriptions != null && !descriptions.isEmpty()) {
+            binding.setPath(descriptions.get(index));
             binding.setOnJump(this);
         }
     }
 
     public void setValue(List<PathDescription> descriptions) {
         data.setValue(descriptions);
+        notifyDataSetChanged();
     }
 
     public void observe(LifecycleOwner owner, Observer<Collection<PathDescription>> observer) {
@@ -64,7 +62,10 @@ public class PathAdapter
 
     @Override
     public void displaying(int position) {
-        onSelect.onChanged(position);
+        List<PathDescription> descriptions = data.getValue();
+        if (descriptions != null && !descriptions.isEmpty()) {
+            onSelect.onChanged(descriptions.get(position).id);
+        }
     }
 
     @Override

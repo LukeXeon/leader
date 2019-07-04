@@ -19,7 +19,12 @@ import android.widget.FrameLayout;
 import org.kexie.android.dng.navi.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+import androidx.annotation.MainThread;
 
 /**
  * Created by xmuSistone on 2017/5/12.
@@ -81,14 +86,11 @@ public class PileLayout extends ViewGroup {
         mTouchSlop = configuration.getScaledTouchSlop();
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
 
-        onClickListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != adapter) {
-                    int position = Integer.parseInt(v.getTag().toString());
-                    if (position >= 0 && position < adapter.getItemCount()) {
-                        adapter.onItemClick(((FrameLayout) v).getChildAt(0), position);
-                    }
+        onClickListener = v -> {
+            if (null != adapter) {
+                int position = Integer.parseInt(v.getTag().toString());
+                if (position >= 0 && position < adapter.getItemCount()) {
+                    adapter.onItemClick(((FrameLayout) v).getChildAt(0), position);
                 }
             }
         };
@@ -383,6 +385,7 @@ public class PileLayout extends ViewGroup {
     /**
      * 绑定Adapter
      */
+    @MainThread
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
 
@@ -403,6 +406,7 @@ public class PileLayout extends ViewGroup {
         if (hasSetAdapter) {
             throw new RuntimeException("PileLayout can only hold one adapter.");
         }
+        adapter.onAttach(this);
         hasSetAdapter = true;
         if (getChildCount() == 0) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -447,18 +451,17 @@ public class PileLayout extends ViewGroup {
     /**
      * 数据更新通知
      */
-    public void notifyDataSetChanged() {
+    private void onDataSetChanged() {
         int num = getChildCount();
         for (int i = 0; i < num; i++) {
             FrameLayout frameLayout = (FrameLayout) getChildAt(i);
             int tag = Integer.parseInt(frameLayout.getTag().toString());
-            if (tag > 0 && tag < adapter.getItemCount()) {
+            if (tag >= 0 && tag < adapter.getItemCount()) {
                 frameLayout.setVisibility(View.VISIBLE);
                 adapter.bindView(frameLayout.getChildAt(0), tag);
             } else {
                 frameLayout.setVisibility(View.INVISIBLE);
             }
-
             if (i == 3 && tag == 0) {
                 adapter.displaying(0);
             }
@@ -506,6 +509,12 @@ public class PileLayout extends ViewGroup {
     @SuppressWarnings("WeakerAccess")
     public static abstract class Adapter {
 
+        private void onAttach(PileLayout pileLayout) {
+            layouts.add(pileLayout);
+        }
+
+        private Set<PileLayout> layouts = Collections.newSetFromMap(new WeakHashMap<>());
+
         /**
          * layout文件ID，调用者必须实现
          */
@@ -532,6 +541,13 @@ public class PileLayout extends ViewGroup {
          * item点击，可重载
          */
         public void onItemClick(View view, int position) {
+        }
+
+        @MainThread
+        public void notifyDataSetChanged() {
+            for (PileLayout pileLayout : layouts) {
+                pileLayout.onDataSetChanged();
+            }
         }
     }
 }

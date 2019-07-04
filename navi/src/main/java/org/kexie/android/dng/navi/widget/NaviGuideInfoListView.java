@@ -47,9 +47,9 @@ public class NaviGuideInfoListView extends ExpandableListView {
             footer.setGroupIconType(-2);
             footer.setGroupName("");
             dataList.add(dataList.size(), footer);
-
             NaviGuideAdapter adapter = new NaviGuideAdapter(getContext(), dataList);
             setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
     }
 

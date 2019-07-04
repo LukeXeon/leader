@@ -16,11 +16,11 @@
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="450dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:cardCornerRadius="20dp"
             app:cardElevation="10dp"
@@ -39,7 +39,7 @@
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
@@ -47,21 +47,20 @@
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
+                            android:padding="5dp"
                             android:layout_marginLeft="10dp"
                             android:src="@mipmap/image_search"/>
 
                         <TextView
-                            android:singleLine="true"
                             android:id="@+id/tv_title"
-                             
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp"
                             android:hint="@string/string_navi_name"
+                            android:singleLine="true"
                             android:text="@{path.name}"
                             android:textColor="@android:color/black"
                             android:textColorHint="@android:color/black"
-                            android:textSize="30dp"/>
+                            android:textSize="20dp" />
                     </LinearLayout>
 
                     <View
@@ -72,17 +71,15 @@
                     <TextView
                         android:singleLine="true"
                         android:id="@+id/tv_info"
-                         
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical|right"
+                        android:layout_height="30dp"
+                        android:gravity="center_vertical"
                         android:hint="@string/test_text1"
                         android:paddingRight="20dp"
-                        android:text='@{path.time+"("+path.length+")"}'
+                        android:text="@{path.lengthAndTime}"
                         android:textColor="@android:color/black"
                         android:textColorHint="@android:color/black"
-                        android:textSize="30sp"
-                        tools:ignore="RtlHardcoded"/>
+                        android:textSize="20dp"/>
                 </LinearLayout>
 
                 <org.kexie.android.dng.navi.widget.NaviGuideInfoListView
@@ -98,14 +95,14 @@
                 <Button
                     android:id="@+id/btn_summit"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="35dp"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/btn_draw"
                     android:onClick="@{onJump}"
                     android:text="@string/string_submit"
                     android:textColor="@color/white"
-                    android:textSize="30sp"/>
+                    android:textSize="20dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </FrameLayout>
