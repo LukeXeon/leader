@@ -4,6 +4,7 @@ import android.app.Application;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.blankj.utilcode.util.FileUtils;
 
@@ -21,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.core.math.MathUtils;
 import androidx.lifecycle.MutableLiveData;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
@@ -41,9 +41,10 @@ public class MusicPlayerViewModel extends IjkMusicViewModel {
         workerThread = new HandlerThread("music");
         workerThread.start();
         worker = new Handler(workerThread.getLooper());
+        main = new Handler(Looper.getMainLooper());
         volumePercent.observeForever(value -> {
-            float percent = MathUtils.clamp(value, 0, 1f);
-            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            float percent = value / 100f;
+            float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                     (int) (maxVolume * percent), 0);
         });

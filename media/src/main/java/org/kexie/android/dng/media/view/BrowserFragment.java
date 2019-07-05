@@ -27,7 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = Module.Media.browser)
+@Route(path = Module.Media.gallery)
 public class BrowserFragment extends Fragment {
 
     private FragmentBrowserBinding binding;

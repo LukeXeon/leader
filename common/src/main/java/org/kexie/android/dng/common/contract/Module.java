@@ -56,7 +56,7 @@ public final class Module {
 
     public static final class Media {
         public static final String music = "/media/music";
-        public static final String browser = "/media/browser";
+        public static final String gallery = "/media/gallery";
     }
 
     public static final class Host {

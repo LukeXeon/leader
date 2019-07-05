@@ -40,7 +40,7 @@ public class BrowserViewModel extends AndroidViewModel {
 
     public BrowserViewModel(@NonNull Application application) {
         super(application);
-        workerThread = new HandlerThread("browser");
+        workerThread = new HandlerThread("gallery");
         workerThread.start();
         worker = new Handler(workerThread.getLooper());
         graphs.openLoadAnimation();

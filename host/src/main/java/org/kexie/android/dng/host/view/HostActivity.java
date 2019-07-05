@@ -84,7 +84,7 @@ public final class HostActivity extends AppCompatActivity {
 
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(Module.Media.browser)
+                .build(Module.Media.music)
                 .navigation();
 
         getSupportFragmentManager()

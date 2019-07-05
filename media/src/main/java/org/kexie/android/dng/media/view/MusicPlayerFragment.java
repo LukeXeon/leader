@@ -14,6 +14,7 @@ import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentMusicPlayerBinding;
 import org.kexie.android.dng.media.util.Utils;
 import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
+import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -79,8 +80,9 @@ public class MusicPlayerFragment extends Fragment {
                 viewModel.seekTo(musicSeekBar.getProgress());
             }
         });
-        binding.play.setOnClickListener(v -> viewModel.setNewSource("/storage/emulated" +
-                "/0/qqmusic/song/泠鸢yousa - 何日重到苏澜桥 [mqms2].mp3"));
+        binding.play.setOnClickListener(v -> {
+            
+        });
         //musicPlayer
         viewModel.lyricSet.observe(this, lyrics -> {
             binding.lrcView.setLrc(lyrics);
@@ -100,12 +102,16 @@ public class MusicPlayerFragment extends Fragment {
                 });
         binding.musicSeek.setEnabled(true);
         viewModel.details.setOnItemChildClickListener((adapter, view1, position) -> {
-
+            MusicDetail detail = (MusicDetail) adapter.getItem(position);
+            if (detail != null) {
+                viewModel.setNewSource(detail.path);
+            }
         });
         viewModel.current.observe(this,
                 mediaDetails -> binding.setDetails(mediaDetails));
         binding.setVolume(viewModel.volumePercent);
         int value = viewModel.getVolume();
+        binding.volume.setMax(100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             binding.volume.setProgress(value, true);
         } else {

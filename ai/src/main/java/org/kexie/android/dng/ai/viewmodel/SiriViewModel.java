@@ -3,6 +3,7 @@ package org.kexie.android.dng.ai.viewmodel;
 import android.app.Application;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 
@@ -33,6 +34,7 @@ public class SiriViewModel
     public final LiveEvent<Integer> volume = new LiveEvent<>();
     public final MutableLiveData<Integer> status = new MutableLiveData<>();
 
+    private final Handler main;
     private final Handler worker;
     private final HandlerThread workerThread;
     private final NLP nlp;
@@ -41,6 +43,7 @@ public class SiriViewModel
 
     public SiriViewModel(@NonNull Application application) {
         super(application);
+
         nlp = (NLP) ARouter.getInstance().build(Module.Ai.nlp).navigation(application);
         asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation(application);
         tts = (TTS) ARouter.getInstance().build(Module.Ai.tts).navigation(application);
@@ -50,6 +53,7 @@ public class SiriViewModel
         workerThread = new HandlerThread(toString());
         workerThread.start();
         worker = new Handler(workerThread.getLooper());
+        main = new Handler(Looper.getMainLooper());
     }
 
     @Override
@@ -85,7 +89,11 @@ public class SiriViewModel
             worker.post(() -> {
                 Object result = nlp.process(text);
                 if (result instanceof String) {
-                    tts.send((String) result);
+                    main.post(() -> {
+                        String aiText = (String) result;
+                        tts.send(aiText);
+                        messages.addData(new TextMessage(TextMessage.TYPE_AI, aiText));
+                    });
                 } else if (result instanceof Runnable) {
                     action.post((Runnable) result);
                 }
