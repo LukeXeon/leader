@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
@@ -43,13 +42,13 @@ import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorBinding;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorPreviewBinding;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorRunningBinding;
-import org.kexie.android.dng.navi.databinding.WidgetPilePathBinding;
 import org.kexie.android.dng.navi.model.beans.Point;
 import org.kexie.android.dng.navi.viewmodel.NavigatorViewModel;
 import org.kexie.android.dng.navi.viewmodel.beans.PathDescription;
 import org.kexie.android.dng.navi.viewmodel.beans.TipText;
 import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarMarker;
+import org.kexie.android.dng.navi.widget.PileLayout;
 
 import java.util.Collection;
 import java.util.List;
@@ -542,7 +541,7 @@ public class NavigatorFragment extends Fragment {
 
         private FragmentNavigatorPreviewBinding binding;
 
-        private WidgetPilePathBinding widget;
+        private View widget;
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -567,25 +566,23 @@ public class NavigatorFragment extends Fragment {
             viewModel.selfLocationName.observe(this, s -> binding.setFormText(s));
             viewModel.isPreview.observe(this, val -> {
                 if (val) {
-                    widget = DataBindingUtil.inflate(
-                            getLayoutInflater(),
+                    widget = getLayoutInflater().inflate(
                             R.layout.widget_pile_path,
                             (ViewGroup) binding.getRoot(),
                             false);
                     ((ViewGroup) binding.getRoot())
-                            .addView(widget.getRoot());
-                    widget.paths.setAdapter(viewModel.paths);
+                            .addView(widget);
+                    PileLayout paths = widget.findViewById(R.id.paths);
+                    paths.setAdapter(viewModel.paths);
                 } else if (widget != null) {
                     ((ViewGroup) binding.getRoot())
-                            .removeView(widget.getRoot());
+                            .removeView(widget);
                     widget = null;
                 }
                 binding.setIsPreview(val);
             });
             binding.setOpenSearch(v -> {
-                Fragment fragment = (Fragment) ARouter.getInstance()
-                        .build(Module.Navi.search)
-                        .navigation();
+                Fragment fragment = new SearchFragment();
                 Fragment parent = requireParentFragment();
                 fragment.setTargetFragment(parent, R.id.search_request_code);
                 parent.requireFragmentManager()

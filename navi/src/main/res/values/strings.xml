@@ -19,4 +19,5 @@
     <string name="string_start">出发</string>
     <string name="amap_inner_class_name">com.amap.api.wrapper.MapFragmentDelegateWrapper</string>
     <item name="search_request_code" type="id"/>
+    <item name="speaker_request_code" type="id"/>
 </resources>

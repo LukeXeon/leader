@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="res"
+            type="org.kexie.android.dng.media.model.beans.Graph"/>
+    </data>
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.makeramen.roundedimageview.RoundedImageView
+            async_src="@{res.data}"
+            android:scaleType="centerCrop"
+            app:riv_corner_radius_top_left="10dp"
+            app:riv_corner_radius_top_right="10dp"
+            android:layout_width="250dp"
+            android:layout_height="200dp"/>
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_gravity="right|bottom"
+            async_src="@{res.video?@drawable/ic_video:@drawable/ic_camera}"
+            app:riv_corner_radius_bottom_right="10dp"
+            android:scaleType="centerCrop"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+    </androidx.cardview.widget.CardView>
+</layout>

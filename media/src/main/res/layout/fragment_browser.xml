@@ -1,14 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="title"
+            type="String"/>
+        <variable
+            name="albums"
+            type="androidx.recyclerview.widget.RecyclerView.Adapter"/>
+        <variable
+            name="graphs"
+            type="androidx.recyclerview.widget.RecyclerView.Adapter"/>
+        <variable
+            name="onOpen"
+            type="android.view.View.OnClickListener"/>
+    </data>
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            
+            <LinearLayout
+                android:background="@color/pinka100"
+                android:layout_width="match_parent"
+                android:layout_height="70dp">
+                <ImageView
+                    android:onClick="@{onOpen}"
+                    android:layout_marginLeft="20dp"
+                    async_src="@{`icon_photo`}"
+                    android:padding="10dp"
+                    android:scaleType="centerCrop"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp" />
+                <TextView
+                    android:layout_marginLeft="15dp"
+                    android:gravity="left|center_vertical"
+                    android:text="@{title}"
+                    android:textColor="@color/whitesmoke"
+                    android:textSize="35dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:background="@color/whitesmoke"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:adapter="@{graphs}"
+                app:spanCount="4"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"/>
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:orientation="vertical"
+            android:adapter="@{albums}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="?android:windowBackground"
+            android:clipToPadding="false">
         </androidx.recyclerview.widget.RecyclerView>
-    </LinearLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

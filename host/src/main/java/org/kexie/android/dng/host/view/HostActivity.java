@@ -24,15 +24,11 @@ import java8.util.stream.IntStreams;
 @Route(path = Module.Host.host)
 public final class HostActivity extends AppCompatActivity {
 
-    private ActivityHostBinding binding;
-
-    private ASR asr;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.hideSystemUi(getWindow());
-        binding = DataBindingUtil.setContentView(this,
+        ActivityHostBinding binding = DataBindingUtil.setContentView(this,
                 R.layout.activity_host);
         binding.setOnBack(v -> {
             Logger.d(getSupportFragmentManager().getBackStackEntryCount());
@@ -65,7 +61,7 @@ public final class HostActivity extends AppCompatActivity {
             }
         });
 
-        asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
+        ASR asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation();
 
         asr.addHandler(new ASR.WeakUpHandler(){
             @Override
@@ -88,7 +84,7 @@ public final class HostActivity extends AppCompatActivity {
 
 
         Fragment fragment = (Fragment) ARouter.getInstance()
-                .build(Module.Navi.navigator)
+                .build(Module.Media.browser)
                 .navigation();
 
         getSupportFragmentManager()

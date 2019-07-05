@@ -1,5 +1,6 @@
 package org.kexie.android.dng.media.util;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 public class Utils {
@@ -21,5 +22,10 @@ public class Utils {
 
     public static boolean safeUnBox(Boolean b) {
         return b != null && b;
+    }
+
+    public static boolean isSameMouth(Calendar calendar1, Calendar calendar2) {
+        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)
+                && calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH);
     }
 }

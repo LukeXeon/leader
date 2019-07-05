@@ -10,8 +10,8 @@ import com.blankj.utilcode.util.FileUtils;
 import org.kexie.android.danmakux.converter.LyricParser;
 import org.kexie.android.danmakux.model.Lyric;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.media.model.MediaInfoLoader;
-import org.kexie.android.dng.media.model.beans.MusicInfo;
+import org.kexie.android.dng.media.model.MusicStore;
+import org.kexie.android.dng.media.model.beans.Music;
 import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 import org.kexie.android.dng.media.widget.MusicQuickAdapter;
 import org.kexie.android.dng.player.music.IjkMusicViewModel;
@@ -82,10 +82,10 @@ public class MusicPlayerViewModel extends IjkMusicViewModel {
 
     private void initMusicList() {
         worker.post(()-> {
-            List<MusicInfo> musicList = MediaInfoLoader.getMusicInfos(getApplication());
+            List<Music> musicList = MusicStore.getInstance(getApplication()).loadList();
             List<MusicDetail> musicDetails = StreamSupport.stream(musicList)
                     .map(mediaInfo -> new MusicDetail(
-                            mediaInfo.uri,
+                            mediaInfo.path,
                             mediaInfo.drawable,
                             mediaInfo.title,
                             mediaInfo.singer))

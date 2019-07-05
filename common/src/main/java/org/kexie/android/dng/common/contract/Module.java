@@ -51,25 +51,12 @@ public final class Module {
          * 导航主界面
          */
         public static final String navigator = "/navi/navigator";
-        public static final String search = "/navi/search";
         public static final String location = "/navi/location";
     }
 
     public static final class Media {
-        /**
-         * 图片浏览
-         */
-        public static final String photoViewer = "/media/photo/viewer";
-        /**
-         * 视频播放
-         */
-        public static final String videoPlayer = "/media/video/player";
-        /**
-         * 音乐播放
-         */
         public static final String music = "/media/music";
-        public static final String photo = "/media/photo/browse";
-        public static final String video = "/media/video/browse";
+        public static final String browser = "/media/browser";
     }
 
     public static final class Host {
@@ -77,11 +64,11 @@ public final class Module {
     }
 
     public static final class Ai {
-
         public final static String nlp = "/ai/nlp";
         public final static String tts = "/ai/tts";
         public final static String asr = "/ai/asr";
 
         public final static String siri = "/ai/siri";
+        public final static String speaker = "/ai/speaker";
     }
 }

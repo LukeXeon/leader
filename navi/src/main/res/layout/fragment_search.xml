@@ -15,47 +15,38 @@
             name="onSpeech"
             type="android.view.View.OnClickListener"/>
     </data>
-    <FrameLayout
+    <LinearLayout
+        android:background="@color/white"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
-            android:background="@color/white"
+        <TextView
+            android:text="@{text}"
+            android:onClick="@{onSpeech}"
+            android:textSize="30dp"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:textColorHint="@color/colorBlackAlpha26"
+            android:hint="点击打开语音输入"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/input_background"
+            android:layout_width="match_parent"
+            android:layout_height="60dp" />
+        <View
+            android:background="@color/whitesmoke"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:background="@color/whitesmoke"
+            android:layout_weight="1"
             android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:adapter="@{tipsAdapter}"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:text="@{text}"
-                android:onClick="@{onSpeech}"
-                android:textSize="30dp"
-                android:textColor="@color/colorBlack"
-                android:gravity="center"
-                android:textColorHint="@color/colorBlackAlpha26"
-                android:hint="点击打开语音输入"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/input_background"
-                android:layout_width="match_parent"
-                android:layout_height="60dp" />
-            <View
-                android:background="@color/whitesmoke"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:background="@color/whitesmoke"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:adapter="@{tipsAdapter}"
-                android:layout_width="match_parent"
-                android:layout_height="0dp">
-            </androidx.recyclerview.widget.RecyclerView>
-        </LinearLayout>
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
-    </FrameLayout>
+            android:layout_height="0dp">
+        </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
 </layout>

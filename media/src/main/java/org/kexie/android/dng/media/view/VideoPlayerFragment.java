@@ -10,7 +10,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import org.kexie.android.danmakux.utils.FileUtils;
-import org.kexie.android.dng.media.viewmodel.beans.Resource;
+import org.kexie.android.dng.media.model.beans.Graph;
+import org.kexie.android.dng.media.widget.VideoPlayerActivityHolder;
 import org.kexie.android.dng.player.vedio.IjkPlayerView;
 
 import java.io.File;
@@ -20,7 +21,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 
 public class VideoPlayerFragment
         extends Fragment {
@@ -61,19 +61,19 @@ public class VideoPlayerFragment
         super.onViewCreated(view, savedInstanceState);
 
         if (!isFormWindow) {
-            Resource info = requireArguments().getParcelable("media");
-            if (info != null && info.uri != null) {
+            Graph info = requireArguments().getParcelable("media");
+            if (info != null && info.data != null) {
                 Glide.with(this)
-                        .load(info.uri)
+                        .load(info.data)
                         .apply(RequestOptions.fitCenterTransform())
                         .into(player.mPlayerThumb);
 
                 // set title
-                player.init().setTitle(info.title)
+                player.init().setTitle(info.displayName)
                         .enableDanmaku()
-                        .setVideoPath(info.uri)
+                        .setVideoPath(info.data)
                         .alwaysFullScreen();
-                List<File> files = FileUtils.getAttachedSubtitles(info.uri);
+                List<File> files = FileUtils.getAttachedSubtitles(info.data);
                 if (!files.isEmpty()) {
                     File file = files.get(0);
                     player.setDanmakuSource(file);
@@ -99,8 +99,8 @@ public class VideoPlayerFragment
     private void transformToWindow() {
         playerContainer.removeView(player);
         player.setFloatClickListener(null);
-        VideoPlayerHolder holderActivity
-                = (VideoPlayerHolder) requireActivity();
+        VideoPlayerActivityHolder holderActivity
+                = (VideoPlayerActivityHolder) requireActivity();
         holderActivity.holdByWindow(player);
         player = null;
         holderActivity.onBackPressed();

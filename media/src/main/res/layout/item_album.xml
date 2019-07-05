@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="androidx.databinding.adapters.Converters"/>
+        <variable
+            name="album"
+            type="org.kexie.android.dng.media.viewmodel.beans.AlbumDetail"/>
+    </data>
+    <LinearLayout
+        android:background="@{!album.isChecked?Converters.convertColorToDrawable(@color/white):Converters.convertColorToDrawable(@color/pinka100)}"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
+        <ImageView
+            async_src="@{album.cover}"
+            android:id="@+id/image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            tools:src="@android:color/holo_purple" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+            <TextView
+                android:singleLine="true"
+                android:textSize="25dp"
+                android:text="@{album.title}"
+                android:id="@+id/text_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@android:color/black"
+                tools:text="所有图片" />
+            <TextView
+                android:textSize="20dp"
+                android:singleLine="true"
+                android:text="@{album.count+`张`}"
+                android:id="@+id/text_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                tools:text="13张" />
+        </LinearLayout>
+    </LinearLayout>
+</layout>

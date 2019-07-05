@@ -8,17 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 
-import org.kexie.android.dng.common.contract.ASR;
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentSearchBinding;
-import org.kexie.android.dng.navi.databinding.FragmentSpeakerBinding;
 import org.kexie.android.dng.navi.viewmodel.SearchViewModel;
 import org.kexie.android.dng.navi.viewmodel.beans.TipText;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -26,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
-@Route(path = Module.Navi.search)
 public class SearchFragment extends Fragment {
 
     private SearchViewModel viewModel;
@@ -56,11 +52,14 @@ public class SearchFragment extends Fragment {
         binding.getRoot().setOnTouchListener((v, event) -> true);
         binding.setTipsAdapter(viewModel.tips);
         binding.setOnSpeech(v -> {
-            Fragment fragment = new SpeakerFragment();
-            getChildFragmentManager()
+            Fragment fragment = (Fragment) ARouter.getInstance()
+                    .build(Module.Ai.speaker)
+                    .navigation();
+            fragment.setTargetFragment(this, R.id.speaker_request_code);
+            requireFragmentManager()
                     .beginTransaction()
                     .addToBackStack(null)
-                    .add(R.id.container, fragment)
+                    .add(getId(), fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commitAllowingStateLoss();
         });
@@ -71,67 +70,24 @@ public class SearchFragment extends Fragment {
             if (target != null) {
                 Intent intent = new Intent();
                 intent.putExtra("tip", tipText);
-                target.onActivityResult(R.id.search_request_code, Activity.RESULT_OK, intent);
+                target.onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, intent);
             }
         });
-        viewModel.speechResult.observe(this, s -> binding.setText(s));
+        //viewModel.speechResult.observe(this, s -> binding.setText(s));
     }
 
-    public static class SpeakerFragment extends Fragment {
-
-        private SearchViewModel viewModel;
-
-        private FragmentSpeakerBinding binding;
-
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            viewModel = ViewModelProviders.of(requireParentFragment())
-                    .get(SearchViewModel.class);
-        }
-
-
-        @Nullable
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater,
-                                 @Nullable ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.fragment_speaker,
-                    container,
-                    false);
-            return binding.getRoot();
-        }
-
-        @Override
-        public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            viewModel.asr.begin();
-            viewModel.speechPartText.observe(this, s -> binding.setText(s));
-            viewModel.speechResult.observe(this, s -> {
-                binding.setText(s);
-                viewModel.search(s);
-                requireFragmentManager().popBackStackImmediate();
-            });
-            viewModel.status.observe(this, status -> {
-                if (status == ASR.RECOGNITION) {
-                    binding.setText("识别中......");
-                }
-            });
-            requireActivity().getOnBackPressedDispatcher()
-                    .addCallback(this,
-                    new OnBackPressedCallback(true) {
-                        @Override
-                        public void handleOnBackPressed() {
-                            requireFragmentManager().popBackStackImmediate();
-                        }
-                    });
-        }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-            viewModel.asr.stop();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (R.id.speaker_request_code == requestCode
+                && Activity.RESULT_OK == resultCode
+                && data != null) {
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                String text = bundle.getString("text");
+                binding.setText(text);
+                viewModel.search(text);
+            }
         }
     }
 }

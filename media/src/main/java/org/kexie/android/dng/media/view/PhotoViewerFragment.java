@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-
-import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.widget.AnimationAdapter;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.databinding.FragmentPhotoViewerBinding;
@@ -24,7 +21,6 @@ import androidx.collection.ArrayMap;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-@Route(path = Module.Media.photoViewer)
 public class PhotoViewerFragment extends Fragment {
 
     private FragmentPhotoViewerBinding binding;
@@ -65,17 +61,17 @@ public class PhotoViewerFragment extends Fragment {
 
     private void doHideAnimation() {
         AlphaAnimation animation
-                = (AlphaAnimation) binding.blurView.getTag();
+                = (AlphaAnimation) binding.header.getTag();
         if (animation != null) {
             animation.cancel();
         }
         if (Utils.safeUnBox(binding.getHide())) {
             //show
-            binding.blurView.setVisibility(View.VISIBLE);
+            binding.header.setVisibility(View.VISIBLE);
             AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
             alphaAnimation.setDuration(200);
-            binding.blurView.startAnimation(alphaAnimation);
-            binding.blurView.setTag(alphaAnimation);
+            binding.header.startAnimation(alphaAnimation);
+            binding.header.setTag(alphaAnimation);
         } else {
             //hide
             AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
@@ -83,13 +79,13 @@ public class PhotoViewerFragment extends Fragment {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     if (Utils.safeUnBox(binding.getHide())) {
-                        binding.blurView.setVisibility(View.GONE);
+                        binding.header.setVisibility(View.GONE);
                     }
                 }
             });
             alphaAnimation.setDuration(200);
-            binding.blurView.startAnimation(alphaAnimation);
-            binding.blurView.setTag(alphaAnimation);
+            binding.header.startAnimation(alphaAnimation);
+            binding.header.setTag(alphaAnimation);
         }
         binding.setHide(!Utils.safeUnBox(binding.getHide()));
     }

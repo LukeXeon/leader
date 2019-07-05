@@ -40,14 +40,17 @@ dependencies {
     //api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //ui widget
+    api 'org.devio.takephoto:takephoto_library:4.1.0'
     api 'ren.qinc.edgetranslucent:lib:0.0.3'
     api 'com.github.DingMouRen:LayoutManagerGroup:1e6f4f96eb'
+
     api 'jp.wasabeef:recyclerview-animators:3.0.0'
+
     //悬浮窗
     api 'com.github.yhaolpz:FloatWindow:1.0.9'
     api 'com.mikhaellopez:circularprogressbar:2.0.0'
     //StackView
-    api 'com.bartoszlipinski.flippablestackview:library:1.2.1'
+    //api 'com.bartoszlipinski.flippablestackview:library:1.2.1'
     api 'com.github.fxc0719:RoundCornerLayout:1.0.2'
     //高斯模糊
     api 'com.github.chrisbanes:PhotoView:2.3.0'
@@ -72,7 +75,7 @@ dependencies {
     //权限处理
     api 'com.github.LukeXeon:auto-permissions:0.0.5'
     //组件化
-    api 'com.alibaba:arouter-api:1.4.1'
+    api 'com.alibaba:arouter-api:1.5.0'
     //二维码
     api 'com.mylhyl:zxingscanner:2.1.3'
     //retrofit2

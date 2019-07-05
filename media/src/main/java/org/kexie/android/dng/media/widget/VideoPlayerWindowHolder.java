@@ -7,27 +7,25 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
 import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 
-import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.media.R;
 import org.kexie.android.dng.media.view.VideoPlayerFragment;
 import org.kexie.android.dng.player.vedio.IjkPlayerView;
 
 import androidx.fragment.app.Fragment;
 
-public final class WindowPlayer
+public class VideoPlayerWindowHolder
         extends ViewStateAdapter
         implements View.OnClickListener {
 
     private IjkPlayerView player;
     private View root;
 
-    public WindowPlayer(IjkPlayerView player) {
+    VideoPlayerWindowHolder(IjkPlayerView player) {
         this.player = player;
         root = View.inflate(
                 player.getContext(),
@@ -82,15 +80,14 @@ public final class WindowPlayer
             }
         } else if (id == R.id.transform) {
             Context context = player.getContext().getApplicationContext();
-            ARouter.getInstance()
-                    .build(Module.Media.videoPlayer)
-                    .withFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .withBoolean(context.getString(R.string.is_form_window), true)
-                    .navigation(context);
+            Intent intent = new Intent(context, VideoPlayerActivityHolder.class);
+            intent.putExtra(context.getString(R.string.is_form_window), true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         }
     }
 
-    public Fragment transformToFragment() {
+    Fragment transformToFragment() {
         player.setFloatClickListener(null);
         FrameLayout container = (FrameLayout) player.getParent();
         container.removeView(player);

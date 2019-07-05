@@ -1,16 +1,15 @@
-package org.kexie.android.dng.media.view;
+package org.kexie.android.dng.media.widget;
 
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.yhao.floatwindow.FloatWindow;
 
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.common.util.Utils;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.widget.WindowPlayer;
+import org.kexie.android.dng.media.view.VideoPlayerFragment;
 import org.kexie.android.dng.player.vedio.IjkPlayerView;
 
 import androidx.annotation.Nullable;
@@ -20,11 +19,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 //需要实现浮窗
 //多进程,单进程是在是顶不住了
-@Route(path = Module.Media.videoPlayer)
-public class VideoPlayerHolder
+public class VideoPlayerActivityHolder
         extends AppCompatActivity {
 
-    private WindowPlayer windowPlayer;
+    private VideoPlayerWindowHolder windowPlayer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +65,7 @@ public class VideoPlayerHolder
     }
 
     public void holdByWindow(IjkPlayerView player) {
-        windowPlayer = new WindowPlayer(player);
+        windowPlayer = new VideoPlayerWindowHolder(player);
     }
 
     @Override
