@@ -17,7 +17,6 @@ import org.kexie.android.dng.player.vedio.IjkPlayerView;
 import java.io.File;
 import java.util.List;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -61,7 +60,8 @@ public class VideoPlayerFragment
         super.onViewCreated(view, savedInstanceState);
 
         if (!isFormWindow) {
-            Graph info = requireArguments().getParcelable("media");
+            Bundle bundle = requireArguments();
+            Graph info = bundle.getParcelable("media");
             if (info != null && info.data != null) {
                 Glide.with(this)
                         .load(info.data)
@@ -81,17 +81,6 @@ public class VideoPlayerFragment
                 player.start();
             }
         }
-        requireActivity().getOnBackPressedDispatcher().addCallback(this,
-                new OnBackPressedCallback(true) {
-                    @Override
-                    public void handleOnBackPressed() {
-                        if (player != null && player.onBackPressed()) {
-                            return;
-                        }
-                        setEnabled(false);
-                        requireActivity().onBackPressed();
-                    }
-                });
         player.setOnClickBackListener(requireActivity()::onBackPressed);
         player.setFloatClickListener(v -> transformToWindow());
     }

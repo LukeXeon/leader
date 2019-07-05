@@ -97,6 +97,7 @@ public class BrowserFragment extends Fragment {
                     fragment.setArguments(bundle);
                     requireFragmentManager()
                             .beginTransaction()
+                            .addToBackStack(null)
                             .add(getId(), fragment)
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .commitAllowingStateLoss();

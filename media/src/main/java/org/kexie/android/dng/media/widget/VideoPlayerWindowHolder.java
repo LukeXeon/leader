@@ -29,7 +29,7 @@ public class VideoPlayerWindowHolder
         this.player = player;
         root = View.inflate(
                 player.getContext(),
-                R.layout.window_float_player,
+                R.layout.window_video_player,
                 null);
         root.findViewById(R.id.transform)
                 .setOnClickListener(this);

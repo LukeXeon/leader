@@ -1,7 +1,10 @@
 package org.kexie.android.dng.media.widget;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.yhao.floatwindow.FloatWindow;
@@ -38,7 +41,9 @@ public class VideoPlayerActivityHolder
     }
 
     private void doTransform() {
-        Utils.hideSystemUi(getWindow());
+        Window window = getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+        Utils.hideSystemUi(window);
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
             return;
