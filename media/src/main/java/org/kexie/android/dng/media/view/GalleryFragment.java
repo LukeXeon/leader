@@ -10,7 +10,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.databinding.FragmentBrowserBinding;
+import org.kexie.android.dng.media.databinding.FragmentGalleryBinding;
 import org.kexie.android.dng.media.model.beans.Graph;
 import org.kexie.android.dng.media.viewmodel.BrowserViewModel;
 import org.kexie.android.dng.media.viewmodel.beans.AlbumDetail;
@@ -28,9 +28,9 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 @Route(path = Module.Media.gallery)
-public class BrowserFragment extends Fragment {
+public class GalleryFragment extends Fragment {
 
-    private FragmentBrowserBinding binding;
+    private FragmentGalleryBinding binding;
 
     private BrowserViewModel viewModel;
 
@@ -47,7 +47,7 @@ public class BrowserFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater,
-                R.layout.fragment_browser,
+                R.layout.fragment_gallery,
                 container,
                 false);
         return binding.getRoot();
