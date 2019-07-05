@@ -104,5 +104,7 @@ public class BrowserFragment extends Fragment {
                 }
             }
         });
+        viewModel.isLoading.observe(this,
+                isLoading -> binding.progressBar.enableIndeterminateMode(isLoading));
     }
 }

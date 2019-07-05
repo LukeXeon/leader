@@ -458,7 +458,6 @@ public class NavigatorFragment extends Fragment {
             viewModel.isRunning.observe(this, isRunning -> {
                 binding.setIsLoading(!isRunning);
                 binding.progressBar.enableIndeterminateMode(!isRunning);
-                ;
             });
             viewModel.laneInfo.observe(this, laneInfo -> {
                 if (laneInfo != null) {

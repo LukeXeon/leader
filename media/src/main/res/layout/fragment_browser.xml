@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="title"
             type="String"/>
@@ -14,6 +15,9 @@
         <variable
             name="onOpen"
             type="android.view.View.OnClickListener"/>
+        <variable
+            name="isLoading"
+            type="Boolean"/>
     </data>
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer"
@@ -44,15 +48,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="70dp" />
             </LinearLayout>
-            <androidx.recyclerview.widget.RecyclerView
-                android:background="@color/whitesmoke"
+            <FrameLayout
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:adapter="@{graphs}"
-                app:spanCount="4"
-                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"/>
+                android:layout_height="0dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:background="@color/whitesmoke"
+                    android:orientation="vertical"
+                    android:adapter="@{graphs}"
+                    app:spanCount="4"
+                    app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                    android:visibility="@{safeUnbox(isLoading)?View.VISIBLE:View.GONE}"
+                    android:layout_gravity="center"
+                    android:id="@+id/progressBar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:cpb_background_progressbar_color="@color/pinka100"
+                    app:cpb_background_progressbar_width="10dp"
+                    app:cpb_progressbar_color="@color/pinka200"
+                    app:cpb_progressbar_width="20dp" />
+            </FrameLayout>
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:orientation="vertical"
