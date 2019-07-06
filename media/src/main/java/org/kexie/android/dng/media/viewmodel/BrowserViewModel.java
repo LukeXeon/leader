@@ -44,9 +44,9 @@ public class BrowserViewModel extends AndroidViewModel {
         workerThread.start();
         worker = new Handler(workerThread.getLooper());
         graphs.openLoadAnimation();
-        current.observeForever(album -> graphs.setNewData(album == null
-                ? Collections.emptyList()
-                : album.resources));
+        current.observeForever(album -> graphs.setNewData(
+                album == null ? Collections.emptyList()
+                        : album.resources));
         load();
     }
 

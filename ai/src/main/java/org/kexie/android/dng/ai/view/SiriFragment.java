@@ -62,7 +62,8 @@ public class SiriFragment extends Fragment {
         binding.setLifecycleOwner(this);
         binding.setAdapter(viewModel.messages);
         binding.setIsShowPartial(false);
-        viewModel.scroll.observe(this, val -> binding.dataContent.scrollToPosition(val));
+        viewModel.scroll.observe(this, val ->
+                binding.dataContent.scrollToPosition(val));
         viewModel.part.observe(this, s -> {
             binding.setIsShowPartial(!TextUtils.isEmpty(s));
             binding.setSpeechText(s);
@@ -79,9 +80,14 @@ public class SiriFragment extends Fragment {
                     binding.icon.postDelayed(
                             () -> binding.icon.setVisibility(View.VISIBLE),
                             100);
+                }break;
+                case ASR.IDLE: {
+                    waveformView.stop();
+                    binding.setIsShowPartial(false);
+                    binding.icon.postDelayed(
+                            () -> binding.icon.setVisibility(View.VISIBLE),
+                            100);
                 }
-                waveformView.stop();
-                binding.setIsShowPartial(false);
                 break;
                 case ASR.PREPARE: {
                     binding.icon.postDelayed(
@@ -104,10 +110,7 @@ public class SiriFragment extends Fragment {
                 break;
             }
         });
-        viewModel.action.observe(this, runnable -> {
-            requireFragmentManager().popBackStackImmediate();
-            runnable.run();
-        });
+        viewModel.action.observe(this, runnable -> runnable.done(this));
         requireActivity().getOnBackPressedDispatcher()
                 .addCallback(this,
                         new OnBackPressedCallback(true) {

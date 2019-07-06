@@ -28,7 +28,7 @@ public class SiriViewModel
     public final GenericQuickAdapter<TextMessage> messages
             = new GenericQuickAdapter<>(R.layout.item_message, BR.message);
 
-    public final LiveEvent<Runnable> action = new LiveEvent<>();
+    public final LiveEvent<NLP.Behavior> action = new LiveEvent<>();
     public final LiveEvent<Integer> scroll = new LiveEvent<>();
     public final LiveEvent<String> part = new LiveEvent<>();
     public final LiveEvent<Integer> volume = new LiveEvent<>();
@@ -43,7 +43,6 @@ public class SiriViewModel
 
     public SiriViewModel(@NonNull Application application) {
         super(application);
-
         nlp = (NLP) ARouter.getInstance().build(Module.Ai.nlp).navigation(application);
         asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation(application);
         tts = (TTS) ARouter.getInstance().build(Module.Ai.tts).navigation(application);
@@ -60,10 +59,10 @@ public class SiriViewModel
     protected void onCleared() {
         tts.stop();
         asr.stop();
-        worker.removeCallbacksAndMessages(null);
         workerThread.quit();
         worker.removeCallbacksAndMessages(null);
-        asr.addHandler(this);
+        main.removeCallbacksAndMessages(null);
+        asr.removeHandler(this);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class SiriViewModel
     @Override
     public void onResult(boolean isFinal, @NonNull String text) {
         if (isFinal) {
-            messages.addData(new TextMessage(TextMessage.TYPE_USER, text));
+            messages.addData(0, new TextMessage(TextMessage.TYPE_USER, text));
             scroll.post(messages.getHeaderLayoutCount());
             worker.post(() -> {
                 Object result = nlp.process(text);
@@ -92,10 +91,10 @@ public class SiriViewModel
                     main.post(() -> {
                         String aiText = (String) result;
                         tts.send(aiText);
-                        messages.addData(new TextMessage(TextMessage.TYPE_AI, aiText));
+                        messages.addData(0, new TextMessage(TextMessage.TYPE_AI, aiText));
                     });
-                } else if (result instanceof Runnable) {
-                    action.post((Runnable) result);
+                } else if (result instanceof NLP.Behavior) {
+                    action.post((NLP.Behavior) result);
                 }
             });
         } else {

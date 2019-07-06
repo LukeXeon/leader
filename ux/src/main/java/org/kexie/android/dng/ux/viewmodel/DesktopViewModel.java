@@ -19,7 +19,7 @@ public class DesktopViewModel extends AndroidViewModel {
             item("导航", R.drawable.icon_navi, Module.Navi.navigator),
             item("时间", R.drawable.icon_time, Module.Ux.time),
             item("收音机", R.drawable.icon_fm, Module.Ux.fm),
-            item("视频和照片", R.drawable.icon_photo, Module.Media.gallery),
+            item("影库", R.drawable.icon_photo, Module.Media.gallery),
             item("APPS", R.drawable.icon_apps, Module.Ux.apps),
             item("音乐", R.drawable.icon_music, Module.Media.music),
             item("个人中心", R.drawable.icon_info, Module.Ux.userInfo),

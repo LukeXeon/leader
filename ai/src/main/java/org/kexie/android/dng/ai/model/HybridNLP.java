@@ -4,6 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.ai.R;
 import org.kexie.android.dng.ai.widget.CookieCache;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -25,6 +29,22 @@ import retrofit2.http.POST;
 
 @Route(path = Module.Ai.nlp)
 public class HybridNLP implements NLP {
+
+    private static final String[] navigationPrefix = {
+            "打开","启动","开启"
+    };
+    private static final Navigation[] navigationTargets = {
+            item(Module.Navi.navigator, "导航", "地图"),
+            item(Module.Ux.time, "时间", "闹钟"),
+            item(Module.Ux.fm, "收音机"),
+            item(Module.Media.gallery, "影库", "相册", "图库", "视频", "多媒体"),
+            item(Module.Ux.apps, "APP", "应用"),
+            item(Module.Media.music, "音乐", "歌曲"),
+            item(Module.Ux.userInfo, "个人中心", "信息"),
+            item(Module.Ux.weather, "天气"),
+            item(Module.Ux.appStore, "商店"),
+            item(Module.Ux.setting, "设置")
+    };
 
     private static final String TYPE_TEXT = "text";
 
@@ -48,7 +68,32 @@ public class HybridNLP implements NLP {
     @Nullable
     @Override
     public Object process(String text) {
+        Object result = processByLocal(text);
+        if (result != null) {
+            return result;
+        }
         return processByNetwork(text);
+    }
+
+    private Object processByLocal(String text) {
+        if (TextUtils.isEmpty(text)) {
+            return null;
+        }
+        for (String prefix : navigationPrefix) {
+            int index = text.indexOf(prefix);
+            if (index != -1) {
+                text = text.substring(index + prefix.length());
+                Logger.d(text);
+                for (Navigation navigation : navigationTargets) {
+                    for (String key : navigation.keywords) {
+                        if (text.contains(key)) {
+                            return navigation;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private Object processByNetwork(String text) {
@@ -67,14 +112,50 @@ public class HybridNLP implements NLP {
             if (result != null && result.results != null && result.results.size() > 0) {
                 TuringResponse.Result r = result.results.get(0);
                 String text1 = r.values.text;
-                if (TYPE_TEXT.equals(r.resultType) && !TextUtils.isEmpty(text1)) {
+                if (TYPE_TEXT.equals(r.resultType)
+                        && !TextUtils.isEmpty(text1)) {
                     return text1;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return NO_OP;
+        return null;
+    }
+
+    private static Navigation item(String path, String... key) {
+        return new Navigation(key, path);
+    }
+
+    private static final class Navigation
+            implements Behavior {
+
+        final String[] keywords;
+
+        final String path;
+
+        private Navigation(String[] keywords, String path) {
+            this.keywords = keywords;
+            this.path = path;
+        }
+
+        @Override
+        public void done(Object input) {
+            Fragment fragment = (Fragment) input;
+            int id = fragment.getId();
+            fragment.requireFragmentManager()
+                    .popBackStackImmediate();
+            Fragment target = (Fragment) ARouter.getInstance()
+                    .build(path)
+                    .navigation();
+            fragment.requireFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(id, target)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commitAllowingStateLoss();
+
+        }
     }
 
     private interface TuringApi {
