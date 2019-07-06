@@ -1,4 +1,4 @@
-package org.kexie.android.dng.navi.widget;
+package org.kexie.android.dng.common.widget;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -15,7 +15,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 
-import org.kexie.android.dng.navi.R;
+import org.kexie.android.dng.common.R;
 
 import java.util.ArrayList;
 import java.util.Collections;

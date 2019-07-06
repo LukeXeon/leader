@@ -14,11 +14,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application>
-        <provider
-            android:authorities="${applicationId}.waveformview2-initializer"
-            android:multiprocess="false"
-            android:name=".widget.WaveformView$Initializer"
-            android:exported="false"/>
+
         <meta-data android:name="com.baidu.speech.APP_ID"
                    android:value="15252051" />
         <meta-data
@@ -27,6 +23,11 @@
         <meta-data
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="tjwfviK6NWsEcIbuIgMMwVRMfV96dLLx" />
+        <provider
+            android:authorities="${applicationId}.waveformview2-initializer"
+            android:multiprocess="false"
+            android:name=".widget.WaveformView$Initializer"
+            android:exported="false"/>
         <service
             android:exported="false"
             android:enabled="true"

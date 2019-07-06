@@ -28,17 +28,15 @@ public class IjkMusicViewModel
     private static final int MIN_INTERVAL = 500;
 
     public final LiveEvent<Boolean> onComplete = new LiveEvent<>();
-
     public final MutableLiveData<Long> duration = new MutableLiveData<>();
-
-
+    public final MutableLiveData<String> source = new MutableLiveData<>();
+    public final MutableLiveData<Boolean> isPlaying = new MutableLiveData<>(false);
 
     protected AudioManager audioManager;
     protected Handler main;
 
     private final LiveFft fft = new LiveFft();
     private final LivePosition position = new LivePosition();
-    private String path;
     private long marker = 0;
     private long interval = MIN_INTERVAL;
     private IMediaPlayer mediaPlayer;
@@ -81,6 +79,10 @@ public class IjkMusicViewModel
         audioManager = (AudioManager) getApplication().getSystemService(Context.AUDIO_SERVICE);
     }
 
+    public boolean isPlaying() {
+        return mediaPlayer != null && mediaPlayer.isPlaying();
+    }
+
     public LiveData<byte[]> getFft() {
         return fft;
     }
@@ -97,7 +99,7 @@ public class IjkMusicViewModel
         if (mediaPlayer != null) {
             release();
         }
-        this.path = path;
+        source.setValue(path);
         marker = 0;
         if (!TextUtils.isEmpty(path)) {
             open(path);
@@ -107,23 +109,22 @@ public class IjkMusicViewModel
     public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
+            marker = mediaPlayer.getCurrentPosition();
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    void onPauseFromComponent() {
-        if (mediaPlayer != null) {
-            mediaPlayer.pause();
-            marker = mediaPlayer.getCurrentPosition();
-            release();
-        }
+    void onPause() {
+        pause();
+        release();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void onResumeFromComponent() {
+    void onResume() {
         if (mediaPlayer != null) {
             release();
         }
+        String path = source.getValue();
         if (!TextUtils.isEmpty(path)) {
             open(path);
         }
@@ -135,11 +136,14 @@ public class IjkMusicViewModel
         }
     }
 
-    private void start() {
+    public void start() {
+        String path;
         if (mediaPlayer != null) {
             mediaPlayer.start();
             main.removeCallbacksAndMessages(positionUpdater);
             main.post(positionUpdater);
+        } else if (!TextUtils.isEmpty((path = source.getValue()))) {
+            open(path);
         }
     }
 
@@ -187,8 +191,6 @@ public class IjkMusicViewModel
     @Override
     protected void onCleared() {
         release();
-        marker = 0;
-        path = null;
         main.removeCallbacksAndMessages(null);
     }
 

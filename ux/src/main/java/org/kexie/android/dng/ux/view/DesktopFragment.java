@@ -12,19 +12,31 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import org.kexie.android.dng.common.contract.Module;
 import org.kexie.android.dng.ux.R;
 import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
-import org.kexie.android.dng.ux.widget.DesktopController;
+import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
+import org.kexie.android.dng.ux.viewmodel.beans.DesktopItem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 
 @Route(path = Module.Ux.desktop)
 public class DesktopFragment extends Fragment {
 
     private FragmentDesktopBinding binding;
+
+    private DesktopViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = ViewModelProviders.of(this)
+                .get(DesktopViewModel.class);
+    }
 
     @Nullable
     @Override
@@ -40,8 +52,16 @@ public class DesktopFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.list.setAdapter(new DesktopController(getLifecycle(),
-                action -> jumpTo(ARouter.getInstance().build(action))));
+        binding.list.setLayoutManager(new LinearLayoutManager(requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false));
+        binding.list.setAdapter(viewModel.items);
+        viewModel.items.setOnItemClickListener((adapter, view1, position) -> {
+            DesktopItem item = (DesktopItem) adapter.getItem(position);
+            if (item != null) {
+                jumpTo(ARouter.getInstance().build(item.path));
+            }
+        });
     }
 
     private FragmentTransaction getTransaction(Postcard postcard) {

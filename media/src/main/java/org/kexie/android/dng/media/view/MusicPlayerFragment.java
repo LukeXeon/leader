@@ -15,6 +15,7 @@ import org.kexie.android.dng.media.databinding.FragmentMusicPlayerBinding;
 import org.kexie.android.dng.media.util.Utils;
 import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
 import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
+import org.kexie.android.dng.media.widget.MusicCallbacks;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,20 +60,10 @@ public class MusicPlayerFragment extends Fragment {
         binding.musicSeek.setTimePopupWindowViewColor(getResources().getColor(R.color.deeppurplea100));
         binding.musicSeek.setProgressColor(getResources().getColor(R.color.deeppurplea200));
         binding.musicSeek.setThumbColor(getResources().getColor(R.color.deeppurplea700));
-        binding.musicSeek.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
+        binding.musicSeek.setOnMusicListener(new MusicCallbacks() {
             @Override
             public String getTimeText() {
                 return Utils.getProgressTime(binding.musicSeek.getProgress());
-            }
-
-            @Override
-            public String getLrcText() {
-                return null;
-            }
-
-            @Override
-            public void onProgressChanged(MusicSeekBar musicSeekBar) {
-
             }
 
             @Override
@@ -81,7 +72,11 @@ public class MusicPlayerFragment extends Fragment {
             }
         });
         binding.play.setOnClickListener(v -> {
-            
+            if (viewModel.isPlaying()) {
+                viewModel.pause();
+            } else {
+                viewModel.start();
+            }
         });
         //musicPlayer
         viewModel.lyricSet.observe(this, lyrics -> {

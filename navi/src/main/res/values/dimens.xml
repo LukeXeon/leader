@@ -35,11 +35,5 @@
     <dimen name="text_size_normal">16sp</dimen>
     <dimen name="text_size_big">18sp</dimen>
 
-    <declare-styleable name="pile">
-        <attr name="interval" format="dimension" />
-        <attr name="sizeRatio" format="float" />
-        <attr name="scaleStep" format="float" />
-        <attr name="displayCount" format="float" />
-    </declare-styleable>
 
 </resources>

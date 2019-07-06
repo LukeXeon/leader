@@ -38,6 +38,7 @@ import com.amap.api.navi.view.RouteOverLay;
 import com.orhanobut.logger.Logger;
 
 import org.kexie.android.dng.common.contract.Module;
+import org.kexie.android.dng.common.widget.PileLayout;
 import org.kexie.android.dng.navi.R;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorBinding;
 import org.kexie.android.dng.navi.databinding.FragmentNavigatorPreviewBinding;
@@ -48,7 +49,6 @@ import org.kexie.android.dng.navi.viewmodel.beans.PathDescription;
 import org.kexie.android.dng.navi.viewmodel.beans.TipText;
 import org.kexie.android.dng.navi.widget.AMapCompatFragment;
 import org.kexie.android.dng.navi.widget.CarMarker;
-import org.kexie.android.dng.navi.widget.PileLayout;
 
 import java.util.Collection;
 import java.util.List;

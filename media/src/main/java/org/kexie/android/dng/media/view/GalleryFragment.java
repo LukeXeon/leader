@@ -104,7 +104,8 @@ public class GalleryFragment extends Fragment {
                 }
             }
         });
-        viewModel.isLoading.observe(this,
-                isLoading -> binding.progressBar.enableIndeterminateMode(isLoading));
+        viewModel.isLoading.observe(this, isLoading -> binding.progressBar
+                        .enableIndeterminateMode(isLoading));
     }
+
 }
