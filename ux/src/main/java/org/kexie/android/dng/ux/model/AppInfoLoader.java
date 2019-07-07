@@ -18,9 +18,9 @@ import java.util.List;
  * Created by Mr.小世界 on 2018/11/27.
  */
 
-public final class AppInfoProvider {
+public final class AppInfoLoader {
 
-    private AppInfoProvider() {
+    private AppInfoLoader() {
         throw new AssertionError();
     }
 

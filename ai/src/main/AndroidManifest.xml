@@ -26,7 +26,7 @@
         <provider
             android:authorities="${applicationId}.waveformview2-initializer"
             android:multiprocess="false"
-            android:name=".widget.WaveformView$Initializer"
+            android:name=".widget.WaveformView$Loader"
             android:exported="false"/>
         <service
             android:exported="false"

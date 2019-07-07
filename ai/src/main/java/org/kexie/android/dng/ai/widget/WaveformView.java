@@ -17,8 +17,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
-import java.util.Objects;
-
 import androidx.annotation.FloatRange;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -27,9 +25,10 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import java.util.Objects;
+
 public final class WaveformView
-        extends WebView
-{
+        extends WebView {
 
     public enum Provider {
         /**
@@ -40,7 +39,7 @@ public final class WaveformView
         private final WaveformView mView;
 
         Provider() {
-            mView = Initializer.createView();
+            mView = Loader.createView();
         }
 
         @MainThread
@@ -60,9 +59,10 @@ public final class WaveformView
             FrameLayout parent = (FrameLayout) mView.getParent();
             parent.removeView(mView);
             MutableContextWrapper contextWrapper = (MutableContextWrapper) mView.getContext();
-            contextWrapper.setBaseContext(Initializer.mApplication);
+            contextWrapper.setBaseContext(Loader.mApplication);
         }
     }
+
     private final LifecycleObserver mObserver;
 
     @SuppressWarnings("deprecation")
@@ -129,8 +129,7 @@ public final class WaveformView
         mWebView.loadUrl("file:///android_asset/voicewave.html");
     }
 
-    public void prepare()
-    {
+    public void prepare() {
         WebView mWebView = this;
         DisplayMetrics displayMetrics = getContext()
                 .getResources()
@@ -142,8 +141,7 @@ public final class WaveformView
                 null);
     }
 
-    public void setAmplitude(@FloatRange(from = 0.1f, to = 1f) float value)
-    {
+    public void setAmplitude(@FloatRange(from = 0.1f, to = 1f) float value) {
         WebView mWebView = this;
         mWebView.evaluateJavascript("javascript:SW9.setAmplitude(\""
                         + Math.min(Math.max(value, 0.1f), 1f)
@@ -151,8 +149,7 @@ public final class WaveformView
                 null);
     }
 
-    public static final class Initializer extends ContentProvider
-    {
+    public static final class Loader extends ContentProvider {
         private static Application mApplication;
 
         private static WaveformView createView() {
@@ -160,8 +157,7 @@ public final class WaveformView
         }
 
         @Override
-        public boolean onCreate()
-        {
+        public boolean onCreate() {
             mApplication = (Application) Objects.requireNonNull(getContext())
                     .getApplicationContext();
             return Provider.values().length == 1;
@@ -173,31 +169,27 @@ public final class WaveformView
                             @Nullable String[] projection,
                             @Nullable String selection,
                             @Nullable String[] selectionArgs,
-                            @Nullable String sortOrder)
-        {
+                            @Nullable String sortOrder) {
             return null;
         }
 
         @Nullable
         @Override
-        public String getType(@NonNull Uri uri)
-        {
+        public String getType(@NonNull Uri uri) {
             return null;
         }
 
         @Nullable
         @Override
         public Uri insert(@NonNull Uri uri,
-                          @Nullable ContentValues values)
-        {
+                          @Nullable ContentValues values) {
             return null;
         }
 
         @Override
         public int delete(@NonNull Uri uri,
                           @Nullable String selection,
-                          @Nullable String[] selectionArgs)
-        {
+                          @Nullable String[] selectionArgs) {
             return 0;
         }
 
@@ -205,8 +197,7 @@ public final class WaveformView
         public int update(@NonNull Uri uri,
                           @Nullable ContentValues values,
                           @Nullable String selection,
-                          @Nullable String[] selectionArgs)
-        {
+                          @Nullable String[] selectionArgs) {
             return 0;
         }
     }

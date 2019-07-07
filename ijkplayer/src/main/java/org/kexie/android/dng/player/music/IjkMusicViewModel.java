@@ -7,11 +7,6 @@ import android.media.audiofx.Visualizer;
 import android.os.Handler;
 import android.text.TextUtils;
 
-import org.kexie.android.dng.common.util.LiveEvent;
-import org.kexie.android.dng.player.BuildConfig;
-
-import java.io.IOException;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
@@ -19,9 +14,16 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
+
+import org.kexie.android.dng.common.util.LiveEvent;
+import org.kexie.android.dng.player.BuildConfig;
+
+import java.io.IOException;
+
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
+@SuppressWarnings("WeakerAccess")
 public class IjkMusicViewModel
         extends AndroidViewModel
         implements LifecycleObserver {
@@ -29,9 +31,9 @@ public class IjkMusicViewModel
 
     public final LiveEvent<Boolean> onComplete = new LiveEvent<>();
     public final MutableLiveData<Long> duration = new MutableLiveData<>();
-    public final MutableLiveData<String> source = new MutableLiveData<>();
     public final MutableLiveData<Boolean> isPlaying = new MutableLiveData<>(false);
 
+    protected final MutableLiveData<String> source = new MutableLiveData<>();
     protected AudioManager audioManager;
     protected Handler main;
 
@@ -91,11 +93,11 @@ public class IjkMusicViewModel
         return position;
     }
 
-    public void setInterval(long interval) {
+    protected void setInterval(long interval) {
         this.interval = interval;
     }
 
-    public void setNewSource(String path) {
+    protected void setNewSource(String path) {
         if (mediaPlayer != null) {
             release();
         }
@@ -114,13 +116,13 @@ public class IjkMusicViewModel
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    void onPause() {
+    protected void onPause() {
         pause();
         release();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void onResume() {
+    protected void onResume() {
         if (mediaPlayer != null) {
             release();
         }

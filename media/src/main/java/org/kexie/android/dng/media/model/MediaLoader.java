@@ -22,7 +22,7 @@ import java.util.TreeMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class MediaBeanStore {
+public final class MediaLoader {
     private static final AtomicBoolean sInit = new AtomicBoolean(false);
     private static final String _ID = MediaStore.Files.FileColumns._ID;
     private static final String DATA = MediaStore.Files.FileColumns.DATA;
@@ -36,18 +36,18 @@ public final class MediaBeanStore {
             MIME_TYPE, BUCKET_DISPLAY_NAME
     };
 
-    private static MediaBeanStore instance;
+    private static MediaLoader instance;
 
-    public static MediaBeanStore getInstance(Context context) {
+    public static MediaLoader getInstance(Context context) {
         if (sInit.compareAndSet(false, true)) {
-            instance = new MediaBeanStore(context);
+            instance = new MediaLoader(context);
         }
         return instance;
     }
 
     private final Application application;
 
-    private MediaBeanStore(Context context) {
+    private MediaLoader(Context context) {
         application = (Application) context.getApplicationContext();
     }
 

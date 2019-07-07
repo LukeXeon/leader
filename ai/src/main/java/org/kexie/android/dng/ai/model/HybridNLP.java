@@ -3,6 +3,10 @@ package org.kexie.android.dng.ai.model;
 import android.content.Context;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.orhanobut.logger.Logger;
@@ -16,9 +20,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -30,15 +31,13 @@ import retrofit2.http.POST;
 @Route(path = Module.Ai.nlp)
 public class HybridNLP implements NLP {
 
-    private static final String[] navigationPrefix = {
-            "打开","启动","开启"
-    };
+    private static final String[] navigationPrefix = {"打开", "启动", "开启"};
     private static final Navigation[] navigationTargets = {
             item(Module.Navi.navigator, "导航", "地图"),
             item(Module.Ux.time, "时间", "闹钟"),
             item(Module.Ux.fm, "收音机"),
             item(Module.Media.gallery, "影库", "相册", "图库", "视频", "多媒体"),
-            item(Module.Ux.apps, "APP", "应用"),
+            item(Module.Ux.apps, "APP", "app", "应用"),
             item(Module.Media.music, "音乐", "歌曲"),
             item(Module.Ux.userInfo, "个人中心", "信息"),
             item(Module.Ux.weather, "天气"),
@@ -134,7 +133,7 @@ public class HybridNLP implements NLP {
 
         final String path;
 
-        private Navigation(String[] keywords, String path) {
+        Navigation(String[] keywords, String path) {
             this.keywords = keywords;
             this.path = path;
         }

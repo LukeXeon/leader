@@ -9,6 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.ai.R;
@@ -17,13 +24,6 @@ import org.kexie.android.dng.ai.viewmodel.SiriViewModel;
 import org.kexie.android.dng.ai.widget.WaveformView;
 import org.kexie.android.dng.common.contract.ASR;
 import org.kexie.android.dng.common.contract.Module;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 @Route(path = Module.Ai.siri)
 public class SiriFragment extends Fragment {
@@ -69,8 +69,9 @@ public class SiriFragment extends Fragment {
             binding.setSpeechText(s);
         });
         binding.setOnStart(v -> {
+            viewModel.tts.stop();
             viewModel.asr.stop();
-            viewModel.asr.begin();
+            viewModel.asr.begin(0);
         });
         viewModel.volume.observe(this,
                 integer -> waveformView.setAmplitude(integer.floatValue() / 100f));
@@ -122,7 +123,8 @@ public class SiriFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             if (bundle.getBoolean("weakUp")) {
-                viewModel.asr.begin();
+                viewModel.asr.stop();
+                viewModel.asr.begin(ASR.WEAK_UP_BACK_TRACK_IN_MS);
             }
         }
     }

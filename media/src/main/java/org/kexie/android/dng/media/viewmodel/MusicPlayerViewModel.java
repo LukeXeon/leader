@@ -6,12 +6,15 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
 import com.blankj.utilcode.util.FileUtils;
 
 import org.kexie.android.danmakux.converter.LyricParser;
 import org.kexie.android.danmakux.model.Lyric;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-import org.kexie.android.dng.media.model.MediaBeanStore;
+import org.kexie.android.dng.media.model.MediaLoader;
 import org.kexie.android.dng.media.model.beans.Music;
 import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 import org.kexie.android.dng.media.widget.MusicQuickAdapter;
@@ -21,8 +24,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
 
@@ -51,11 +52,11 @@ public class MusicPlayerViewModel extends IjkMusicViewModel {
         initMusicList();
     }
 
-    @Override
-    public void setNewSource(String path) {
-        super.setNewSource(path);
+    public void setNewSource(MusicDetail detail) {
+        setNewSource(detail.path);
+        current.setValue(detail);
         worker.post(() -> {
-            File file = new File(path);
+            File file = new File(detail.path);
             String noExt = FileUtils.getFileNameNoExtension(file);
             File[] files = file.getParentFile()
                     .listFiles(pathname -> {
@@ -83,7 +84,8 @@ public class MusicPlayerViewModel extends IjkMusicViewModel {
 
     private void initMusicList() {
         worker.post(()-> {
-            List<Music> musicList = MediaBeanStore.getInstance(getApplication()).loadMusic();
+            List<Music> musicList = MediaLoader.getInstance(getApplication())
+                    .loadMusic();
             List<MusicDetail> musicDetails = StreamSupport.stream(musicList)
                     .map(mediaInfo -> new MusicDetail(
                             mediaInfo.path,

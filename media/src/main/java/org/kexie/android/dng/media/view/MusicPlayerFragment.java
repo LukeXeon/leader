@@ -6,6 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.zml.libs.widget.MusicSeekBar;
 
@@ -16,12 +22,6 @@ import org.kexie.android.dng.media.util.Utils;
 import org.kexie.android.dng.media.viewmodel.MusicPlayerViewModel;
 import org.kexie.android.dng.media.viewmodel.beans.MusicDetail;
 import org.kexie.android.dng.media.widget.MusicCallbacks;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 @Route(path = Module.Media.music)
 public class MusicPlayerFragment extends Fragment {
@@ -79,6 +79,7 @@ public class MusicPlayerFragment extends Fragment {
             }
         });
         //musicPlayer
+        getLifecycle().addObserver(viewModel);
         viewModel.lyricSet.observe(this, lyrics -> {
             binding.lrcView.setLrc(lyrics);
             binding.lrcView.start();
@@ -96,10 +97,10 @@ public class MusicPlayerFragment extends Fragment {
                     binding.lrcView.seekTo(Utils.safeUnBoxInt(position));
                 });
         binding.musicSeek.setEnabled(true);
-        viewModel.details.setOnItemChildClickListener((adapter, view1, position) -> {
+        viewModel.details.setOnItemClickListener((adapter, view1, position) -> {
             MusicDetail detail = (MusicDetail) adapter.getItem(position);
             if (detail != null) {
-                viewModel.setNewSource(detail.path);
+                viewModel.setNewSource(detail);
             }
         });
         viewModel.current.observe(this,

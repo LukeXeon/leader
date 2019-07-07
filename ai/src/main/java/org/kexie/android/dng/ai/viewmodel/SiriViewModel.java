@@ -5,6 +5,10 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+
 import com.alibaba.android.arouter.launcher.ARouter;
 
 import org.kexie.android.dng.ai.BR;
@@ -16,10 +20,6 @@ import org.kexie.android.dng.common.contract.NLP;
 import org.kexie.android.dng.common.contract.TTS;
 import org.kexie.android.dng.common.util.LiveEvent;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
 
 public class SiriViewModel
         extends AndroidViewModel
@@ -39,7 +39,7 @@ public class SiriViewModel
     private final HandlerThread workerThread;
     private final NLP nlp;
     public final ASR asr;
-    private final TTS tts;
+    public final TTS tts;
 
     public SiriViewModel(@NonNull Application application) {
         super(application);
@@ -47,7 +47,6 @@ public class SiriViewModel
         asr = (ASR) ARouter.getInstance().build(Module.Ai.asr).navigation(application);
         tts = (TTS) ARouter.getInstance().build(Module.Ai.tts).navigation(application);
         tts.stop();
-        asr.stop();
         asr.addHandler(this);
         workerThread = new HandlerThread(toString());
         workerThread.start();
@@ -77,7 +76,7 @@ public class SiriViewModel
 
     @Override
     public void onWeakUp(@NonNull String text) {
-        asr.begin();
+        asr.begin(ASR.WEAK_UP_BACK_TRACK_IN_MS);
     }
 
     @Override
@@ -100,5 +99,10 @@ public class SiriViewModel
         } else {
             part.post(text);
         }
+    }
+
+    @Override
+    public void onCancel() {
+
     }
 }

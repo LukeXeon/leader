@@ -7,23 +7,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
+
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.ux.BR;
 import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.model.AppInfoProvider;
+import org.kexie.android.dng.ux.model.AppInfoLoader;
 import org.kexie.android.dng.ux.model.beans.AppInfo;
 import org.kexie.android.dng.ux.viewmodel.beans.App;
 
 import java.util.List;
 
-import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
-import androidx.arch.core.util.Function;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
 import java8.util.Objects;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
@@ -32,14 +31,7 @@ public class AppsViewModel extends AndroidViewModel {
 
     private BroadcastReceiver broadcastReceiver;
 
-    private HandlerThread workerThread = new HandlerThread(toString());
-
     private Handler mainWorker = new Handler(Looper.getMainLooper());
-
-    private Handler worker = ((Function<HandlerThread, Handler>) input -> {
-        input.start();
-        return new Handler(input.getLooper());
-    }).apply(workerThread);
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
@@ -47,7 +39,6 @@ public class AppsViewModel extends AndroidViewModel {
 
     public AppsViewModel(@NonNull Application application) {
         super(application);
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
@@ -61,7 +52,7 @@ public class AppsViewModel extends AndroidViewModel {
                 }
                 String packageName = uri.getSchemeSpecificPart();
                 if (Intent.ACTION_PACKAGE_ADDED.equals(intent.getAction())) {
-                    AppInfo appInfo = AppInfoProvider.getLaunchApp(getApplication(), packageName);
+                    AppInfo appInfo = AppInfoLoader.getLaunchApp(getApplication(), packageName);
                     if (appInfo != null) {
                         App app = new App(
                                 appInfo.getName(),
@@ -97,8 +88,8 @@ public class AppsViewModel extends AndroidViewModel {
     @MainThread
     private void load() {
         isLoading.setValue(true);
-        worker.post(() -> {
-            List<App> list = StreamSupport.stream(AppInfoProvider
+        new Thread(() -> {
+            List<App> list = StreamSupport.stream(AppInfoLoader
                     .getLaunchApps(getApplication()))
                     .map(info -> new App(
                             info.getName(),
@@ -111,12 +102,11 @@ public class AppsViewModel extends AndroidViewModel {
                 appAdapter.setNewData(list);
                 isLoading.setValue(false);
             });
-        });
+        }).start();
     }
 
     @Override
     protected void onCleared() {
         getApplication().unregisterReceiver(broadcastReceiver);
-        workerThread.quit();
     }
 }

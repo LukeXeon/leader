@@ -7,6 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 
 import org.kexie.android.dng.ai.R;
@@ -14,13 +20,6 @@ import org.kexie.android.dng.ai.databinding.FragmentSpeakerBinding;
 import org.kexie.android.dng.ai.viewmodel.SpeakerViewModel;
 import org.kexie.android.dng.common.contract.ASR;
 import org.kexie.android.dng.common.contract.Module;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
 
 @Route(path = Module.Ai.speaker)
 public class SpeakerFragment extends Fragment {
@@ -51,6 +50,8 @@ public class SpeakerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel.part.observe(this, s -> binding.setText(s));
+        viewModel.cancel.observe(this,
+                __ -> binding.setText("前重试"));
         viewModel.finish.observe(this, s -> {
             binding.setText(s);
             requireFragmentManager().popBackStackImmediate();
@@ -66,13 +67,5 @@ public class SpeakerFragment extends Fragment {
                 binding.setText("识别中......");
             }
         });
-        requireActivity().getOnBackPressedDispatcher()
-                .addCallback(this,
-                        new OnBackPressedCallback(true) {
-                            @Override
-                            public void handleOnBackPressed() {
-                                requireFragmentManager().popBackStackImmediate();
-                            }
-                        });
     }
 }

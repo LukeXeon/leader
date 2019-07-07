@@ -1,16 +1,17 @@
 package org.kexie.android.dng.common.contract;
 
-import com.alibaba.android.arouter.facade.template.IProvider;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
+import com.alibaba.android.arouter.facade.template.IProvider;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public interface ASR extends IProvider {
+    int WEAK_UP_BACK_TRACK_IN_MS = 1500;
     //Initialization-->Idle-->Prepare-->Speaking-->Recognition-->Idle
     //初始化中
     int INITIALIZATION = 0;
@@ -38,7 +39,7 @@ public interface ASR extends IProvider {
     @IntRange(from = 0, to = 100)
     int getVolume();
 
-    boolean begin();
+    void begin(int ms);
 
     void stop();
 
@@ -54,9 +55,17 @@ public interface ASR extends IProvider {
 
         @MainThread
         void onResult(boolean isFinal, @NonNull String text);
+
+        @MainThread
+        void onCancel();
     }
 
     abstract class WeakUpHandler implements Handler {
+
+        @Override
+        public void onCancel() {
+
+        }
 
         @Override
         public final void onStatusUpdate(int status) {

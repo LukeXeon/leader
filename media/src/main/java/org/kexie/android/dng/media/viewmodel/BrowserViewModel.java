@@ -8,7 +8,7 @@ import android.os.Looper;
 import org.kexie.android.dng.common.BR;
 import org.kexie.android.dng.common.widget.GenericQuickAdapter;
 import org.kexie.android.dng.media.R;
-import org.kexie.android.dng.media.model.MediaBeanStore;
+import org.kexie.android.dng.media.model.MediaLoader;
 import org.kexie.android.dng.media.model.beans.Graph;
 import org.kexie.android.dng.media.viewmodel.beans.AlbumDetail;
 
@@ -53,7 +53,7 @@ public class BrowserViewModel extends AndroidViewModel {
     private void load() {
         isLoading.setValue(true);
         worker.post(() -> {
-            List<Graph.Album> albums = MediaBeanStore.getInstance(getApplication()).loadGraph();
+            List<Graph.Album> albums = MediaLoader.getInstance(getApplication()).loadGraph();
             List<AlbumDetail> albumDetails = new LinkedList<>();
             for (Graph.Album album : albums) {
                 albumDetails.add(new AlbumDetail(album.name, album.resources));

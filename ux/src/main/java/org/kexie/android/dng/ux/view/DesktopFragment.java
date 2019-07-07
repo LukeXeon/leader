@@ -5,16 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.alibaba.android.arouter.facade.Postcard;
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
-
-import org.kexie.android.dng.common.contract.Module;
-import org.kexie.android.dng.ux.R;
-import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
-import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
-import org.kexie.android.dng.ux.viewmodel.beans.DesktopItem;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -22,6 +12,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.alibaba.android.arouter.facade.Postcard;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+
+import org.kexie.android.dng.common.contract.Module;
+import org.kexie.android.dng.ux.R;
+import org.kexie.android.dng.ux.databinding.FragmentDesktopBinding;
+import org.kexie.android.dng.ux.viewmodel.AppsViewModel;
+import org.kexie.android.dng.ux.viewmodel.DesktopViewModel;
+import org.kexie.android.dng.ux.viewmodel.beans.DesktopItem;
 
 
 @Route(path = Module.Ux.desktop)
@@ -36,6 +37,8 @@ public class DesktopFragment extends Fragment {
         super.onCreate(savedInstanceState);
         viewModel = ViewModelProviders.of(this)
                 .get(DesktopViewModel.class);
+        ViewModelProviders.of(requireActivity())
+                .get(AppsViewModel.class);
     }
 
     @Nullable

@@ -3,6 +3,10 @@ package org.kexie.android.dng.ai.model;
 import android.content.Context;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
+import androidx.core.math.MathUtils;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.baidu.speech.EventListener;
 import com.baidu.speech.EventManager;
@@ -18,13 +22,9 @@ import org.kexie.android.dng.common.contract.Module;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
-
 @Route(path = Module.Ai.asr)
 public class BaiduASR implements ASR, EventListener {
 
-    private static final int BACK_TRACK_IN_MS = 1500;
     private static final int ERROR_NONE = 0;
     private static final int NORMAL_VID = 1536;
     private static final String WEAK_UP_BIN = "assets:///WakeUp.bin";
@@ -45,23 +45,21 @@ public class BaiduASR implements ASR, EventListener {
     }
 
     @Override
-    public boolean begin() {
+    public void begin(int ms) {
         // 必须主线程
         assertMainThread();
         // 必须待机态
         if (IDLE != session.status) {
             Logger.d("asr no idle");
-            return false;
         }
         ArrayMap<String, Object> map = new ArrayMap<>(4);
         map.put(SpeechConstant.ACCEPT_AUDIO_VOLUME, true);
         map.put(SpeechConstant.VAD, SpeechConstant.VAD_DNN);
         map.put(SpeechConstant.PID, NORMAL_VID);
         map.put(SpeechConstant.AUDIO_MILLS,
-                System.currentTimeMillis() - BACK_TRACK_IN_MS);
+                System.currentTimeMillis() - MathUtils.clamp(ms, 0, WEAK_UP_BACK_TRACK_IN_MS));
         eventManager.send(SpeechConstant.ASR_START, gson.toJson(map), null, 0, 0);
         session.onStatusUpdate(PREPARE);
-        return true;
     }
 
     @Override
@@ -100,7 +98,7 @@ public class BaiduASR implements ASR, EventListener {
 
     @Override
     public void onEvent(String name, String pram, byte[] data, int offset, int length) {
- //       Logger.d(name);
+        //       Logger.d(name);
         if (session.status == INITIALIZATION
                 && SpeechConstant.CALLBACK_EVENT_WAKEUP_READY.equals(name)) {
             session.status = IDLE;
@@ -127,8 +125,14 @@ public class BaiduASR implements ASR, EventListener {
                 session.onVolumeUpdate(volumeResult.volumePercent);
             }
             break;
-            // 引擎完成 or 取消
-            case SpeechConstant.CALLBACK_EVENT_ASR_CANCEL:
+            // 取消
+            case SpeechConstant.CALLBACK_EVENT_ASR_CANCEL: {
+                session.onStatusUpdate(IDLE);
+                session.onVolumeUpdate(0);
+                session.onCancel();
+            }
+            break;
+            // 引擎完成
             case SpeechConstant.CALLBACK_EVENT_ASR_FINISH: {
                 session.onStatusUpdate(IDLE);
                 session.onVolumeUpdate(0);
@@ -177,9 +181,7 @@ public class BaiduASR implements ASR, EventListener {
         public void onStatusUpdate(int status) {
             this.status = status;
             for (Handler handler : handlers) {
-                if (handler != null) {
-                    handler.onStatusUpdate(status);
-                }
+                handler.onStatusUpdate(status);
             }
         }
 
@@ -187,27 +189,28 @@ public class BaiduASR implements ASR, EventListener {
         public void onVolumeUpdate(int value) {
             this.volume = value;
             for (Handler handler : handlers) {
-                if (handler != null) {
-                    handler.onVolumeUpdate(value);
-                }
+                handler.onVolumeUpdate(value);
             }
         }
 
         @Override
         public void onWeakUp(@NonNull String text) {
             for (Handler handler : handlers) {
-                if (handler != null) {
-                    handler.onWeakUp(text);
-                }
+                handler.onWeakUp(text);
             }
         }
 
         @Override
         public void onResult(boolean isFinal, @NonNull String text) {
             for (Handler handler : handlers) {
-                if (handler != null) {
-                    handler.onResult(isFinal, text);
-                }
+                handler.onResult(isFinal, text);
+            }
+        }
+
+        @Override
+        public void onCancel() {
+            for (Handler handler : handlers) {
+                handler.onCancel();
             }
         }
 
@@ -249,7 +252,6 @@ public class BaiduASR implements ASR, EventListener {
         @SerializedName("results_recognition")
         String[] results;
 
-        @SuppressWarnings("All")
         boolean hasError() {
             return error != ERROR_NONE;
         }
